@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="page-grid">
+    <main class="site-shell page-grid">
       <aside class="site-nav" aria-label="Main navigation">
         <a class="brand" href="#" aria-label="Andre Ubeyvolk home">
           <img class="brand-mark" src="./assets/logo.svg" alt="Andre Ubeyvolk" />
@@ -24,7 +24,7 @@
         </nav>
       </aside>
 
-      <section class="intro" aria-label="Project introduction">
+      <section class="section-intro intro" aria-label="Project introduction">
         <p>
           In-house is when I work inside your company. Building the team,
           shaping the brand identity, and handling visual communications end to
@@ -32,14 +32,14 @@
         </p>
       </section>
 
-      <section class="project-frame" aria-label="Project content">
-        <header class="project-header">
+      <section class="content-pane project-frame" aria-label="Project content">
+        <header class="content-pane__header project-header">
           <h1>Stickerburg</h1>
           <button class="close-button" type="button" aria-label="Close project">[x]</button>
         </header>
 
-        <div class="project-scroll">
-          <article class="project-content">
+        <div class="content-pane__scroll project-scroll custom-scroll">
+          <article class="project-view project-content">
             <figure class="media media--wide media--hero">
               <img src="./assets/cap.jpg" alt="Black branded cap with Stickerburg mark" />
             </figure>
@@ -93,7 +93,7 @@
 
             <footer class="project-footer">
               <p>Want something<br />like this?<br />Let's talk.</p>
-              <address>
+              <address class="social-links">
                 <a href="mailto:hello@example.com">Mail</a>
                 <a href="#">Telegram</a>
                 <a href="#">LinkedIn</a>
