@@ -26,6 +26,13 @@ Current state:
   - `social-links`
 - Extracted reusable scrollbar styling into `.custom-scroll`.
 - Added active menu italic style through `.nav-list a.is-active`.
+- Added static route prototype:
+  - `inhouse/index.html`
+  - `inhouse/stickerburg/index.html`
+- Refined scrollbar sizing variables:
+  - `--scrollbar-thumb-width`
+  - `--scrollbar-track-padding`
+  - `--scrollbar-gutter`
 
 ## Core Direction
 

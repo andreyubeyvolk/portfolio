@@ -1,7 +1,9 @@
 :root {
   --page-margin: 16px;
   --grid-gap: 16px;
-  --scrollbar-gutter: 16px;
+  --scrollbar-thumb-width: 8px;
+  --scrollbar-track-padding: 4px;
+  --scrollbar-gutter: calc(var(--scrollbar-thumb-width) + var(--scrollbar-track-padding) * 2);
   --link-underline-thickness: 1px;
   --text: #111;
   --muted: #f2f2f2;
@@ -182,6 +184,7 @@ img {
 }
 
 .close-button {
+  display: block;
   flex: 0 0 auto;
   width: auto;
   min-width: 0;
@@ -207,12 +210,13 @@ img {
 .custom-scroll {
   overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-gutter: stable;
   scrollbar-width: auto;
   scrollbar-color: #000 #fff;
 }
 
 .custom-scroll::-webkit-scrollbar {
-  width: 16px;
+  width: var(--scrollbar-gutter);
 }
 
 .custom-scroll::-webkit-scrollbar-track {
@@ -227,7 +231,7 @@ img {
 
 .custom-scroll::-webkit-scrollbar-thumb {
   min-height: 48px;
-  border: 4px solid transparent;
+  border: var(--scrollbar-track-padding) solid transparent;
   border-radius: 0;
   background: #000;
   background-clip: content-box;
