@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Andre Ubeyvolk - Project</title>
+    <title>Andre Ubeyvolk</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -12,97 +12,51 @@
   <body>
     <main class="site-shell page-grid">
       <aside class="site-nav" aria-label="Main navigation">
-        <a class="brand" href="#" aria-label="Andre Ubeyvolk home">
+        <a class="brand" href="./index.html" aria-label="Andre Ubeyvolk home">
           <img class="brand-mark" src="./assets/logo.svg" alt="Andre Ubeyvolk" />
         </a>
 
         <nav class="nav-list">
-          <a class="is-active" href="#">Inhouse</a>
-          <a href="#">Brands</a>
-          <a href="#">Archive</a>
-          <a href="#">About</a>
+          <a href="./inhouse/">Inhouse</a>
+          <a href="./brands/">Brands</a>
+          <a href="./archive/">Archive</a>
+          <a href="./about/">About</a>
         </nav>
       </aside>
 
-      <section class="section-intro intro" aria-label="Project introduction">
+      <section class="section-intro home-intro" aria-label="Andre Ubeyvolk introduction">
         <p>
-          In-house is when I work inside your company. Building the team,
-          shaping the brand identity, and handling visual communications end to
-          end from the inside.
+          Andrey is a conceptual art director specializing in visual
+          communications and brand identity for tech companies and Series A/B
+          startups ready to scale.
         </p>
+
+        <figure class="home-portrait">
+          <img src="./assets/portrait.jpg" alt="Portrait of Andrey Ubeyvolk" />
+        </figure>
       </section>
 
-      <section class="content-pane project-frame" aria-label="Project content">
-        <header class="content-pane__header project-header">
-          <h1>Stickerburg</h1>
-          <button class="close-button" type="button" aria-label="Close project">[x]</button>
-        </header>
+      <section class="content-pane home-pane" aria-label="Showreel and contacts">
+        <article class="home-view">
+          <button class="reel-card" type="button" aria-label="Play reel">
+            <img class="reel-card__poster" src="./assets/reel.jpg" alt="" />
+            <span class="reel-card__cta" aria-hidden="true">
+              <img class="reel-card__icon" src="./assets/reel-icon.svg" alt="" />
+              <img class="reel-card__text" src="./assets/reel-text.svg" alt="" />
+            </span>
+          </button>
 
-        <div class="content-pane__scroll project-scroll custom-scroll">
-          <article class="project-view project-content">
-            <figure class="media media--wide media--hero">
-              <img src="./assets/cap.jpg" alt="Black branded cap with Stickerburg mark" />
-            </figure>
-
-            <div class="split-row">
-              <figure class="media">
-                <img src="./assets/laptop.jpg" alt="Stickerburg printed identity card" />
-              </figure>
-              <div class="copy">
-                <p>
-                  Stickerburg is a print studio specializing in stickers, with
-                  a strong craft-driven reputation and a long-standing identity.
-                  Over time, the logo stopped reflecting the level of expertise
-                  and maturity the studio had reached.
-                </p>
-                <p>
-                  The goal was to evolve it into something more systematic and
-                  considered, while keeping it simple, recognizable, and true to
-                  its character.
-                </p>
-                <p>
-                  We approached Saint Petersburg as a structural language rather
-                  than a set of symbols. Angled building corners, cast-iron
-                  forms, and urban geometry informed the visual logic.
-                </p>
-              </div>
-            </div>
-
-            <figure class="media media--wide media--tape">
-              <img src="./assets/box.jpg" alt="Stickerburg tape mark on paper" />
-            </figure>
-
-            <div class="image-grid">
-              <figure class="media">
-                <img src="./assets/appart.jpg" alt="Stickerburg sign in an interior" />
-              </figure>
-              <figure class="media">
-                <img src="./assets/ring.jpg" alt="Sticker roll with Stickerburg symbol" />
-              </figure>
-            </div>
-
-            <div class="bottom-copy">
-              <p>
-                The identity centers on a refined multi-sided form, somewhere
-                between an architectural fragment and a stamped sign. Paired
-                with restrained typography, it builds a system that feels calm,
-                precise, and repeatable.
-              </p>
-              <a href="#">Download project images [↓]</a>
-            </div>
-
-            <footer class="project-footer">
-              <p>Want something<br />like this?<br />Let's talk.</p>
-              <address class="social-links">
-                <a href="mailto:hello@example.com">Mail</a>
-                <a href="#">Telegram</a>
-                <a href="#">LinkedIn</a>
-              </address>
-            </footer>
-          </article>
-        </div>
+          <address class="home-socials">
+            <button class="copy-mail-link" type="button" data-copy-email="6169393@gmail.com">Mail</button>
+            <a href="https://t.me/andreyubeyvolk" target="_blank" rel="noreferrer">Telegram</a>
+            <a href="https://www.linkedin.com/in/andrei-ubeyvolk-b318a817b" target="_blank" rel="noreferrer">LinkedIn</a>
+            <a href="https://www.youtube.com/@visual_athleticism" target="_blank" rel="noreferrer">YouTube</a>
+            <a href="https://t.me/visual_athleticism" target="_blank" rel="noreferrer">TG Channel</a>
+            <a href="https://instagram.com/andreyubeyvolk/" target="_blank" rel="noreferrer">Instagram</a>
+          </address>
+        </article>
       </section>
     </main>
-    <script src="./scroll.js"></script>
+    <script src="./main.js"></script>
   </body>
 </html>

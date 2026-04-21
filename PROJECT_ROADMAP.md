@@ -34,6 +34,15 @@ Current state:
   - `--scrollbar-track-padding`
   - `--scrollbar-gutter`
 - Native Chrome/Windows scrollbar styling was not enough for the desired sharp black rectangle. Started custom visual scrollbar in `scroll.js`, with native scroll hidden inside `.custom-scroll`.
+- Replaced root `index.html` with home page prototype:
+  - intro text and portrait;
+  - reel poster with custom play/title assets;
+  - two-column social links under reel.
+- Added home assets:
+  - `assets/reel.jpg`
+  - `assets/portrait.jpg`
+  - `assets/reel-icon.svg`
+  - `assets/reel-text.svg`
 
 ## Core Direction
 
