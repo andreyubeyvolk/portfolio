@@ -33,6 +33,7 @@ Current state:
   - `--scrollbar-thumb-width`
   - `--scrollbar-track-padding`
   - `--scrollbar-gutter`
+- Native Chrome/Windows scrollbar styling was not enough for the desired sharp black rectangle. Started custom visual scrollbar in `scroll.js`, with native scroll hidden inside `.custom-scroll`.
 
 ## Core Direction
 
