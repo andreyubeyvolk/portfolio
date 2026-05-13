@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Andre Ubeyvolk - About</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../styles.css" />
+    <style>
+      .about-pane {
+        grid-template-rows: minmax(0, 1fr);
+      }
+
+      .about-view {
+        display: grid;
+        grid-template-columns: repeat(16, minmax(0, 1fr));
+        column-gap: var(--grid-gap);
+        row-gap: 0;
+        padding-bottom: 58px;
+      }
+
+      .about-photo {
+        grid-column: 1 / -1;
+        height: 50vh;
+        margin: 0 0 6px;
+        background: var(--muted);
+      }
+
+      .about-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
+      }
+
+      /* Sections */
+      .about-section {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(16, minmax(0, 1fr));
+        column-gap: var(--grid-gap);
+        align-items: start;
+        border-top: 4px solid var(--text);
+        padding-top: 2px;
+        margin-bottom: 80px;
+      }
+
+      /* No line above first section (Focus) */
+      .about-section:first-of-type {
+        border-top: none;
+        padding-top: 0;
+      }
+
+      .about-section__label {
+        grid-column: 1 / 5;
+        margin: 0;
+        font: inherit;
+      }
+
+      .about-section__content {
+        grid-column: 5 / 17;
+      }
+
+      .about-section--contact .about-section__content {
+        grid-column: 9 / 17;
+      }
+
+      .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: var(--grid-gap);
+        row-gap: 16px;
+      }
+
+      .contact-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        border-top: 2px solid var(--text);
+        border-left: 0;
+        border-right: 0;
+        border-bottom: 0;
+        padding: 2px 0 0;
+        margin: 0;
+        background: none;
+        font: inherit;
+        color: inherit;
+        text-decoration: none;
+        text-align: left;
+        cursor: pointer;
+        transition: color 150ms ease, background-color 150ms ease;
+      }
+
+      .contact-link:hover {
+        color: #fff;
+        background-color: #000;
+      }
+
+      .contact-grid .contact-link:nth-child(-n+2) {
+        border-top: none;
+        padding-top: 2px;
+        margin-top: -2px;
+      }
+
+      /* Service rows (Focus) — 2px divider, 4px gap, 32px between blocks */
+      .service-row {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        column-gap: var(--grid-gap);
+        align-items: start;
+        margin-bottom: 32px;
+      }
+
+      .service-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .service-row + .service-row {
+        border-top: 2px solid var(--text);
+        padding-top: 2px;
+      }
+
+      .service-row__title {
+        grid-column: 1 / 5;
+      }
+
+      .service-row__desc {
+        grid-column: 5 / 13;
+        margin: 0;
+      }
+
+      /* Leading Team */
+      .about-section__content > p {
+        margin: 0;
+      }
+
+      /* Experience rows */
+      .exp-row {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        column-gap: var(--grid-gap);
+        align-items: start;
+        margin-bottom: 32px;
+      }
+
+      .exp-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .exp-row + .exp-row {
+        border-top: 2px solid var(--text);
+        padding-top: 2px;
+      }
+
+      .exp-row__company { grid-column: 1 / 5; }
+      .exp-row__role    { grid-column: 5 / 9; }
+      .exp-row__years   { grid-column: 9 / 13; }
+
+
+      /* Download — right quarter, 4px divider */
+      .about-download {
+        grid-column: 13 / 17;
+        border-top: 4px solid var(--text);
+        padding-top: 0;
+      }
+
+      .about-download a {
+        display: block;
+        padding-top: 2px;
+        color: inherit;
+        transition: color 150ms ease, background-color 150ms ease;
+      }
+
+      .about-download a:hover {
+        color: #fff;
+        background-color: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="site-shell page-grid">
+      <aside class="site-nav" aria-label="Main navigation">
+        <a class="brand" href="../index.html" aria-label="Andre Ubeyvolk home">
+          <img class="brand-mark" src="../assets/logo.svg" alt="Andre Ubeyvolk" />
+        </a>
+
+        <nav class="nav-list">
+          <a href="../inhouse/index.html">Inhouse</a>
+          <a href="../brands/index.html">Brands</a>
+          <a href="../archive/index.html">Archive</a>
+          <a class="is-active" href="../about/index.html">About</a>
+        </nav>
+      </aside>
+
+      <section class="section-intro home-intro" aria-label="About Andrey Ubeyvolk">
+        <p>
+          Andrey is a conceptual art director specializing in visual
+          communications and brand identity for tech companies and Series A/B
+          startups ready to scale.
+        </p>
+
+        <figure class="home-portrait">
+          <img src="../assets/portrait.jpg" alt="Portrait of Andrey Ubeyvolk" />
+        </figure>
+      </section>
+
+      <section class="content-pane about-pane" aria-label="About content">
+        <div class="content-pane__scroll project-scroll custom-scroll">
+          <article class="about-view">
+
+            <figure class="about-photo">
+              <img src="../assets/about-hero.jpg" alt="Andrey Ubeyvolk" />
+            </figure>
+
+            <!-- Focus — no top line (first section) -->
+            <section class="about-section">
+              <h2 class="about-section__label">Focus</h2>
+              <div class="about-section__content">
+                <div class="service-row">
+                  <span class="service-row__title">Brand Strategy</span>
+                  <p class="service-row__desc">The business foundation before anything is made—core narrative and direction that give design its reason to exist.</p>
+                </div>
+                <div class="service-row">
+                  <span class="service-row__title">Brand Identity</span>
+                  <p class="service-row__desc">From a core visual system to a full marketing ecosystem—across every touchpoint, digital and physical. Including artificial intelligence for visual generation and team workflow.</p>
+                </div>
+                <div class="service-row">
+                  <span class="service-row__title">Visual Artifacts</span>
+                  <p class="service-row__desc">Specific, considered assets created within your existing brand—when you need one thing done right.</p>
+                </div>
+                <div class="service-row">
+                  <span class="service-row__title">Design Consulting</span>
+                  <p class="service-row__desc">A sharp audit of what you have—what works, what doesn't, and why. Competitor research, best practices, and clear directions for where to win or differentiate.</p>
+                </div>
+                <div class="service-row">
+                  <span class="service-row__title">Mentoring</span>
+                  <p class="service-row__desc">For designers at any level—design principles, quality control, artistic practice, and a clear path to growth.</p>
+                </div>
+              </div>
+            </section>
+
+            <!-- Leading Team — 4px top line -->
+            <section class="about-section">
+              <h2 class="about-section__label">Leading Team</h2>
+              <div class="about-section__content">
+                <p>Demanding on detail, logic, and visual quality. I help hire strong players, share knowledge directly, and develop each designer with close attention to their personality and strengths. Strong teams build strong brands—and brands that grow.</p>
+              </div>
+            </section>
+
+            <!-- Experience — 4px top line -->
+            <section class="about-section">
+              <h2 class="about-section__label">Experience</h2>
+              <div class="about-section__content">
+                <div class="exp-row">
+                  <span class="exp-row__company">Sumsub</span>
+                  <span class="exp-row__role">Art Director</span>
+                  <span class="exp-row__years">2021–2025</span>
+                </div>
+                <div class="exp-row">
+                  <span class="exp-row__company">Nimax</span>
+                  <span class="exp-row__role">Graphic designer</span>
+                  <span class="exp-row__years">2021</span>
+                </div>
+                <div class="exp-row">
+                  <span class="exp-row__company">SKS Bank</span>
+                  <span class="exp-row__role">UX/UI & Communication Designer</span>
+                  <span class="exp-row__years">2020–2021</span>
+                </div>
+                <div class="exp-row">
+                  <span class="exp-row__company">Gazprom Neft</span>
+                  <span class="exp-row__role">UX/UI & Communication Designer</span>
+                  <span class="exp-row__years">2018–2020</span>
+                </div>
+                <div class="exp-row">
+                  <span class="exp-row__company">Freelance</span>
+                  <span class="exp-row__role">Art Director & Graphic designer</span>
+                  <span class="exp-row__years">2014–2018</span>
+                </div>
+                <div class="exp-row">
+                  <span class="exp-row__company">Leonid Alexeev Design Studio</span>
+                  <span class="exp-row__role">Graphic designer</span>
+                  <span class="exp-row__years">2011–2014</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- Contact — 4px top line -->
+            <section class="about-section about-section--contact">
+              <h2 class="about-section__label">Contact</h2>
+              <div class="about-section__content">
+                <div class="contact-grid">
+                  <button class="contact-link" type="button" data-copy-email="6169393@gmail.com">Mail<span class="copy-label" aria-hidden="true">Copied</span></button>
+                  <a class="contact-link" href="https://www.youtube.com/@visual_athleticism" target="_blank" rel="noreferrer">YouTube</a>
+                  <a class="contact-link" href="https://t.me/andreyubeyvolk" target="_blank" rel="noreferrer">Telegram</a>
+                  <a class="contact-link" href="https://t.me/visual_athleticism" target="_blank" rel="noreferrer">Telegram channel</a>
+                  <a class="contact-link" href="https://instagram.com/andreyubeyvolk/" target="_blank" rel="noreferrer">Instagram</a>
+                  <a class="contact-link" href="https://www.linkedin.com/in/andrei-ubeyvolk-b318a817b" target="_blank" rel="noreferrer">LinkedIn</a>
+                </div>
+              </div>
+            </section>
+
+            <!-- Download — cols 13-17, 4px top line -->
+            <div class="about-download">
+              <a href="#">Download PDF-resume [↓]</a>
+            </div>
+
+          </article>
+        </div>
+      </section>
+    </main>
+    <script src="../scroll.js"></script>
+    <script src="../main.js"></script>
+  </body>
+</html>

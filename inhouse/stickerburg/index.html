@@ -8,6 +8,58 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../../styles.css" />
+    <style>
+      .bottom-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: var(--grid-gap);
+        margin-top: 42px;
+        align-items: start;
+      }
+
+      /* Двойная специфичность, чтобы победить .bottom-copy a в styles.css */
+      .bottom-copy .bottom-link {
+        display: block;
+        position: static;
+        border: 0;
+        margin-top: 0;
+        padding: 2px 0 0;
+        background: none;
+        font: inherit;
+        color: inherit;
+        text-decoration: none;
+        text-align: left;
+        cursor: pointer;
+        transition: color 150ms ease, background-color 150ms ease;
+      }
+
+      .bottom-copy .bottom-link:hover {
+        color: #fff;
+        background-color: #000;
+      }
+
+      /* Download и Mail — 4px делитель */
+      .bottom-copy .bottom-link--primary {
+        border-top: 4px solid var(--text);
+      }
+
+      /* Telegram, LinkedIn — 2px делитель */
+      .bottom-copy .bottom-link--secondary {
+        border-top: 2px solid var(--text);
+      }
+
+      .bottom-socials {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .bottom-copy .mail-btn {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+    </style>
   </head>
   <body>
     <main class="site-shell page-grid">
@@ -17,10 +69,10 @@
         </a>
 
         <nav class="nav-list">
-          <a class="is-active" href="../">Inhouse</a>
-          <a href="../../brands/">Brands</a>
-          <a href="../../archive/">Archive</a>
-          <a href="../../about/">About</a>
+          <a class="is-active" href="../../inhouse/index.html">Inhouse</a>
+          <a href="../../brands/index.html">Brands</a>
+          <a href="../../archive/index.html">Archive</a>
+          <a href="../../about/index.html">About</a>
         </nav>
       </aside>
 
@@ -35,7 +87,7 @@
       <section class="content-pane project-frame" aria-label="Stickerburg project content">
         <header class="content-pane__header project-header">
           <h1>Stickerburg</h1>
-          <a class="close-button" href="../" aria-label="Close project">[x]</a>
+          <a class="close-button" href="../index.html" aria-label="Close project">[x]</a>
         </header>
 
         <div class="content-pane__scroll project-scroll custom-scroll">
@@ -88,17 +140,15 @@
                 with restrained typography, it builds a system that feels calm,
                 precise, and repeatable.
               </p>
-              <a href="#">Download project images [↓]</a>
+              <div class="bottom-links">
+                <a class="bottom-link bottom-link--primary" href="#">Download project images [↓]</a>
+                <div class="bottom-socials">
+                  <button class="bottom-link bottom-link--primary mail-btn" type="button" data-copy-email="6169393@gmail.com">Mail<span class="copy-label" aria-hidden="true">Copied</span></button>
+                  <a class="bottom-link bottom-link--secondary" href="https://t.me/andreyubeyvolk" target="_blank" rel="noreferrer">Telegram</a>
+                  <a class="bottom-link bottom-link--secondary" href="https://www.linkedin.com/in/andrei-ubeyvolk-b318a817b" target="_blank" rel="noreferrer">LinkedIn</a>
+                </div>
+              </div>
             </div>
-
-            <footer class="project-footer">
-              <p>Want something<br />like this?<br />Let's talk.</p>
-              <address class="social-links">
-                <button class="copy-mail-link" type="button" data-copy-email="6169393@gmail.com">Mail</button>
-                <a href="https://t.me/andreyubeyvolk" target="_blank" rel="noreferrer">Telegram</a>
-                <a href="https://www.linkedin.com/in/andrei-ubeyvolk-b318a817b" target="_blank" rel="noreferrer">LinkedIn</a>
-              </address>
-            </footer>
           </article>
         </div>
       </section>

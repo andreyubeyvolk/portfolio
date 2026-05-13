@@ -5,24 +5,6 @@
     return;
   }
 
-  const toast = document.createElement("div");
-  toast.className = "copy-toast";
-  toast.setAttribute("role", "status");
-  toast.setAttribute("aria-live", "polite");
-  toast.textContent = "Email copied";
-  document.body.appendChild(toast);
-
-  let toastTimer = 0;
-
-  const showToast = () => {
-    window.clearTimeout(toastTimer);
-    toast.classList.add("is-visible");
-
-    toastTimer = window.setTimeout(() => {
-      toast.classList.remove("is-visible");
-    }, 1600);
-  };
-
   const copyText = async (text) => {
     if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(text);
@@ -41,6 +23,7 @@
   };
 
   copyButtons.forEach((button) => {
+    let timer = 0;
     button.addEventListener("click", async () => {
       const email = button.getAttribute("data-copy-email");
 
@@ -50,7 +33,9 @@
 
       try {
         await copyText(email);
-        showToast();
+        clearTimeout(timer);
+        button.classList.add("is-copied");
+        timer = setTimeout(() => button.classList.remove("is-copied"), 1600);
       } catch (error) {
         window.location.href = `mailto:${email}`;
       }

@@ -25,11 +25,22 @@ body {
   margin: 0;
   overflow: hidden;
   color: var(--text);
-  background: #fff;
+  background: #F5F4F4;
   font-family: "Inter", Arial, Helvetica, sans-serif;
   font-size: 16px;
+  font-weight: 700;
   line-height: 20px;
   letter-spacing: 0;
+}
+
+::selection {
+  background: #000;
+  color: #fff;
+}
+
+::-moz-selection {
+  background: #000;
+  color: #fff;
 }
 
 a {
@@ -91,38 +102,50 @@ img {
   transform: translateY(4px);
 }
 
-.nav-list a,
 .bottom-copy a,
 .project-footer a,
 .project-footer .copy-mail-link,
-.home-socials a,
 .copy-mail-link {
   display: inline-block;
   position: relative;
   padding: 0;
   border: 0;
-  background-image: linear-gradient(currentColor, currentColor);
-  background-repeat: no-repeat;
-  background-position: 0 calc(100% - 1px);
-  background-size: 0 var(--link-underline-thickness);
-  background-color: transparent;
+  background: none;
   color: inherit;
   cursor: pointer;
   font: inherit;
-  transition: background-size 220ms ease;
+  text-decoration: none;
+  transition: color 150ms ease, background-color 150ms ease;
 }
 
-.nav-list a:hover,
 .bottom-copy a:hover,
 .project-footer a:hover,
 .project-footer .copy-mail-link:hover,
-.home-socials a:hover,
 .copy-mail-link:hover {
-  background-size: 100% var(--link-underline-thickness);
+  color: #fff;
+  background-color: #000;
+}
+
+.nav-list a {
+  display: block;
+  width: 100%;
+  padding: 0;
+  color: inherit;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.nav-list a:hover {
+  color: #fff;
+  background-color: #000;
 }
 
 .nav-list a.is-active {
   font-style: italic;
+}
+
+.nav-list a.is-active:hover {
+  color: inherit;
+  background-color: transparent;
 }
 
 .section-intro {
@@ -163,7 +186,7 @@ img {
 }
 
 .home-intro p {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .home-portrait {
@@ -199,13 +222,16 @@ img {
   align-items: flex-start;
   justify-content: space-between;
   min-height: 18px;
-  padding: 0 var(--scrollbar-gutter) 6px 0;
+  padding: 0 var(--scrollbar-gutter) 0 0;
 }
 
 .project-header h1 {
   margin: 0;
+  margin-bottom: 0;
   font: inherit;
-  font-weight: 500;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 .close-button {
@@ -226,6 +252,36 @@ img {
 .close-button:hover {
   color: #fff;
   background: #000;
+}
+
+.archive-preview__inner {
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.archive-preview__inner > .project-header,
+.archive-preview__inner > .preview-text {
+  width: 100%;
+  max-width: 100%;
+}
+
+.archive-preview__inner > .media {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.archive-preview__inner > .media img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.archive-preview .content-pane__header {
+  gap: var(--scrollbar-gutter);
+  padding-right: 0;
 }
 
 .project-scroll {
@@ -331,7 +387,7 @@ body::-webkit-scrollbar-thumb:active {
   right: 0;
   z-index: 5;
   width: var(--scrollbar-gutter);
-  background: #fff;
+  background: #F5F4F4;
   pointer-events: auto;
 }
 
@@ -403,36 +459,108 @@ body::-webkit-scrollbar-thumb:active {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-auto-flow: column;
   grid-template-rows: repeat(3, auto);
-  gap: 0 var(--grid-gap);
-  margin-top: -6px;
+  gap: 8px var(--grid-gap);
+  margin-top: -10px;
   font-style: normal;
 }
 
-.home-socials a {
-  justify-self: start;
+.home-socials a,
+.home-socials button {
+  display: block;
+  width: 100%;
+  border-top: 2px solid var(--text);
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  padding: 2px 0 0;
+  margin: 0;
+  background: none;
+  background-image: none;
+  font: inherit;
+  color: inherit;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.home-socials a:hover,
+.home-socials button:hover {
+  color: #fff;
+  background-color: #000;
+}
+
+/* Mail (1st) and YouTube (4th) — first row, no top border */
+.home-socials :nth-child(1),
+.home-socials :nth-child(4) {
+  border-top: none;
+  padding-top: 2px;
+  margin-top: -2px;
+}
+
+.inhouse-page {
+  background: #f1f1f1;
+}
+
+.inhouse-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px var(--grid-gap);
+  padding-bottom: 58px;
+}
+
+.inhouse-card {
+  display: block;
+}
+
+.inhouse-title {
+  display: block;
+  margin-bottom: 0;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.inhouse-card:hover .inhouse-title {
+  color: #fff;
+  background-color: #000;
+}
+
+.inhouse-card img {
+  width: 100%;
+  object-fit: cover;
+  background: #d9d9d9;
+}
+
+.inhouse-card--portrait img {
+  aspect-ratio: 0.74 / 1;
+}
+
+.inhouse-card--square img {
+  aspect-ratio: 1 / 1;
 }
 
 .copy-mail-link {
   justify-self: start;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 }
 
-.copy-toast {
-  position: fixed;
-  right: var(--page-margin);
-  bottom: var(--page-margin);
-  z-index: 20;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--text);
-  font: inherit;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 160ms ease;
+/* Перебиваем display: block от .home-socials button */
+.home-socials .copy-mail-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 }
 
-.copy-toast.is-visible {
-  opacity: 1;
+.copy-label {
+  display: none;
+}
+
+.is-copied .copy-label {
+  display: inline;
 }
 
 .project-view {
@@ -559,6 +687,10 @@ body::-webkit-scrollbar-thumb:active {
     height: auto;
     min-height: 0;
   }
+
+  .inhouse-title {
+    font-size: 28px;
+  }
 }
 
 @media (max-width: 640px) {
@@ -593,7 +725,8 @@ body::-webkit-scrollbar-thumb:active {
 
   .project-view,
   .split-row,
-  .home-view {
+  .home-view,
+  .inhouse-grid {
     display: block;
   }
 
@@ -613,6 +746,14 @@ body::-webkit-scrollbar-thumb:active {
 
   .reel-card {
     margin-bottom: var(--grid-gap);
+  }
+
+  .inhouse-card {
+    margin-bottom: 22px;
+  }
+
+  .inhouse-title {
+    font-size: 16px;
   }
 
   .home-socials {

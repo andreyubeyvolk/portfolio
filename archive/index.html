@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Andre Ubeyvolk - Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../styles.css" />
+    <style>
+      .archive-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        column-gap: 16px;
+        row-gap: 40px;
+      }
+
+      .archive-card {
+        display: block;
+      }
+
+      .archive-card img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .archive-card__media {
+        position: relative;
+        display: block;
+      }
+
+      .ai-tag {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        display: block;
+        height: 1em;
+        width: auto !important;
+        opacity: 0;
+        transition: opacity 150ms ease;
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .inhouse-card:hover .ai-tag {
+        opacity: 1;
+      }
+
+      .archive-preview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10;
+      }
+
+      .archive-preview[hidden] {
+        display: none;
+      }
+
+      .archive-preview__inner {
+        width: fit-content;
+        max-width: calc(100% - 16px);
+        max-height: 100%;
+        margin-left: auto;
+        margin-right: 16px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .preview-text {
+        background: #F5F4F4;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding: 0;
+        display: block;
+        height: auto;
+        box-sizing: border-box;
+        overflow-wrap: anywhere;
+      }
+
+      .preview-text p {
+        margin: 0;
+      }
+
+      .archive-preview .project-header {
+        background: #F5F4F4;
+        box-sizing: border-box;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 0;
+        padding-right: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .archive-preview__inner > .project-header,
+      .archive-preview__inner > .preview-text {
+        width: var(--preview-width, auto);
+        max-width: 100%;
+      }
+
+      .archive-preview.is-horizontal .project-header {
+        grid-column: 11 / 25;
+        width: 100%;
+      }
+
+      .preview-media {
+        margin: 0;
+        margin-bottom: 0;
+        padding: 0;
+      }
+
+      .preview-media img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .archive-preview.is-vertical .preview-media {
+        flex: 0 1 auto;
+        min-height: 0;
+        margin-top: -2px;
+      }
+
+      .archive-preview.is-vertical .preview-media img {
+        width: auto;
+        max-width: 100%;
+        height: var(--preview-image-height, auto);
+      }
+
+      .archive-preview.is-horizontal .preview-media {
+        flex: 0 1 auto;
+        min-height: 0;
+        margin-top: -2px;
+      }
+
+      .archive-preview.is-horizontal .preview-media img {
+        width: auto;
+        max-width: 100%;
+        height: var(--preview-image-height, auto);
+      }
+
+      .archive-preview.is-horizontal .project-header,
+      .archive-preview.is-horizontal .preview-text,
+      .archive-preview.is-horizontal .preview-media {
+        margin-left: auto;
+      }
+
+      .archive-preview.is-vertical .project-header,
+      .archive-preview.is-vertical .preview-text,
+      .archive-preview.is-vertical .preview-media {
+        margin-left: auto;
+      }
+
+      body.is-preview-open .content-pane__scroll.custom-scroll::-webkit-scrollbar {
+        display: none;
+      }
+
+      body.is-preview-open .content-pane__scroll.custom-scroll {
+        scrollbar-width: none;
+      }
+
+      body.is-preview-open .custom-scrollbar {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="inhouse-page">
+    <main class="site-shell page-grid">
+      <aside class="site-nav" aria-label="Main navigation">
+        <a class="brand" href="../index.html" aria-label="Andre Ubeyvolk home">
+          <img class="brand-mark" src="../assets/logo.svg" alt="Andre Ubeyvolk" />
+        </a>
+
+        <nav class="nav-list">
+          <a href="../inhouse/index.html">Inhouse</a>
+          <a href="../brands/index.html">Brands</a>
+          <a class="is-active" href="../archive/index.html">Archive</a>
+          <a href="../about/index.html">About</a>
+        </nav>
+      </aside>
+
+      <section class="section-intro intro" aria-label="Archive section introduction">
+        <p>
+          Archive is where smaller, focused works live. Selected projects, visual
+          explorations, and experiments across design, AI, and other mediums.
+        </p>
+      </section>
+
+      <section class="content-pane" aria-label="Archive projects">
+        <div class="content-pane__scroll custom-scroll">
+          <article class="archive-grid inhouse-grid">
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Nimax Tote</span>
+              <img data-preview data-description="A tote system for a branding lecture: green field, hard typography, and event details treated like part of the object." src="../assets/archive/Frame 49-4.jpg" alt="Nimax tote archive project" />
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Startup Hoodie</span>
+              <img data-preview data-description="Black hoodie merch with startup-sector typography across the sleeve and a small chest badge." src="../assets/archive/Frame 49.jpg" alt="Startup hoodie archive project" />
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Botanical Editorial</span>
+              <span class="archive-card__media">
+                <img data-preview data-description="A wide fashion image where red floral fabric expands into the landscape and turns the frame into motion." src="../assets/archive/txema-yeste-vogue-spain-mayowa-nicholas-2019-5-1500x972.jpg" alt="Botanical editorial archive project" />
+                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
+              </span>
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Stickerburg Tote</span>
+              <img data-preview data-description="A soft product portrait for a city tote, balancing Cyrillic lettering, icon graphics, and a quiet studio pose." src="../assets/archive/Frame 49-2.jpg" alt="Stickerburg tote archive project" />
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Lucente Pack</span>
+              <span class="archive-card__media">
+                <img data-preview data-description="Beauty packaging study with a split floral/product composition and restrained serif branding." src="../assets/archive/Frame 2085666535 — копия.jpg" alt="Lucente packaging archive project" />
+                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
+              </span>
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Sois Libre</span>
+              <img data-preview data-description="Washed grey long sleeve with tonal back print, sleeve text, and a deliberately faded graphic system." src="../assets/archive/Frame 49-7.jpg" alt="Sois Libre longsleeve archive project" />
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Quarry Tee</span>
+              <img data-preview data-description="Outdoor merch shot with a grey tee, white back mark, and small dataset-style labels in the corner." src="../assets/archive/Frame 49-1.jpg" alt="Quarry tee archive project" />
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Pocket Publication</span>
+              <img data-preview data-description="Black field with a small editorial spread, app screens, stickers, and publication assets arranged as one system." src="../assets/archive/Frame 49-6.jpg" alt="Pocket publication archive project" />
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Disruptive Tee</span>
+              <span class="archive-card__media">
+                <img data-preview data-description="Black T-shirt mockup with sharp white venture graphics and sleeve typography on a grey technical backdrop." src="../assets/archive/Frame 49-3.jpg" alt="Disruptive tee archive project" />
+                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
+              </span>
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Valera Cover</span>
+              <span class="archive-card__media">
+                <img data-preview data-description="Magazine cover experiment with bold masthead, plastic texture, barcode, and layered white graphic marks." src="../assets/archive/Frame 49-5.jpg" alt="Valera cover archive project" />
+                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
+              </span>
+            </a>
+          </article>
+        </div>
+
+        <div class="archive-preview" hidden>
+          <div class="archive-preview__inner">
+          <header class="content-pane__header project-header">
+            <h1 class="preview-title"></h1>
+            <button class="close-button preview-close">[X]</button>
+          </header>
+
+          <div class="preview-media">
+            <img class="preview-image" src="" alt="">
+          </div>
+
+          <div class="preview-text">
+            <p>Details matter. Precision in typography, grid and composition is not perfectionism for its own sake — it's respect for the work.</p>
+          </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="../scroll.js"></script>
+    <script src="../main.js"></script>
+    <script>
+      const items = document.querySelectorAll('[data-preview]');
+      const overlay = document.querySelector('.archive-preview');
+      const previewImg = document.querySelector('.preview-image');
+      const previewTitle = document.querySelector('.preview-title');
+      const closeBtn = document.querySelector('.preview-close');
+      const grid = document.querySelector('.inhouse-grid');
+      const previewInner = document.querySelector('.archive-preview__inner');
+      const previewText = document.querySelector('.preview-text');
+      const previewTextContent = previewText.querySelector('p');
+      const previewHeader = document.querySelector('.archive-preview .project-header');
+      const contentPane = document.querySelector('.content-pane');
+      let activeArchiveTitle = null;
+
+      function closePreview() {
+        overlay.hidden = true;
+        grid.style.opacity = '1';
+        document.body.classList.remove('is-preview-open');
+        activeArchiveTitle = null;
+        document.body.style.removeProperty('--preview-scroll-top');
+        overlay.style.removeProperty('--preview-width');
+        overlay.style.removeProperty('--preview-image-height');
+      }
+
+      function alignPreviewScrollbar() {
+        if (!activeArchiveTitle) {
+          return;
+        }
+
+        const paneTop = contentPane.getBoundingClientRect().top;
+        const titleTop = activeArchiveTitle.getBoundingClientRect().top;
+        document.body.style.setProperty('--preview-scroll-top', `${Math.max(0, titleTop - paneTop)}px`);
+      }
+
+      function fitPreviewImage() {
+        const availableHeight = overlay.clientHeight - previewHeader.offsetHeight - previewText.offsetHeight;
+        const availableWidth = overlay.clientWidth - 16;
+        const heightByWidth = availableWidth * (previewImg.naturalHeight / previewImg.naturalWidth);
+        const previewHeight = Math.min(availableHeight, heightByWidth);
+        overlay.style.setProperty('--preview-image-height', `${Math.max(0, previewHeight)}px`);
+      }
+
+      async function syncPreviewSize() {
+        if (previewImg.decode) {
+          try {
+            await previewImg.decode();
+          } catch (error) {
+            // Continue with the browser's current image metrics.
+          }
+        }
+
+        window.requestAnimationFrame(() => {
+          fitPreviewImage();
+          overlay.style.setProperty('--preview-width', `${previewImg.getBoundingClientRect().width}px`);
+          window.requestAnimationFrame(() => {
+            fitPreviewImage();
+            overlay.style.setProperty('--preview-width', `${previewImg.getBoundingClientRect().width}px`);
+          });
+        });
+      }
+
+      items.forEach(img => {
+        const card = img.closest('.archive-card');
+
+        card.addEventListener('click', (event) => {
+          event.preventDefault();
+          const isVertical = img.naturalHeight >= img.naturalWidth;
+
+          activeArchiveTitle = img.closest('.inhouse-card').querySelector('.inhouse-title');
+          previewImg.src = img.src;
+          previewTitle.textContent = activeArchiveTitle.textContent;
+          previewTextContent.textContent = img.dataset.description || 'Details matter. Precision in typography, grid and composition is not perfectionism for its own sake — it\'s respect for the work.';
+
+          overlay.style.removeProperty('--preview-width');
+          overlay.style.removeProperty('--preview-image-height');
+          overlay.hidden = false;
+          grid.style.opacity = '0.15';
+          document.body.classList.add('is-preview-open');
+          alignPreviewScrollbar();
+          window.dispatchEvent(new Event('resize'));
+
+          overlay.classList.toggle('is-vertical', isVertical);
+          overlay.classList.toggle('is-horizontal', !isVertical);
+
+          syncPreviewSize();
+        });
+      });
+
+      closeBtn.addEventListener('click', closePreview);
+
+      overlay.addEventListener('click', (event) => {
+        if (!previewInner.contains(event.target)) {
+          closePreview();
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !overlay.hidden) {
+          closePreview();
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        if (!overlay.hidden) {
+          alignPreviewScrollbar();
+          fitPreviewImage();
+          overlay.style.setProperty('--preview-width', `${previewImg.getBoundingClientRect().width}px`);
+        }
+      });
+    </script>
+  </body>
+</html>
