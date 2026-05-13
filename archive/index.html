@@ -167,6 +167,70 @@
       body.is-preview-open .custom-scrollbar {
         display: none;
       }
+
+      @media (max-width: 980px) {
+        /* Transparent overlay — dimmed grid shows through (same mechanic as desktop) */
+        .archive-preview {
+          position: fixed;
+          top: 32px;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 15;
+          display: flex;
+          flex-direction: column;
+          padding: 24px var(--page-margin) var(--page-margin);
+          background: transparent;
+        }
+
+        .archive-preview__inner {
+          width: 100%;
+          max-width: 100%;
+          margin-left: 0;
+          margin-right: 0;
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Header: solid bg so it's readable over dimmed grid */
+        .archive-preview .project-header {
+          flex: 0 0 auto;
+          width: 100%;
+          padding-right: 0;
+          background: #fff;
+        }
+
+        /* Both header and text widths are overridable by JS for too-tall case */
+        .archive-preview__inner > .project-header,
+        .archive-preview__inner > .preview-text {
+          width: 100%;
+        }
+
+        /* Media: sized by image (JS sets width/height directly) */
+        .archive-preview.is-horizontal .preview-media,
+        .archive-preview.is-vertical .preview-media {
+          flex: 0 0 auto;
+          margin-top: 0;
+          margin-left: 0;
+        }
+
+        /* Description: white bg, flush below image, no gap */
+        .archive-preview .preview-text {
+          flex: 0 0 auto;
+          background: #fff;
+          padding-top: 0;
+          margin-top: 0;
+        }
+
+        body.is-preview-open {
+          overflow: hidden;
+        }
+
+        /* AI tag always visible on tablet (no hover) */
+        .ai-tag {
+          opacity: 1;
+        }
+      }
     </style>
   </head>
   <body class="inhouse-page">
@@ -255,6 +319,63 @@
                 <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
               </span>
             </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Transit Patch</span>
+              <img data-preview data-description="Embroidered patch series for an urban transit brand — tight grid, high contrast, minimal palette." src="../assets/archive/Frame 49-3.jpg" alt="Transit patch archive project" />
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Field Notes</span>
+              <span class="archive-card__media">
+                <img data-preview data-description="Editorial layout study: column-based type system, rough scan textures, and deliberate misregistration." src="../assets/archive/Frame 49-6.jpg" alt="Field notes archive project" />
+                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
+              </span>
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Soft Club Tee</span>
+              <img data-preview data-description="Washed jersey with a small chest mark and a tonal back system — quiet merch for a quiet audience." src="../assets/archive/Frame 49-7.jpg" alt="Soft club tee archive project" />
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Still Life 01</span>
+              <span class="archive-card__media">
+                <img data-preview data-description="Product still life in natural light — texture study with ceramic, paper, and a single dried stem." src="../assets/archive/Frame 2085666535 — копия.jpg" alt="Still life archive project" />
+                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
+              </span>
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Open Run Cap</span>
+              <img data-preview data-description="Five-panel cap with laser-cut logo, reflective tape detail, and a runner's wordmark along the brim." src="../assets/archive/Frame 49-1.jpg" alt="Open run cap archive project" />
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Bloom Spread</span>
+              <span class="archive-card__media">
+                <img data-preview data-description="Fashion editorial frame where fabric and flora collapse into a single material — movement locked in still image." src="../assets/archive/txema-yeste-vogue-spain-mayowa-nicholas-2019-5-1500x972.jpg" alt="Bloom spread archive project" />
+                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
+              </span>
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Dark Format</span>
+              <img data-preview data-description="Brand system on black — logotype, grid, and a sticker sheet used as a single composition." src="../assets/archive/Frame 49-4.jpg" alt="Dark format archive project" />
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Overlap Hoodie</span>
+              <img data-preview data-description="Layered garment mockup where two typefaces and two weights compete for the same surface." src="../assets/archive/Frame 49.jpg" alt="Overlap hoodie archive project" />
+            </a>
+
+            <a class="archive-card inhouse-card" href="#">
+              <span class="inhouse-title">Index Card</span>
+              <span class="archive-card__media">
+                <img data-preview data-description="Pocket-format publication: hand-numbered, folded once, content dense enough to fold again." src="../assets/archive/Frame 49-2.jpg" alt="Index card archive project" />
+                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
+              </span>
+            </a>
           </article>
         </div>
 
@@ -300,6 +421,11 @@
         document.body.style.removeProperty('--preview-scroll-top');
         overlay.style.removeProperty('--preview-width');
         overlay.style.removeProperty('--preview-image-height');
+        previewImg.style.width = '';
+        previewImg.style.height = '';
+        previewHeader.style.width = '';
+        previewText.style.width = '';
+        previewInner.style.alignItems = '';
       }
 
       function alignPreviewScrollbar() {
@@ -313,11 +439,36 @@
       }
 
       function fitPreviewImage() {
-        const availableHeight = overlay.clientHeight - previewHeader.offsetHeight - previewText.offsetHeight;
-        const availableWidth = overlay.clientWidth - 16;
-        const heightByWidth = availableWidth * (previewImg.naturalHeight / previewImg.naturalWidth);
-        const previewHeight = Math.min(availableHeight, heightByWidth);
-        overlay.style.setProperty('--preview-image-height', `${Math.max(0, previewHeight)}px`);
+        const isTablet = window.matchMedia('(max-width: 980px)').matches;
+        if (isTablet) {
+          // padding: 24px top + 16px bottom on overlay
+          const availableHeight = overlay.clientHeight - previewHeader.offsetHeight - previewText.offsetHeight - 40;
+          const availableWidth = overlay.clientWidth - 32; // 16px left + 16px right padding
+          const heightByWidth = availableWidth * (previewImg.naturalHeight / previewImg.naturalWidth);
+          if (heightByWidth <= availableHeight) {
+            // Fits at full width — stretch to margins
+            previewImg.style.width = '100%';
+            previewImg.style.height = 'auto';
+            previewHeader.style.width = '';
+            previewText.style.width = '';
+            previewInner.style.alignItems = '';
+          } else {
+            // Too tall — constrain to height, scale width proportionally
+            // Header, caption match image width; block right-aligned
+            const scaledWidth = availableHeight * (previewImg.naturalWidth / previewImg.naturalHeight);
+            previewImg.style.width = scaledWidth + 'px';
+            previewImg.style.height = availableHeight + 'px';
+            previewHeader.style.width = scaledWidth + 'px';
+            previewText.style.width = scaledWidth + 'px';
+            previewInner.style.alignItems = 'flex-end';
+          }
+        } else {
+          const availableHeight = overlay.clientHeight - previewHeader.offsetHeight - previewText.offsetHeight;
+          const availableWidth = overlay.clientWidth - 16;
+          const heightByWidth = availableWidth * (previewImg.naturalHeight / previewImg.naturalWidth);
+          const previewHeight = Math.min(availableHeight, heightByWidth);
+          overlay.style.setProperty('--preview-image-height', `${Math.max(0, previewHeight)}px`);
+        }
       }
 
       async function syncPreviewSize() {
