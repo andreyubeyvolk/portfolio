@@ -31,21 +31,23 @@
         display: block;
       }
 
-      .ai-tag {
+      .preview-media {
+        position: relative;
+      }
+
+      .preview-media .preview-ai-tag {
         position: absolute;
         bottom: 0;
         left: 0;
         display: block;
-        height: 1em;
+        height: 0.75em !important;
         width: auto !important;
-        opacity: 0;
-        transition: opacity 150ms ease;
         pointer-events: none;
         z-index: 2;
       }
 
-      .inhouse-card:hover .ai-tag {
-        opacity: 1;
+      .preview-media .preview-ai-tag[hidden] {
+        display: none;
       }
 
       .archive-preview {
@@ -226,10 +228,6 @@
           overflow: hidden;
         }
 
-        /* AI tag always visible on tablet (no hover) */
-        .ai-tag {
-          opacity: 1;
-        }
       }
     </style>
   </head>
@@ -257,6 +255,21 @@
 
       <section class="content-pane" aria-label="Archive projects">
         <div class="content-pane__scroll custom-scroll">
+          <!--
+            ARCHIVE CARD TEMPLATE
+            ─────────────────────
+            Без AI-тега:
+              <a class="archive-card inhouse-card" href="#">
+                <span class="inhouse-title">Название</span>
+                <img data-preview data-description="Описание." src="../assets/archive/file.jpg" alt="Alt text" />
+              </a>
+
+            С AI-тегом (добавить data-ai на img):
+              <a class="archive-card inhouse-card" href="#">
+                <span class="inhouse-title">Название</span>
+                <img data-preview data-ai data-description="Описание." src="../assets/archive/file.jpg" alt="Alt text" />
+              </a>
+          -->
           <article class="archive-grid inhouse-grid">
             <a class="archive-card inhouse-card" href="#">
               <span class="inhouse-title">Nimax Tote</span>
@@ -270,10 +283,7 @@
 
             <a class="archive-card inhouse-card" href="#">
               <span class="inhouse-title">Botanical Editorial</span>
-              <span class="archive-card__media">
-                <img data-preview data-description="A wide fashion image where red floral fabric expands into the landscape and turns the frame into motion." src="../assets/archive/txema-yeste-vogue-spain-mayowa-nicholas-2019-5-1500x972.jpg" alt="Botanical editorial archive project" />
-                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
-              </span>
+              <img data-preview data-ai data-description="A wide fashion image where red floral fabric expands into the landscape and turns the frame into motion." src="../assets/archive/txema-yeste-vogue-spain-mayowa-nicholas-2019-5-1500x972.jpg" alt="Botanical editorial archive project" />
             </a>
 
             <a class="archive-card inhouse-card" href="#">
@@ -283,10 +293,7 @@
 
             <a class="archive-card inhouse-card" href="#">
               <span class="inhouse-title">Lucente Pack</span>
-              <span class="archive-card__media">
-                <img data-preview data-description="Beauty packaging study with a split floral/product composition and restrained serif branding." src="../assets/archive/Frame 2085666535 — копия.jpg" alt="Lucente packaging archive project" />
-                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
-              </span>
+              <img data-preview data-ai data-description="Beauty packaging study with a split floral/product composition and restrained serif branding." src="../assets/archive/Frame 2085666535 — копия.jpg" alt="Lucente packaging archive project" />
             </a>
 
             <a class="archive-card inhouse-card" href="#">
@@ -306,18 +313,12 @@
 
             <a class="archive-card inhouse-card" href="#">
               <span class="inhouse-title">Disruptive Tee</span>
-              <span class="archive-card__media">
-                <img data-preview data-description="Black T-shirt mockup with sharp white venture graphics and sleeve typography on a grey technical backdrop." src="../assets/archive/Frame 49-3.jpg" alt="Disruptive tee archive project" />
-                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
-              </span>
+              <img data-preview data-ai data-description="Black T-shirt mockup with sharp white venture graphics and sleeve typography on a grey technical backdrop." src="../assets/archive/Frame 49-3.jpg" alt="Disruptive tee archive project" />
             </a>
 
             <a class="archive-card inhouse-card" href="#">
               <span class="inhouse-title">Valera Cover</span>
-              <span class="archive-card__media">
-                <img data-preview data-description="Magazine cover experiment with bold masthead, plastic texture, barcode, and layered white graphic marks." src="../assets/archive/Frame 49-5.jpg" alt="Valera cover archive project" />
-                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
-              </span>
+              <img data-preview data-ai data-description="Magazine cover experiment with bold masthead, plastic texture, barcode, and layered white graphic marks." src="../assets/archive/Frame 49-5.jpg" alt="Valera cover archive project" />
             </a>
 
             <a class="archive-card inhouse-card" href="#">
@@ -327,10 +328,7 @@
 
             <a class="archive-card inhouse-card" href="#">
               <span class="inhouse-title">Field Notes</span>
-              <span class="archive-card__media">
-                <img data-preview data-description="Editorial layout study: column-based type system, rough scan textures, and deliberate misregistration." src="../assets/archive/Frame 49-6.jpg" alt="Field notes archive project" />
-                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
-              </span>
+              <img data-preview data-ai data-description="Editorial layout study: column-based type system, rough scan textures, and deliberate misregistration." src="../assets/archive/Frame 49-6.jpg" alt="Field notes archive project" />
             </a>
 
             <a class="archive-card inhouse-card" href="#">
@@ -340,10 +338,7 @@
 
             <a class="archive-card inhouse-card" href="#">
               <span class="inhouse-title">Still Life 01</span>
-              <span class="archive-card__media">
-                <img data-preview data-description="Product still life in natural light — texture study with ceramic, paper, and a single dried stem." src="../assets/archive/Frame 2085666535 — копия.jpg" alt="Still life archive project" />
-                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
-              </span>
+              <img data-preview data-ai data-description="Product still life in natural light — texture study with ceramic, paper, and a single dried stem." src="../assets/archive/Frame 2085666535 — копия.jpg" alt="Still life archive project" />
             </a>
 
             <a class="archive-card inhouse-card" href="#">
@@ -353,10 +348,7 @@
 
             <a class="archive-card inhouse-card" href="#">
               <span class="inhouse-title">Bloom Spread</span>
-              <span class="archive-card__media">
-                <img data-preview data-description="Fashion editorial frame where fabric and flora collapse into a single material — movement locked in still image." src="../assets/archive/txema-yeste-vogue-spain-mayowa-nicholas-2019-5-1500x972.jpg" alt="Bloom spread archive project" />
-                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
-              </span>
+              <img data-preview data-ai data-description="Fashion editorial frame where fabric and flora collapse into a single material — movement locked in still image." src="../assets/archive/txema-yeste-vogue-spain-mayowa-nicholas-2019-5-1500x972.jpg" alt="Bloom spread archive project" />
             </a>
 
             <a class="archive-card inhouse-card" href="#">
@@ -371,10 +363,7 @@
 
             <a class="archive-card inhouse-card" href="#">
               <span class="inhouse-title">Index Card</span>
-              <span class="archive-card__media">
-                <img data-preview data-description="Pocket-format publication: hand-numbered, folded once, content dense enough to fold again." src="../assets/archive/Frame 49-2.jpg" alt="Index card archive project" />
-                <img class="ai-tag" src="../assets/ai-tag.svg" alt="AI" />
-              </span>
+              <img data-preview data-ai data-description="Pocket-format publication: hand-numbered, folded once, content dense enough to fold again." src="../assets/archive/Frame 49-2.jpg" alt="Index card archive project" />
             </a>
           </article>
         </div>
@@ -388,6 +377,7 @@
 
           <div class="preview-media">
             <img class="preview-image" src="" alt="">
+            <img class="preview-ai-tag" src="../assets/ai-tag.svg" alt="AI" hidden>
           </div>
 
           <div class="preview-text">
@@ -410,6 +400,7 @@
       const previewText = document.querySelector('.preview-text');
       const previewTextContent = previewText.querySelector('p');
       const previewHeader = document.querySelector('.archive-preview .project-header');
+      const previewAiTag = document.querySelector('.preview-ai-tag');
       const contentPane = document.querySelector('.content-pane');
       let activeArchiveTitle = null;
 
@@ -426,6 +417,7 @@
         previewHeader.style.width = '';
         previewText.style.width = '';
         previewInner.style.alignItems = '';
+        previewAiTag.hidden = true;
       }
 
       function alignPreviewScrollbar() {
@@ -504,6 +496,7 @@
 
           overlay.style.removeProperty('--preview-width');
           overlay.style.removeProperty('--preview-image-height');
+          previewAiTag.hidden = !img.hasAttribute('data-ai');
           overlay.hidden = false;
           grid.style.opacity = '0.15';
           document.body.classList.add('is-preview-open');

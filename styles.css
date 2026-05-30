@@ -657,11 +657,12 @@ body::-webkit-scrollbar-thumb:active {
 
 @media (max-width: 980px) {
   body {
-    overflow: auto;
+    overflow-y: auto;
   }
 
   .site-shell {
     display: block;
+    width: 100%;
     height: auto;
     min-height: 100vh;
     padding: 0;
@@ -673,6 +674,7 @@ body::-webkit-scrollbar-thumb:active {
     top: 0;
     z-index: 10;
     display: grid;
+    width: 100%;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     column-gap: var(--grid-gap);
     align-items: end;
@@ -705,6 +707,7 @@ body::-webkit-scrollbar-thumb:active {
   /* Section text flows with content, aligned to col 3 */
   .section-intro {
     display: grid;
+    width: 100%;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     column-gap: var(--grid-gap);
     padding: 24px var(--page-margin) 80px;
@@ -726,6 +729,7 @@ body::-webkit-scrollbar-thumb:active {
   /* Content pane: no fixed height, flows with page */
   .content-pane {
     display: block;
+    width: 100%;
     height: auto;
     min-height: 0;
     padding: 0 var(--page-margin) 58px;
@@ -736,6 +740,7 @@ body::-webkit-scrollbar-thumb:active {
   .content-pane__scroll {
     overflow: visible;
     padding-right: 0;
+    scrollbar-gutter: auto;
   }
 
   .content-pane__header {
