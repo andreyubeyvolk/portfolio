@@ -24,7 +24,7 @@
     display: block;
     height: auto;
     min-height: 100vh;
-    padding: 16px 16px 100px;
+    padding: 16px 16px 200px;
   }
 
   /* ── Hide desktop nav ── */
@@ -49,12 +49,17 @@
   }
 
   .mobile-bar__brand {
-    font-family: 'Impact', Impact, sans-serif;
-    font-size: 18px;
-    font-weight: normal;
-    line-height: 1;
-    color: #fff;
+    display: flex;
+    align-items: center;
+    height: 40px;
     text-decoration: none;
+  }
+
+  .mobile-bar__brand img {
+    display: block;
+    width: 123px;
+    height: auto;
+    filter: brightness(0) invert(1);
   }
 
   .mobile-bar__menu {
