@@ -340,18 +340,34 @@
     font-family: 'Inter', sans-serif;
     font-size: 32px;
     font-weight: 700;
+    font-style: normal;
     line-height: 1.4;
     letter-spacing: 0.4px;
     color: #171717;
     text-decoration: none;
     padding: 0;
+    touch-action: manipulation;
     transition: color 120ms ease, background-color 120ms ease;
+  }
+
+  /* Current page — Bold Italic */
+  .menu-tabs a[aria-current="page"] {
+    font-style: italic;
   }
 
   .menu-tabs a:hover {
     color: #fff;
     background: #171717;
     padding: 0 4px;
+  }
+
+  /* Tap state — full black rect, white text, instant */
+  .menu-tabs a:active,
+  .menu-tabs a.is-tapped {
+    color: #fff;
+    background: #171717;
+    padding: 0 4px;
+    transition: none;
   }
 
 }
