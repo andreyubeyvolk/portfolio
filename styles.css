@@ -499,7 +499,7 @@ body::-webkit-scrollbar-thumb:active {
 }
 
 .inhouse-page {
-  background: #f1f1f1;
+  background: #F5F4F4;
 }
 
 .inhouse-grid {
@@ -510,14 +510,28 @@ body::-webkit-scrollbar-thumb:active {
 }
 
 .inhouse-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.inhouse-card__cover {
+  overflow: hidden;
+  background: #d9d9d9;
+  aspect-ratio: 3 / 4;
+}
+
+.inhouse-card__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .inhouse-title {
+  order: -1;
   display: block;
-  margin-bottom: 0;
   font-size: 16px;
-  line-height: 1;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   transition: color 150ms ease, background-color 150ms ease;
 }
@@ -527,18 +541,55 @@ body::-webkit-scrollbar-thumb:active {
   background-color: #000;
 }
 
-.inhouse-card img {
-  width: 100%;
-  object-fit: cover;
+.load-more-btn {
+  display: none;
+}
+
+.brands-page {
+  background: #F5F4F4;
+}
+
+.archive-page {
+  background: #F5F4F4;
+}
+
+.archive-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 40px;
+  padding-bottom: 58px;
+}
+
+.archive-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.archive-card__cover {
+  overflow: hidden;
   background: #d9d9d9;
 }
 
-.inhouse-card--portrait img {
-  aspect-ratio: 0.74 / 1;
+.archive-card__cover img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
-.inhouse-card--square img {
-  aspect-ratio: 1 / 1;
+.archive-title {
+  order: -1;
+  display: block;
+  font-size: 16px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.archive-card:hover .archive-title {
+  color: #fff;
+  background-color: #000;
 }
 
 .copy-mail-link {
@@ -684,8 +735,10 @@ body::-webkit-scrollbar-thumb:active {
   }
 
   /* Inhouse/Archive/Brands/About pages have darker bg */
-  .inhouse-page .site-nav {
-    background: #f1f1f1;
+  .inhouse-page .site-nav,
+  .brands-page .site-nav,
+  .archive-page .site-nav {
+    background: #F5F4F4;
   }
 
   .brand {
@@ -793,8 +846,7 @@ body::-webkit-scrollbar-thumb:active {
 
   .project-view,
   .split-row,
-  .home-view,
-  .inhouse-grid {
+  .home-view {
     display: block;
   }
 
@@ -814,10 +866,6 @@ body::-webkit-scrollbar-thumb:active {
 
   .reel-card {
     margin-bottom: var(--grid-gap);
-  }
-
-  .inhouse-card {
-    margin-bottom: 22px;
   }
 
   .inhouse-title {

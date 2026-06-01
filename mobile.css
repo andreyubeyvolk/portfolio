@@ -212,6 +212,243 @@
     border-top: none;
   }
 
+  /* ── Archive card overlay ── */
+  .card-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .card-overlay[hidden] {
+    display: none;
+  }
+
+  .card-panel {
+    position: absolute;
+    top: 16px;
+    left: 15px;
+    right: 16px;
+  }
+
+  .card-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0);
+    pointer-events: none;
+    transition: background 0.3s ease;
+    z-index: 10;
+  }
+
+  body.menu-is-open .card-panel::after {
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  .card-panel__header {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 8px;
+    align-items: start;
+    background: #fff;
+  }
+
+  .card-panel__title {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .card-panel__close {
+    width: 100%;
+    padding: 1px 0 0;
+    background: #fff;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    text-align: right;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .card-panel__image-wrap {
+    width: 100%;
+  }
+
+  .card-panel__image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .card-panel__desc {
+    background: #fff;
+    width: 100%;
+  }
+
+  .card-panel__desc-text {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    margin: 0;
+    display: block;
+    width: 100%;
+  }
+
+  .card-panel__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .card-panel__tags[hidden] {
+    display: none;
+  }
+
+  .card-panel__tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background: #E7FF35;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    white-space: nowrap;
+  }
+
+  body.card-is-open {
+    overflow: hidden;
+  }
+
+  body.card-is-open .site-shell {
+    opacity: 0.1;
+    pointer-events: none;
+  }
+
+  /* ── Archive page ── */
+  .archive-page .section-intro.intro {
+    display: block;
+    padding: 0;
+    margin-bottom: 96px;
+  }
+
+  .archive-page .section-intro.intro p {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    margin: 0;
+  }
+
+  .archive-page .archive-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 8px;
+    padding-bottom: 0;
+  }
+
+  .archive-card--more {
+    display: none;
+  }
+
+  .archive-card {
+    gap: 3px;
+  }
+
+  .archive-card__cover {
+    height: auto;
+  }
+
+  .archive-title {
+    order: 0;
+    font-size: 15px;
+    letter-spacing: -0.4px;
+  }
+
+  /* ── Inhouse page ── */
+  .inhouse-page .section-intro.intro,
+  .brands-page .section-intro.intro {
+    display: block;
+    padding: 0;
+    margin-bottom: 96px;
+  }
+
+  .inhouse-page .section-intro.intro p,
+  .brands-page .section-intro.intro p {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    margin: 0 0 16px;
+  }
+
+  .inhouse-page .section-intro.intro p:last-child,
+  .brands-page .section-intro.intro p:last-child {
+    margin-bottom: 0;
+  }
+
+  .inhouse-page .inhouse-grid,
+  .brands-page .inhouse-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 8px;
+    padding-bottom: 0;
+  }
+
+  .inhouse-card--more {
+    display: none;
+  }
+
+  .inhouse-card {
+    gap: 3px;
+  }
+
+  .inhouse-card__cover {
+    aspect-ratio: unset;
+    height: 233px;
+  }
+
+  .inhouse-title {
+    order: 0;
+    font-size: 15px;
+    letter-spacing: -0.4px;
+  }
+
+  .load-more-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 40px;
+    margin-top: 40px;
+    background: #fff;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    cursor: pointer;
+  }
+
   /* ── Site shell dims when menu is open ── */
   .site-shell {
     transition: opacity 0.3s ease;
@@ -219,6 +456,10 @@
 
   body.menu-is-open .site-shell {
     opacity: 0.4;
+    pointer-events: none;
+  }
+
+  body.menu-is-open .card-overlay {
     pointer-events: none;
   }
 
