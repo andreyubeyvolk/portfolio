@@ -206,10 +206,10 @@
     border-top-width: 1px;
   }
 
-  /* Reset desktop "no border on first items" rule */
+  /* No top border on first item in each column */
   .home-socials :nth-child(1),
   .home-socials :nth-child(4) {
-    border-top: 1px solid #171717;
+    border-top: none;
   }
 
   /* ── Site shell dims when menu is open ── */
