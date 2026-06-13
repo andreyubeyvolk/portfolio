@@ -793,7 +793,7 @@
     height: 83px;
     object-fit: cover;
     object-position: top;
-    margin-top: 16px;
+    margin-top: 14px;
   }
 
   /* Contact grid — 2 columns */
@@ -818,22 +818,19 @@
     padding-bottom: 22px; /* no border → 18px text + 22px = 40px tap target */
   }
 
-  /* Inline text highlight — full tap area stays, only text gets black bg */
-  .about-page .contact-link .contact-label {
-    display: inline-block;
-    transition: color 150ms ease, background-color 150ms ease;
-  }
-
+  /* Full-width black bg clipped to text+border height, not the full tap area */
   .about-page .contact-link:hover,
   .about-page .contact-link:active {
-    color: inherit;
-    background: none;
+    color: #fff;
+    background-color: #000;
+    background-size: 100% 20px; /* 2px border + 18px text */
+    background-repeat: no-repeat;
+    background-position: top;
   }
 
-  .about-page .contact-link:hover .contact-label,
-  .about-page .contact-link:active .contact-label {
-    color: #fff;
-    background: #000;
+  .about-page .contact-grid .contact-link:nth-child(-n+2):hover,
+  .about-page .contact-grid .contact-link:nth-child(-n+2):active {
+    background-size: 100% 18px; /* no border, just text */
   }
 
   /* Hide desktop download link on mobile */
