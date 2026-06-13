@@ -34,6 +34,15 @@ Next milestone: finish all content in HTML → then migrate to Nuxt.
 - Finalize About content
 - Replace all placeholder images (cap.jpg, laptop.jpg, etc.)
 
+### Phase 3.5 — Pre-launch (before going live)
+- Convert all photos to WebP (80–85% quality, target <400KB for covers, <80KB for thumbs)
+- Batch conversion script: `node scripts/convert-images.js` — drag folder, outputs WebP
+- Add `<meta name="description">` to every page
+- Add Open Graph tags (`og:title`, `og:description`, `og:image`, `og:url`) to every page
+- Register on Google Search Console, submit sitemap.xml
+- Connect Google Analytics 4 (one tag per HTML file, or once in Nuxt layout)
+- ⚠️ Reminder: do SEO and analytics setup right after the site goes live on a real domain
+
 ### Phase 4 — Migrate to Nuxt
 - Create Nuxt project, move CSS into assets
 - Build layout components (shell, nav, content pane, scrollbar)
