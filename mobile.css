@@ -808,7 +808,7 @@
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
-    padding: 4px 0 16px; /* 2px border + 4px + ~18px text + 16px = 40px tap target */
+    padding: 0 0 20px; /* 2px border + 0 + ~18px text + 20px = 40px tap target */
     border-top-width: 2px;
   }
 
