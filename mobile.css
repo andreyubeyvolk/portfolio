@@ -808,13 +808,14 @@
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
-    padding: 4px 0 10px;
+    padding: 4px 0 16px; /* 2px border + 4px + ~18px text + 16px = 40px tap target */
     border-top-width: 2px;
   }
 
   .about-page .contact-grid .contact-link:nth-child(-n+2) {
     border-top: none;
     padding-top: 0;
+    padding-bottom: 22px; /* no border → 18px text + 22px = 40px tap target */
   }
 
   /* Hide desktop download link on mobile */
