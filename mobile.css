@@ -6,7 +6,11 @@
 .reel-card__overlay-left,
 .reel-card__overlay-right,
 .menu-overlay,
-.mobile-menu {
+.mobile-menu,
+.open-to-portrait,
+.about-download-mobile,
+.project-bar,
+.mobile-project {
   display: none;
 }
 
@@ -14,6 +18,17 @@
    MOBILE LAYOUT  ≤ 640px
    ───────────────────────────────────────────── */
 @media (max-width: 640px) {
+
+  /* ── Global rule: intro paragraph spacing ──
+     All section-intro blocks on every page use 2 paragraphs.
+     Gap between them = 8px (less than side padding, more than line-height). */
+  .section-intro p {
+    margin: 0 0 8px;
+  }
+
+  .section-intro p:last-child {
+    margin-bottom: 0;
+  }
 
   /* ── Shell ── */
   body {
@@ -104,7 +119,7 @@
     line-height: 1.2;
     letter-spacing: -0.4px;
     color: #171717;
-    margin: 0 0 16px;
+    margin: 0 0 8px;
   }
 
   .home-portrait {
@@ -353,7 +368,6 @@
     line-height: 1.2;
     letter-spacing: -0.4px;
     color: #171717;
-    margin: 0;
   }
 
   .archive-page .archive-grid {
@@ -396,7 +410,7 @@
     line-height: 1.2;
     letter-spacing: -0.4px;
     color: #171717;
-    margin: 0 0 16px;
+    margin: 0 0 8px;
   }
 
   .inhouse-page .section-intro.intro p:last-child,
@@ -441,7 +455,7 @@
     background: #fff;
     border: none;
     font-family: 'Inter', sans-serif;
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -609,6 +623,458 @@
     background: #171717;
     padding: 0 4px;
     transition: none;
+  }
+
+  /* ── About page ── */
+
+  /* Intro text: two paras, no extra top padding (site-shell already has 16px), then 96px gap before content */
+  .about-page .section-intro.home-intro {
+    padding-top: 0;
+    margin-bottom: 128px;
+  }
+
+  .about-page .section-intro.home-intro p {
+    margin: 0 0 8px;
+  }
+
+  .about-page .section-intro.home-intro p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Reset desktop article grid → plain column */
+  .about-page .about-view {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
+  }
+
+  /* Photo: full-width square, 8px gap below */
+  .about-page .about-photo {
+    grid-column: unset;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    margin: 0 0 8px;
+  }
+
+  /* Sections: flex row — label (84px) + content (flex-1) */
+  .about-page .about-section {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: flex-start;
+    grid-column: unset;
+    border-top: 4px solid #171717;
+    margin-top: 96px;
+    margin-bottom: 0;
+    padding-top: 0;
+  }
+
+  /* Focus — no top line, no top margin (immediately after photo) */
+  .about-page .about-section:first-of-type {
+    border-top: none;
+    margin-top: 0;
+  }
+
+  .about-page .about-section__label {
+    grid-column: unset;
+    width: 84px;
+    min-width: 84px;
+    flex-shrink: 0;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    margin: 0;
+  }
+
+  .about-page .about-section__content {
+    grid-column: unset;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .about-page .about-section__content > p {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    margin: 0;
+  }
+
+  /* Contact section — same layout as others */
+  .about-page .about-section--contact .about-section__content {
+    grid-column: unset;
+    flex: 1;
+  }
+
+  /* Service rows (Focus) → stacked title + desc, dividers between rows */
+  .about-page .service-row {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 32px;
+    border-top: 2px solid #171717;
+    padding-top: 0;
+    grid-template-columns: unset;
+    column-gap: unset;
+    align-items: unset;
+  }
+
+  .about-page .service-row:first-child {
+    border-top: none;
+  }
+
+  .about-page .service-row__title,
+  .about-page .service-row__desc {
+    grid-column: unset;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    margin: 0;
+  }
+
+  /* Experience rows → стaircase (лесенка):
+     container = flex-col + align-items: flex-end
+     company = full width → appears left edge
+     role    = 175px → indented (266-175=91px from left)
+     years   = 83px  → most indented (266-83=183px from left) */
+  .about-page .exp-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+    margin-bottom: 21px;
+    border-top: 2px solid #171717;
+    padding-top: 0;
+    grid-template-columns: unset;
+    column-gap: unset;
+  }
+
+  .about-page .exp-row:first-child {
+    border-top: none;
+  }
+
+  .about-page .exp-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .about-page .exp-row__company,
+  .about-page .exp-row__role,
+  .about-page .exp-row__years {
+    grid-column: unset;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    text-align: left;
+  }
+
+  /* Staircase widths */
+  .about-page .exp-row__company {
+    width: 100%;
+  }
+
+  .about-page .exp-row__role {
+    width: 175px;
+  }
+
+  .about-page .exp-row__years {
+    width: 83px;
+  }
+
+  /* Open to portrait — 83×83, shown on mobile */
+  .about-page .open-to-portrait {
+    display: block;
+    width: 83px;
+    height: 83px;
+    object-fit: cover;
+    object-position: top;
+    margin-top: 16px;
+  }
+
+  /* Contact grid — 2 columns */
+  .about-page .contact-grid {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 8px;
+    row-gap: 0;
+  }
+
+  .about-page .contact-link {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    padding: 10px 0;
+    border-top-width: 2px;
+  }
+
+  .about-page .contact-grid .contact-link:nth-child(-n+2) {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  /* Hide desktop download link on mobile */
+  .about-page .about-download {
+    display: none;
+  }
+
+  /* Mobile download PDF section — right-aligned, 129px (= one action-button width) */
+  .about-page .about-download-mobile {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 96px;
+  }
+
+  .about-page .about-download-mobile .download-pdf-btn {
+    width: 129px;
+  }
+
+  .about-page .download-pdf-btn {
+    display: block;
+    width: 100%;
+    border-top: 4px solid #171717;
+    padding-top: 2px;
+    padding-bottom: 0;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 150ms ease, background-color 150ms ease;
+  }
+
+  .about-page .download-pdf-btn.is-downloading {
+    color: #fff;
+    background-color: #171717;
+  }
+
+  /* ── Project page (mobile) ── */
+
+  /* Hide desktop shell and section intro */
+  .project-page .site-shell {
+    display: none;
+  }
+
+  /* Fixed top bar: project title + [X] */
+  .project-page .project-bar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: #f5f4f4;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 100;
+  }
+
+  .project-bar__title {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+  }
+
+  .project-bar__close {
+    display: flex;
+    align-items: center;
+    height: 40px; /* full bar height = full tap area */
+    padding-left: 32px; /* wider tap zone to the left */
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 150ms ease, background-color 150ms ease;
+  }
+
+  .project-bar__close:active {
+    color: #fff;
+    background-color: #171717;
+  }
+
+  /* Scrollable project content */
+  .project-page .mobile-project {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 56px 16px 200px; /* 40px bar + 16px gap top; 200px clears bottom bar */
+    background: #f5f4f4;
+    min-height: 100vh;
+  }
+
+  .mobile-project__intro {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    margin: 0 0 88px; /* 88px + 8px flex gap = 96px to first photo */
+  }
+
+  /* Photos: full width, auto height, no margin (gap handles spacing) */
+  .mobile-project__photo {
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .mobile-project__photo img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Short landscape photo (e.g. wide mockup) */
+  .mobile-project__photo--short img {
+    max-height: 184px;
+    object-fit: cover;
+  }
+
+  /* Challenge / Solution text blocks */
+  .mobile-project__blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 8px;
+  }
+
+  .mobile-project__block {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  /* 2px divider above Solution */
+  .mobile-project__block--divider {
+    border-top: 2px solid #171717;
+  }
+
+  .mobile-project__label {
+    width: 84px;
+    min-width: 84px;
+    flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+  }
+
+  .mobile-project__text {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Solution column: text + icon */
+  .mobile-project__solution {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Small square icon/logo */
+  .mobile-project__icon {
+    width: 83px;
+    height: 83px;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  /*
+   * Solution outer group: wraps [Solution block] + [Download/Next buttons].
+   * gap-40px between them, right-aligned (items-end).
+   */
+  .mobile-solution-group {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: flex-end;
+  }
+
+  /* Inner solution block stretches full width */
+  .mobile-solution-group > .mobile-project__block {
+    width: 100%;
+  }
+
+  /* Download/Next buttons row — aligned with text column (right of 84px label) */
+  .mobile-project__actions {
+    display: flex;
+    gap: 8px;
+    width: calc(100% - 84px - 8px);
+  }
+
+  .mobile-project__action {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mobile-project__action-bar {
+    height: 4px;
+    background: #171717;
+    flex-shrink: 0;
+  }
+
+  .mobile-project__action a,
+  .next-project-btn {
+    display: block;
+    padding: 0;
+    background: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    width: 100%;
+    transition: color 150ms ease, background-color 150ms ease;
+  }
+
+  .mobile-project__action a:hover,
+  .mobile-project__action a:active,
+  .next-project-btn:hover,
+  .next-project-btn:active {
+    color: #fff;
+    background-color: #171717;
   }
 
 }

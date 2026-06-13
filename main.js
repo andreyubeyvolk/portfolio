@@ -1,4 +1,18 @@
 (function () {
+  // ── Download PDF — flash highlight on click ──
+  const downloadBtns = Array.from(document.querySelectorAll(".download-pdf-btn"));
+
+  downloadBtns.forEach((btn) => {
+    let timer = 0;
+    btn.addEventListener("click", () => {
+      clearTimeout(timer);
+      btn.classList.add("is-downloading");
+      timer = setTimeout(() => btn.classList.remove("is-downloading"), 1600);
+    });
+  });
+})();
+
+(function () {
   const copyButtons = Array.from(document.querySelectorAll("[data-copy-email]"));
 
   if (copyButtons.length === 0) {

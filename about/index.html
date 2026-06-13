@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -105,7 +105,7 @@
         margin-top: 0;
       }
 
-      /* Service rows (Focus) — 2px divider, 4px gap, 32px between blocks */
+      /* Service rows (Focus)—2px divider, 4px gap, 32px between blocks */
       .service-row {
         display: grid;
         grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -160,7 +160,7 @@
       .exp-row__years   { grid-column: 9 / 13; }
 
 
-      /* Download — right quarter, 4px divider */
+      /* Download—right quarter, 4px divider */
       .about-download {
         grid-column: 13 / 17;
         border-top: 4px solid var(--text);
@@ -197,11 +197,11 @@
 
       <section class="section-intro home-intro" aria-label="About Andrey Ubeyvolk">
         <p>
-          Andrey is a conceptual art director specializing in visual
-          communications and brand identity for tech companies and Series A/B
-          startups ready to scale.
+          Conceptual art direction for startups, AI, crypto, and art-fashion brands.
         </p>
-
+        <p>
+          Deep, non-template work that finds your character—so you stop blending in.
+        </p>
       </section>
 
       <section class="content-pane about-pane" aria-label="About content">
@@ -212,17 +212,17 @@
               <img src="../assets/about-hero.jpg" alt="Andrey Ubeyvolk" />
             </figure>
 
-            <!-- Focus — no top line (first section) -->
+            <!-- Focus—no top line (first section) -->
             <section class="about-section">
               <h2 class="about-section__label">Focus</h2>
               <div class="about-section__content">
                 <div class="service-row">
                   <span class="service-row__title">Brand Strategy</span>
-                  <p class="service-row__desc">The business foundation before anything is made—core narrative and direction that give design its reason to exist.</p>
+                  <p class="service-row__desc">The business foundation before anything is made—finding your core, your silence, your central meaning. With AI as part of the process, instead of a separate strategy team.</p>
                 </div>
                 <div class="service-row">
                   <span class="service-row__title">Brand Identity</span>
-                  <p class="service-row__desc">From a core visual system to a full marketing ecosystem—across every touchpoint, digital and physical. Including artificial intelligence for visual generation and team workflow.</p>
+                  <p class="service-row__desc">From a core visual system to a full marketing ecosystem—across every touchpoint, digital and physical. AI expands the toolkit for faster iteration and bolder concepts.</p>
                 </div>
                 <div class="service-row">
                   <span class="service-row__title">Visual Artifacts</span>
@@ -230,24 +230,24 @@
                 </div>
                 <div class="service-row">
                   <span class="service-row__title">Design Consulting</span>
-                  <p class="service-row__desc">A sharp audit of what you have—what works, what doesn't, and why. Competitor research, best practices, and clear directions for where to win or differentiate.</p>
+                  <p class="service-row__desc">A sharp audit of what you have—what works, what doesn't, and why. Including where AI tools could fit into your workflow.</p>
                 </div>
                 <div class="service-row">
                   <span class="service-row__title">Mentoring</span>
-                  <p class="service-row__desc">For designers at any level—design principles, quality control, artistic practice, and a clear path to growth.</p>
+                  <p class="service-row__desc">For designers at any level—design principles, quality control, artistic practice, and a clear path to growth. Not a mass course—a mentor-to-student approach, built on depth.</p>
                 </div>
               </div>
             </section>
 
-            <!-- Leading Team — 4px top line -->
+            <!-- Leading Teams—4px top line -->
             <section class="about-section">
-              <h2 class="about-section__label">Leading Team</h2>
+              <h2 class="about-section__label">Leading<br>Teams</h2>
               <div class="about-section__content">
-                <p>Demanding on detail, logic, and visual quality. I help hire strong players, share knowledge directly, and develop each designer with close attention to their personality and strengths. Strong teams build strong brands—and brands that grow.</p>
+                <p>I hire and develop the strongest players—for quality, speed, and judgment that move the business forward. People who stay, and become the foundation a brand can grow on. Demanding on detail, logic, and visual quality, with close attention to each designer's personality and strengths.</p>
               </div>
             </section>
 
-            <!-- Experience — 4px top line -->
+            <!-- Experience—4px top line -->
             <section class="about-section">
               <h2 class="about-section__label">Experience</h2>
               <div class="about-section__content">
@@ -284,9 +284,18 @@
               </div>
             </section>
 
-            <!-- Contact — 4px top line -->
+            <!-- Open to—4px top line -->
+            <section class="about-section about-section--open-to">
+              <h2 class="about-section__label">Open to</h2>
+              <div class="about-section__content">
+                <p>In-house, full-time—leading design inside a team. Or as a guest expert—for a specific brief, project, or rebranding.</p>
+                <img class="open-to-portrait" src="../assets/portrait.jpg" alt="" aria-hidden="true" />
+              </div>
+            </section>
+
+            <!-- Contact—4px top line -->
             <section class="about-section about-section--contact">
-              <h2 class="about-section__label">Contact</h2>
+              <h2 class="about-section__label">Contacts</h2>
               <div class="about-section__content">
                 <div class="contact-grid">
                   <button class="contact-link" type="button" data-copy-email="6169393@gmail.com">Mail<span class="copy-label" aria-hidden="true">Copied</span></button>
@@ -299,9 +308,14 @@
               </div>
             </section>
 
-            <!-- Download — cols 13-17, 4px top line -->
+            <!-- Download—desktop: cols 13-17, 4px top line; mobile: full-width section -->
             <div class="about-download">
-              <a href="#">Download PDF-resume [↓]</a>
+              <a class="download-pdf-btn" href="../assets/Andrey-Ubeyvolk-Resume.pdf" download>Download PDF-resume</a>
+            </div>
+
+            <!-- Mobile-only: Download full PDF section (4px divider + full-width button) -->
+            <div class="about-download-mobile">
+              <a class="download-pdf-btn" href="../assets/Andrey-Ubeyvolk-Resume.pdf" download>Download full PDF-resume</a>
             </div>
 
           </article>
@@ -328,7 +342,7 @@
         <a href="../inhouse/index.html">Inhouse</a>
         <a href="../brands/index.html">Brands</a>
         <a href="../archive/index.html">Archive</a>
-        <a href="../about/index.html">About</a>
+        <a href="../about/index.html" aria-current="page">About</a>
       </nav>
     </div>
 
