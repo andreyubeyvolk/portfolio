@@ -228,7 +228,15 @@
     border-top: none;
   }
 
-  /* Keep black highlight while Copied label is visible */
+  /* Neutralize sticky hover on touch; rely on :active + is-copied only */
+  .home-socials a:hover,
+  .home-socials button:hover {
+    color: inherit;
+    background-color: transparent;
+  }
+
+  .home-socials a:active,
+  .home-socials button:active,
   .home-socials .copy-mail-link.is-copied {
     color: #fff;
     background-color: #000;
@@ -846,14 +854,23 @@
     height: 18px; /* no border, just line-height */
   }
 
-  .about-page .contact-link:hover,
+  /* Neutralize sticky hover on touch */
+  .about-page .contact-link:hover {
+    color: inherit;
+    background: none;
+  }
+
+  .about-page .contact-link:hover::before {
+    opacity: 0;
+  }
+
+  /* Touch feedback + Copied state */
   .about-page .contact-link:active,
   .about-page .contact-link.is-copied {
     color: #fff;
     background: none;
   }
 
-  .about-page .contact-link:hover::before,
   .about-page .contact-link:active::before,
   .about-page .contact-link.is-copied::before {
     opacity: 1;
