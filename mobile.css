@@ -128,7 +128,7 @@
     aspect-ratio: 1 / 1;
     overflow: hidden;
     margin: 0;
-    margin-top: 2px;
+    margin-top: 4px;
   }
 
   .home-portrait img {
@@ -226,6 +226,12 @@
   .home-socials :nth-child(1),
   .home-socials :nth-child(4) {
     border-top: none;
+  }
+
+  /* Keep black highlight while Copied label is visible */
+  .home-socials .copy-mail-link.is-copied {
+    color: #fff;
+    background-color: #000;
   }
 
   /* ── Archive card overlay ── */
