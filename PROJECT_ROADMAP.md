@@ -1,278 +1,180 @@
-# Portfolio Project Roadmap
+# Portfolio — Project Roadmap
 
-## Purpose
+## Current State
 
-This file is the working memory for the portfolio site. Read it at the start of each session before making structural changes.
+Static HTML/CSS/JS portfolio. Desktop and mobile layouts built. One project page (Stickerburg) fully implemented. All main sections exist as pages.
 
-Current state:
-- Static HTML/CSS prototype.
-- Main files: `index.html`, `styles.css`, `assets/`.
-- The current visual direction is worth preserving: minimal, precise, editorial, grid-based.
-- Do not multiply pages by copy-pasting full HTML layouts. Shared layout, navigation, scroll, video, and content patterns should become reusable.
+Stack: vanilla HTML + CSS + JS. No framework, no build step.
+Next milestone: finish all content in HTML → then migrate to Nuxt.
 
-## Progress Log
+---
 
-### 2026-04-21
+## Implementation Phases
 
-- Added this roadmap.
-- Started turning the static prototype into future component-shaped HTML/CSS.
-- Added structural classes:
-  - `site-shell`
-  - `section-intro`
-  - `content-pane`
-  - `content-pane__header`
-  - `content-pane__scroll`
-  - `project-view`
-  - `social-links`
-- Extracted reusable scrollbar styling into `.custom-scroll`.
-- Added active menu italic style through `.nav-list a.is-active`.
-- Added static route prototype:
-  - `inhouse/index.html`
-  - `inhouse/stickerburg/index.html`
-- Refined scrollbar sizing variables:
-  - `--scrollbar-thumb-width`
-  - `--scrollbar-track-padding`
-  - `--scrollbar-gutter`
-- Native Chrome/Windows scrollbar styling was not enough for the desired sharp black rectangle. Started custom visual scrollbar in `scroll.js`, with native scroll hidden inside `.custom-scroll`.
-- Replaced root `index.html` with home page prototype:
-  - intro text and portrait;
-  - reel poster with custom play/title assets;
-  - two-column social links under reel.
-- Added home assets:
-  - `assets/reel.jpg`
-  - `assets/portrait.jpg`
-  - `assets/reel-icon.svg`
-  - `assets/reel-text.svg`
+### Phase 1 — Stabilize desktop prototype ✅ DONE
+- 24-column grid, custom scrollbar, navigation behavior
+- Home page: reel, portrait, social links
+- Inhouse, Brands, Archive, About pages built
+- Project page template (Stickerburg as reference)
+- Active nav state, hover underlines, close button behavior
 
-## Core Direction
+### Phase 2 — Mobile layouts ✅ DONE
+- Mobile nav bar, mobile menu overlay
+- All sections adapted for mobile: Home, Inhouse, Brands, Archive, About
+- Mobile project page: Stickerburg
+- Load more pagination (Inhouse, Brands, Archive)
+- Archive card preview on mobile (overlay)
+- Consistent background dimming on card open (mobile + desktop)
 
-Build the site first as a stable visual prototype, then migrate it to Nuxt as a component system.
+### Phase 3 — Finish HTML content 🔄 IN PROGRESS
+- Fill remaining Inhouse project pages (currently only Stickerburg done)
+- Fill remaining Brands project pages
+- Add real Archive cards with actual images
+- Add AI section (new menu item) — see Routes below
+- Finalize About content
+- Replace all placeholder images (cap.jpg, laptop.jpg, etc.)
 
-Do not migrate to Nuxt before the base desktop composition, scroll behavior, navigation behavior, and reel behavior are clear enough.
+### Phase 4 — Migrate to Nuxt
+- Create Nuxt project, move CSS into assets
+- Build layout components (shell, nav, content pane, scrollbar)
+- Implement routes matching the route plan below
+- Move nav, projects, archive to local data files
+- Add page/layout transitions (fade, curtain — the main reason for Nuxt)
+- Preserve desktop layout pixel-exactly before adding any new behavior
 
-Target stack later:
-- Nuxt for routing, layouts, reusable components, transitions, and future CMS integration.
-- Local content data first.
-- Consider Nuxt Content or Sanity only after project fields and archive behavior are stable.
+### Phase 5 — Interactions & animations
+- Route/page transitions (fade ~250ms or curtain effect)
+- Project open/close animation
+- Archive item open/close animation
+- Custom reel video player (play/pause, progress, mute, fullscreen)
+- GSAP or Motion One for complex transitions
 
-## Desktop Layout
+### Phase 6 — Content system (optional)
+- Decision: local data files vs Nuxt Content vs Sanity
+- Only after content model is fully stable
+- Sanity if non-code editing (image upload, crop, hotspot) becomes needed
 
-Use a 24-column grid.
-
-Base geometry:
-- Page margin: `16px`.
-- Grid gutter: `16px`.
-- Columns `1-4`: fixed logo and menu.
-- Columns `5-8`: section info block.
-- Columns `9-24`: main content pane.
-
-Typography:
-- Font: Inter for now.
-- Base text: `16px`.
-- Base line-height: `20px`.
-- Letter spacing: `0`.
-
-Visual rules:
-- White background.
-- Black text.
-- No decorative cards.
-- No rounded UI unless needed by a specific media asset.
-- No gradients except possible subtle black overlay for video controls.
-- Keep layout editorial and precise.
+---
 
 ## Routes
 
-Future Nuxt routes should support shareable URLs while preserving the same visual layout.
-
-Planned routes:
-
-```text
-/                         Home / reel
-/inhouse                  Inhouse project list
-/inhouse/[slug]           Open inhouse project
-/brands                   Brands project list
-/brands/[slug]            Open brand project
-/archive                  Archive grid
-/archive/[slug]           Open archive item
-/about                    About page
+```
+/                   Home / reel
+/inhouse            Inhouse project grid
+/inhouse/[slug]     Single inhouse project
+/brands             Brands project grid
+/brands/[slug]      Single brand project
+/archive            Archive grid
+/about              About page
+/ai                 AI projects, plugins, tools, experiments (future)
 ```
 
-Important routing decision:
-- Projects should not be only internal state inside `/inhouse` or `/brands`.
-- Each opened project needs its own URL.
-- Visually, the opened project still appears inside the right content pane, columns `9-24`.
+Note: each opened project needs its own URL. Visually it opens inside the right content pane (columns 9–24), but the URL changes.
 
-## Navigation
-
-Final desktop menu:
-- Inhouse
-- Brands
-- Archive
-- About
-
-Logo:
-- Click returns to `/`.
-- Hover opacity: about `60-70%`.
-
-Menu behavior:
-- Active section is italic.
-- Hover underline animates left to right.
-- Current structure should allow a future fifth menu item.
-- Future special item may be visually separated by extra spacing.
-
-Future data shape:
-
-```ts
-[
-  { label: 'Inhouse', to: '/inhouse' },
-  { label: 'Brands', to: '/brands' },
-  { label: 'Archive', to: '/archive' },
-  { label: 'About', to: '/about' }
-]
-```
-
-Possible later special item:
-
-```ts
-{ label: 'Special', to: '/special', group: 'secondary' }
-```
-
-## Home Page
-
-Home is a separate start page and is not listed as a menu item.
-
-Desktop composition:
-- Columns `1-4`: logo and menu.
-- Columns `5-8`: short personal/section text plus small square photo.
-- Columns `9-24`: video showreel.
-- Under the reel: text social links.
-
-Future optional additions:
-- Banner below social links, for example PDF report download.
-- Small photo interaction: hover/click may expand into vertical video or another compact media component.
-
-Home reel:
-- No visible frame.
-- Center play icon plus word `Reel`.
-- Existing source assets mentioned by user:
-  - `C:/Users/User/Downloads/Reel text.svg`
-  - `C:/Users/User/Downloads/Reel icon.svg`
-- Later move these into project assets, likely `public/icons/` in Nuxt.
-
-## Video Player
-
-Use a custom player over native HTML5 video.
-
-Required controls:
-- Play/pause.
-- Loading/progress bar.
-- Volume/mute.
-- Quality selector.
-- Fullscreen/expand.
-- Collapse/close from fullscreen.
-- Esc should close fullscreen if possible.
-
-Visual direction:
-- Minimal white controls.
-- Controls appear near bottom, likely on hover.
-- A subtle black gradient behind controls is acceptable for readability.
-- Start state is only play triangle plus `Reel` in the center.
-
-Implementation notes:
-- For full custom controls, prefer direct video files with multiple qualities.
-- Vimeo iframe limits control customization.
-- Later component name: `ReelPlayer.vue`.
-
-## Scroll
-
-Scroll is a site-level behavior, not a project-specific hack.
-
-Where it appears:
-- Main content pane when page/project content exceeds viewport height.
-- Nested project/archive content blocks if needed.
-
-Visual:
-- White track/background.
-- No arrows at top or bottom.
-- Thumb is a black rectangle.
-- No rounded corners.
-- Standard browser scroll mechanics.
-
-Geometry:
-- Right side should feel like: `4px` outer space + `8px` black scrollbar + `4px` inner space before content.
-- Scrollbar belongs inside the right content area, not outside the page margin.
-
-Future CSS abstraction:
-
-```css
-.custom-scroll {
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: auto;
-  scrollbar-color: #000 #fff;
-}
-```
-
-All scrollable panes should use a shared class or `CustomScroll` component later.
+---
 
 ## Sections
 
 ### Inhouse
-
-Purpose:
-- In-house projects.
-
-Behavior:
-- Section page shows project cards/list inside columns `9-24`.
-- Clicking a project opens it inside the same right content pane.
-- URL must become `/inhouse/[slug]`.
-- Project content can scroll vertically.
+In-house work: brand identity, campaigns, design systems, team leadership.
+Grid of project cards → click opens project in right pane.
+Each project = own slug + own page.
 
 ### Brands
-
-Purpose:
-- Side projects / brand projects.
-
-Behavior:
-- Same interaction model as Inhouse.
-- URL must become `/brands/[slug]`.
+Brand/client projects. Same interaction model as Inhouse.
 
 ### Archive
-
-Purpose:
-- Smaller focused works, selected projects, visual explorations, experiments across design, AI, and other mediums.
-
-Index behavior:
-- Right content pane contains card grid.
-- Cards are usually 4 columns wide.
-- Card has image plus caption.
-
-Open item behavior:
-- Clicking a card opens image/item inside the right content pane.
-- URL must become `/archive/[slug]`.
-- Open item has title and close button at top.
-- Vertical images scale by width/columns; height follows image.
-- Horizontal images can span about 14 columns to visually crop/interfere with lower cards.
+Smaller focused works, visual explorations, AI experiments, selected references.
+Grid of image cards → click opens card preview (image + title + description).
+Cards added frequently — should be data-driven in Nuxt.
 
 ### About
+Personal page: focus areas, experience, open to, contacts, PDF resume download.
 
-Purpose:
-- Personal/about page.
+### AI (planned)
+Separate menu section for AI-related work:
+presentations, plugins, effects, utilities, process documentation, downloadable files.
+May use a different card layout (file/download-oriented vs image-oriented).
+Add as 5th nav item with slight visual separation from the main four.
 
-Content:
-- Photos.
-- Text.
-- Possibly reel/video.
-- Social links.
+---
 
-Structure:
-- Similar to project page/content pane model.
+## Asset Convention
 
-## Project Content Model
+```
+assets/
+  logo.svg                          Brand logo (used everywhere)
+  portrait.jpg                      Home page portrait
+  reel.jpg / reel-icon.svg          Home page reel
+  about-hero.jpg                    Placeholder (replace)
+  inhouse/
+    [slug]/
+      [slug]-cover.jpg              Main cover image
+      [slug]-about.jpg              Intro/about thumbnail
+      [slug]-photo-01.jpg           Body photos, numbered
+      [slug]-photo-02.jpg
+      [slug]-icon.png               Project logo/icon if exists
+  brands/
+    [slug]/                         Same naming convention as inhouse
+  archive/
+    archive-[description].jpg       Archive images, descriptive name
+  about/
+    (portrait and assets specific to about page)
+```
 
-Projects should be data-driven later.
+Rule: always prefix project files with the project slug.
+Reason: unique filenames across the whole project, safe to download as a zip, no collision if all images are in one folder.
 
-Possible project fields:
+---
+
+## Desktop Layout
+
+24-column grid.
+
+- Page margin: 16px
+- Grid gutter: 16px
+- Columns 1–4: logo + nav
+- Columns 5–8: section intro text
+- Columns 9–24: content pane (scrollable)
+
+Typography:
+- Font: Inter
+- Base: 16px / 20px line-height
+- Letter spacing: 0 (section labels: –0.02em)
+
+Visual rules:
+- Background: #F5F4F4
+- Text: #171717
+- No rounded UI unless forced by media
+- No gradients (subtle black overlay on video controls is ok)
+- No decorative effects
+- Editorial, grid-based, minimal
+
+Scrollbar (content pane):
+- 4px outer space + 8px black thumb + 4px inner space
+- No rounded corners, no arrows
+- Implemented via scroll.js + custom WebKit styles
+
+---
+
+## Navigation
+
+Desktop:
+- 4 items: Inhouse, Brands, Archive, About
+- Active item: italic
+- Hover: underline animates left to right
+- Logo: click → home, hover → opacity ~0.7
+- Future 5th item (AI): same nav, slight extra top spacing to separate it visually
+
+Mobile:
+- Bottom bar: logo left, Menu button right
+- Menu opens as overlay from bottom
+- Menu contains same section links
+- Project pages: fixed top bar with project title + close button
+
+---
+
+## Project Content Model (for Nuxt later)
 
 ```ts
 type Project = {
@@ -280,173 +182,87 @@ type Project = {
   slug: string
   section: 'inhouse' | 'brands'
   description?: string
-  cover: MediaItem
-  content: ProjectBlock[]
+  cover: string         // filename in assets/[section]/[slug]/
+  about?: string        // thumbnail filename
+  icon?: string         // icon/logo filename
+  challenge?: string
+  solution?: string
+  photos: string[]      // photo-01, photo-02, ...
 }
 ```
 
-Possible block types:
-
+Block types for flexible project layouts:
 ```ts
 type ProjectBlock =
-  | { type: 'image'; src: string; alt: string; span: 8 | 16; ratio?: string }
-  | { type: 'video'; src: string; poster?: string; span: 8 | 16 }
-  | { type: 'text'; text: string; span: 8; style?: 'body' | 'large' }
-  | { type: 'split'; media: MediaItem; text: string }
+  | { type: 'cover';  src: string }
+  | { type: 'about';  thumb: string; text: string }
+  | { type: 'pair';   photos: [string, string] }
+  | { type: 'wide';   src: string }
+  | { type: 'info';   challenge: string; solution: string; icon?: string }
 ```
 
-Do not lock project pages into one rigid template. Keep enough structure for:
-- 8-column media.
-- 16-column media.
-- Text blocks.
-- Split media/text rows.
-- Videos.
+---
 
-## Responsive Plan
+## Transitions (Nuxt Phase)
 
-Desktop:
-- 24-column layout.
-- Left menu fixed.
-- Section info fixed in columns `5-8`.
-- Content scrolls in columns `9-24`.
+Main reason for Nuxt: page transitions are not possible in clean HTML without complex JS hacks.
 
-Tablet:
-- Needs design exploration.
-- Possible compact logo variant.
-- Long logo may switch to two-line/stacked logo.
-- Do not squeeze text columns until they become ugly.
+Planned:
+- Route change: fade 200–300ms (start simple)
+- Project open/close: possible curtain or slide from right
+- Archive card open/close: expand from card position or fade overlay
+- GSAP hooks: `onBeforeLeave` / `onEnter` for complex sequences
 
-Mobile:
-- Top white bar.
-- Logo on left.
-- `[menu]` text or icon on right.
-- Menu opens fullscreen.
-- Menu contains section links.
-- Mobile fullscreen menu may include social links at bottom.
-- Content becomes single-column/full-width.
+Start simple (opacity fade), refine after migration is stable.
 
-Assets to consider:
-- `logo-wide.svg`.
-- `logo-stacked.svg`.
+---
 
-## Transitions
+## Data Structure (Nuxt Phase)
 
-Desired direction:
-- Soft page/content fade.
-- No heavy animation at first.
-- Later: animated video fullscreen expand/collapse.
-- Later: project/archive item opening animation if it fits the design.
-
-Nuxt later:
-- Use page/layout transitions for route changes.
-- Start with simple opacity transition around `200-300ms`.
-
-## CMS / Content Editing
-
-Do not add Sanity immediately.
-
-Recommended phases:
-1. Static HTML/CSS prototype.
-2. Nuxt with local data files.
-3. Add Nuxt Content or Sanity only after content fields are stable.
-
-Local data first:
-
-```text
+```
 data/
-  nav.ts
-  home.ts
-  projects.ts
-  archive.ts
-  about.ts
+  nav.ts          Menu items and routes
+  projects.ts     All inhouse + brands projects
+  archive.ts      All archive items
+  about.ts        About page content
+  ai.ts           AI section content
 ```
 
-CMS decision later:
-- Nuxt Content if content can live in markdown/data files.
-- Sanity if image uploading, admin editing, crop/hotspot, and non-code content updates become important.
+CMS decision (Phase 6):
+- Nuxt Content: if content stays in files, no external editing needed
+- Sanity: if image upload, crop, hotspot, non-code editing becomes important
+- Do not add CMS until content model is 100% stable
 
-## Implementation Phases
-
-### Phase 1 - Stabilize Current Prototype
-
-- Preserve current desktop visual direction.
-- Finish custom scrollbar as reusable system class.
-- Clean current CSS into clearer sections.
-- Make current nav rules match final behavior:
-  - active item italic;
-  - hover underline;
-  - logo hover opacity.
-- Build/adjust home page layout with reel composition.
-- Keep changes scoped; do not introduce Nuxt yet unless explicitly decided.
-
-### Phase 2 - Define Reusable Static Patterns
-
-- Separate layout concepts in HTML/CSS:
-  - site shell;
-  - site nav;
-  - section intro;
-  - content pane;
-  - project scroll;
-  - social links;
-  - media blocks.
-- Avoid duplicate full-page HTML.
-- Prepare content examples for Inhouse, Brands, Archive, About.
-
-### Phase 3 - Migrate to Nuxt
-
-- Create Nuxt project structure.
-- Move visual CSS into Nuxt assets.
-- Build layout components.
-- Implement routes.
-- Move menu to data.
-- Move projects/archive to local data.
-- Preserve desktop layout exactly before adding new behavior.
-
-### Phase 4 - Add Interactions
-
-- Custom reel player.
-- Fullscreen video mode.
-- Mobile fullscreen menu.
-- Route/page transitions.
-- Archive open/close behavior.
-- Project open/close behavior.
-
-### Phase 5 - Content System
-
-- Decide local data vs Nuxt Content vs Sanity.
-- Only add CMS after the content model is stable.
-- Keep project data structured and portable.
-
-## Session Checklist
-
-At the start of a new session:
-1. Read `PROJECT_ROADMAP.md`.
-2. Read `PROJECT_NOTES.md`.
-3. Check `git status --short`.
-4. Confirm whether the goal is visual polishing, architecture, Nuxt migration, or content.
-5. Do not overwrite user edits.
-
-Before changing layout:
-1. Preserve 24-column desktop logic unless explicitly changing architecture.
-2. Check desktop first.
-3. Then check tablet/mobile implications.
-
-Before creating a new page:
-1. Ask whether it should be a future Nuxt route.
-2. Avoid copying the entire page shell.
-3. Reuse nav, intro, content pane, scroll, and media patterns.
-
-Before adding CMS:
-1. Confirm project/archive fields.
-2. Confirm image/video workflow.
-3. Confirm whether editing without code is actually needed now.
+---
 
 ## Open Decisions
 
-- Exact mobile menu design.
-- Tablet breakpoint and compact logo behavior.
-- Final reel video hosting/source strategy.
-- Whether video quality selector uses local files, CDN, Mux, Vimeo API, or another service.
-- Whether archive open item behaves like a route page, overlay-like content pane, or animated expansion.
-- Whether to use Nuxt Content or Sanity after Nuxt migration.
-- Whether the site needs a global footer. Current direction: no global footer yet; use reusable social links instead.
+- Tablet breakpoint behavior (compact logo, column collapse)
+- Reel video hosting: local file, Vimeo API, Mux, or CDN
+- Video quality selector approach
+- AI section card layout (download-oriented vs image-oriented)
+- Whether archive items need their own full URL or overlay-only is enough
+- Sanity vs Nuxt Content vs local data files
+
+---
+
+## Progress Log
+
+### 2026-04-21
+- Started roadmap
+- Built 24-column grid, custom scrollbar, nav behavior
+- Added structural CSS classes: site-shell, section-intro, content-pane, custom-scroll
+- Built home page: reel, portrait, social links
+- Added static routes: inhouse/index.html, inhouse/stickerburg/index.html
+
+### 2026-06-13
+- Phase 1 complete, Phase 2 complete
+- Built mobile layouts for all sections (Home, Inhouse, Brands, Archive, About)
+- Mobile nav: bottom bar, menu overlay, project bar
+- Stickerburg project page: full desktop layout (pv-* CSS system) + mobile layout
+- Archive card preview: desktop (overlay in content pane) + mobile (fixed overlay)
+- Consistent background dimming on card open (mobile + desktop)
+- Load more pagination: Inhouse, Brands, Archive
+- Asset restructure: project files prefixed with slug, logo.svg renamed, cyrillic filenames removed
+- Added .gitignore, git tag v0.1-mobile-complete
+- Decided: finish all content in HTML first, then migrate to Nuxt
