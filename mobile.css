@@ -818,6 +818,24 @@
     padding-bottom: 22px; /* no border → 18px text + 22px = 40px tap target */
   }
 
+  /* Inline text highlight — full tap area stays, only text gets black bg */
+  .about-page .contact-link .contact-label {
+    display: inline-block;
+    transition: color 150ms ease, background-color 150ms ease;
+  }
+
+  .about-page .contact-link:hover,
+  .about-page .contact-link:active {
+    color: inherit;
+    background: none;
+  }
+
+  .about-page .contact-link:hover .contact-label,
+  .about-page .contact-link:active .contact-label {
+    color: #fff;
+    background: #000;
+  }
+
   /* Hide desktop download link on mobile */
   .about-page .about-download {
     display: none;
