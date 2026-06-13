@@ -811,6 +811,8 @@
     letter-spacing: -0.4px;
     padding: 0 0 20px; /* 2px border + 0 + ~18px text + 20px = 40px tap target */
     border-top-width: 2px;
+    position: relative;
+    z-index: 0;
   }
 
   .about-page .contact-grid .contact-link:nth-child(-n+2) {
@@ -819,19 +821,34 @@
     padding-bottom: 22px; /* no border → 18px text + 22px = 40px tap target */
   }
 
-  /* Full-width black bg clipped to text+border height, not the full tap area */
+  /* Hover bar: full-width, covers border + text only (not the full tap area) */
+  .about-page .contact-link::before {
+    content: '';
+    position: absolute;
+    top: -2px; /* extends up to cover the 2px border */
+    left: 0;
+    right: 0;
+    height: 20px; /* 2px border + 18px line-height */
+    background: #171717;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 150ms ease;
+  }
+
+  .about-page .contact-grid .contact-link:nth-child(-n+2)::before {
+    top: 0;
+    height: 18px; /* no border, just line-height */
+  }
+
   .about-page .contact-link:hover,
   .about-page .contact-link:active {
     color: #fff;
-    background-color: #000;
-    background-size: 100% 20px; /* 2px border + 18px text */
-    background-repeat: no-repeat;
-    background-position: top;
+    background: none;
   }
 
-  .about-page .contact-grid .contact-link:nth-child(-n+2):hover,
-  .about-page .contact-grid .contact-link:nth-child(-n+2):active {
-    background-size: 100% 18px; /* no border, just text */
+  .about-page .contact-link:hover::before,
+  .about-page .contact-link:active::before {
+    opacity: 1;
   }
 
   /* Hide desktop download link on mobile */
