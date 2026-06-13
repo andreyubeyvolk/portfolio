@@ -712,7 +712,7 @@
   .about-page .service-row {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
     margin-bottom: 32px;
     border-top: 2px solid #171717;
     padding-top: 0;
@@ -744,7 +744,7 @@
   .about-page .exp-row {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     align-items: flex-end;
     margin-bottom: 21px;
     border-top: 2px solid #171717;
@@ -808,7 +808,7 @@
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
-    padding: 10px 0;
+    padding: 4px 0 10px;
     border-top-width: 2px;
   }
 
