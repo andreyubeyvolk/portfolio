@@ -841,13 +841,15 @@
   }
 
   .about-page .contact-link:hover,
-  .about-page .contact-link:active {
+  .about-page .contact-link:active,
+  .about-page .contact-link.is-copied {
     color: #fff;
     background: none;
   }
 
   .about-page .contact-link:hover::before,
-  .about-page .contact-link:active::before {
+  .about-page .contact-link:active::before,
+  .about-page .contact-link.is-copied::before {
     opacity: 1;
   }
 
