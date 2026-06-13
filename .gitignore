@@ -1,0 +1,8 @@
+# Claude Code worktrees (temp session copies)
+.claude/worktrees/
+
+# AI assistant config — keep locally, not needed in repo
+codex/
+
+# Dev/test artifacts
+screenshots/
