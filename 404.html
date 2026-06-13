@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="./assets/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="./assets/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" />
+    <meta name="description" content="Page not found — Andrey Ubeyvolk" />
+    <meta name="robots" content="noindex" />
+    <title>404 — Andrey Ubeyvolk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./mobile.css" />
+    <style>
+      /* ── 404 content area ── */
+      .not-found-pane {
+        grid-column: 5 / 25;
+        display: flex;
+        padding: 0;
+      }
+
+      .not-found-box {
+        flex: 1;
+        position: relative;
+        border: 2px solid #D3D3D3;
+        overflow: hidden;
+        background: #F5F4F4;
+      }
+
+      .not-found-box__x {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .not-found-label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #F5F4F4;
+        border: 2px solid #D3D3D3;
+        padding: 4px 6px;
+        text-align: center;
+        white-space: nowrap;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.4px;
+      }
+
+      .not-found-label p {
+        margin: 0;
+      }
+
+      .not-found-label p:first-child {
+        font-family: 'Impact', 'Arial Narrow', sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        letter-spacing: 0;
+      }
+
+      @media (max-width: 640px) {
+        .not-found-page .site-nav {
+          display: none;
+        }
+
+        .not-found-pane {
+          position: fixed;
+          inset: 16px;
+          display: flex;
+          grid-column: unset;
+        }
+
+        .not-found-box {
+          border: 2px solid #D3D3D3;
+        }
+      }
+    </style>
+  </head>
+  <body class="not-found-page">
+    <main class="site-shell page-grid">
+      <aside class="site-nav" aria-label="Main navigation">
+        <a class="brand" href="./index.html" aria-label="Andrey Ubeyvolk home">
+          <img class="brand-mark" src="./assets/logo.svg" alt="Andrey Ubeyvolk" />
+        </a>
+
+        <nav class="nav-list">
+          <a href="./inhouse/index.html">Inhouse</a>
+          <a href="./brands/index.html">Brands</a>
+          <a href="./archive/index.html">Archive</a>
+          <a href="./about/index.html">About</a>
+        </nav>
+      </aside>
+
+      <div class="not-found-pane">
+        <div class="not-found-box">
+          <svg class="not-found-box__x" preserveAspectRatio="none" viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <line x1="0" y1="0" x2="1" y2="1" vector-effect="non-scaling-stroke" stroke="#D3D3D3" stroke-width="2"/>
+            <line x1="1" y1="0" x2="0" y2="1" vector-effect="non-scaling-stroke" stroke="#D3D3D3" stroke-width="2"/>
+          </svg>
+          <div class="not-found-label" role="main" aria-label="Page not found">
+            <p>404</p>
+            <p>Wrong address.</p>
+            <p>The work is elsewhere.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
+
+    <div class="mobile-menu" id="mobile-menu" role="dialog" aria-label="Navigation menu" aria-modal="true">
+      <div class="menu-banner" id="menu-banner" hidden>
+        <img loading="lazy" class="menu-banner__bg" src="" alt="" />
+        <div class="menu-banner__title">
+          <p>AI design</p>
+          <p>visual trends</p>
+          <p>2026</p>
+        </div>
+        <span class="menu-banner__cta">Download free</span>
+        <svg class="menu-banner__arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M1 11L11 1M11 1H4M11 1V8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <nav class="menu-tabs">
+        <a href="./inhouse/index.html">Inhouse</a>
+        <a href="./brands/index.html">Brands</a>
+        <a href="./archive/index.html">Archive</a>
+        <a href="./about/index.html">About</a>
+      </nav>
+    </div>
+
+    <nav class="mobile-bar" aria-label="Mobile navigation">
+      <a class="mobile-bar__brand" href="./index.html" aria-label="Andrey Ubeyvolk home">
+        <img src="./assets/logo.svg" alt="Andrey Ubeyvolk" />
+      </a>
+      <button class="mobile-bar__menu" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
+    </nav>
+
+    <script src="./main.js"></script>
+    <script src="./menu.js"></script>
+  </body>
+</html>
