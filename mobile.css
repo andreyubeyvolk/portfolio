@@ -10,7 +10,8 @@
 .open-to-portrait,
 .about-download-mobile,
 .project-bar,
-.mobile-project {
+.mobile-project,
+.section-page-title {
   display: none;
 }
 
@@ -111,7 +112,8 @@
   .section-intro.home-intro {
     display: block;
     padding: 0;
-    margin-bottom: 40px;
+    margin-bottom: 0;
+    min-height: calc(33.33vh - 16px);
   }
 
   .section-intro.home-intro p {
@@ -155,8 +157,8 @@
   /* ── Showreel ── */
   .reel-card {
     width: 100%;
-    height: 640px;
-    aspect-ratio: unset;
+    height: auto;
+    aspect-ratio: 3 / 4;
     margin-bottom: 8px;
     overflow: hidden;
   }
@@ -242,24 +244,25 @@
     background-color: #000;
   }
 
-  /* ── Archive card overlay ── */
+  /* ── Archive card overlay — phones get the swipe carousel ──
+     Single-card tablet styles live in styles.css @media (max-width: 980px);
+     these phone-only rules override them into a horizontal swipe ribbon. */
   .card-overlay {
-    position: fixed;
-    inset: 0;
     z-index: 50;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  .card-overlay[hidden] {
-    display: none;
-  }
-
   .card-panel {
-    position: absolute;
-    top: 16px;
-    left: 15px;
-    right: 16px;
+    position: relative;
+    right: auto;
+    top: auto;
+    left: auto;
+    width: auto;
+    max-width: none;
+    margin: 16px;
+    background: transparent;
+    gap: 0;
   }
 
   .card-panel::after {
@@ -284,82 +287,68 @@
     background: #fff;
   }
 
-  .card-panel__title {
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -0.4px;
-    color: #171717;
-    margin: 0;
-    min-width: 0;
-  }
-
   .card-panel__close {
     width: 100%;
-    padding: 1px 0 0;
-    background: #fff;
-    border: none;
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -0.4px;
-    color: #171717;
+    padding: 0;
     text-align: right;
-    cursor: pointer;
     white-space: nowrap;
   }
 
-  .card-panel__image-wrap {
-    width: 100%;
-  }
-
-  .card-panel__image {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-
-  .card-panel__desc {
-    background: #fff;
-    width: 100%;
-  }
-
-  .card-panel__desc-text {
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -0.4px;
-    color: #171717;
-    margin: 0;
-    display: block;
-    width: 100%;
-  }
-
-  .card-panel__tags {
+  /* Horizontal swipe ribbon — magnetic snap, 16px gaps between cards. */
+  .card-track {
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
 
-  .card-panel__tags[hidden] {
+  .card-track::-webkit-scrollbar {
     display: none;
   }
 
-  .card-panel__tag {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    background: #E7FF35;
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -0.4px;
-    color: #171717;
-    white-space: nowrap;
+  .card-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
   }
+
+  .card-panel__image-wrap {
+    flex-shrink: 0;
+    overflow: hidden;
+    line-height: 0;
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .card-panel__image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .card-panel__desc {
+    flex-shrink: 0;
+    margin-top: 4px;
+    background: transparent;
+    width: auto;
+  }
+
+  .card-panel__tags {
+    margin-top: 2px;
+    background: transparent;
+    width: auto;
+  }
+
+
 
   body.card-is-open {
     overflow: hidden;
@@ -374,7 +363,13 @@
   .archive-page .section-intro.intro {
     display: block;
     padding: 0;
-    margin-bottom: 96px;
+    margin-bottom: 0;
+    min-height: calc(33.33vh - 16px);
+  }
+
+  .section-intro p.section-page-title {
+    display: block;
+    margin: 0 0 10px;
   }
 
   .archive-page .section-intro.intro p {
@@ -410,12 +405,14 @@
     letter-spacing: -0.4px;
   }
 
+
   /* ── Inhouse page ── */
   .inhouse-page .section-intro.intro,
   .brands-page .section-intro.intro {
     display: block;
     padding: 0;
-    margin-bottom: 96px;
+    margin-bottom: 0;
+    min-height: calc(33.33vh - 16px);
   }
 
   .inhouse-page .section-intro.intro p,
@@ -479,13 +476,25 @@
   }
 
   /* ── Site shell dims when menu is open ── */
-  .site-shell {
+  /* Project pages hide .site-shell on mobile and render their own layout
+     (.project-bar + .mobile-project), so those must dim too. */
+  .site-shell,
+  .project-bar,
+  .mobile-project {
     transition: opacity 0.3s ease;
   }
 
-  body.menu-is-open .site-shell {
+  body.menu-is-open .site-shell,
+  body.menu-is-open .project-bar,
+  body.menu-is-open .mobile-project {
     opacity: 0.4;
     pointer-events: none;
+  }
+
+  /* Card already dims the grid to 0.1; opening the menu on top must not
+     pull it back up to 0.4. The card itself dims via .card-panel::after. */
+  body.card-is-open.menu-is-open .site-shell {
+    opacity: 0.1;
   }
 
   body.menu-is-open .card-overlay {
@@ -645,7 +654,7 @@
   /* Intro text: two paras, no extra top padding (site-shell already has 16px), then 96px gap before content */
   .about-page .section-intro.home-intro {
     padding-top: 0;
-    margin-bottom: 128px;
+    margin-bottom: 0;
   }
 
   .about-page .section-intro.home-intro p {
@@ -988,7 +997,8 @@
     line-height: 1.2;
     letter-spacing: -0.4px;
     color: #171717;
-    margin: 0 0 88px; /* 88px + 8px flex gap = 96px to first photo */
+    margin: 0;
+    min-height: calc(33.33vh - 56px); /* 56px = 40px project bar + 16px gap */
   }
 
   /* Photos: full width, auto height, no margin (gap handles spacing) */

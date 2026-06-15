@@ -410,6 +410,7 @@ body::-webkit-scrollbar-thumb:active {
   border-radius: 0;
   background: #000;
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -817,6 +818,144 @@ body::-webkit-scrollbar-thumb:active {
 
   .inhouse-title {
     font-size: 16px;
+  }
+
+  /* ── Archive card overlay (tablet) ── */
+
+  /* Transparent full-screen backdrop (click-to-close). The visible panel is
+     .card-panel — sized and positioned by JS, pinned right: 16px top: 16px. */
+  .card-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: transparent;
+  }
+
+  .card-overlay[hidden] {
+    display: none;
+  }
+
+  /* Visible white panel — right-aligned, width set by JS */
+  .card-panel {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .card-panel__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .card-panel__title {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-panel__close {
+    padding: 0;
+    margin: 0;
+    background: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* Image-wrap: shrinks to image size (no stretch) */
+  .card-panel__image-wrap {
+    flex-shrink: 0;
+    overflow: hidden;
+    margin-top: -4px;
+    line-height: 0;
+  }
+
+  /* Width + height set by JS */
+  .card-panel__image {
+    display: block;
+  }
+
+  .card-panel__tags {
+    flex-shrink: 0;
+    display: block;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #9f9f9f;
+    background: #fff;
+    width: 100%;
+    margin-top: -4px;
+  }
+
+  .card-panel__tags[hidden] {
+    display: none;
+  }
+
+  .card-panel__desc {
+    flex-shrink: 0;
+  }
+
+  .card-panel__desc-text {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    margin: 0;
+  }
+
+  body.card-is-open {
+    overflow: hidden;
+  }
+
+  body.card-is-open .site-shell {
+    opacity: 0.1;
+    pointer-events: none;
+  }
+
+  /* ── Project page (tablet) ── */
+
+  /* No section description — project starts immediately */
+  .project-page .section-intro {
+    display: none;
+  }
+
+  /* Sticky project title + [X] bar — sits just below the 32px nav, 16px breathing room */
+  .project-page .content-pane__header {
+    position: sticky;
+    top: 32px;
+    padding-top: 16px;
+    background: #F5F4F4;
+    z-index: 9;
+  }
+
+  /* Challenge + Solution: full content width (not right-half only) */
+  .project-page .pv-info {
+    width: 100%;
+    margin-left: 0;
+    margin-top: -8px;
+  }
+
+  /* Download + Next: full content width, each 50% */
+  .project-page .pv-actions {
+    margin-left: 0;
   }
 }
 

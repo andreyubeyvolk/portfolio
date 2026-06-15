@@ -25,21 +25,6 @@
     <link rel="stylesheet" href="../mobile.css" />
     <style>
       /* ── Preview overlay ── */
-      .preview-media .preview-ai-tag {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        display: block;
-        height: 0.75em !important;
-        width: auto !important;
-        pointer-events: none;
-        z-index: 2;
-      }
-
-      .preview-media .preview-ai-tag[hidden] {
-        display: none;
-      }
-
       .archive-preview {
         position: absolute;
         top: 0;
@@ -74,14 +59,29 @@
         overflow-wrap: anywhere;
       }
 
+
       .preview-text p {
         margin: 0;
+      }
+
+      .preview-tags {
+        display: block;
+        font-size: 12px;
+        line-height: 1.4;
+        color: #9f9f9f;
+        background: #fff;
+        padding-top: 4px;
+      }
+
+      .preview-tags[hidden] {
+        display: none;
       }
 
       .preview-media {
         position: relative;
         margin: 0 0 0;
         padding: 0;
+        overflow: hidden;
       }
 
       .preview-media img {
@@ -102,7 +102,8 @@
       }
 
       .archive-preview__inner > .project-header,
-      .archive-preview__inner > .preview-text {
+      .archive-preview__inner > .preview-text,
+      .archive-preview__inner > .preview-tags {
         width: var(--preview-width, auto);
         max-width: 100%;
       }
@@ -133,12 +134,14 @@
 
       .archive-preview.is-horizontal .project-header,
       .archive-preview.is-horizontal .preview-text,
+      .archive-preview.is-horizontal .preview-tags,
       .archive-preview.is-horizontal .preview-media {
         margin-left: auto;
       }
 
       .archive-preview.is-vertical .project-header,
       .archive-preview.is-vertical .preview-text,
+      .archive-preview.is-vertical .preview-tags,
       .archive-preview.is-vertical .preview-media {
         margin-left: auto;
       }
@@ -238,8 +241,8 @@
       </aside>
 
       <section class="section-intro intro" aria-label="Archive section introduction">
-        <p>Single projects and visual experiments across design, AI, and other mediums.</p>
-        <p>Visual artifacts for brands and companies, alongside ongoing research into new techniques—the visible trace of work that never stops.</p>
+        <p class="section-page-title">Archive</p>
+        <p>Single projects and visual experiments across design, AI, and other mediums — a running record of the tools, workflows and ideas I keep testing.</p>
       </section>
 
       <section class="content-pane" aria-label="Archive projects">
@@ -248,21 +251,21 @@
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img data-preview data-ai data-description="A tote system designed for a branding lecture series at Nimax. The brief was simple: green field, hard typography, and event logistics treated as part of the object—not printed on it. Result is a functional artifact that doubles as a poster." src="../assets/archive/Frame 49-4.jpg" alt="Nimax tote archive project" />
+                <img data-preview data-description="A tote system designed for a branding lecture series at Nimax. The brief was simple: green field, hard typography, and event logistics treated as part of the object—not printed on it. Result is a functional artifact that doubles as a poster." src="../assets/archive/Frame 49-4.jpg" alt="Nimax tote archive project" />
               </div>
               <span class="archive-title">Nimax Tote</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img loading="lazy" data-preview data-description="Black hoodie merch for a startup accelerator: venture-sector typography stretched across the sleeve, a small chest badge with the cohort number, and a deliberately institutional back print." src="../assets/archive/Frame 49.jpg" alt="Startup hoodie archive project" />
+                <img loading="lazy" data-preview data-tags="AI, MidJourney, Figma Weave" data-description="Black hoodie merch for a startup accelerator: venture-sector typography stretched across the sleeve, a small chest badge with the cohort number, and a deliberately institutional back print." src="../assets/archive/Frame 49.jpg" alt="Startup hoodie archive project" />
               </div>
               <span class="archive-title">Startup Hoodie</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img loading="lazy" data-preview data-ai data-description="Editorial for Vogue España—red floral fabric expanding into the landscape until fabric and terrain become indistinguishable. Shot by Txema Yeste. AI was used to extend the frame and reconstruct the background environment without altering the subject." src="../assets/archive/txema-yeste-vogue-spain-mayowa-nicholas-2019-5-1500x972.jpg" alt="Botanical editorial archive project" />
+                <img loading="lazy" data-preview data-tags="AI, MidJourney, Figma Weave" data-description="Editorial for Vogue España—red floral fabric expanding into the landscape until fabric and terrain become indistinguishable. Shot by Txema Yeste. AI was used to extend the frame and reconstruct the background environment without altering the subject." src="../assets/archive/txema-yeste-vogue-spain-mayowa-nicholas-2019-5-1500x972.jpg" alt="Botanical editorial archive project" />
               </div>
               <span class="archive-title">Botanical Editorial</span>
             </a>
@@ -276,7 +279,7 @@
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img loading="lazy" data-preview data-ai data-description="Beauty packaging concept for Lucente—a fictional luxury skincare line. Split composition: botanical on the left, product on the right. Serif logotype kept deliberately restrained against the richness of the visual. AI generated all product renders and background textures." src="../assets/archive/Frame 2085666535 — копия.jpg" alt="Lucente packaging archive project" />
+                <img loading="lazy" data-preview data-description="Beauty packaging concept for Lucente—a fictional luxury skincare line. Split composition: botanical on the left, product on the right. Serif logotype kept deliberately restrained against the richness of the visual. AI generated all product renders and background textures." src="../assets/archive/archive-lucente.jpg" alt="Lucente packaging archive project" />
               </div>
               <span class="archive-title">Lucente Beauty</span>
             </a>
@@ -290,28 +293,28 @@
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img loading="lazy" data-preview data-ai data-description="Outdoor merch for a trail-running community. Grey tee, white back mark, and dataset-style labels in the corner—the kind of visual language borrowed from technical gear, not fashion. AI was used to composite the environment and adjust ambient light." src="../assets/archive/Frame 49-1.jpg" alt="Quarry tee archive project" />
+                <img loading="lazy" data-preview data-description="Outdoor merch for a trail-running community. Grey tee, white back mark, and dataset-style labels in the corner—the kind of visual language borrowed from technical gear, not fashion. AI was used to composite the environment and adjust ambient light." src="../assets/archive/Frame 49-1.jpg" alt="Quarry tee archive project" />
               </div>
               <span class="archive-title">Quarry Tee</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img loading="lazy" data-preview data-ai data-description="Black field with a small editorial spread—app screens, stickers, brand assets and publication fragments arranged as one system. The goal was to show how a single brand language scales from digital product to printed object without losing density or tone." src="../assets/archive/Frame 49-6.jpg" alt="Pocket publication archive project" />
+                <img loading="lazy" data-preview data-description="Black field with a small editorial spread—app screens, stickers, brand assets and publication fragments arranged as one system. The goal was to show how a single brand language scales from digital product to printed object without losing density or tone." src="../assets/archive/Frame 49-6.jpg" alt="Pocket publication archive project" />
               </div>
               <span class="archive-title">Pocket Publication</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img loading="lazy" data-preview data-ai data-description="Black T-shirt mockup with sharp white venture graphics and sleeve typography on a grey technical backdrop." src="../assets/archive/Frame 49-3.jpg" alt="Disruptive tee archive project" />
+                <img loading="lazy" data-preview data-description="Black T-shirt mockup with sharp white venture graphics and sleeve typography on a grey technical backdrop." src="../assets/archive/Frame 49-3.jpg" alt="Disruptive tee archive project" />
               </div>
               <span class="archive-title">Disruptive Tee</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img loading="lazy" data-preview data-ai data-description="Magazine cover experiment with bold masthead, plastic texture, barcode, and layered white graphic marks." src="../assets/archive/Frame 49-5.jpg" alt="Valera cover archive project" />
+                <img loading="lazy" data-preview data-tags="AI, MidJourney, Figma Weave" data-description="Magazine cover experiment with bold masthead, plastic texture, barcode, and layered white graphic marks." src="../assets/archive/Frame 49-5.jpg" alt="Valera cover archive project" />
               </div>
               <span class="archive-title">Valera Cover</span>
             </a>
@@ -325,7 +328,7 @@
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img loading="lazy" data-preview data-ai data-description="Editorial layout study: column-based type system, rough scan textures, and deliberate misregistration." src="../assets/archive/Frame 49-6.jpg" alt="Field notes archive project" />
+                <img loading="lazy" data-preview data-description="Editorial layout study: column-based type system, rough scan textures, and deliberate misregistration." src="../assets/archive/Frame 49-6.jpg" alt="Field notes archive project" />
               </div>
               <span class="archive-title">Field Notes</span>
             </a>
@@ -339,7 +342,7 @@
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img loading="lazy" data-preview data-ai data-description="Product still life in natural light—texture study with ceramic, paper, and a single dried stem." src="../assets/archive/Frame 2085666535 — копия.jpg" alt="Still life archive project" />
+                <img loading="lazy" data-preview data-description="Product still life in natural light—texture study with ceramic, paper, and a single dried stem." src="../assets/archive/Frame 49-2.jpg" alt="Still life archive project" />
               </div>
               <span class="archive-title">Still Life 01</span>
             </a>
@@ -353,7 +356,7 @@
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img loading="lazy" data-preview data-ai data-description="Fashion editorial frame where fabric and flora collapse into a single material—movement locked in still image." src="../assets/archive/txema-yeste-vogue-spain-mayowa-nicholas-2019-5-1500x972.jpg" alt="Bloom spread archive project" />
+                <img loading="lazy" data-preview data-description="Fashion editorial frame where fabric and flora collapse into a single material—movement locked in still image." src="../assets/archive/txema-yeste-vogue-spain-mayowa-nicholas-2019-5-1500x972.jpg" alt="Bloom spread archive project" />
               </div>
               <span class="archive-title">Bloom Spread</span>
             </a>
@@ -374,7 +377,7 @@
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img loading="lazy" data-preview data-ai data-description="Pocket-format publication: hand-numbered, folded once, content dense enough to fold again." src="../assets/archive/Frame 49-2.jpg" alt="Index card archive project" />
+                <img loading="lazy" data-preview data-description="Pocket-format publication: hand-numbered, folded once, content dense enough to fold again." src="../assets/archive/Frame 49-2.jpg" alt="Index card archive project" />
               </div>
               <span class="archive-title">Index Card</span>
             </a>
@@ -392,11 +395,11 @@
             </header>
             <div class="preview-media">
               <img loading="lazy" class="preview-image" src="" alt="">
-              <img loading="lazy" class="preview-ai-tag" src="../assets/ai-tag.svg" alt="AI" hidden>
             </div>
             <div class="preview-text">
               <p></p>
             </div>
+            <span class="preview-tags" hidden></span>
           </div>
         </div>
       </section>
@@ -438,13 +441,6 @@
           <p class="card-panel__title"></p>
           <button class="card-panel__close" type="button">[X]</button>
         </div>
-        <div class="card-panel__image-wrap">
-          <img loading="lazy" class="card-panel__image" src="" alt="" />
-        </div>
-        <div class="card-panel__desc">
-          <p class="card-panel__desc-text"></p>
-        </div>
-        <div class="card-panel__tags" hidden></div>
       </div>
     </div>
 
@@ -457,59 +453,223 @@
       var overlay = document.querySelector('.archive-preview');
       var previewImg = document.querySelector('.preview-image');
       var previewTitle = document.querySelector('.preview-title');
+      var previewTagsEl = document.querySelector('.preview-tags');
       var closeBtn = document.querySelector('.preview-close');
       var grid = document.querySelector('.archive-grid');
       var previewInner = document.querySelector('.archive-preview__inner');
       var previewText = document.querySelector('.preview-text');
       var previewTextContent = previewText.querySelector('p');
       var previewHeader = document.querySelector('.archive-preview .project-header');
-      var previewAiTag = document.querySelector('.preview-ai-tag');
       var contentPane = document.querySelector('.content-pane');
       var activeArchiveTitle = null;
 
-      // ── Mobile card overlay ──────────────────────────────────────
+      // ── Archive card overlay ─────────────────────────────────────
+      // Phones (≤640px): horizontal swipe carousel — the header (title + [X])
+      //   stays fixed while a ribbon of slides swipes beneath it; the title
+      //   updates as a new card scrolls into the snap position.
+      // Tablet (641–980px): the original single-card view, sized to the image.
       var cardOverlay = document.getElementById('card-overlay');
       var cardTitleEl = document.querySelector('.card-panel__title');
-      var cardImgEl = document.querySelector('.card-panel__image');
-      var cardDescEl = document.querySelector('.card-panel__desc-text');
-      var cardTagsEl = document.querySelector('.card-panel__tags');
       var cardCloseBtn = document.querySelector('.card-panel__close');
+      var cardPanel = document.querySelector('.card-panel');
+      var cardHeader = document.querySelector('.card-panel__header');
 
       function isMobile() {
+        return window.matchMedia('(max-width: 980px)').matches;
+      }
+      function isPhone() {
         return window.matchMedia('(max-width: 640px)').matches;
       }
 
-      function openMobileCard(card, img) {
+      // Strip everything in the panel except the fixed header.
+      function clearCardBody() {
+        var kids = Array.prototype.slice.call(cardPanel.children);
+        kids.forEach(function (k) {
+          if (k !== cardHeader) cardPanel.removeChild(k);
+        });
+      }
+
+      function buildSlideContent(img, includeImgAttrs) {
+        var frag = document.createDocumentFragment();
+
+        var wrap = document.createElement('div');
+        wrap.className = 'card-panel__image-wrap';
+        var im = document.createElement('img');
+        im.className = 'card-panel__image';
+        im.src = img.getAttribute('src');
+        im.alt = img.alt || '';
+        if (includeImgAttrs) im.loading = 'lazy';
+        wrap.appendChild(im);
+
+        var desc = document.createElement('div');
+        desc.className = 'card-panel__desc';
+        var p = document.createElement('p');
+        p.className = 'card-panel__desc-text';
+        p.textContent = img.dataset.description || '';
+        desc.appendChild(p);
+
+        var tg = document.createElement('span');
+        tg.className = 'card-panel__tags';
+        tg.textContent = img.dataset.tags || '';
+        tg.hidden = !(img.dataset.tags || '');
+
+        frag.appendChild(wrap);
+        frag.appendChild(desc);
+        frag.appendChild(tg);
+        return { frag: frag, img: im };
+      }
+
+      // ── Tablet: single card, sized to fit the image (original behaviour) ──
+      var tabletImg = null;
+
+      function fitCardPanel(img) {
+        var naturalW = img.naturalWidth;
+        var naturalH = img.naturalHeight;
+        if (!naturalW || !naturalH) return;
+
+        var inset = 16;
+        var ratio = naturalW / naturalH;
+        var maxImgW = window.innerWidth - inset * 2;
+
+        img.style.width = '0px';
+        img.style.height = '0px';
+
+        cardPanel.style.width = maxImgW + 'px';
+        var nonImgH = cardPanel.getBoundingClientRect().height;
+        var maxImgH = window.innerHeight - inset * 2 - nonImgH;
+
+        var imgW = maxImgW;
+        var imgH = imgW / ratio;
+
+        if (imgH > maxImgH) {
+          imgH = maxImgH;
+          imgW = imgH * ratio;
+          cardPanel.style.width = Math.round(imgW) + 'px';
+          nonImgH = cardPanel.getBoundingClientRect().height;
+          maxImgH = window.innerHeight - inset * 2 - nonImgH;
+          if (imgH > maxImgH) {
+            imgH = maxImgH;
+            imgW = imgH * ratio;
+          }
+        }
+
+        imgW = Math.round(imgW);
+        imgH = Math.round(imgH);
+
+        img.style.width = imgW + 'px';
+        img.style.height = imgH + 'px';
+        cardPanel.style.width = imgW + 'px';
+      }
+
+      function openTabletCard(card, img) {
+        cardPanel.style.width = '';
+        clearCardBody();
         var titleEl = card.querySelector('.archive-title');
         cardTitleEl.textContent = titleEl ? titleEl.textContent : '';
-        cardImgEl.src = img.src;
-        cardImgEl.alt = img.alt || '';
-        cardDescEl.textContent = img.dataset.description || '';
-        if (img.hasAttribute('data-ai')) {
-          cardTagsEl.innerHTML = '<span class="card-panel__tag">AI</span>';
-          cardTagsEl.hidden = false;
-        } else {
-          cardTagsEl.innerHTML = '';
-          cardTagsEl.hidden = true;
-        }
+        var built = buildSlideContent(img, false);
+        cardPanel.appendChild(built.frag);
+        tabletImg = built.img;
         cardOverlay.hidden = false;
-        cardOverlay.scrollTop = 0;
         document.body.classList.add('card-is-open');
+        if (tabletImg.complete && tabletImg.naturalWidth) {
+          fitCardPanel(tabletImg);
+        } else {
+          tabletImg.addEventListener('load', function () { fitCardPanel(tabletImg); }, { once: true });
+        }
       }
 
-      function closeMobileCard() {
+      // ── Phones: swipe carousel ──
+      var slideTitles = [];
+      var sourceImgs = [];
+      var cardTrack = null;
+      var activeSlideIndex = 0;
+
+      function slideStride() {
+        if (!cardTrack || !cardTrack.firstElementChild) return 1;
+        return cardTrack.firstElementChild.getBoundingClientRect().width + 16;
+      }
+
+      function updateTitleFromScroll() {
+        if (!cardTrack || !cardTrack.firstElementChild) return;
+        var idx = Math.round(cardTrack.scrollLeft / slideStride());
+        idx = Math.max(0, Math.min(slideTitles.length - 1, idx));
+        if (idx !== activeSlideIndex) {
+          activeSlideIndex = idx;
+          cardTitleEl.textContent = slideTitles[idx];
+        }
+      }
+
+      // Rebuilt on every open so cards revealed via "Load more" are included.
+      function buildTrack() {
+        cardTrack = document.createElement('div');
+        cardTrack.className = 'card-track';
+        slideTitles = [];
+        sourceImgs = [];
+        items.forEach(function (img) {
+          var card = img.closest('.archive-card');
+          if (!card || card.classList.contains('archive-card--more')) return;
+          var titleEl = card.querySelector('.archive-title');
+          slideTitles.push(titleEl ? titleEl.textContent : '');
+          sourceImgs.push(img);
+
+          var slide = document.createElement('div');
+          slide.className = 'card-slide';
+          slide.appendChild(buildSlideContent(img, true).frag);
+          cardTrack.appendChild(slide);
+        });
+
+        var raf = null;
+        cardTrack.addEventListener('scroll', function () {
+          if (raf) return;
+          raf = requestAnimationFrame(function () {
+            raf = null;
+            updateTitleFromScroll();
+          });
+        }, { passive: true });
+
+        cardPanel.appendChild(cardTrack);
+      }
+
+      function openMobileCard(card, img) {
+        cardPanel.style.width = '';
+        clearCardBody();
+        buildTrack();
+        var idx = sourceImgs.indexOf(img);
+        if (idx < 0) idx = 0;
+        activeSlideIndex = idx;
+        cardTitleEl.textContent = slideTitles[idx] || '';
+        cardOverlay.hidden = false;
+        document.body.classList.add('card-is-open');
+        // Jump straight to the clicked card (no animated scroll).
+        requestAnimationFrame(function () {
+          cardTrack.scrollLeft = idx * slideStride();
+        });
+      }
+
+      function closeCard() {
         cardOverlay.hidden = true;
         document.body.classList.remove('card-is-open');
+        cardPanel.style.width = '';
       }
 
-      if (cardCloseBtn) cardCloseBtn.addEventListener('click', closeMobileCard);
+      if (cardCloseBtn) cardCloseBtn.addEventListener('click', closeCard);
       if (cardOverlay) {
         cardOverlay.addEventListener('click', function (e) {
-          if (e.target === cardOverlay) closeMobileCard();
+          if (e.target === cardOverlay) closeCard();
         });
       }
       document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && cardOverlay && !cardOverlay.hidden) closeMobileCard();
+        if (e.key === 'Escape' && cardOverlay && !cardOverlay.hidden) closeCard();
+      });
+
+      // Keep things aligned/sized when the viewport changes while open.
+      window.addEventListener('resize', function () {
+        if (!cardOverlay || cardOverlay.hidden) return;
+        if (isPhone() && cardTrack) {
+          cardTrack.scrollLeft = activeSlideIndex * slideStride();
+        } else if (tabletImg) {
+          fitCardPanel(tabletImg);
+        }
       });
 
       function closePreview() {
@@ -525,7 +685,6 @@
         previewHeader.style.width = '';
         previewText.style.width = '';
         previewInner.style.alignItems = '';
-        previewAiTag.hidden = true;
       }
 
       function alignPreviewScrollbar() {
@@ -536,9 +695,10 @@
       }
 
       function fitPreviewImage() {
+        var previewTagsH = (previewTagsEl && !previewTagsEl.hidden) ? previewTagsEl.offsetHeight : 0;
         var isTablet = window.matchMedia('(max-width: 980px)').matches;
         if (isTablet) {
-          var availableHeight = overlay.clientHeight - previewHeader.offsetHeight - previewText.offsetHeight - 40;
+          var availableHeight = overlay.clientHeight - previewHeader.offsetHeight - previewText.offsetHeight - previewTagsH - 40;
           var availableWidth = overlay.clientWidth - 32;
           var heightByWidth = availableWidth * (previewImg.naturalHeight / previewImg.naturalWidth);
           if (heightByWidth <= availableHeight) {
@@ -556,7 +716,7 @@
             previewInner.style.alignItems = 'flex-end';
           }
         } else {
-          var availableHeight2 = overlay.clientHeight - previewHeader.offsetHeight - previewText.offsetHeight;
+          var availableHeight2 = overlay.clientHeight - previewHeader.offsetHeight - previewText.offsetHeight - previewTagsH;
           var availableWidth2 = overlay.clientWidth - 16;
           var heightByWidth2 = availableWidth2 * (previewImg.naturalHeight / previewImg.naturalWidth);
           var previewHeight = Math.min(availableHeight2, heightByWidth2);
@@ -583,17 +743,22 @@
         card.addEventListener('click', function (event) {
           event.preventDefault();
           if (isMobile()) {
-            openMobileCard(card, img);
+            if (isPhone()) openMobileCard(card, img);
+            else openTabletCard(card, img);
             return;
           }
           var isVertical = img.naturalHeight >= img.naturalWidth;
           activeArchiveTitle = card.querySelector('.archive-title');
           previewImg.src = img.src;
           previewTitle.textContent = activeArchiveTitle ? activeArchiveTitle.textContent : '';
+          var tags = img.dataset.tags || '';
+          if (previewTagsEl) {
+            previewTagsEl.textContent = tags;
+            previewTagsEl.hidden = !tags;
+          }
           previewTextContent.textContent = img.dataset.description || '';
           overlay.style.removeProperty('--preview-width');
           overlay.style.removeProperty('--preview-image-height');
-          previewAiTag.hidden = !img.hasAttribute('data-ai');
           overlay.hidden = false;
           grid.style.opacity = '0.15';
           document.body.classList.add('is-preview-open');
@@ -618,6 +783,11 @@
       window.addEventListener('resize', function () {
         if (!overlay.hidden) {
           alignPreviewScrollbar();
+          // Two passes: image size depends on text height, text width (hence
+          // its wrapped height) depends on image width — one pass can leave the
+          // image over-budget and spilling onto the text. Second pass converges.
+          fitPreviewImage();
+          overlay.style.setProperty('--preview-width', previewImg.getBoundingClientRect().width + 'px');
           fitPreviewImage();
           overlay.style.setProperty('--preview-width', previewImg.getBoundingClientRect().width + 'px');
         }

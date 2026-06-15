@@ -6,3 +6,9 @@ codex/
 
 # Dev/test artifacts
 screenshots/
+ss_*.png
+
+# Node tooling — Playwright, used locally for visual verification only
+node_modules/
+package.json
+package-lock.json

@@ -315,3 +315,37 @@ CMS decision (Phase 6):
 - Asset restructure: project files prefixed with slug, logo.svg renamed, cyrillic filenames removed
 - Added .gitignore, git tag v0.1-mobile-complete
 - Decided: finish all content in HTML first, then migrate to Nuxt
+
+### 2026-06-16
+- Archive card preview/overlay: added gray caption tags (12px, #9F9F9F) below the
+  description — desktop preview, tablet single-card, and mobile. Tuned spacing per
+  breakpoint; used padding (not margin) so the gap keeps the white background.
+- Archive mobile: rebuilt the open card as a horizontal swipe carousel (CSS
+  scroll-snap, fixed header, title updates live as a card scrolls in). Tablet
+  (641–980px) kept the original single-card "fit to image" view; desktop preview
+  untouched. Phone vs tablet split via isPhone()/isMobile() routing in JS.
+- Fixed desktop archive preview bug: image overflowed its container and covered the
+  description text at certain window sizes (tags height wasn't subtracted in the fit
+  calc). Added tag-height accounting, two-pass resize, and overflow:hidden safety net.
+- Replaced missing images: Lucente → archive-lucente.jpg, Still Life → Frame 49-2.jpg
+  (old "Frame 2085666535 — копия.jpg" no longer existed).
+- Mobile menu dimming: project pages render .project-bar + .mobile-project outside
+  .site-shell, so they weren't dimming on menu open — added them to the dim rule.
+- Fixed opacity conflict on Archive mobile: when a card AND the menu are both open,
+  the grid now stays at 0.1 (was jumping to 0.4) via a two-class specificity rule.
+- Ran a full HTML/CSS/a11y/perf audit. Top priorities recorded for next session
+  (see below). Nothing from the audit applied yet — discussed only.
+
+### Audit findings — backlog (from 2026-06-16, ordered by impact)
+1. Images ~14.2 MB total; archive-lucente.jpg 2.4 MB/2168px, many 500–850 KB, shown
+   at ~360px. Resize to ~800–1000px max, convert to WebP, add srcset. (biggest perf win)
+2. No width/height attributes on any <img> (93 total) → layout shift (CLS). Add them.
+3. No <h1> on Home/About/Inhouse/Brands/404 — section titles are <p>. Promote to h1.
+4. about/index.html <title> duplicates the homepage title — make it "About—…".
+5. All font-sizes in px (0 rem) — switch to rem; body line-height to unitless.
+6. Mobile menu role="dialog" aria-modal without focus trap/management; hidden menu
+   links stay keyboard-focusable when closed (use inert).
+7. 404.html has a nested second role="main" — remove it.
+8. Many inhouse/brands cards are href="#" dead links — disable until pages exist.
+9. CSS: 15px/700/1.2/-0.4px type block repeated ~27× — extract a utility class.
+10. Archive image filenames contain spaces ("Frame 49-1.jpg") — rename to hyphens.
