@@ -81,7 +81,7 @@
   .mobile-bar__menu {
     font-family: 'Inter', sans-serif;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 0.9375rem;
     line-height: 1;
     letter-spacing: -0.4px;
     color: #fff;
@@ -101,7 +101,7 @@
   /* ── About section ── */
   .home-headline {
     display: block;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -117,7 +117,7 @@
   }
 
   .section-intro.home-intro p {
-    font-size: 15px;
+    font-size: 0.9375rem;
     line-height: 1.2;
     letter-spacing: -0.4px;
     color: #171717;
@@ -186,7 +186,7 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -217,7 +217,7 @@
 
   .home-socials a,
   .home-socials button {
-    font-size: 15px;
+    font-size: 0.9375rem;
     letter-spacing: -0.4px;
     line-height: 1.2;
     border-top: 1px solid #171717;
@@ -373,7 +373,7 @@
   }
 
   .archive-page .section-intro.intro p {
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -401,7 +401,7 @@
 
   .archive-title {
     order: 0;
-    font-size: 15px;
+    font-size: 0.9375rem;
     letter-spacing: -0.4px;
   }
 
@@ -417,7 +417,7 @@
 
   .inhouse-page .section-intro.intro p,
   .brands-page .section-intro.intro p {
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -453,7 +453,7 @@
 
   .inhouse-title {
     order: 0;
-    font-size: 15px;
+    font-size: 0.9375rem;
     letter-spacing: -0.4px;
   }
 
@@ -467,7 +467,7 @@
     background: #fff;
     border: none;
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -484,10 +484,17 @@
     transition: opacity 0.3s ease;
   }
 
-  body.menu-is-open .site-shell,
+  body.menu-is-open .site-shell {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  /* Project pages dim as ONE merged layer via the menu overlay veil (see
+     .menu-overlay below). The fixed header + content are NOT faded
+     individually — doing that makes the translucent fixed bar reveal the
+     content scrolled beneath it (double-exposed, not a single dim layer). */
   body.menu-is-open .project-bar,
   body.menu-is-open .mobile-project {
-    opacity: 0.4;
     pointer-events: none;
   }
 
@@ -512,6 +519,13 @@
 
   body.menu-is-open .menu-overlay {
     display: block;
+  }
+
+  /* Project pages: the overlay doubles as a single translucent dim layer
+     over the header + content — one unified veil instead of per-element
+     opacity (matches the Archive card's .card-panel::after veil). */
+  body.project-page.menu-is-open .menu-overlay {
+    background: rgba(255, 255, 255, 0.6);
   }
 
   /* ── Full mobile menu ── */
@@ -569,7 +583,7 @@
     top: 8px;
     left: 8px;
     font-family: 'Impact', Impact, sans-serif;
-    font-size: 24px;
+    font-size: 1.5rem;
     letter-spacing: -0.4px;
     color: #fff;
   }
@@ -585,7 +599,7 @@
     left: 8px;
     font-family: 'Inter', sans-serif;
     font-weight: 500;
-    font-size: 16px;
+    font-size: 1rem;
     line-height: 1;
     letter-spacing: -0.4px;
     color: #fff;
@@ -617,7 +631,7 @@
     width: 100%;
     height: 48px;
     font-family: 'Inter', sans-serif;
-    font-size: 32px;
+    font-size: 2rem;
     font-weight: 700;
     font-style: normal;
     line-height: 1.4;
@@ -705,7 +719,7 @@
     width: 84px;
     min-width: 84px;
     flex-shrink: 0;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -719,7 +733,7 @@
   }
 
   .about-page .about-section__content > p {
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -752,7 +766,7 @@
   .about-page .service-row__title,
   .about-page .service-row__desc {
     grid-column: unset;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -789,7 +803,7 @@
   .about-page .exp-row__role,
   .about-page .exp-row__years {
     grid-column: unset;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -828,7 +842,7 @@
   }
 
   .about-page .contact-link {
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -890,15 +904,16 @@
     display: none;
   }
 
-  /* Mobile download PDF section — right-aligned, 129px (= one action-button width) */
+  /* Mobile download PDF section — right-aligned, aligned to the 2nd contact column */
   .about-page .about-download-mobile {
     display: flex;
     justify-content: flex-end;
     margin-top: 96px;
   }
 
+  /* Match the 2nd contact column: full row minus label(84)+gap(8)+grid-gap(8)=100, halved */
   .about-page .about-download-mobile .download-pdf-btn {
-    width: 129px;
+    width: calc((100% - 100px) / 2);
   }
 
   .about-page .download-pdf-btn {
@@ -912,7 +927,7 @@
     border-right: none;
     border-bottom: none;
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -947,12 +962,12 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
-    z-index: 100;
+    z-index: 98; /* below .menu-overlay (99) so the menu veil dims it too */
   }
 
   .project-bar__title {
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -965,7 +980,7 @@
     height: 40px; /* full bar height = full tap area */
     padding-left: 32px; /* wider tap zone to the left */
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -992,7 +1007,7 @@
 
   .mobile-project__intro {
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -1046,7 +1061,7 @@
     min-width: 84px;
     flex-shrink: 0;
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -1055,7 +1070,7 @@
 
   .mobile-project__text {
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -1126,7 +1141,7 @@
     background: none;
     border: none;
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
+    font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.4px;
