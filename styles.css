@@ -505,6 +505,24 @@ body::-webkit-scrollbar-thumb:active {
   margin-top: 0;
 }
 
+/* "See all projects": sits in the empty column to the left of the socials,
+   same row, flush with the borderless top row (Mail / YouTube). */
+.home-projects-link {
+  grid-column: 1 / 9;
+  align-self: start;
+  display: block;
+  width: fit-content;
+  margin-top: -10px;
+  color: inherit;
+  text-decoration: none;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.home-projects-link:hover {
+  color: #fff;
+  background-color: #000;
+}
+
 .inhouse-page {
   background: #F5F4F4;
 }
@@ -548,6 +566,13 @@ body::-webkit-scrollbar-thumb:active {
   background-color: #000;
 }
 
+/* Cards without a built target (href dropped, set by main.js) aren't links —
+   don't present the interactive hover affordance. */
+.inhouse-card--pending:hover .inhouse-title {
+  color: inherit;
+  background-color: transparent;
+}
+
 .load-more-btn {
   display: none;
 }
@@ -560,7 +585,21 @@ body::-webkit-scrollbar-thumb:active {
   background: #F5F4F4;
 }
 
+.all-projects-page {
+  background: #F5F4F4;
+}
+
 .archive-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 40px;
+  padding-bottom: 58px;
+}
+
+/* All Projects: same card component as Inhouse/Brands (.inhouse-card),
+   laid out on Archive's 4-column grid for a bigger, gallery-like scroll. */
+.projects-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   column-gap: 16px;

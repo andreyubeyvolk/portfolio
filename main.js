@@ -56,3 +56,21 @@
     });
   });
 })();
+
+(function () {
+  // Project cards whose target page isn't built yet ship with href="#".
+  // A live href="#" is a dead link: keyboard / screen-reader users focus it
+  // and it scrolls to top instead of navigating. Neutralize those cards —
+  // drop the href (removes them from the tab order and the link role) and
+  // mark them aria-disabled. As soon as a real href is set, the card becomes
+  // a working link again on its own, so there's nothing to undo per project.
+  const pending = Array.from(
+    document.querySelectorAll('a.inhouse-card[href="#"], a.brands-card[href="#"]')
+  );
+
+  pending.forEach((card) => {
+    card.removeAttribute("href");
+    card.setAttribute("aria-disabled", "true");
+    card.classList.add("inhouse-card--pending");
+  });
+})();
