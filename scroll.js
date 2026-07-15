@@ -116,4 +116,27 @@
 
     update();
   });
+
+  // Let the wheel scroll the content pane no matter where the cursor is on
+  // the page (sidebar, margins, even the fake scrollbar track), not only
+  // while hovering the pane itself. Desktop layout only: below 981px the
+  // page already scrolls natively (body overflow-y:auto), so there's
+  // nothing to redirect there.
+  if (scrollPanes.length === 1) {
+    const pane = scrollPanes[0];
+    const mq = window.matchMedia("(min-width: 981px)");
+
+    window.addEventListener(
+      "wheel",
+      (event) => {
+        if (!mq.matches) return;
+        if (pane.contains(event.target)) return; // already over the pane: let native scroll run
+        if (pane.scrollHeight <= pane.clientHeight) return; // nothing to scroll
+
+        pane.scrollTop += event.deltaY;
+        event.preventDefault();
+      },
+      { passive: false }
+    );
+  }
 })();
