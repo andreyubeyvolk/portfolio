@@ -395,7 +395,7 @@
                       </div>
                       <div class="pv-action">
                         <div class="pv-action__bar"></div>
-                        <button class="pv-action__btn next-project-btn" type="button" data-next-url="../index.html">Next project</button>
+                        <button class="pv-action__btn next-project-btn" type="button" data-section="inhouse" data-slug="igaming" data-next-url="../index.html">Next project</button>
                       </div>
                     </div>
                   </div>
@@ -541,7 +541,7 @@
             </div>
             <div class="mobile-project__action">
               <div class="mobile-project__action-bar"></div>
-              <button class="next-project-btn" type="button" data-next-url="../index.html">Next project</button>
+              <button class="next-project-btn" type="button" data-section="inhouse" data-slug="igaming" data-next-url="../index.html">Next project</button>
             </div>
           </div>
         </div>
@@ -581,15 +581,8 @@
     </nav>
 
     <script src="../../scroll.js"></script>
+    <script src="../../project-order.js"></script>
     <script src="../../main.js"></script>
     <script src="../../menu.js"></script>
-    <script>
-      document.querySelectorAll('.next-project-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          var url = btn.getAttribute('data-next-url');
-          if (url) window.location.href = url;
-        });
-      });
-    </script>
   </body>
 </html>

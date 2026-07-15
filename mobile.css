@@ -1069,7 +1069,8 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    margin-top: 8px;
+    /* No extra margin-top: the 8px gap from .mobile-project (the parent
+       flex column) already matches the spacing between photos. */
   }
 
   .mobile-project__block {

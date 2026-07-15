@@ -74,3 +74,33 @@
     card.classList.add("inhouse-card--pending");
   });
 })();
+
+(function () {
+  // "Next project" chains to the next REAL project in the same section,
+  // using the hand-maintained sequence in project-order.js (declared via
+  // data-section/data-slug on the button). Wraps to the first project when
+  // the current one is last. Falls back to data-next-url (the section
+  // listing page) if project-order.js hasn't loaded or the project isn't
+  // registered yet — so the button never breaks while a new project is
+  // being wired up.
+  const nextButtons = Array.from(document.querySelectorAll(".next-project-btn"));
+
+  nextButtons.forEach((btn) => {
+    const section = btn.getAttribute("data-section");
+    const slug = btn.getAttribute("data-slug");
+    const order = (section && window.PROJECT_ORDER && window.PROJECT_ORDER[section]) || [];
+    const idx = order.indexOf(slug);
+    // Need at least 2 real projects to chain between — with only one,
+    // "next" has nowhere to go yet, so keep the section-listing fallback.
+    const nextSlug = idx === -1 || order.length < 2 ? null : order[(idx + 1) % order.length];
+    const url = nextSlug ? `../${nextSlug}/index.html` : btn.getAttribute("data-next-url");
+
+    if (!url) {
+      return;
+    }
+
+    btn.addEventListener("click", () => {
+      window.location.href = url;
+    });
+  });
+})();
