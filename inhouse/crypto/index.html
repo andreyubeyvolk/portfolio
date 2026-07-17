@@ -214,11 +214,12 @@
         --vp-hit: 24px;   /* invisible hit area around the thin line */
       }
 
-      /* Single clip, fixed 16:9, full width, same as .pv-wide's slot */
+      /* Full width; height follows the video's own natural aspect ratio
+         (no forced aspect-ratio/object-fit, so nothing gets cropped even
+         if a clip isn't exactly 16:9 or carries unusual SAR metadata). */
       .vp {
         position: relative;
         width: 100%;
-        aspect-ratio: 16 / 9;
         background: #000;
         overflow: hidden;
         user-select: none;
@@ -226,12 +227,11 @@
       }
 
       .vp__video {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
         display: block;
+        width: 100%;
+        height: auto;
+        margin-bottom: -2px; /* absorb sub-pixel rounding so .vp's black
+          background never shows a hairline under the video */
       }
 
       .vp__hit {
@@ -239,6 +239,24 @@
         inset: 0;
         cursor: pointer;
         z-index: 1;
+      }
+
+      /* Scrim: soft gradient behind the bottom/right controls so the white
+         icons stay legible over bright video content. Fades with the
+         controls (hidden together while idle + playing). */
+      .vp::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        background:
+          linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 110px),
+          linear-gradient(to left, rgba(0, 0, 0, 0.35), transparent 130px);
+        transition: opacity 0.3s ease;
+      }
+      .vp.is-idle::before {
+        opacity: 0;
       }
 
       .vp__big {
