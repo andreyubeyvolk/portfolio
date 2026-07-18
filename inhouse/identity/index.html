@@ -204,6 +204,259 @@
         color: #fff;
       }
 
+      /* ─── Video player (custom controls) ─── */
+      :root {
+        --vp-line: rgba(255, 255, 255, 0.2); /* unfilled track */
+        --vp-fill: #ffffff;                   /* played / level */
+        --vp-control: #ffffff;
+        --vp-gap: 16px;   /* icon inset from edges */
+        --vp-inset: 26px; /* line inset from bottom / right */
+        --vp-thickness: 2px;
+        --vp-hit: 24px;   /* invisible hit area around the thin line */
+      }
+
+      /* Full width; height follows the video's own natural aspect ratio
+         (no forced aspect-ratio/object-fit, so nothing gets cropped even
+         if a clip isn't exactly 16:9 or carries unusual SAR metadata). */
+      .vp {
+        position: relative;
+        width: 100%;
+        background: #000;
+        overflow: hidden;
+        user-select: none;
+        margin: 0;
+      }
+
+      .vp__video {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: -2px 0; /* absorb sub-pixel rounding on either edge so .vp's
+          black background never shows a hairline under (or above) the video */
+      }
+
+      /* Variant: video filling a fixed 3:4 pair slot (its own true aspect
+         already matches the slot, so cover crops nothing) instead of the
+         free-flowing, natural-height showreel used elsewhere on the page.
+         Declared after the base .vp/.vp__video rules above so its
+         position:absolute override actually wins (equal specificity,
+         source order decides). */
+      .vp--paired {
+        position: absolute;
+        inset: 0;
+      }
+      .vp--paired .vp__video {
+        position: absolute;
+        inset: -1px; /* 1px overscan on every edge; .vp/.pv-pair__photo both
+          clip via overflow:hidden, so this just kills any hairline gap
+          from sub-pixel rounding without visibly cropping content */
+        width: calc(100% + 2px);
+        height: calc(100% + 2px);
+        object-fit: cover;
+        margin: 0;
+      }
+
+      /* Bare video: silent, looping, no player chrome at all—just a plain
+         autoplaying clip. Same sizing rules as .vp__video/.vp--paired
+         .vp__video above, scoped to a plain <video> instead of the full
+         custom-player markup. */
+      .vp-bare {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: -2px 0;
+      }
+      .pv-pair__photo .vp-bare {
+        position: absolute;
+        inset: -1px;
+        width: calc(100% + 2px);
+        height: calc(100% + 2px);
+        object-fit: cover;
+        margin: 0;
+      }
+
+      .vp__hit {
+        position: absolute;
+        inset: 0;
+        cursor: pointer;
+        z-index: 1;
+      }
+
+      /* Scrim: soft gradient behind the bottom/right controls so the white
+         icons stay legible over bright video content. Fades with the
+         controls (hidden together while idle + playing). */
+      .vp::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        background:
+          linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 110px),
+          linear-gradient(to left, rgba(0, 0, 0, 0.35), transparent 130px);
+        transition: opacity 0.3s ease;
+      }
+      .vp.is-idle::before {
+        opacity: 0;
+      }
+
+      /* Narrower box (half the gallery width, paired slot), the full-size
+         showreel scrim would eat most of the frame here, so fade tighter.
+         Declared after the base .vp::before above so this override wins
+         (equal specificity, source order decides). */
+      .vp--paired::before {
+        background:
+          linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 70px),
+          linear-gradient(to left, rgba(0, 0, 0, 0.35), transparent 70px);
+      }
+
+      .vp__big {
+        position: absolute;
+        top: calc(50% - var(--vp-inset) / 2);
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3;
+        width: 45px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        color: var(--vp-control);
+        transition: opacity 0.2s ease;
+      }
+      .vp__big svg { width: 100%; height: 100%; display: block; }
+      .vp[data-state="playing"] .vp__big { opacity: 0; pointer-events: none; }
+
+      .vp__mute {
+        position: absolute;
+        top: var(--vp-gap);
+        right: var(--vp-gap);
+        z-index: 3;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        background: none;
+        border: 0;
+        cursor: pointer;
+        color: var(--vp-control);
+      }
+      .vp__mute svg { width: 100%; height: 100%; display: block; }
+      .vp__mute .icon-on { display: none; }
+      .vp__mute .icon-off { display: block; }
+      .vp:not([data-muted="true"]) .vp__mute .icon-on { display: block; }
+      .vp:not([data-muted="true"]) .vp__mute .icon-off { display: none; }
+
+      .vp-slider {
+        position: absolute;
+        z-index: 3;
+        cursor: pointer;
+        touch-action: none;
+      }
+      .vp-slider__track {
+        position: absolute;
+        background: var(--vp-line);
+      }
+      .vp-slider__fill {
+        position: absolute;
+        background: var(--vp-fill);
+      }
+      .vp-slider__head {
+        position: absolute;
+        background: var(--vp-fill);
+        opacity: 0;
+        transition: opacity 0.12s ease;
+      }
+      .vp-slider.is-dragging .vp-slider__head {
+        opacity: 1;
+      }
+      .vp-slider--x .vp-slider__head {
+        top: 50%;
+        left: 0%;
+        width: 2px;
+        height: 12px;
+        transform: translate(-50%, -50%);
+      }
+      .vp-slider--y .vp-slider__head {
+        right: 0;
+        bottom: 0%;
+        width: 12px;
+        height: 2px;
+        transform: translate(50%, 50%);
+      }
+
+      .vp-slider--x {
+        left: 48px;
+        right: var(--vp-inset);
+        bottom: calc(var(--vp-inset) - var(--vp-hit) / 2);
+        height: var(--vp-hit);
+      }
+      .vp-slider--x .vp-slider__track {
+        left: 0; right: 0;
+        top: 50%;
+        height: var(--vp-thickness);
+        transform: translateY(-50%);
+      }
+      .vp-slider--x .vp-slider__fill {
+        left: 0;
+        top: 50%;
+        height: var(--vp-thickness);
+        transform: translateY(-50%);
+        width: 0%;
+      }
+
+      .vp-slider--y {
+        top: 47px;
+        bottom: 54px;
+        right: var(--vp-inset);
+        width: var(--vp-hit);
+      }
+      .vp-slider--y .vp-slider__track {
+        top: 0; bottom: 0;
+        right: 0;
+        width: var(--vp-thickness);
+      }
+      .vp-slider--y .vp-slider__fill {
+        bottom: 0;
+        right: 0;
+        width: var(--vp-thickness);
+        height: 70%;
+      }
+
+      .vp__play {
+        position: absolute;
+        left: var(--vp-gap);
+        bottom: var(--vp-gap);
+        z-index: 3;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        background: none;
+        border: 0;
+        cursor: pointer;
+        color: var(--vp-control);
+      }
+      .vp__play svg { width: 100%; height: 100%; display: block; }
+      .vp__play .icon-pause { display: none; }
+      .vp[data-state="playing"] .vp__play .icon-play { display: none; }
+      .vp[data-state="playing"] .vp__play .icon-pause { display: block; }
+
+      .vp__mute,
+      .vp-slider,
+      .vp__play {
+        transition: opacity 0.3s ease;
+      }
+      .vp.is-idle .vp__mute,
+      .vp.is-idle .vp-slider,
+      .vp.is-idle .vp__play {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .vp.is-idle { cursor: none; }
+
     </style>
   </head>
   <body class="project-page">
@@ -251,9 +504,10 @@
             </figure>
 
             <div class="pv-pair">
-              <figure class="pv-pair__photo">
-                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-03.webp" alt="Digital identity visual 03" />
-              </figure>
+              <div class="pv-pair__photo">
+                <!-- id-03: plays once scrolled into view, muted (no audio track), no player chrome -->
+                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/identity/identity-03.mp4"></video>
+              </div>
               <figure class="pv-pair__photo">
                 <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-04.webp" alt="Digital identity visual 04" />
               </figure>
@@ -267,14 +521,14 @@
               <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-06.webp" alt="Digital identity visual 06" />
             </figure>
 
-            <figure class="pv-wide">
-              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-07.webp" alt="Digital identity visual 07" />
-            </figure>
+            <!-- id-07: plays once scrolled into view, muted (no audio track), no player chrome -->
+            <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/identity/identity-07.mp4"></video>
 
             <div class="pv-pair">
-              <figure class="pv-pair__photo">
-                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-08.webp" alt="Digital identity visual 08" />
-              </figure>
+              <div class="pv-pair__photo">
+                <!-- id-08: plays once scrolled into view, muted (no audio track), no player chrome -->
+                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/identity/identity-08.mp4"></video>
+              </div>
               <figure class="pv-pair__photo">
                 <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-09.webp" alt="Digital identity visual 09" />
               </figure>
@@ -309,6 +563,56 @@
             <figure class="pv-wide">
               <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-16.webp" alt="Digital identity visual 16" />
             </figure>
+
+            <!-- Sumsub Multiverse conf: plays once scrolled into view, muted by default -->
+            <div class="vp" data-state="paused" data-muted="true" data-autoplay="scroll">
+              <video class="vp__video" playsinline muted loop preload="metadata" src="../../assets/inhouse/identity/identity-conf.mp4"></video>
+
+              <div class="vp__hit" data-role="toggle"></div>
+
+              <button class="vp__big" type="button" aria-label="Play" data-role="toggle">
+                <svg viewBox="0 0 45 54" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M0 0L45 27L0 54V0Z" fill="currentColor" />
+                </svg>
+              </button>
+
+              <button class="vp__mute" type="button" aria-label="Toggle sound" data-role="mute">
+                <svg class="icon-on" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M4 9V15H8L13 19V5L8 9H4Z" fill="currentColor" />
+                  <path d="M16 9C16.8 9.8 16.8 14.2 16 15M18.5 6.5C20.5 8.5 20.5 15.5 18.5 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                <svg class="icon-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M4 9V15H8L13 19V5L8 9H4Z" fill="currentColor" />
+                  <path d="M17 10L21 14M21 10L17 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+              </button>
+
+              <div class="vp-slider vp-slider--y" data-role="volume"
+                   role="slider" aria-label="Volume" aria-orientation="vertical"
+                   aria-valuemin="0" aria-valuemax="100" aria-valuenow="70" tabindex="0">
+                <div class="vp-slider__track"></div>
+                <div class="vp-slider__fill"></div>
+                <div class="vp-slider__head"></div>
+              </div>
+
+              <button class="vp__play" type="button" aria-label="Play" data-role="toggle">
+                <svg class="icon-play" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M4 2L20 11L4 20V2Z" fill="currentColor" />
+                </svg>
+                <svg class="icon-pause" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="4" y="2" width="5" height="18" fill="currentColor" />
+                  <rect x="13" y="2" width="5" height="18" fill="currentColor" />
+                </svg>
+              </button>
+
+              <div class="vp-slider vp-slider--x" data-role="seek"
+                   role="slider" aria-label="Seek" aria-orientation="horizontal"
+                   aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+                <div class="vp-slider__track"></div>
+                <div class="vp-slider__fill"></div>
+                <div class="vp-slider__head"></div>
+              </div>
+            </div>
 
             <div class="pv-pair">
               <figure class="pv-pair__photo">
@@ -386,9 +690,10 @@
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-02.webp" alt="Digital identity visual 02" />
       </figure>
-      <figure class="mobile-project__photo" style="background:#d3d3d3;">
-        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-03.webp" alt="Digital identity visual 03" />
-      </figure>
+
+      <!-- id-03: plays once scrolled into view, muted (no audio track), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/identity/identity-03.mp4"></video>
+
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-04.webp" alt="Digital identity visual 04" />
       </figure>
@@ -398,12 +703,13 @@
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-06.webp" alt="Digital identity visual 06" />
       </figure>
-      <figure class="mobile-project__photo" style="background:#d3d3d3;">
-        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-07.webp" alt="Digital identity visual 07" />
-      </figure>
-      <figure class="mobile-project__photo" style="background:#d3d3d3;">
-        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-08.webp" alt="Digital identity visual 08" />
-      </figure>
+
+      <!-- id-07: plays once scrolled into view, muted (no audio track), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/identity/identity-07.mp4"></video>
+
+      <!-- id-08: plays once scrolled into view, muted (no audio track), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/identity/identity-08.mp4"></video>
+
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-09.webp" alt="Digital identity visual 09" />
       </figure>
@@ -428,6 +734,57 @@
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-16.webp" alt="Digital identity visual 16" />
       </figure>
+
+      <!-- Sumsub Multiverse conf: plays once scrolled into view, muted by default -->
+      <div class="vp" data-state="paused" data-muted="true" data-autoplay="scroll">
+        <video class="vp__video" playsinline muted loop preload="metadata" src="../../assets/inhouse/identity/identity-conf.mp4"></video>
+
+        <div class="vp__hit" data-role="toggle"></div>
+
+        <button class="vp__big" type="button" aria-label="Play" data-role="toggle">
+          <svg viewBox="0 0 45 54" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M0 0L45 27L0 54V0Z" fill="currentColor" />
+          </svg>
+        </button>
+
+        <button class="vp__mute" type="button" aria-label="Toggle sound" data-role="mute">
+          <svg class="icon-on" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 9V15H8L13 19V5L8 9H4Z" fill="currentColor" />
+            <path d="M16 9C16.8 9.8 16.8 14.2 16 15M18.5 6.5C20.5 8.5 20.5 15.5 18.5 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+          <svg class="icon-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 9V15H8L13 19V5L8 9H4Z" fill="currentColor" />
+            <path d="M17 10L21 14M21 10L17 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </button>
+
+        <div class="vp-slider vp-slider--y" data-role="volume"
+             role="slider" aria-label="Volume" aria-orientation="vertical"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="70" tabindex="0">
+          <div class="vp-slider__track"></div>
+          <div class="vp-slider__fill"></div>
+          <div class="vp-slider__head"></div>
+        </div>
+
+        <button class="vp__play" type="button" aria-label="Play" data-role="toggle">
+          <svg class="icon-play" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 2L20 11L4 20V2Z" fill="currentColor" />
+          </svg>
+          <svg class="icon-pause" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="4" y="2" width="5" height="18" fill="currentColor" />
+            <rect x="13" y="2" width="5" height="18" fill="currentColor" />
+          </svg>
+        </button>
+
+        <div class="vp-slider vp-slider--x" data-role="seek"
+             role="slider" aria-label="Seek" aria-orientation="horizontal"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+          <div class="vp-slider__track"></div>
+          <div class="vp-slider__fill"></div>
+          <div class="vp-slider__head"></div>
+        </div>
+      </div>
+
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/identity/identity-17.webp" alt="Digital identity visual 17" />
       </figure>
@@ -506,5 +863,6 @@
     <script src="../../project-order.js"></script>
     <script src="../../main.js"></script>
     <script src="../../menu.js"></script>
+    <script src="../../video-player.js"></script>
   </body>
 </html>

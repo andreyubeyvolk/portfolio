@@ -88,14 +88,21 @@
       var observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (entry.isIntersecting) {
-            video.play().catch(function () {});
+            // Hide the interface right away—no controls flash before the
+            // first hover—rather than waiting for the usual HIDE_DELAY.
+            vp.classList.add('is-idle');
+            video.play().catch(function () { vp.classList.remove('is-idle'); });
             observer.disconnect(); // one-shot: don't re-trigger on scroll back in/out
           }
         });
       }, { threshold: 0.5 });
       observer.observe(vp);
     } else {
-      video.play().catch(function () { vp.dataset.state = 'paused'; });
+      vp.classList.add('is-idle');
+      video.play().catch(function () {
+        vp.dataset.state = 'paused';
+        vp.classList.remove('is-idle');
+      });
     }
 
     // ── Mute toggle ──────────────────────────────────────────────
@@ -174,4 +181,22 @@
   }
 
   document.querySelectorAll('.vp').forEach(initPlayer);
+
+  // ── Bare videos: silent, looping, no player chrome—just autoplay once
+  // scrolled into view. No controls to wire up, so no hover/idle logic.
+  document.querySelectorAll('.vp-bare').forEach(function (video) {
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            video.play().catch(function () {});
+            observer.disconnect();
+          }
+        });
+      }, { threshold: 0.5 });
+      observer.observe(video);
+    } else {
+      video.play().catch(function () {});
+    }
+  });
 })();
