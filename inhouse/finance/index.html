@@ -53,6 +53,7 @@
         gap: 16px;
       }
       .pv-pair__photo {
+        position: relative;
         flex: 1;
         aspect-ratio: 3 / 4;
         overflow: hidden;
@@ -230,8 +231,29 @@
         display: block;
         width: 100%;
         height: auto;
-        margin-bottom: -2px; /* absorb sub-pixel rounding so .vp's black
-          background never shows a hairline under the video */
+        margin: -2px 0; /* absorb sub-pixel rounding on either edge so .vp's
+          black background never shows a hairline under (or above) the video */
+      }
+
+      /* Variant: video filling a fixed 3:4 pair slot (its own true aspect
+         already matches the slot, so cover crops nothing) instead of the
+         free-flowing, natural-height showreel used elsewhere on the page.
+         Declared after the base .vp/.vp__video rules above so its
+         position:absolute override actually wins (equal specificity,
+         source order decides). */
+      .vp--paired {
+        position: absolute;
+        inset: 0;
+      }
+      .vp--paired .vp__video {
+        position: absolute;
+        inset: -1px; /* 1px overscan on every edge; .vp/.pv-pair__photo both
+          clip via overflow:hidden, so this just kills any hairline gap
+          from sub-pixel rounding without visibly cropping content */
+        width: calc(100% + 2px);
+        height: calc(100% + 2px);
+        object-fit: cover;
+        margin: 0;
       }
 
       .vp__hit {
@@ -257,6 +279,16 @@
       }
       .vp.is-idle::before {
         opacity: 0;
+      }
+
+      /* Narrower box (half the gallery width, paired slot), the full-size
+         showreel scrim would eat most of the frame here, so fade tighter.
+         Declared after the base .vp::before above so this override wins
+         (equal specificity, source order decides). */
+      .vp--paired::before {
+        background:
+          linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 70px),
+          linear-gradient(to left, rgba(0, 0, 0, 0.35), transparent 70px);
       }
 
       .vp__big {
@@ -528,9 +560,57 @@
             </figure>
 
             <div class="pv-pair">
-              <figure class="pv-pair__photo">
-                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/finance/finance-09.webp" alt="Finance identity visual 09" />
-              </figure>
+              <div class="pv-pair__photo">
+                <!-- Finance stories: plays once scrolled into view, muted (no audio track) -->
+                <div class="vp vp--paired" data-state="paused" data-muted="true" data-autoplay="scroll">
+                  <video class="vp__video" playsinline muted loop preload="metadata" src="../../assets/inhouse/finance/finance-stories.mp4"></video>
+
+                  <div class="vp__hit" data-role="toggle"></div>
+
+                  <button class="vp__big" type="button" aria-label="Play" data-role="toggle">
+                    <svg viewBox="0 0 45 54" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M0 0L45 27L0 54V0Z" fill="currentColor" />
+                    </svg>
+                  </button>
+
+                  <button class="vp__mute" type="button" aria-label="Toggle sound" data-role="mute">
+                    <svg class="icon-on" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M4 9V15H8L13 19V5L8 9H4Z" fill="currentColor" />
+                      <path d="M16 9C16.8 9.8 16.8 14.2 16 15M18.5 6.5C20.5 8.5 20.5 15.5 18.5 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                    <svg class="icon-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M4 9V15H8L13 19V5L8 9H4Z" fill="currentColor" />
+                      <path d="M17 10L21 14M21 10L17 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                  </button>
+
+                  <div class="vp-slider vp-slider--y" data-role="volume"
+                       role="slider" aria-label="Volume" aria-orientation="vertical"
+                       aria-valuemin="0" aria-valuemax="100" aria-valuenow="70" tabindex="0">
+                    <div class="vp-slider__track"></div>
+                    <div class="vp-slider__fill"></div>
+                    <div class="vp-slider__head"></div>
+                  </div>
+
+                  <button class="vp__play" type="button" aria-label="Play" data-role="toggle">
+                    <svg class="icon-play" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M4 2L20 11L4 20V2Z" fill="currentColor" />
+                    </svg>
+                    <svg class="icon-pause" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <rect x="4" y="2" width="5" height="18" fill="currentColor" />
+                      <rect x="13" y="2" width="5" height="18" fill="currentColor" />
+                    </svg>
+                  </button>
+
+                  <div class="vp-slider vp-slider--x" data-role="seek"
+                       role="slider" aria-label="Seek" aria-orientation="horizontal"
+                       aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+                    <div class="vp-slider__track"></div>
+                    <div class="vp-slider__fill"></div>
+                    <div class="vp-slider__head"></div>
+                  </div>
+                </div>
+              </div>
               <figure class="pv-pair__photo">
                 <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/finance/finance-10.webp" alt="Finance identity visual 10" />
               </figure>
@@ -727,9 +807,55 @@
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/finance/finance-08.webp" alt="Finance identity visual 08" />
       </figure>
-      <figure class="mobile-project__photo" style="background:#d3d3d3;">
-        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/finance/finance-09.webp" alt="Finance identity visual 09" />
-      </figure>
+      <!-- Finance stories: plays once scrolled into view, muted (no audio track) -->
+      <div class="vp" data-state="paused" data-muted="true" data-autoplay="scroll">
+        <video class="vp__video" playsinline muted loop preload="metadata" src="../../assets/inhouse/finance/finance-stories.mp4"></video>
+
+        <div class="vp__hit" data-role="toggle"></div>
+
+        <button class="vp__big" type="button" aria-label="Play" data-role="toggle">
+          <svg viewBox="0 0 45 54" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M0 0L45 27L0 54V0Z" fill="currentColor" />
+          </svg>
+        </button>
+
+        <button class="vp__mute" type="button" aria-label="Toggle sound" data-role="mute">
+          <svg class="icon-on" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 9V15H8L13 19V5L8 9H4Z" fill="currentColor" />
+            <path d="M16 9C16.8 9.8 16.8 14.2 16 15M18.5 6.5C20.5 8.5 20.5 15.5 18.5 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+          <svg class="icon-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 9V15H8L13 19V5L8 9H4Z" fill="currentColor" />
+            <path d="M17 10L21 14M21 10L17 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </button>
+
+        <div class="vp-slider vp-slider--y" data-role="volume"
+             role="slider" aria-label="Volume" aria-orientation="vertical"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="70" tabindex="0">
+          <div class="vp-slider__track"></div>
+          <div class="vp-slider__fill"></div>
+          <div class="vp-slider__head"></div>
+        </div>
+
+        <button class="vp__play" type="button" aria-label="Play" data-role="toggle">
+          <svg class="icon-play" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 2L20 11L4 20V2Z" fill="currentColor" />
+          </svg>
+          <svg class="icon-pause" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="4" y="2" width="5" height="18" fill="currentColor" />
+            <rect x="13" y="2" width="5" height="18" fill="currentColor" />
+          </svg>
+        </button>
+
+        <div class="vp-slider vp-slider--x" data-role="seek"
+             role="slider" aria-label="Seek" aria-orientation="horizontal"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+          <div class="vp-slider__track"></div>
+          <div class="vp-slider__fill"></div>
+          <div class="vp-slider__head"></div>
+        </div>
+      </div>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/finance/finance-10.webp" alt="Finance identity visual 10" />
       </figure>
