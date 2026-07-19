@@ -1,0 +1,907 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="../../assets/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png" />
+    <meta name="description" content="Welcome to Greenflag visual identity by Andrey Ubeyvolk." />
+    <meta name="author" content="Andrey Ubeyvolk" />
+    <meta name="keywords" content="Andrey Ubeyvolk, art director, brand identity, visual identity, graphic design, visual communication" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Andrey Ubeyvolk" />
+    <meta property="og:title" content="Welcome to Greenflag—Andrey Ubeyvolk" />
+    <meta property="og:description" content="Welcome to Greenflag visual identity by Andrey Ubeyvolk." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Welcome to Greenflag—Andrey Ubeyvolk" />
+    <meta name="twitter:description" content="Welcome to Greenflag visual identity by Andrey Ubeyvolk." />
+    <title>Welcome to Greenflag—Andrey Ubeyvolk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../../styles.css" />
+    <link rel="stylesheet" href="../../mobile.css" />
+    <style>
+      /* ─── Desktop project layout ─── */
+
+      .project-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding-bottom: 58px;
+      }
+
+      /* Cover: full width, 3:2 */
+      .pv-cover {
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        overflow: hidden;
+        background: #d3d3d3;
+        margin: 0;
+      }
+      .pv-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Photo pair: two equal 3:4 columns */
+      .pv-pair {
+        display: flex;
+        gap: 16px;
+      }
+      .pv-pair__photo {
+        position: relative;
+        flex: 1;
+        aspect-ratio: 3 / 4;
+        overflow: hidden;
+        background: #d3d3d3;
+        margin: 0;
+      }
+      .pv-pair__photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Wide photo: full width, 3:2 */
+      .pv-wide {
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        overflow: hidden;
+        background: #d3d3d3;
+        margin: 0;
+      }
+      .pv-wide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Info rows (About / Challenge / Solution):
+         label left column, text right column */
+      .pv-info {
+        width: 100%;
+        margin-top: -8px; /* lift toward the image above (half the 16px gap) */
+        display: flex;
+        flex-direction: column;
+        gap: 32px; /* Challenge -> Solution block */
+      }
+
+      /* About row: lifted the same 8px toward the cover */
+      .pv-row--about {
+        margin-top: -8px;
+      }
+
+      /* Two equal columns, 16px gap */
+      .pv-row {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      .pv-row__label {
+        flex: 1;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      .pv-row__content {
+        flex: 1;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      /* Solution block: 2px full-width divider, 4px gap, then the row */
+      .pv-solution-block {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .pv-divider {
+        width: 100%;
+        height: 2px;
+        background: var(--text);
+      }
+
+      /* Solution right column: body (text), then actions (56px gap) */
+      .pv-solution {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 56px;
+      }
+
+      .pv-solution__body {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .pv-solution__body > p {
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      .pv-icon {
+        margin: 0;
+        line-height: 0;
+      }
+      .pv-icon img {
+        display: block;
+        height: 103px;
+        width: auto; /* keep the icon's own aspect, no cropping */
+      }
+
+      /* Actions: Download + Next project, two equal columns */
+      .pv-actions {
+        display: flex;
+        gap: 16px;
+      }
+
+      .pv-action {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .pv-action__bar {
+        height: 4px;
+        background: var(--text);
+        flex-shrink: 0;
+      }
+
+      .pv-action__btn {
+        display: block;
+        padding: 0;
+        background: none;
+        border: 0;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.4px;
+        color: inherit;
+        text-decoration: none;
+        text-align: left;
+        cursor: pointer;
+        transition: color 150ms ease, background-color 150ms ease;
+        white-space: nowrap;
+      }
+
+      /* Hover: the whole action (bar + text) highlights black, like the home socials */
+      .pv-action:hover {
+        background: #000;
+      }
+      .pv-action:hover .pv-action__bar {
+        background: #000;
+      }
+      .pv-action:hover .pv-action__btn {
+        color: #fff;
+      }
+
+      /* ─── Video player (custom controls) ─── */
+      :root {
+        --vp-line: rgba(255, 255, 255, 0.2); /* unfilled track */
+        --vp-fill: #ffffff;                   /* played / level */
+        --vp-control: #ffffff;
+        --vp-gap: 16px;   /* icon inset from edges */
+        --vp-inset: 26px; /* line inset from bottom / right */
+        --vp-thickness: 2px;
+        --vp-hit: 24px;   /* invisible hit area around the thin line */
+      }
+
+      /* Full width; height follows the video's own natural aspect ratio
+         (no forced aspect-ratio/object-fit, so nothing gets cropped even
+         if a clip isn't exactly 16:9 or carries unusual SAR metadata). */
+      .vp {
+        position: relative;
+        width: 100%;
+        background: #000;
+        overflow: hidden;
+        user-select: none;
+        margin: 0;
+      }
+
+      .vp__video {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: -2px 0; /* absorb sub-pixel rounding on either edge so .vp's
+          black background never shows a hairline under (or above) the video */
+      }
+
+      /* Variant: video filling a fixed 3:4 pair slot (its own true aspect
+         already matches the slot, so cover crops nothing) instead of the
+         free-flowing, natural-height showreel used elsewhere on the page.
+         Declared after the base .vp/.vp__video rules above so its
+         position:absolute override actually wins (equal specificity,
+         source order decides). */
+      .vp--paired {
+        position: absolute;
+        inset: 0;
+      }
+      .vp--paired .vp__video {
+        position: absolute;
+        inset: -1px; /* 1px overscan on every edge; .vp/.pv-pair__photo both
+          clip via overflow:hidden, so this just kills any hairline gap
+          from sub-pixel rounding without visibly cropping content */
+        width: calc(100% + 2px);
+        height: calc(100% + 2px);
+        object-fit: cover;
+        margin: 0;
+      }
+
+      /* Bare video: silent, looping, no player chrome at all, just a plain
+         autoplaying clip. Same sizing rules as .vp__video/.vp--paired
+         .vp__video above, scoped to a plain video element instead of the
+         full custom-player markup. */
+      .vp-bare {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: -2px 0;
+      }
+      .pv-pair__photo .vp-bare {
+        position: absolute;
+        inset: -1px;
+        width: calc(100% + 2px);
+        height: calc(100% + 2px);
+        object-fit: cover;
+        margin: 0;
+      }
+
+      .vp__hit {
+        position: absolute;
+        inset: 0;
+        cursor: pointer;
+        z-index: 1;
+      }
+
+      /* Scrim: soft gradient behind the bottom/right controls so the white
+         icons stay legible over bright video content. Fades with the
+         controls (hidden together while idle + playing). */
+      .vp::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        background:
+          linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 110px),
+          linear-gradient(to left, rgba(0, 0, 0, 0.35), transparent 130px);
+        transition: opacity 0.3s ease;
+      }
+      .vp.is-idle::before {
+        opacity: 0;
+      }
+
+      /* Narrower box (half the gallery width, paired slot), the full-size
+         showreel scrim would eat most of the frame here, so fade tighter.
+         Declared after the base .vp::before above so this override wins
+         (equal specificity, source order decides). */
+      .vp--paired::before {
+        background:
+          linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 70px),
+          linear-gradient(to left, rgba(0, 0, 0, 0.35), transparent 70px);
+      }
+
+      .vp__big {
+        position: absolute;
+        top: calc(50% - var(--vp-inset) / 2);
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3;
+        width: 45px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        color: var(--vp-control);
+        transition: opacity 0.2s ease;
+      }
+      .vp__big svg { width: 100%; height: 100%; display: block; }
+      .vp[data-state="playing"] .vp__big { opacity: 0; pointer-events: none; }
+
+      .vp__mute {
+        position: absolute;
+        top: var(--vp-gap);
+        right: var(--vp-gap);
+        z-index: 3;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        background: none;
+        border: 0;
+        cursor: pointer;
+        color: var(--vp-control);
+      }
+      .vp__mute svg { width: 100%; height: 100%; display: block; }
+      .vp__mute .icon-on { display: none; }
+      .vp__mute .icon-off { display: block; }
+      .vp:not([data-muted="true"]) .vp__mute .icon-on { display: block; }
+      .vp:not([data-muted="true"]) .vp__mute .icon-off { display: none; }
+
+      .vp-slider {
+        position: absolute;
+        z-index: 3;
+        cursor: pointer;
+        touch-action: none;
+      }
+      .vp-slider__track {
+        position: absolute;
+        background: var(--vp-line);
+      }
+      .vp-slider__fill {
+        position: absolute;
+        background: var(--vp-fill);
+      }
+      .vp-slider__head {
+        position: absolute;
+        background: var(--vp-fill);
+        opacity: 0;
+        transition: opacity 0.12s ease;
+      }
+      .vp-slider.is-dragging .vp-slider__head {
+        opacity: 1;
+      }
+      .vp-slider--x .vp-slider__head {
+        top: 50%;
+        left: 0%;
+        width: 2px;
+        height: 12px;
+        transform: translate(-50%, -50%);
+      }
+      .vp-slider--y .vp-slider__head {
+        right: 0;
+        bottom: 0%;
+        width: 12px;
+        height: 2px;
+        transform: translate(50%, 50%);
+      }
+
+      .vp-slider--x {
+        left: 48px;
+        right: var(--vp-inset);
+        bottom: calc(var(--vp-inset) - var(--vp-hit) / 2);
+        height: var(--vp-hit);
+      }
+      .vp-slider--x .vp-slider__track {
+        left: 0; right: 0;
+        top: 50%;
+        height: var(--vp-thickness);
+        transform: translateY(-50%);
+      }
+      .vp-slider--x .vp-slider__fill {
+        left: 0;
+        top: 50%;
+        height: var(--vp-thickness);
+        transform: translateY(-50%);
+        width: 0%;
+      }
+
+      .vp-slider--y {
+        top: 47px;
+        bottom: 54px;
+        right: var(--vp-inset);
+        width: var(--vp-hit);
+      }
+      .vp-slider--y .vp-slider__track {
+        top: 0; bottom: 0;
+        right: 0;
+        width: var(--vp-thickness);
+      }
+      .vp-slider--y .vp-slider__fill {
+        bottom: 0;
+        right: 0;
+        width: var(--vp-thickness);
+        height: 70%;
+      }
+
+      .vp__play {
+        position: absolute;
+        left: var(--vp-gap);
+        bottom: var(--vp-gap);
+        z-index: 3;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        background: none;
+        border: 0;
+        cursor: pointer;
+        color: var(--vp-control);
+      }
+      .vp__play svg { width: 100%; height: 100%; display: block; }
+      .vp__play .icon-pause { display: none; }
+      .vp[data-state="playing"] .vp__play .icon-play { display: none; }
+      .vp[data-state="playing"] .vp__play .icon-pause { display: block; }
+
+      .vp__mute,
+      .vp-slider,
+      .vp__play {
+        transition: opacity 0.3s ease;
+      }
+      .vp.is-idle .vp__mute,
+      .vp.is-idle .vp-slider,
+      .vp.is-idle .vp__play {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .vp.is-idle { cursor: none; }
+
+    </style>
+  </head>
+  <body class="project-page">
+
+    <!-- ── DESKTOP LAYOUT ─────────────────────────── -->
+    <main class="site-shell page-grid">
+      <aside class="site-nav" aria-label="Main navigation">
+        <a class="brand" href="../../index.html" aria-label="Andrey Ubeyvolk home">
+          <img width="129" height="16" class="brand-mark" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
+        </a>
+        <nav class="nav-list">
+          <a class="is-active" href="../../inhouse/index.html">Inhouse</a>
+          <a href="../../brands/index.html">Brands</a>
+          <a href="../../archive/index.html">Archive</a>
+          <a href="../../about/index.html">About</a>
+        </nav>
+      </aside>
+
+      <section class="section-intro intro" aria-label="Inhouse section introduction">
+        <p>Art direction and hands-on work, where I lead an in-house design team. Brand communications, visual systems, and every direction a brand needs to express itself.</p>
+      </section>
+
+      <section class="content-pane project-frame" aria-label="Welcome to Greenflag project content">
+        <header class="content-pane__header project-header">
+          <h1>Welcome to Greenflag</h1>
+          <a class="close-button" href="../index.html" aria-label="Close project"><span>[x]</span></a>
+        </header>
+        <div class="content-pane__scroll project-scroll custom-scroll">
+          <article class="project-content">
+
+            <!-- Cover -->
+            <figure class="pv-cover">
+              <img width="2160" height="1440" src="../../assets/inhouse/greenflag/greenflag-cover.webp" alt="Welcome to Greenflag cover visual" />
+            </figure>
+
+            <!-- About: label left, text right -->
+            <div class="pv-row pv-row--about">
+              <span class="pv-row__label">About</span>
+              <p class="pv-row__content">Digital exclusion affects over 627 million people worldwide. Flawed verification technology wrongly flags them as risks. Sumsub launched Greenflag—a fictional nation representing these excluded users. The project needed a visual identity as human as the issue itself.</p>
+            </div>
+
+            <!-- Gallery -->
+            <!-- greenflag-01: plays once scrolled into view, muted (no audio track), no player chrome -->
+            <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-01.mp4"></video>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-02.webp" alt="Greenflag visual 02" />
+            </figure>
+
+            <!-- Greenflag brand film: plays once scrolled into view, muted by default -->
+            <div class="vp" data-state="paused" data-muted="true" data-autoplay="scroll">
+              <video class="vp__video" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-03.mp4"></video>
+
+              <div class="vp__hit" data-role="toggle"></div>
+
+              <button class="vp__big" type="button" aria-label="Play" data-role="toggle">
+                <svg viewBox="0 0 45 54" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M0 0L45 27L0 54V0Z" fill="currentColor" />
+                </svg>
+              </button>
+
+              <button class="vp__mute" type="button" aria-label="Toggle sound" data-role="mute">
+                <svg class="icon-on" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M4 9V15H8L13 19V5L8 9H4Z" fill="currentColor" />
+                  <path d="M16 9C16.8 9.8 16.8 14.2 16 15M18.5 6.5C20.5 8.5 20.5 15.5 18.5 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+                <svg class="icon-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M4 9V15H8L13 19V5L8 9H4Z" fill="currentColor" />
+                  <path d="M17 10L21 14M21 10L17 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+              </button>
+
+              <div class="vp-slider vp-slider--y" data-role="volume"
+                   role="slider" aria-label="Volume" aria-orientation="vertical"
+                   aria-valuemin="0" aria-valuemax="100" aria-valuenow="70" tabindex="0">
+                <div class="vp-slider__track"></div>
+                <div class="vp-slider__fill"></div>
+                <div class="vp-slider__head"></div>
+              </div>
+
+              <button class="vp__play" type="button" aria-label="Play" data-role="toggle">
+                <svg class="icon-play" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M4 2L20 11L4 20V2Z" fill="currentColor" />
+                </svg>
+                <svg class="icon-pause" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="4" y="2" width="5" height="18" fill="currentColor" />
+                  <rect x="13" y="2" width="5" height="18" fill="currentColor" />
+                </svg>
+              </button>
+
+              <div class="vp-slider vp-slider--x" data-role="seek"
+                   role="slider" aria-label="Seek" aria-orientation="horizontal"
+                   aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+                <div class="vp-slider__track"></div>
+                <div class="vp-slider__fill"></div>
+                <div class="vp-slider__head"></div>
+              </div>
+            </div>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-04.webp" alt="Greenflag visual 04" />
+              </figure>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-05.webp" alt="Greenflag visual 05" />
+              </figure>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-06.webp" alt="Greenflag visual 06" />
+            </figure>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-07.webp" alt="Greenflag visual 07" />
+              </figure>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-08.webp" alt="Greenflag visual 08" />
+              </figure>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-09.webp" alt="Greenflag visual 09" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-10.webp" alt="Greenflag visual 10" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-11.webp" alt="Greenflag visual 11" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-12.webp" alt="Greenflag visual 12" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-13.webp" alt="Greenflag visual 13" />
+            </figure>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-14.webp" alt="Greenflag visual 14" />
+              </figure>
+              <div class="pv-pair__photo">
+                <!-- greenflag-15: plays once scrolled into view, muted (no audio track), no player chrome -->
+                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-15.mp4"></video>
+              </div>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-16.webp" alt="Greenflag visual 16" />
+            </figure>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-17.webp" alt="Greenflag visual 17" />
+              </figure>
+              <div class="pv-pair__photo">
+                <!-- greenflag-18: plays once scrolled into view, muted (no audio track), no player chrome -->
+                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-18.mp4"></video>
+              </div>
+            </div>
+
+            <!-- greenflag-19: plays once scrolled into view, muted (no audio track), no player chrome -->
+            <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-19.mp4"></video>
+
+            <div class="pv-pair">
+              <div class="pv-pair__photo">
+                <!-- greenflag-20: plays once scrolled into view, muted (no audio track), no player chrome -->
+                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-20.mp4"></video>
+              </div>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-21.webp" alt="Greenflag visual 21" />
+              </figure>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-22.webp" alt="Greenflag visual 22" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-23.webp" alt="Greenflag visual 23" />
+            </figure>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-24.webp" alt="Greenflag visual 24" />
+              </figure>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-25.webp" alt="Greenflag visual 25" />
+              </figure>
+            </div>
+
+            <!-- greenflag-26: plays once scrolled into view, muted (no audio track), no player chrome -->
+            <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-26.mp4"></video>
+
+            <!-- Project info box -->
+            <div class="pv-info">
+              <!-- Challenge -->
+              <div class="pv-row">
+                <span class="pv-row__label">Challenge</span>
+                <p class="pv-row__content">A partner agency began the project with a heavily digital, tech-driven direction. Futuristic typography, cold and system-like. But Greenflag isn't about technology. It's about people shut out by it. The challenge was to reset the art direction toward humanity, without losing the tech-era tension that caused the problem in the first place.</p>
+              </div>
+
+              <!-- Solution: top divider, then text + icon + actions in the right column -->
+              <div class="pv-solution-block">
+                <div class="pv-divider"></div>
+                <div class="pv-row">
+                  <span class="pv-row__label">Solution</span>
+                  <div class="pv-solution">
+                    <div class="pv-solution__body">
+                      <p>We shifted the typography toward a cinematic register, inspired by film title sequences, built around our signature mint accent. Photography turned toward real people: warm, atmospheric, grain-textured, emotionally direct. Pixelation, infographic elements, and hard-edged plaques stayed in the system—small reminders of the technology at the heart of the conflict. Video production was handled by an external studio, while we led identity, website, and campaign communications, blending real footage with AI-generated visuals to hit the vision fast and without extra production cost. The result: a human story told through the exact language that once excluded it—and a project that went on to win multiple international creative awards.</p>
+                      <figure class="pv-icon">
+                        <img width="206" height="206" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-kv.png" alt="" aria-hidden="true" />
+                      </figure>
+                    </div>
+                    <div class="pv-actions">
+                      <div class="pv-action">
+                        <div class="pv-action__bar"></div>
+                        <a class="pv-action__btn" href="../../assets/inhouse/greenflag/greenflag-project-images.zip" download>Download project images</a>
+                      </div>
+                      <div class="pv-action">
+                        <div class="pv-action__bar"></div>
+                        <button class="pv-action__btn next-project-btn" type="button" data-section="inhouse" data-slug="greenflag" data-next-url="../index.html">Next project</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <!-- ── MOBILE LAYOUT ──────────────────────────── -->
+
+    <!-- Fixed top bar: project title + close -->
+    <div class="project-bar" id="project-bar">
+      <span class="project-bar__title">Welcome to Greenflag</span>
+      <a class="project-bar__close" href="../index.html" aria-label="Close project">[X]</a>
+    </div>
+
+    <!-- Scrollable project content -->
+    <div class="mobile-project">
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" src="../../assets/inhouse/greenflag/greenflag-cover.webp" alt="Welcome to Greenflag cover visual" />
+      </figure>
+
+      <!-- About block -->
+      <div class="mobile-project__block">
+        <span class="mobile-project__label">About</span>
+        <p class="mobile-project__text">Digital exclusion affects over 627 million people worldwide. Flawed verification technology wrongly flags them as risks. Sumsub launched Greenflag—a fictional nation representing these excluded users. The project needed a visual identity as human as the issue itself.</p>
+      </div>
+
+      <!-- greenflag-01: plays once scrolled into view, muted (no audio track), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-01.mp4"></video>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-02.webp" alt="Greenflag visual 02" />
+      </figure>
+      <!-- Greenflag brand film: plays once scrolled into view, muted by default -->
+      <div class="vp" data-state="paused" data-muted="true" data-autoplay="scroll">
+        <video class="vp__video" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-03.mp4"></video>
+
+        <div class="vp__hit" data-role="toggle"></div>
+
+        <button class="vp__big" type="button" aria-label="Play" data-role="toggle">
+          <svg viewBox="0 0 45 54" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M0 0L45 27L0 54V0Z" fill="currentColor" />
+          </svg>
+        </button>
+
+        <button class="vp__mute" type="button" aria-label="Toggle sound" data-role="mute">
+          <svg class="icon-on" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 9V15H8L13 19V5L8 9H4Z" fill="currentColor" />
+            <path d="M16 9C16.8 9.8 16.8 14.2 16 15M18.5 6.5C20.5 8.5 20.5 15.5 18.5 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+          <svg class="icon-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 9V15H8L13 19V5L8 9H4Z" fill="currentColor" />
+            <path d="M17 10L21 14M21 10L17 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </button>
+
+        <div class="vp-slider vp-slider--y" data-role="volume"
+             role="slider" aria-label="Volume" aria-orientation="vertical"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="70" tabindex="0">
+          <div class="vp-slider__track"></div>
+          <div class="vp-slider__fill"></div>
+          <div class="vp-slider__head"></div>
+        </div>
+
+        <button class="vp__play" type="button" aria-label="Play" data-role="toggle">
+          <svg class="icon-play" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 2L20 11L4 20V2Z" fill="currentColor" />
+          </svg>
+          <svg class="icon-pause" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="4" y="2" width="5" height="18" fill="currentColor" />
+            <rect x="13" y="2" width="5" height="18" fill="currentColor" />
+          </svg>
+        </button>
+
+        <div class="vp-slider vp-slider--x" data-role="seek"
+             role="slider" aria-label="Seek" aria-orientation="horizontal"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+          <div class="vp-slider__track"></div>
+          <div class="vp-slider__fill"></div>
+          <div class="vp-slider__head"></div>
+        </div>
+      </div>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-04.webp" alt="Greenflag visual 04" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-05.webp" alt="Greenflag visual 05" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-06.webp" alt="Greenflag visual 06" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-07.webp" alt="Greenflag visual 07" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-08.webp" alt="Greenflag visual 08" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-09.webp" alt="Greenflag visual 09" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-10.webp" alt="Greenflag visual 10" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-11.webp" alt="Greenflag visual 11" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-12.webp" alt="Greenflag visual 12" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-13.webp" alt="Greenflag visual 13" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-14.webp" alt="Greenflag visual 14" />
+      </figure>
+      <!-- greenflag-15: plays once scrolled into view, muted (no audio track), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-15.mp4"></video>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-16.webp" alt="Greenflag visual 16" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-17.webp" alt="Greenflag visual 17" />
+      </figure>
+      <!-- greenflag-18: plays once scrolled into view, muted (no audio track), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-18.mp4"></video>
+      <!-- greenflag-19: plays once scrolled into view, muted (no audio track), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-19.mp4"></video>
+      <!-- greenflag-20: plays once scrolled into view, muted (no audio track), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-20.mp4"></video>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-21.webp" alt="Greenflag visual 21" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-22.webp" alt="Greenflag visual 22" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-23.webp" alt="Greenflag visual 23" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-24.webp" alt="Greenflag visual 24" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/greenflag/greenflag-25.webp" alt="Greenflag visual 25" />
+      </figure>
+      <!-- greenflag-26: plays once scrolled into view, muted (no audio track), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/greenflag/greenflag-26.mp4"></video>
+
+      <!-- Challenge / Solution blocks -->
+      <div class="mobile-project__blocks">
+        <div class="mobile-project__block">
+          <span class="mobile-project__label">Challenge</span>
+          <p class="mobile-project__text">A partner agency began the project with a heavily digital, tech-driven direction. Futuristic typography, cold and system-like. But Greenflag isn't about technology. It's about people shut out by it. The challenge was to reset the art direction toward humanity, without losing the tech-era tension that caused the problem in the first place.</p>
+        </div>
+
+        <!-- Solution outer group: Solution block + Download/Next buttons (40px gap, right-aligned) -->
+        <div class="mobile-solution-group">
+          <div class="mobile-project__block mobile-project__block--divider">
+            <span class="mobile-project__label">Solution</span>
+            <div class="mobile-project__solution">
+              <p class="mobile-project__text">We shifted the typography toward a cinematic register, inspired by film title sequences, built around our signature mint accent. Photography turned toward real people: warm, atmospheric, grain-textured, emotionally direct. Pixelation, infographic elements, and hard-edged plaques stayed in the system—small reminders of the technology at the heart of the conflict. Video production was handled by an external studio, while we led identity, website, and campaign communications, blending real footage with AI-generated visuals to hit the vision fast and without extra production cost. The result: a human story told through the exact language that once excluded it—and a project that went on to win multiple international creative awards.</p>
+              <img width="206" height="206" loading="lazy" class="mobile-project__icon" src="../../assets/inhouse/greenflag/greenflag-kv.png" alt="" aria-hidden="true" />
+            </div>
+          </div>
+
+          <!-- Download / Next buttons—right-aligned with text column -->
+          <div class="mobile-project__actions">
+            <div class="mobile-project__action">
+              <div class="mobile-project__action-bar"></div>
+              <a href="../../assets/inhouse/greenflag/greenflag-project-images.zip" download>Download project images</a>
+            </div>
+            <div class="mobile-project__action">
+              <div class="mobile-project__action-bar"></div>
+              <button class="next-project-btn" type="button" data-section="inhouse" data-slug="greenflag" data-next-url="../index.html">Next project</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
+
+    <div class="mobile-menu" id="mobile-menu" role="dialog" aria-label="Navigation menu" aria-modal="true">
+      <div class="menu-banner" id="menu-banner" hidden>
+        <img loading="lazy" class="menu-banner__bg" src="" alt="" />
+        <div class="menu-banner__title">
+          <p>AI design</p>
+          <p>visual trends</p>
+          <p>2026</p>
+        </div>
+        <span class="menu-banner__cta">Download free</span>
+        <svg class="menu-banner__arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M1 11L11 1M11 1H4M11 1V8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <nav class="menu-tabs">
+        <a href="../../inhouse/index.html" aria-current="page">Inhouse</a>
+        <a href="../../brands/index.html">Brands</a>
+        <a href="../../archive/index.html">Archive</a>
+        <a href="../../about/index.html">About</a>
+      </nav>
+    </div>
+
+    <!-- Mobile bottom bar -->
+    <nav class="mobile-bar" aria-label="Mobile navigation">
+      <a class="mobile-bar__brand" href="../../index.html" aria-label="Andrey Ubeyvolk home">
+        <img width="129" height="16" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
+      </a>
+      <button class="mobile-bar__menu" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
+    </nav>
+
+    <script src="../../scroll.js"></script>
+    <script src="../../project-order.js"></script>
+    <script src="../../main.js"></script>
+    <script src="../../menu.js"></script>
+    <script src="../../video-player.js"></script>
+  </body>
+</html>
