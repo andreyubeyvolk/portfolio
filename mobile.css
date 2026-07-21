@@ -475,8 +475,8 @@
   }
 
   .inhouse-card__cover {
-    aspect-ratio: unset;
-    height: 233px;
+    aspect-ratio: 3 / 4; /* keep the 1080×1440 proportion at any width—a
+      fixed height cropped the portrait card on wider phones/tablets */
   }
 
   .inhouse-title {

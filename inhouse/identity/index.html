@@ -257,14 +257,14 @@
       }
 
       /* Bare video: silent, looping, no player chrome at all—just a plain
-         autoplaying clip. Same sizing rules as .vp__video/.vp--paired
-         .vp__video above, scoped to a plain <video> instead of the full
-         custom-player markup. */
+         autoplaying clip. Unlike .vp__video, there's no black-background
+         wrapper behind it, so no negative margin is needed—and margin:0
+         keeps its spacing in the flex column identical to a photo's. */
       .vp-bare {
         display: block;
         width: 100%;
         height: auto;
-        margin: -2px 0;
+        margin: 0;
       }
       .pv-pair__photo .vp-bare {
         position: absolute;

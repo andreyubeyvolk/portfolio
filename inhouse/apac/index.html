@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="../../assets/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png" />
+    <meta name="description" content="Digital Identity 3.0 in APAC visual identity by Andrey Ubeyvolk." />
+    <meta name="author" content="Andrey Ubeyvolk" />
+    <meta name="keywords" content="Andrey Ubeyvolk, art director, brand identity, visual identity, graphic design, visual communication" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Andrey Ubeyvolk" />
+    <meta property="og:title" content="Digital Identity 3.0 in APAC—Andrey Ubeyvolk" />
+    <meta property="og:description" content="Digital Identity 3.0 in APAC visual identity by Andrey Ubeyvolk." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Digital Identity 3.0 in APAC—Andrey Ubeyvolk" />
+    <meta name="twitter:description" content="Digital Identity 3.0 in APAC visual identity by Andrey Ubeyvolk." />
+    <title>Digital Identity 3.0 in APAC—Andrey Ubeyvolk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../../styles.css" />
+    <link rel="stylesheet" href="../../mobile.css" />
+    <style>
+      /* ─── Desktop project layout ─── */
+
+      .project-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding-bottom: 58px;
+      }
+
+      /* Cover: full width, 3:2 */
+      .pv-cover {
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        overflow: hidden;
+        background: #d3d3d3;
+        margin: 0;
+      }
+      .pv-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Photo pair: two equal 3:4 columns */
+      .pv-pair {
+        display: flex;
+        gap: 16px;
+      }
+      .pv-pair__photo {
+        position: relative;
+        flex: 1;
+        aspect-ratio: 3 / 4;
+        overflow: hidden;
+        background: #d3d3d3;
+        margin: 0;
+      }
+      .pv-pair__photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Wide photo: full width, 3:2 */
+      .pv-wide {
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        overflow: hidden;
+        background: #d3d3d3;
+        margin: 0;
+      }
+      .pv-wide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      /* Exception: apac-17 is exported taller than 3:2 (2160×1780) and must
+         show its full height instead of being cropped to the wide box. */
+      .pv-wide--tall {
+        aspect-ratio: 2160 / 1780;
+      }
+
+      /* Info rows (About / Challenge / Solution):
+         label left column, text right column */
+      .pv-info {
+        width: 100%;
+        margin-top: -8px; /* lift toward the image above (half the 16px gap) */
+        display: flex;
+        flex-direction: column;
+        gap: 32px; /* Challenge -> Solution block */
+      }
+
+      /* About row: lifted the same 8px toward the cover */
+      .pv-row--about {
+        margin-top: -8px;
+      }
+
+      /* Two equal columns, 16px gap */
+      .pv-row {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      .pv-row__label {
+        flex: 1;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      .pv-row__content {
+        flex: 1;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      /* Solution block: 2px full-width divider, 4px gap, then the row */
+      .pv-solution-block {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .pv-divider {
+        width: 100%;
+        height: 2px;
+        background: var(--text);
+      }
+
+      /* Solution right column: body (text), then actions (56px gap) */
+      .pv-solution {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 56px;
+      }
+
+      .pv-solution__body {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .pv-solution__body > p {
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      .pv-icon {
+        margin: 0;
+        line-height: 0;
+      }
+      .pv-icon img {
+        display: block;
+        height: 103px;
+        width: auto; /* keep the icon's own aspect, no cropping */
+      }
+
+      /* Actions: Download + Next project, two equal columns */
+      .pv-actions {
+        display: flex;
+        gap: 16px;
+      }
+
+      .pv-action {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .pv-action__bar {
+        height: 4px;
+        background: var(--text);
+        flex-shrink: 0;
+      }
+
+      .pv-action__btn {
+        display: block;
+        padding: 0;
+        background: none;
+        border: 0;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.4px;
+        color: inherit;
+        text-decoration: none;
+        text-align: left;
+        cursor: pointer;
+        transition: color 150ms ease, background-color 150ms ease;
+        white-space: nowrap;
+      }
+
+      /* Hover: the whole action (bar + text) highlights black, like the home socials */
+      .pv-action:hover {
+        background: #000;
+      }
+      .pv-action:hover .pv-action__bar {
+        background: #000;
+      }
+      .pv-action:hover .pv-action__btn {
+        color: #fff;
+      }
+
+      /* ─── Video player (custom controls) ─── */
+      :root {
+        --vp-line: rgba(255, 255, 255, 0.2); /* unfilled track */
+        --vp-fill: #ffffff;                   /* played / level */
+        --vp-control: #ffffff;
+        --vp-gap: 16px;   /* icon inset from edges */
+        --vp-inset: 26px; /* line inset from bottom / right */
+        --vp-thickness: 2px;
+        --vp-hit: 24px;   /* invisible hit area around the thin line */
+      }
+
+      /* Full width; height follows the video's own natural aspect ratio
+         (no forced aspect-ratio/object-fit, so nothing gets cropped even
+         if a clip isn't exactly 16:9 or carries unusual SAR metadata). */
+      .vp {
+        position: relative;
+        width: 100%;
+        background: #000;
+        overflow: hidden;
+        user-select: none;
+        margin: 0;
+      }
+
+      .vp__video {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: -2px 0; /* absorb sub-pixel rounding on either edge so .vp's
+          black background never shows a hairline under (or above) the video */
+      }
+
+      /* Variant: video filling a fixed 3:4 pair slot (its own true aspect
+         already matches the slot, so cover crops nothing) instead of the
+         free-flowing, natural-height showreel used elsewhere on the page.
+         Declared after the base .vp/.vp__video rules above so its
+         position:absolute override actually wins (equal specificity,
+         source order decides). */
+      .vp--paired {
+        position: absolute;
+        inset: 0;
+      }
+      .vp--paired .vp__video {
+        position: absolute;
+        inset: -1px; /* 1px overscan on every edge; .vp/.pv-pair__photo both
+          clip via overflow:hidden, so this just kills any hairline gap
+          from sub-pixel rounding without visibly cropping content */
+        width: calc(100% + 2px);
+        height: calc(100% + 2px);
+        object-fit: cover;
+        margin: 0;
+      }
+
+      /* Bare video: silent, looping, no player chrome at all, just a plain
+         autoplaying clip. Unlike .vp__video, there's no black-background
+         wrapper behind it, so no negative margin is needed—and margin:0
+         keeps its spacing in the flex column identical to a photo's. */
+      .vp-bare {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: 0;
+      }
+      .pv-pair__photo .vp-bare {
+        position: absolute;
+        inset: -1px;
+        width: calc(100% + 2px);
+        height: calc(100% + 2px);
+        object-fit: cover;
+        margin: 0;
+      }
+
+      .vp__hit {
+        position: absolute;
+        inset: 0;
+        cursor: pointer;
+        z-index: 1;
+      }
+
+      /* Scrim: soft gradient behind the bottom/right controls so the white
+         icons stay legible over bright video content. Fades with the
+         controls (hidden together while idle + playing). */
+      .vp::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        background:
+          linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 110px),
+          linear-gradient(to left, rgba(0, 0, 0, 0.35), transparent 130px);
+        transition: opacity 0.3s ease;
+      }
+      .vp.is-idle::before {
+        opacity: 0;
+      }
+
+      /* Narrower box (half the gallery width, paired slot), the full-size
+         showreel scrim would eat most of the frame here, so fade tighter.
+         Declared after the base .vp::before above so this override wins
+         (equal specificity, source order decides). */
+      .vp--paired::before {
+        background:
+          linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 70px),
+          linear-gradient(to left, rgba(0, 0, 0, 0.35), transparent 70px);
+      }
+
+      .vp__big {
+        position: absolute;
+        top: calc(50% - var(--vp-inset) / 2);
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3;
+        width: 45px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        color: var(--vp-control);
+        transition: opacity 0.2s ease;
+      }
+      .vp__big svg { width: 100%; height: 100%; display: block; }
+      .vp[data-state="playing"] .vp__big { opacity: 0; pointer-events: none; }
+
+      .vp__mute {
+        position: absolute;
+        top: var(--vp-gap);
+        right: var(--vp-gap);
+        z-index: 3;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        background: none;
+        border: 0;
+        cursor: pointer;
+        color: var(--vp-control);
+      }
+      .vp__mute svg { width: 100%; height: 100%; display: block; }
+      .vp__mute .icon-on { display: none; }
+      .vp__mute .icon-off { display: block; }
+      .vp:not([data-muted="true"]) .vp__mute .icon-on { display: block; }
+      .vp:not([data-muted="true"]) .vp__mute .icon-off { display: none; }
+
+      .vp-slider {
+        position: absolute;
+        z-index: 3;
+        cursor: pointer;
+        touch-action: none;
+      }
+      .vp-slider__track {
+        position: absolute;
+        background: var(--vp-line);
+      }
+      .vp-slider__fill {
+        position: absolute;
+        background: var(--vp-fill);
+      }
+      .vp-slider__head {
+        position: absolute;
+        background: var(--vp-fill);
+        opacity: 0;
+        transition: opacity 0.12s ease;
+      }
+      .vp-slider.is-dragging .vp-slider__head {
+        opacity: 1;
+      }
+      .vp-slider--x .vp-slider__head {
+        top: 50%;
+        left: 0%;
+        width: 2px;
+        height: 12px;
+        transform: translate(-50%, -50%);
+      }
+      .vp-slider--y .vp-slider__head {
+        right: 0;
+        bottom: 0%;
+        width: 12px;
+        height: 2px;
+        transform: translate(50%, 50%);
+      }
+
+      .vp-slider--x {
+        left: 48px;
+        right: var(--vp-inset);
+        bottom: calc(var(--vp-inset) - var(--vp-hit) / 2);
+        height: var(--vp-hit);
+      }
+      .vp-slider--x .vp-slider__track {
+        left: 0; right: 0;
+        top: 50%;
+        height: var(--vp-thickness);
+        transform: translateY(-50%);
+      }
+      .vp-slider--x .vp-slider__fill {
+        left: 0;
+        top: 50%;
+        height: var(--vp-thickness);
+        transform: translateY(-50%);
+        width: 0%;
+      }
+
+      .vp-slider--y {
+        top: 47px;
+        bottom: 54px;
+        right: var(--vp-inset);
+        width: var(--vp-hit);
+      }
+      .vp-slider--y .vp-slider__track {
+        top: 0; bottom: 0;
+        right: 0;
+        width: var(--vp-thickness);
+      }
+      .vp-slider--y .vp-slider__fill {
+        bottom: 0;
+        right: 0;
+        width: var(--vp-thickness);
+        height: 70%;
+      }
+
+      .vp__play {
+        position: absolute;
+        left: var(--vp-gap);
+        bottom: var(--vp-gap);
+        z-index: 3;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+        background: none;
+        border: 0;
+        cursor: pointer;
+        color: var(--vp-control);
+      }
+      .vp__play svg { width: 100%; height: 100%; display: block; }
+      .vp__play .icon-pause { display: none; }
+      .vp[data-state="playing"] .vp__play .icon-play { display: none; }
+      .vp[data-state="playing"] .vp__play .icon-pause { display: block; }
+
+      .vp__mute,
+      .vp-slider,
+      .vp__play {
+        transition: opacity 0.3s ease;
+      }
+      .vp.is-idle .vp__mute,
+      .vp.is-idle .vp-slider,
+      .vp.is-idle .vp__play {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .vp.is-idle { cursor: none; }
+
+    </style>
+  </head>
+  <body class="project-page">
+
+    <!-- ── DESKTOP LAYOUT ─────────────────────────── -->
+    <main class="site-shell page-grid">
+      <aside class="site-nav" aria-label="Main navigation">
+        <a class="brand" href="../../index.html" aria-label="Andrey Ubeyvolk home">
+          <img width="129" height="16" class="brand-mark" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
+        </a>
+        <nav class="nav-list">
+          <a class="is-active" href="../../inhouse/index.html">Inhouse</a>
+          <a href="../../brands/index.html">Brands</a>
+          <a href="../../archive/index.html">Archive</a>
+          <a href="../../about/index.html">About</a>
+        </nav>
+      </aside>
+
+      <section class="section-intro intro" aria-label="Inhouse section introduction">
+        <p>Art direction and hands-on work, where I lead an in-house design team. Brand communications, visual systems, and every direction a brand needs to express itself.</p>
+      </section>
+
+      <section class="content-pane project-frame" aria-label="Digital Identity 3.0 in APAC project content">
+        <header class="content-pane__header project-header">
+          <h1>Digital Identity 3.0 in APAC</h1>
+          <a class="close-button" href="../index.html" aria-label="Close project"><span>[x]</span></a>
+        </header>
+        <div class="content-pane__scroll project-scroll custom-scroll">
+          <article class="project-content">
+
+            <!-- Cover -->
+            <figure class="pv-cover">
+              <img width="2160" height="1440" src="../../assets/inhouse/apac/apac-cover.webp" alt="Digital Identity 3.0 in APAC cover visual" />
+            </figure>
+
+            <!-- About: label left, text right -->
+            <div class="pv-row pv-row--about">
+              <span class="pv-row__label">About</span>
+              <p class="pv-row__content">TradFi and Web3 are starting to share the same users and infrastructure. GenAI and deepfakes are raising the stakes on trust and fraud. That makes identity the new trust point—especially in APAC. For the second Sumsub Multiverse in Singapore, with the Singapore Fintech Association, we built an identity around one idea: Digital Identity 3.0 in an AI-driven world. The result is a bold, simple identity built on one key visual—two circles for money platforms, plus a third mint circle for Web3.0.</p>
+            </div>
+
+            <!-- Gallery -->
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-01.webp" alt="Digital Identity 3.0 in APAC visual 01" />
+            </figure>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-03.webp" alt="Digital Identity 3.0 in APAC visual 03" />
+              </figure>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-04.webp" alt="Digital Identity 3.0 in APAC visual 04" />
+              </figure>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-02.webp" alt="Digital Identity 3.0 in APAC visual 02" />
+            </figure>
+
+            <!-- apac-05: plays once scrolled into view, muted (silent clip), no player chrome -->
+            <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/apac/apac-05.mp4"></video>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-06.webp" alt="Digital Identity 3.0 in APAC visual 06" />
+            </figure>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-07.webp" alt="Digital Identity 3.0 in APAC visual 07" />
+              </figure>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-08.webp" alt="Digital Identity 3.0 in APAC visual 08" />
+              </figure>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-09.webp" alt="Digital Identity 3.0 in APAC visual 09" />
+            </figure>
+
+            <!-- apac-10: plays once scrolled into view, muted (silent clip), no player chrome -->
+            <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/apac/apac-10.mp4"></video>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-11.webp" alt="Digital Identity 3.0 in APAC visual 11" />
+              </figure>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-12.webp" alt="Digital Identity 3.0 in APAC visual 12" />
+              </figure>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-13.webp" alt="Digital Identity 3.0 in APAC visual 13" />
+            </figure>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-14.webp" alt="Digital Identity 3.0 in APAC visual 14" />
+              </figure>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-15.webp" alt="Digital Identity 3.0 in APAC visual 15" />
+              </figure>
+            </div>
+
+            <!-- apac-16: plays once scrolled into view, muted (silent clip), no player chrome -->
+            <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/apac/apac-16.mp4"></video>
+
+            <figure class="pv-wide pv-wide--tall">
+              <img width="2160" height="1780" loading="lazy" src="../../assets/inhouse/apac/apac-17.webp" alt="Digital Identity 3.0 in APAC visual 17" />
+            </figure>
+
+            <!-- apac-18: plays once scrolled into view, muted (silent clip), no player chrome -->
+            <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/apac/apac-18.mp4"></video>
+
+            <!-- Project info box -->
+            <div class="pv-info">
+              <!-- Challenge -->
+              <div class="pv-row">
+                <span class="pv-row__label">Challenge</span>
+                <p class="pv-row__content">APAC's fintech and crypto scene is bold, juicy, colorful. We wanted to match that energy, not hold back. This wasn't a standalone brand needing its own scalable system—it's one event inside the bigger Multiverse umbrella, which already carries that role. So we built it around one strong object instead. The challenge was making that one object carry real meaning (money, platforms, Web3.0) while still feeling loud and Asian-bold enough for the room.</p>
+              </div>
+
+              <!-- Solution: top divider, then text + icon + actions in the right column -->
+              <div class="pv-solution-block">
+                <div class="pv-divider"></div>
+                <div class="pv-row">
+                  <span class="pv-row__label">Solution</span>
+                  <div class="pv-solution">
+                    <div class="pv-solution__body">
+                      <p>We used two overlapping circles—an easy nod to money and payment platforms coming together. Then we added a third: a mint circle for Web3.0, overlapping the other two. Together, they show TradFi and Web3 merging, with AI reshaping trust in the background. As a sub-project within Multiverse, it didn't need its own scalable system—just one bold, juicy image that stood out on its own. Colors were bright and saturated, matching what APAC likes. Simple, object-based, and confident enough to land well and get strong feedback.</p>
+                      <figure class="pv-icon">
+                        <img width="206" height="206" loading="lazy" src="../../assets/inhouse/apac/apac-kv.png" alt="" aria-hidden="true" />
+                      </figure>
+                    </div>
+                    <div class="pv-actions">
+                      <div class="pv-action">
+                        <div class="pv-action__bar"></div>
+                        <a class="pv-action__btn" href="../../assets/inhouse/apac/apac-project-images.zip" download>Download project images</a>
+                      </div>
+                      <div class="pv-action">
+                        <div class="pv-action__bar"></div>
+                        <button class="pv-action__btn next-project-btn" type="button" data-section="inhouse" data-slug="apac" data-next-url="../index.html">Next project</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <!-- ── MOBILE LAYOUT ──────────────────────────── -->
+
+    <!-- Fixed top bar: project title + close -->
+    <div class="project-bar" id="project-bar">
+      <span class="project-bar__title">Digital Identity 3.0 in APAC</span>
+      <a class="project-bar__close" href="../index.html" aria-label="Close project">[X]</a>
+    </div>
+
+    <!-- Scrollable project content -->
+    <div class="mobile-project">
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" src="../../assets/inhouse/apac/apac-cover.webp" alt="Digital Identity 3.0 in APAC cover visual" />
+      </figure>
+
+      <!-- About block -->
+      <div class="mobile-project__block">
+        <span class="mobile-project__label">About</span>
+        <p class="mobile-project__text">TradFi and Web3 are starting to share the same users and infrastructure. GenAI and deepfakes are raising the stakes on trust and fraud. That makes identity the new trust point—especially in APAC. For the second Sumsub Multiverse in Singapore, with the Singapore Fintech Association, we built an identity around one idea: Digital Identity 3.0 in an AI-driven world. The result is a bold, simple identity built on one key visual—two circles for money platforms, plus a third mint circle for Web3.0.</p>
+      </div>
+
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-01.webp" alt="Digital Identity 3.0 in APAC visual 01" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-03.webp" alt="Digital Identity 3.0 in APAC visual 03" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-04.webp" alt="Digital Identity 3.0 in APAC visual 04" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-02.webp" alt="Digital Identity 3.0 in APAC visual 02" />
+      </figure>
+      <!-- apac-05: plays once scrolled into view, muted (silent clip), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/apac/apac-05.mp4"></video>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-06.webp" alt="Digital Identity 3.0 in APAC visual 06" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-07.webp" alt="Digital Identity 3.0 in APAC visual 07" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-08.webp" alt="Digital Identity 3.0 in APAC visual 08" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-09.webp" alt="Digital Identity 3.0 in APAC visual 09" />
+      </figure>
+      <!-- apac-10: plays once scrolled into view, muted (silent clip), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/apac/apac-10.mp4"></video>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-11.webp" alt="Digital Identity 3.0 in APAC visual 11" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-12.webp" alt="Digital Identity 3.0 in APAC visual 12" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-13.webp" alt="Digital Identity 3.0 in APAC visual 13" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-14.webp" alt="Digital Identity 3.0 in APAC visual 14" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/apac/apac-15.webp" alt="Digital Identity 3.0 in APAC visual 15" />
+      </figure>
+      <!-- apac-16: plays once scrolled into view, muted (silent clip), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/apac/apac-16.mp4"></video>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1780" loading="lazy" src="../../assets/inhouse/apac/apac-17.webp" alt="Digital Identity 3.0 in APAC visual 17" />
+      </figure>
+      <!-- apac-18: plays once scrolled into view, muted (silent clip), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/apac/apac-18.mp4"></video>
+
+      <!-- Challenge / Solution blocks -->
+      <div class="mobile-project__blocks">
+        <div class="mobile-project__block">
+          <span class="mobile-project__label">Challenge</span>
+          <p class="mobile-project__text">APAC's fintech and crypto scene is bold, juicy, colorful. We wanted to match that energy, not hold back. This wasn't a standalone brand needing its own scalable system—it's one event inside the bigger Multiverse umbrella, which already carries that role. So we built it around one strong object instead. The challenge was making that one object carry real meaning (money, platforms, Web3.0) while still feeling loud and Asian-bold enough for the room.</p>
+        </div>
+
+        <!-- Solution outer group: Solution block + Download/Next buttons (40px gap, right-aligned) -->
+        <div class="mobile-solution-group">
+          <div class="mobile-project__block mobile-project__block--divider">
+            <span class="mobile-project__label">Solution</span>
+            <div class="mobile-project__solution">
+              <p class="mobile-project__text">We used two overlapping circles—an easy nod to money and payment platforms coming together. Then we added a third: a mint circle for Web3.0, overlapping the other two. Together, they show TradFi and Web3 merging, with AI reshaping trust in the background. As a sub-project within Multiverse, it didn't need its own scalable system—just one bold, juicy image that stood out on its own. Colors were bright and saturated, matching what APAC likes. Simple, object-based, and confident enough to land well and get strong feedback.</p>
+              <img width="206" height="206" loading="lazy" class="mobile-project__icon" src="../../assets/inhouse/apac/apac-kv.png" alt="" aria-hidden="true" />
+            </div>
+          </div>
+
+          <!-- Download / Next buttons—right-aligned with text column -->
+          <div class="mobile-project__actions">
+            <div class="mobile-project__action">
+              <div class="mobile-project__action-bar"></div>
+              <a href="../../assets/inhouse/apac/apac-project-images.zip" download>Download project images</a>
+            </div>
+            <div class="mobile-project__action">
+              <div class="mobile-project__action-bar"></div>
+              <button class="next-project-btn" type="button" data-section="inhouse" data-slug="apac" data-next-url="../index.html">Next project</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
+
+    <div class="mobile-menu" id="mobile-menu" role="dialog" aria-label="Navigation menu" aria-modal="true">
+      <div class="menu-banner" id="menu-banner" hidden>
+        <img loading="lazy" class="menu-banner__bg" src="" alt="" />
+        <div class="menu-banner__title">
+          <p>AI design</p>
+          <p>visual trends</p>
+          <p>2026</p>
+        </div>
+        <span class="menu-banner__cta">Download free</span>
+        <svg class="menu-banner__arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M1 11L11 1M11 1H4M11 1V8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <nav class="menu-tabs">
+        <a href="../../inhouse/index.html" aria-current="page">Inhouse</a>
+        <a href="../../brands/index.html">Brands</a>
+        <a href="../../archive/index.html">Archive</a>
+        <a href="../../about/index.html">About</a>
+      </nav>
+    </div>
+
+    <!-- Mobile bottom bar -->
+    <nav class="mobile-bar" aria-label="Mobile navigation">
+      <a class="mobile-bar__brand" href="../../index.html" aria-label="Andrey Ubeyvolk home">
+        <img width="129" height="16" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
+      </a>
+      <button class="mobile-bar__menu" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
+    </nav>
+
+    <script src="../../scroll.js"></script>
+    <script src="../../project-order.js"></script>
+    <script src="../../main.js"></script>
+    <script src="../../menu.js"></script>
+    <script src="../../video-player.js"></script>
+  </body>
+</html>
