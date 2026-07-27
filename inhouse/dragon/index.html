@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="../../assets/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png" />
+    <meta name="description" content="AI Secures APAC visual identity by Andrey Ubeyvolk." />
+    <meta name="author" content="Andrey Ubeyvolk" />
+    <meta name="keywords" content="Andrey Ubeyvolk, art director, brand identity, visual identity, graphic design, visual communication" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Andrey Ubeyvolk" />
+    <meta property="og:title" content="AI Secures APAC—Andrey Ubeyvolk" />
+    <meta property="og:description" content="AI Secures APAC visual identity by Andrey Ubeyvolk." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="AI Secures APAC—Andrey Ubeyvolk" />
+    <meta name="twitter:description" content="AI Secures APAC visual identity by Andrey Ubeyvolk." />
+    <title>AI Secures APAC—Andrey Ubeyvolk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../../styles.css" />
+    <link rel="stylesheet" href="../../mobile.css" />
+    <style>
+      /* ─── Desktop project layout ─── */
+
+      .project-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding-bottom: 58px;
+      }
+
+      /* Cover: full width, 3:2 */
+      .pv-cover {
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        overflow: hidden;
+        background: #d3d3d3;
+        margin: 0;
+      }
+      .pv-cover {
+        position: relative;
+      }
+      .pv-cover img,
+      .pv-cover .vp-bare {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        margin: 0;
+      }
+      .pv-cover .vp-bare {
+        position: absolute;
+        inset: 0;
+      }
+
+      /* Photo pair: two equal 3:4 columns */
+      .pv-pair {
+        display: flex;
+        gap: 16px;
+      }
+      .pv-pair__photo {
+        position: relative;
+        flex: 1;
+        aspect-ratio: 3 / 4;
+        overflow: hidden;
+        background: #d3d3d3;
+        margin: 0;
+      }
+      .pv-pair__photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Wide photo: full width, 3:2 */
+      .pv-wide {
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        overflow: hidden;
+        background: #d3d3d3;
+        margin: 0;
+      }
+      .pv-wide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Info rows (About / Challenge / Solution):
+         label left column, text right column */
+      .pv-info {
+        width: 100%;
+        margin-top: -8px; /* lift toward the image above (half the 16px gap) */
+        display: flex;
+        flex-direction: column;
+        gap: 32px; /* Challenge -> Solution block */
+      }
+
+      /* About row: lifted the same 8px toward the cover */
+      .pv-row--about {
+        margin-top: -8px;
+      }
+
+      /* Two equal columns, 16px gap */
+      .pv-row {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      .pv-row__label {
+        flex: 1;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      .pv-row__content {
+        flex: 1;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      /* Solution block: 2px full-width divider, 4px gap, then the row */
+      .pv-solution-block {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .pv-divider {
+        width: 100%;
+        height: 2px;
+        background: var(--text);
+      }
+
+      /* Solution right column: body (text), then actions (56px gap) */
+      .pv-solution {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 56px;
+      }
+
+      .pv-solution__body {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .pv-solution__body > p {
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      .pv-icon {
+        margin: 0;
+        line-height: 0;
+      }
+      .pv-icon img {
+        display: block;
+        height: 103px;
+        width: auto; /* keep the icon's own aspect, no cropping */
+      }
+
+      /* Actions: Download + Next project, two equal columns */
+      .pv-actions {
+        display: flex;
+        gap: 16px;
+      }
+
+      .pv-action {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .pv-action__bar {
+        height: 4px;
+        background: var(--text);
+        flex-shrink: 0;
+      }
+
+      .pv-action__btn {
+        display: block;
+        padding: 0;
+        background: none;
+        border: 0;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.4px;
+        color: inherit;
+        text-decoration: none;
+        text-align: left;
+        cursor: pointer;
+        transition: color 150ms ease, background-color 150ms ease;
+        white-space: nowrap;
+      }
+
+      /* Hover: the whole action (bar + text) highlights black, like the home socials */
+      .pv-action:hover {
+        background: #000;
+      }
+      .pv-action:hover .pv-action__bar {
+        background: #000;
+      }
+      .pv-action:hover .pv-action__btn {
+        color: #fff;
+      }
+
+      /* Bare video: silent, looping, autoplay-on-scroll, no player chrome.
+         Standalone it flows at its natural aspect; inside a fixed 3:4 pair
+         slot it fills the slot (its own DAR already matches, so cover
+         crops nothing). */
+      .vp-bare {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: 0;
+      }
+      .pv-pair__photo .vp-bare {
+        position: absolute;
+        inset: -1px; /* 1px overscan clipped by overflow:hidden, kills any
+          sub-pixel hairline gap without visibly cropping content */
+        width: calc(100% + 2px);
+        height: calc(100% + 2px);
+        object-fit: cover;
+        margin: 0;
+      }
+
+    </style>
+  </head>
+  <body class="project-page">
+
+    <!-- ── DESKTOP LAYOUT ─────────────────────────── -->
+    <main class="site-shell page-grid">
+      <aside class="site-nav" aria-label="Main navigation">
+        <a class="brand" href="../../index.html" aria-label="Andrey Ubeyvolk home">
+          <img width="129" height="16" class="brand-mark" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
+        </a>
+        <nav class="nav-list">
+          <a class="is-active" href="../../inhouse/index.html">Inhouse</a>
+          <a href="../../brands/index.html">Brands</a>
+          <a href="../../archive/index.html">Archive</a>
+          <a href="../../about/index.html">About</a>
+        </nav>
+      </aside>
+
+      <section class="section-intro intro" aria-label="Inhouse section introduction">
+        <p>Art direction and hands-on work, where I lead an in-house design team. Brand communications, visual systems, and every direction a brand needs to express itself.</p>
+      </section>
+
+      <section class="content-pane project-frame" aria-label="AI Secures APAC project content">
+        <header class="content-pane__header project-header">
+          <h1>AI Secures APAC</h1>
+          <a class="close-button" href="../index.html" aria-label="Close project"><span>[x]</span></a>
+        </header>
+        <div class="content-pane__scroll project-scroll custom-scroll">
+          <article class="project-content">
+
+            <!-- Cover -->
+            <figure class="pv-cover">
+              <!-- Cover: silent looping video, autoplays in view -->
+              <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/dragon/dragon-cover.mp4"></video>
+            </figure>
+
+            <!-- About: label left, text right -->
+            <div class="pv-row pv-row--about">
+              <span class="pv-row__label">About</span>
+              <p class="pv-row__content">By 2030, APAC is set to overtake the US as the world's leading fintech market, growing at a 27% CAGR. That growth pulls AI into the center of both innovation and fraud. For Sumsub Multiverse in Singapore, we built an identity around the region's most recognizable symbol: the dragon, reimagined as a digital guardian against fraud—tradition merging with AI-driven transformation.</p>
+            </div>
+
+            <!-- Gallery -->
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-01.webp" alt="AI Secures APAC visual 01" />
+              </figure>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-02.webp" alt="AI Secures APAC visual 02" />
+              </figure>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-03.webp" alt="AI Secures APAC visual 03" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-04.webp" alt="AI Secures APAC visual 04" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-05.webp" alt="AI Secures APAC visual 05" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-06.webp" alt="AI Secures APAC visual 06" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-07.webp" alt="AI Secures APAC visual 07" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-08.webp" alt="AI Secures APAC visual 08" />
+            </figure>
+
+            <div class="pv-pair">
+              <div class="pv-pair__photo">
+                <!-- dragon-09: plays once scrolled into view, muted (silent clip), no player chrome -->
+                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/dragon/dragon-09.mp4"></video>
+              </div>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-10.webp" alt="AI Secures APAC visual 10" />
+              </figure>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-11.webp" alt="AI Secures APAC visual 11" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-12.webp" alt="AI Secures APAC visual 12" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-13.webp" alt="AI Secures APAC visual 13" />
+            </figure>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-14.webp" alt="AI Secures APAC visual 14" />
+              </figure>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-15.webp" alt="AI Secures APAC visual 15" />
+              </figure>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-16.webp" alt="AI Secures APAC visual 16" />
+            </figure>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-17.webp" alt="AI Secures APAC visual 17" />
+              </figure>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-18.webp" alt="AI Secures APAC visual 18" />
+              </figure>
+            </div>
+
+            <!-- Project info box -->
+            <div class="pv-info">
+              <!-- Challenge -->
+              <div class="pv-row">
+                <span class="pv-row__label">Challenge</span>
+                <p class="pv-row__content">Sumsub Multiverse already had its own layered visual language, built to represent the hidden depths of fraud prevention. The dragon was the stakeholder's idea from the start, but the dilemma was making it feel earned, not a tacky cliché. In 2024, AI tools couldn't yet generate complex 3D easily, so it had to be built by hand, from flat sketches through to full 3D. The challenge was reconciling a literal symbol with real specificity, without shortcuts.</p>
+              </div>
+
+              <!-- Solution: top divider, then text + icon + actions in the right column -->
+              <div class="pv-solution-block">
+                <div class="pv-divider"></div>
+                <div class="pv-row">
+                  <span class="pv-row__label">Solution</span>
+                  <div class="pv-solution">
+                    <div class="pv-solution__body">
+                      <p>We took the dragon as the central figure, rebuilding its scales as a tangle of wires forming the tail, with AI data reading as glowing pulses running through them. Surfaces shift between solid and semi-transparent, giving the dragon a half-materialized, digital quality. White fire-like panels break through as accents, sharpening the regional read. The result: a digital dragon standing guard, tradition and AI security fused into one figure.</p>
+                      <figure class="pv-icon">
+                        <img width="206" height="206" loading="lazy" src="../../assets/inhouse/dragon/dragon-kv.png" alt="" aria-hidden="true" />
+                      </figure>
+                    </div>
+                    <div class="pv-actions">
+                      <div class="pv-action">
+                        <div class="pv-action__bar"></div>
+                        <a class="pv-action__btn" href="../../assets/inhouse/dragon/dragon-project-images.zip" download>Download project images</a>
+                      </div>
+                      <div class="pv-action">
+                        <div class="pv-action__bar"></div>
+                        <button class="pv-action__btn next-project-btn" type="button" data-section="inhouse" data-slug="dragon" data-next-url="../index.html">Next project</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <!-- ── MOBILE LAYOUT ──────────────────────────── -->
+
+    <!-- Fixed top bar: project title + close -->
+    <div class="project-bar" id="project-bar">
+      <span class="project-bar__title">AI Secures APAC</span>
+      <a class="project-bar__close" href="../index.html" aria-label="Close project">[X]</a>
+    </div>
+
+    <!-- Scrollable project content -->
+    <div class="mobile-project">
+      <!-- Cover: silent looping video, autoplays in view -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/dragon/dragon-cover.mp4"></video>
+
+      <!-- About block -->
+      <div class="mobile-project__block">
+        <span class="mobile-project__label">About</span>
+        <p class="mobile-project__text">By 2030, APAC is set to overtake the US as the world's leading fintech market, growing at a 27% CAGR. That growth pulls AI into the center of both innovation and fraud. For Sumsub Multiverse in Singapore, we built an identity around the region's most recognizable symbol: the dragon, reimagined as a digital guardian against fraud—tradition merging with AI-driven transformation.</p>
+      </div>
+
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-01.webp" alt="AI Secures APAC visual 01" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-02.webp" alt="AI Secures APAC visual 02" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-03.webp" alt="AI Secures APAC visual 03" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-04.webp" alt="AI Secures APAC visual 04" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-05.webp" alt="AI Secures APAC visual 05" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-06.webp" alt="AI Secures APAC visual 06" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-07.webp" alt="AI Secures APAC visual 07" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-08.webp" alt="AI Secures APAC visual 08" />
+      </figure>
+      <!-- dragon-09: plays once scrolled into view, muted (silent clip), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/dragon/dragon-09.mp4"></video>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-10.webp" alt="AI Secures APAC visual 10" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-11.webp" alt="AI Secures APAC visual 11" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-12.webp" alt="AI Secures APAC visual 12" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-13.webp" alt="AI Secures APAC visual 13" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-14.webp" alt="AI Secures APAC visual 14" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-15.webp" alt="AI Secures APAC visual 15" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-16.webp" alt="AI Secures APAC visual 16" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-17.webp" alt="AI Secures APAC visual 17" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-18.webp" alt="AI Secures APAC visual 18" />
+      </figure>
+
+      <!-- Challenge / Solution blocks -->
+      <div class="mobile-project__blocks">
+        <div class="mobile-project__block">
+          <span class="mobile-project__label">Challenge</span>
+          <p class="mobile-project__text">Sumsub Multiverse already had its own layered visual language, built to represent the hidden depths of fraud prevention. The dragon was the stakeholder's idea from the start, but the dilemma was making it feel earned, not a tacky cliché. In 2024, AI tools couldn't yet generate complex 3D easily, so it had to be built by hand, from flat sketches through to full 3D. The challenge was reconciling a literal symbol with real specificity, without shortcuts.</p>
+        </div>
+
+        <!-- Solution outer group: Solution block + Download/Next buttons (40px gap, right-aligned) -->
+        <div class="mobile-solution-group">
+          <div class="mobile-project__block mobile-project__block--divider">
+            <span class="mobile-project__label">Solution</span>
+            <div class="mobile-project__solution">
+              <p class="mobile-project__text">We took the dragon as the central figure, rebuilding its scales as a tangle of wires forming the tail, with AI data reading as glowing pulses running through them. Surfaces shift between solid and semi-transparent, giving the dragon a half-materialized, digital quality. White fire-like panels break through as accents, sharpening the regional read. The result: a digital dragon standing guard, tradition and AI security fused into one figure.</p>
+              <img width="206" height="206" loading="lazy" class="mobile-project__icon" src="../../assets/inhouse/dragon/dragon-kv.png" alt="" aria-hidden="true" />
+            </div>
+          </div>
+
+          <!-- Download / Next buttons—right-aligned with text column -->
+          <div class="mobile-project__actions">
+            <div class="mobile-project__action">
+              <div class="mobile-project__action-bar"></div>
+              <a href="../../assets/inhouse/dragon/dragon-project-images.zip" download>Download project images</a>
+            </div>
+            <div class="mobile-project__action">
+              <div class="mobile-project__action-bar"></div>
+              <button class="next-project-btn" type="button" data-section="inhouse" data-slug="dragon" data-next-url="../index.html">Next project</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
+
+    <div class="mobile-menu" id="mobile-menu" role="dialog" aria-label="Navigation menu" aria-modal="true">
+      <div class="menu-banner" id="menu-banner" hidden>
+        <img loading="lazy" class="menu-banner__bg" src="" alt="" />
+        <div class="menu-banner__title">
+          <p>AI design</p>
+          <p>visual trends</p>
+          <p>2026</p>
+        </div>
+        <span class="menu-banner__cta">Download free</span>
+        <svg class="menu-banner__arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M1 11L11 1M11 1H4M11 1V8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <nav class="menu-tabs">
+        <a href="../../inhouse/index.html" aria-current="page">Inhouse</a>
+        <a href="../../brands/index.html">Brands</a>
+        <a href="../../archive/index.html">Archive</a>
+        <a href="../../about/index.html">About</a>
+      </nav>
+    </div>
+
+    <!-- Mobile bottom bar -->
+    <nav class="mobile-bar" aria-label="Mobile navigation">
+      <a class="mobile-bar__brand" href="../../index.html" aria-label="Andrey Ubeyvolk home">
+        <img width="129" height="16" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
+      </a>
+      <button class="mobile-bar__menu" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
+    </nav>
+
+    <script src="../../scroll.js"></script>
+    <script src="../../project-order.js"></script>
+    <script src="../../main.js"></script>
+    <script src="../../menu.js"></script>
+    <script src="../../video-player.js"></script>
+  </body>
+</html>
