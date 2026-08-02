@@ -5,5 +5,5 @@
 // array, in the order it should appear in the Next-project sequence.
 window.PROJECT_ORDER = {
   inhouse: ["igaming", "crypto", "finance", "identity", "greenflag", "apac", "roadmap", "dragon"],
-  brands: [],
+  brands: ["nimax"],
 };
