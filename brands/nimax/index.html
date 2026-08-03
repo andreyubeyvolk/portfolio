@@ -233,6 +233,33 @@
         margin: 0;
       }
 
+      /* Cursor-following caption for the two banner clips the Nimax team
+         made themselves. A compact black plaque with white text (like the
+         site's menu hovers) that appears to the right of the cursor once
+         it rests ~1s over the clip. Positioned/toggled by the inline
+         script near the end of the page; lives on <body> (position:fixed)
+         so the card's overflow never clips it. */
+      .vp-tip {
+        position: fixed;
+        z-index: 200;
+        margin: 0;
+        padding: 2px;
+        background: #000;
+        color: #fff;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        line-height: 1.2;
+        letter-spacing: -0.2px;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        pointer-events: none;
+      }
+      .vp-tip.is-visible {
+        opacity: 1;
+      }
+
     </style>
   </head>
   <body class="project-page">
@@ -271,7 +298,7 @@
             <!-- About: label left, text right -->
             <div class="pv-row pv-row--about">
               <span class="pv-row__label">About</span>
-              <p class="pv-row__content">Nimax is a digital agency from St. Petersburg—one of the oldest and most respected in the field. I've known the team for a long time: first attending their meetups and joining portfolio reviews, then dreaming of joining their studio—which I eventually did, working on several joint side projects. Later, the team trusted me to refresh a visual identity that hadn't changed in over five years—a real privilege for me. That's how the system came together that makes Nimax more digital, open, and modern.</p>
+              <p class="pv-row__content">Nimax is a digital agency from St. Petersburg—one of the oldest and most respected in the field. I've known the team for a long time. It started with their meetups, where I also took part in portfolio reviews. Joining their studio was a dream back then—one that eventually came true, along with several joint side projects. Later, the team trusted me to refresh a visual identity that hadn't changed in over five years. That was a real privilege. The result is a system that makes Nimax more digital, open, and modern.</p>
             </div>
 
             <!-- Gallery -->
@@ -318,7 +345,7 @@
             </figure>
 
             <div class="pv-pair">
-              <div class="pv-pair__photo">
+              <div class="pv-pair__photo vp-tipslot" data-tip="Made by the Nimax team, following the new style guide">
                 <!-- nimax-11: plays once scrolled into view, muted (silent clip), no player chrome -->
                 <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-11.mp4"></video>
               </div>
@@ -348,7 +375,7 @@
               <figure class="pv-pair__photo">
                 <img width="1080" height="1440" loading="lazy" src="../../assets/brands/nimax/nimax-17.webp" alt="Nimax visual 17" />
               </figure>
-              <div class="pv-pair__photo">
+              <div class="pv-pair__photo vp-tipslot" data-tip="Made by the Nimax team, following the new style guide">
                 <!-- nimax-18: plays once scrolled into view, muted (silent clip), no player chrome -->
                 <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-18.mp4"></video>
               </div>
@@ -388,7 +415,7 @@
               <!-- Challenge -->
               <div class="pv-row">
                 <span class="pv-row__label">Challenge</span>
-                <p class="pv-row__content">In the digital agency category, visual language is part of reputation—it has to read as current to clients who live in tech aesthetics themselves. Nimax's system hadn't been updated in over five years: a dark, near-black base, serious and premium, with 3D illustrations as its signature move. The task wasn't to "make it lighter"—it was to refresh and modernize the language without losing the recognition and weight built up over the years.</p>
+                <p class="pv-row__content">In the digital agency category, visual language is part of reputation. It has to read as current to clients who live in tech aesthetics themselves. Nimax's system hadn't been updated in over five years. It was dark, near-black, serious and premium, with 3D illustrations as its signature move. The task was to refresh and modernize the language without losing the recognition and weight built up over the years.</p>
               </div>
 
               <!-- Solution: top divider, then text + icon + actions in the right column -->
@@ -398,7 +425,7 @@
                   <span class="pv-row__label">Solution</span>
                   <div class="pv-solution">
                     <div class="pv-solution__body">
-                      <p>I didn't start from scratch—I built on Nimax's existing groundwork and their base of 3D illustrations, the signature move I carried into the new vibe. I swapped the dark base for a light one, added a vivid mint as the primary color and purple as a secondary accent, switched the typeface to TT Hoves, dropped the aggressive caps in headlines, and simplified the graphic tags. I softened the system with large rounded shapes while keeping sharpness where it holds the character—in the typography, dividing lines, and type shifts. The system made it to physical objects too—several merch items, including tote bags, actually shipped—and the banner carousels now feature banners the Nimax team built on their own, without me, but within the style I'd set—proof of how it kept living on. I'm glad to have sparked meaningful change: the brand is now lighter, more modern, and more digital, with a foundation for its continued evolution.</p>
+                      <p>The core decision was to refresh Nimax's dark theme—opening it up toward a lighter, more technological future, and updating the color palette. Nimax's own groundwork became the foundation, including their base of 3D illustrations, the signature move carried into the new vibe. The dark base gave way to a light one, with vivid mint as the primary color and purple as a secondary accent, paired with the TT Hoves typeface. Aggressive caps were dropped from headlines, graphic tags were simplified, and large rounded shapes softened the system—while sharpness stayed where it holds the character: typography, dividing lines, type shifts. The system made it to physical objects too, with several merch items, including tote bags, actually shipping. Banner carousels now feature banners the Nimax team built on their own, without me, but within the style that was set—proof of how it kept living on. Sparking this change feels meaningful: the brand is now lighter, more modern, and more digital, with a foundation for its continued evolution.</p>
                       <figure class="pv-icon">
                         <img width="206" height="206" loading="lazy" src="../../assets/brands/nimax/nimax-kv.png" alt="" aria-hidden="true" />
                       </figure>
@@ -440,7 +467,7 @@
       <!-- About block -->
       <div class="mobile-project__block">
         <span class="mobile-project__label">About</span>
-        <p class="mobile-project__text">Nimax is a digital agency from St. Petersburg—one of the oldest and most respected in the field. I've known the team for a long time: first attending their meetups and joining portfolio reviews, then dreaming of joining their studio—which I eventually did, working on several joint side projects. Later, the team trusted me to refresh a visual identity that hadn't changed in over five years—a real privilege for me. That's how the system came together that makes Nimax more digital, open, and modern.</p>
+        <p class="mobile-project__text">Nimax is a digital agency from St. Petersburg—one of the oldest and most respected in the field. I've known the team for a long time. It started with their meetups, where I also took part in portfolio reviews. Joining their studio was a dream back then—one that eventually came true, along with several joint side projects. Later, the team trusted me to refresh a visual identity that hadn't changed in over five years. That was a real privilege. The result is a system that makes Nimax more digital, open, and modern.</p>
       </div>
 
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
@@ -520,7 +547,7 @@
       <div class="mobile-project__blocks">
         <div class="mobile-project__block">
           <span class="mobile-project__label">Challenge</span>
-          <p class="mobile-project__text">In the digital agency category, visual language is part of reputation—it has to read as current to clients who live in tech aesthetics themselves. Nimax's system hadn't been updated in over five years: a dark, near-black base, serious and premium, with 3D illustrations as its signature move. The task wasn't to "make it lighter"—it was to refresh and modernize the language without losing the recognition and weight built up over the years.</p>
+          <p class="mobile-project__text">In the digital agency category, visual language is part of reputation. It has to read as current to clients who live in tech aesthetics themselves. Nimax's system hadn't been updated in over five years. It was dark, near-black, serious and premium, with 3D illustrations as its signature move. The task was to refresh and modernize the language without losing the recognition and weight built up over the years.</p>
         </div>
 
         <!-- Solution outer group: Solution block + Download/Next buttons (40px gap, right-aligned) -->
@@ -528,7 +555,7 @@
           <div class="mobile-project__block mobile-project__block--divider">
             <span class="mobile-project__label">Solution</span>
             <div class="mobile-project__solution">
-              <p class="mobile-project__text">I didn't start from scratch—I built on Nimax's existing groundwork and their base of 3D illustrations, the signature move I carried into the new vibe. I swapped the dark base for a light one, added a vivid mint as the primary color and purple as a secondary accent, switched the typeface to TT Hoves, dropped the aggressive caps in headlines, and simplified the graphic tags. I softened the system with large rounded shapes while keeping sharpness where it holds the character—in the typography, dividing lines, and type shifts. The system made it to physical objects too—several merch items, including tote bags, actually shipped—and the banner carousels now feature banners the Nimax team built on their own, without me, but within the style I'd set—proof of how it kept living on. I'm glad to have sparked meaningful change: the brand is now lighter, more modern, and more digital, with a foundation for its continued evolution.</p>
+              <p class="mobile-project__text">The core decision was to refresh Nimax's dark theme—opening it up toward a lighter, more technological future, and updating the color palette. Nimax's own groundwork became the foundation, including their base of 3D illustrations, the signature move carried into the new vibe. The dark base gave way to a light one, with vivid mint as the primary color and purple as a secondary accent, paired with the TT Hoves typeface. Aggressive caps were dropped from headlines, graphic tags were simplified, and large rounded shapes softened the system—while sharpness stayed where it holds the character: typography, dividing lines, type shifts. The system made it to physical objects too, with several merch items, including tote bags, actually shipping. Banner carousels now feature banners the Nimax team built on their own, without me, but within the style that was set—proof of how it kept living on. Sparking this change feels meaningful: the brand is now lighter, more modern, and more digital, with a foundation for its continued evolution.</p>
               <img width="206" height="206" loading="lazy" class="mobile-project__icon" src="../../assets/brands/nimax/nimax-kv.png" alt="" aria-hidden="true" />
             </div>
           </div>
@@ -585,5 +612,49 @@
     <script src="../../main.js"></script>
     <script src="../../menu.js"></script>
     <script src="../../video-player.js"></script>
+    <script>
+      // Cursor-following caption for the two team-made banner clips.
+      // Shows a black plaque to the lower-right of the cursor once it has
+      // rested ~1s over a clip; any movement hides it and restarts the
+      // wait. One shared element on <body> so the card never clips it.
+      (function () {
+        var DELAY = 1000;
+        var slots = document.querySelectorAll('.vp-tipslot[data-tip]');
+        if (!slots.length) return;
+        var tip = document.createElement('div');
+        tip.className = 'vp-tip';
+        document.body.appendChild(tip);
+        var timer = null, cx = 0, cy = 0, active = null;
+        function show() {
+          if (!active) return;
+          tip.textContent = active.getAttribute('data-tip');
+          var off = 16;
+          var tw = tip.offsetWidth, th = tip.offsetHeight;
+          var left = cx + off, top = cy + off;
+          if (left + tw > window.innerWidth - 8) left = cx - off - tw;
+          if (top + th > window.innerHeight - 8) top = cy - off - th;
+          if (left < 8) left = 8;
+          if (top < 8) top = 8;
+          tip.style.left = left + 'px';
+          tip.style.top = top + 'px';
+          tip.classList.add('is-visible');
+        }
+        slots.forEach(function (slot) {
+          slot.addEventListener('mousemove', function (e) {
+            active = slot;
+            cx = e.clientX;
+            cy = e.clientY;
+            tip.classList.remove('is-visible');
+            clearTimeout(timer);
+            timer = setTimeout(show, DELAY);
+          });
+          slot.addEventListener('mouseleave', function () {
+            if (active === slot) active = null;
+            clearTimeout(timer);
+            tip.classList.remove('is-visible');
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
