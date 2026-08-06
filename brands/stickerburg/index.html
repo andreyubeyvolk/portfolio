@@ -204,6 +204,15 @@
         color: #fff;
       }
 
+      /* Bare video: silent, looping, autoplays once scrolled into view,
+         no player chrome. Standalone it flows at its natural aspect. */
+      .vp-bare {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: 0;
+      }
+
     </style>
   </head>
   <body class="project-page">
@@ -262,6 +271,9 @@
                 <img width="1080" height="1440" loading="lazy" src="../../assets/brands/stickerburg/stickerburg-04.webp" alt="Symbol of Saint Stickerburg visual 04" />
               </figure>
             </div>
+
+            <!-- tape: plays once scrolled into view, muted (silent clip), no player chrome -->
+            <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/stickerburg/stickerburg-tape.mp4"></video>
 
             <figure class="pv-wide">
               <img width="2160" height="1440" loading="lazy" src="../../assets/brands/stickerburg/stickerburg-05.webp" alt="Symbol of Saint Stickerburg visual 05" />
@@ -421,6 +433,8 @@
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/brands/stickerburg/stickerburg-04.webp" alt="Symbol of Saint Stickerburg visual 04" />
       </figure>
+      <!-- tape: plays once scrolled into view, muted (silent clip), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/stickerburg/stickerburg-tape.mp4"></video>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/brands/stickerburg/stickerburg-05.webp" alt="Symbol of Saint Stickerburg visual 05" />
       </figure>
@@ -550,5 +564,6 @@
     <script src="../../project-order.js"></script>
     <script src="../../main.js"></script>
     <script src="../../menu.js"></script>
+    <script src="../../video-player.js"></script>
   </body>
 </html>
