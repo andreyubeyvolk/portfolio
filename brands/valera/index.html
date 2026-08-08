@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="../../assets/favicon-16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png" />
+    <meta name="description" content="Valera the era visual identity by Andrey Ubeyvolk." />
+    <meta name="author" content="Andrey Ubeyvolk" />
+    <meta name="keywords" content="Andrey Ubeyvolk, art director, brand identity, visual identity, graphic design, visual communication" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Andrey Ubeyvolk" />
+    <meta property="og:title" content="Valera the era—Andrey Ubeyvolk" />
+    <meta property="og:description" content="Valera the era visual identity by Andrey Ubeyvolk." />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Valera the era—Andrey Ubeyvolk" />
+    <meta name="twitter:description" content="Valera the era visual identity by Andrey Ubeyvolk." />
+    <title>Valera the era—Andrey Ubeyvolk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../../styles.css" />
+    <link rel="stylesheet" href="../../mobile.css" />
+    <style>
+      /* ─── Desktop project layout ─── */
+
+      .project-content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding-bottom: 58px;
+      }
+
+      /* Cover: full width, 3:2 */
+      .pv-cover {
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        overflow: hidden;
+        background: #d3d3d3;
+        margin: 0;
+      }
+      .pv-cover {
+        position: relative;
+      }
+      .pv-cover img,
+      .pv-cover .vp-bare {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        margin: 0;
+      }
+      .pv-cover .vp-bare {
+        position: absolute;
+        inset: 0;
+      }
+
+      /* Photo pair: two equal 3:4 columns */
+      .pv-pair {
+        display: flex;
+        gap: 16px;
+      }
+      .pv-pair__photo {
+        position: relative;
+        flex: 1;
+        aspect-ratio: 3 / 4;
+        overflow: hidden;
+        background: #d3d3d3;
+        margin: 0;
+      }
+      .pv-pair__photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Wide photo: full width, 3:2 */
+      .pv-wide {
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        overflow: hidden;
+        background: #d3d3d3;
+        margin: 0;
+      }
+      .pv-wide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Info rows (About / Challenge / Solution):
+         label left column, text right column */
+      .pv-info {
+        width: 100%;
+        margin-top: -8px; /* lift toward the image above (half the 16px gap) */
+        display: flex;
+        flex-direction: column;
+        gap: 32px; /* Challenge -> Solution block */
+      }
+
+      /* About row: lifted the same 8px toward the cover */
+      .pv-row--about {
+        margin-top: -8px;
+      }
+
+      /* Two equal columns, 16px gap */
+      .pv-row {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      .pv-row__label {
+        flex: 1;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      .pv-row__content {
+        flex: 1;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      /* Solution block: 2px full-width divider, 4px gap, then the row */
+      .pv-solution-block {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .pv-divider {
+        width: 100%;
+        height: 2px;
+        background: var(--text);
+      }
+
+      /* Solution right column: body (text), then actions (56px gap) */
+      .pv-solution {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 56px;
+      }
+
+      .pv-solution__body {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .pv-solution__body > p {
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      .pv-icon {
+        margin: 0;
+        line-height: 0;
+      }
+      .pv-icon img {
+        display: block;
+        height: 103px;
+        width: auto; /* keep the icon's own aspect, no cropping */
+      }
+
+      /* Actions: Download + Next project, two equal columns */
+      .pv-actions {
+        display: flex;
+        gap: 16px;
+      }
+
+      .pv-action {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .pv-action__bar {
+        height: 4px;
+        background: var(--text);
+        flex-shrink: 0;
+      }
+
+      .pv-action__btn {
+        display: block;
+        padding: 0;
+        background: none;
+        border: 0;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.4px;
+        color: inherit;
+        text-decoration: none;
+        text-align: left;
+        cursor: pointer;
+        transition: color 150ms ease, background-color 150ms ease;
+        white-space: nowrap;
+      }
+
+      /* Hover: the whole action (bar + text) highlights black, like the home socials */
+      .pv-action:hover {
+        background: #000;
+      }
+      .pv-action:hover .pv-action__bar {
+        background: #000;
+      }
+      .pv-action:hover .pv-action__btn {
+        color: #fff;
+      }
+
+      /* Bare video: silent, looping, autoplay-on-scroll, no player chrome.
+         Standalone it flows at its natural aspect; inside a fixed 3:4 pair
+         slot it fills the slot (its own DAR already matches, so cover
+         crops nothing). */
+      .vp-bare {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: 0;
+      }
+      .pv-pair__photo .vp-bare {
+        position: absolute;
+        inset: -1px; /* 1px overscan clipped by overflow:hidden, kills any
+          sub-pixel hairline gap without visibly cropping content */
+        width: calc(100% + 2px);
+        height: calc(100% + 2px);
+        object-fit: cover;
+        margin: 0;
+      }
+
+      /* Cursor-following caption. Each line is its own black rectangle,
+         stacked flush (no shared background); shown to the lower-right of
+         the cursor after it rests ~1s over a tagged slide. Built/toggled
+         by the inline script near the end of the page; lives on <body>
+         (position:fixed) so nothing clips it. */
+      .vp-tip {
+        position: fixed;
+        z-index: 200;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* each line's rectangle hugs its own text
+          width—lines are not forced to a common width */
+        gap: 0;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        pointer-events: none;
+      }
+      .vp-tip span {
+        display: block;
+        background: #000;
+        color: #fff;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        line-height: 1.25;
+        letter-spacing: -0.2px;
+        padding: 4px 5px;
+        white-space: nowrap;
+      }
+      /* Pull the second line closer to the first—eating into the padding
+         above/below so the two rectangles' black areas meet sooner,
+         without either line's text touching the other's. */
+      .vp-tip span + span {
+        margin-top: -6px;
+      }
+      .vp-tip.is-visible {
+        opacity: 1;
+      }
+
+    </style>
+  </head>
+  <body class="project-page">
+
+    <!-- ── DESKTOP LAYOUT ─────────────────────────── -->
+    <main class="site-shell page-grid">
+      <aside class="site-nav" aria-label="Main navigation">
+        <a class="brand" href="../../index.html" aria-label="Andrey Ubeyvolk home">
+          <img width="129" height="16" class="brand-mark" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
+        </a>
+        <nav class="nav-list">
+          <a href="../../inhouse/index.html">Inhouse</a>
+          <a class="is-active" href="../../brands/index.html">Brands</a>
+          <a href="../../archive/index.html">Archive</a>
+          <a href="../../about/index.html">About</a>
+        </nav>
+      </aside>
+
+      <section class="section-intro intro" aria-label="Brands section introduction">
+        <p>Independent identity projects I build for external clients ready to find a voice of their own.</p>
+      </section>
+
+      <section class="content-pane project-frame" aria-label="Valera the era project content">
+        <header class="content-pane__header project-header">
+          <h1>Valera the era</h1>
+          <a class="close-button" href="../index.html" aria-label="Close project"><span>[x]</span></a>
+        </header>
+        <div class="content-pane__scroll project-scroll custom-scroll">
+          <article class="project-content">
+
+            <!-- Cover -->
+            <figure class="pv-cover">
+              <!-- Cover: silent looping video, autoplays in view -->
+              <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-cover.mp4"></video>
+            </figure>
+
+            <!-- About: label left, text right -->
+            <div class="pv-row pv-row--about">
+              <span class="pv-row__label">About</span>
+              <p class="pv-row__content">Valera the era is Valera's personal brand—a DJ, musician, and former professional interviewer for BBC Russia who decided to move from other people's stories to his own creative work. The brand was meant to be a platform for all his future projects—music, performances, media. Instead of an image built around one release or show, he needed a system that could grow with him.</p>
+            </div>
+
+            <!-- Gallery -->
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-01.webp" alt="Valera the era visual 01" />
+            </figure>
+
+            <figure class="pv-wide vp-tipslot" data-tip="Brand guidelines,|styled as a fashion magazine">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-02.webp" alt="Valera the era visual 02" />
+            </figure>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/brands/valera/valera-03.webp" alt="Valera the era visual 03" />
+              </figure>
+              <div class="pv-pair__photo vp-tipslot" data-tip="Quote banners—|Valera's voice for social">
+                <!-- valera-04: plays once scrolled into view, muted (silent clip), no player chrome -->
+                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-04.mp4"></video>
+              </div>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-05.webp" alt="Valera the era visual 05" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-06.webp" alt="Valera the era visual 06" />
+            </figure>
+
+            <div class="pv-pair">
+              <div class="pv-pair__photo">
+                <!-- valera-07: plays once scrolled into view, muted (silent clip), no player chrome -->
+                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-07.mp4"></video>
+              </div>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/brands/valera/valera-08.webp" alt="Valera the era visual 08" />
+              </figure>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-09.webp" alt="Valera the era visual 09" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-10.webp" alt="Valera the era visual 10" />
+            </figure>
+
+            <figure class="pv-wide vp-tipslot" data-tip="Birthday poster,|laid out with Valera">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-11.webp" alt="Valera the era visual 11" />
+            </figure>
+
+            <div class="pv-pair">
+              <div class="pv-pair__photo vp-tipslot" data-tip="Party photos—assembled|by Valera himself">
+                <!-- valera-12: plays once scrolled into view, muted (silent clip), no player chrome -->
+                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-12.mp4"></video>
+              </div>
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/brands/valera/valera-13.webp" alt="Valera the era visual 13" />
+              </figure>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-14.webp" alt="Valera the era visual 14" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-15.webp" alt="Valera the era visual 15" />
+            </figure>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-16.webp" alt="Valera the era visual 16" />
+            </figure>
+
+            <div class="pv-pair">
+              <figure class="pv-pair__photo">
+                <img width="1080" height="1440" loading="lazy" src="../../assets/brands/valera/valera-17.webp" alt="Valera the era visual 17" />
+              </figure>
+              <div class="pv-pair__photo vp-tipslot" data-tip="Outside imagery|still reads as the brand">
+                <!-- valera-18: plays once scrolled into view, muted (silent clip), no player chrome -->
+                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-18.mp4"></video>
+              </div>
+            </div>
+
+            <figure class="pv-wide">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-19.webp" alt="Valera the era visual 19" />
+            </figure>
+
+            <figure class="pv-wide vp-tipslot" data-tip="Stickers, a nod|to vinyl packaging">
+              <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-20.webp" alt="Valera the era visual 20" />
+            </figure>
+
+            <!-- Project info box -->
+            <div class="pv-info">
+              <!-- Challenge -->
+              <div class="pv-row">
+                <span class="pv-row__label">Challenge</span>
+                <p class="pv-row__content">Valera didn't need an image built around one release. He needed a brand that could carry an entire cultural creative project—performances, merch, music, social media. It had to scale across any medium while keeping a recognizable character. To get to the core of it, instead of starting from a ready-made brief, I conducted several deep interviews with Valera myself—not about the project, but about him: his motives and character. Those conversations quickly surfaced two key images—the screen and music. The idea of film, meant to connect them into a material metaphor, didn't come right away. Once it did, everything came together into a single system that absorbed both images and became the foundation of the identity.</p>
+              </div>
+
+              <!-- Solution: top divider, then text + icon + actions in the right column -->
+              <div class="pv-solution-block">
+                <div class="pv-divider"></div>
+                <div class="pv-row">
+                  <span class="pv-row__label">Solution</span>
+                  <div class="pv-solution">
+                    <div class="pv-solution__body">
+                      <p>We didn't build the identity around ready-made graphics. Instead, we built it on the meanings found in deep interviews with Valera. From there came two key images, music and the screen, which formed three pillars: Veil—distance and concealment that invites you closer; Center—the circle, the vinyl, focus and community; Signal—text as the main carrier of meaning. These pillars grew into a flexible system: modular typography, polyethylene as a material metaphor, scan-effect textures, progressive blur, a sticker system, and adaptable photo content. The brand book itself was designed as a fashion magazine—a format that matches Valera's own vibe—so the guidelines read like an editorial, not a manual. The system turned out so clear that for his own birthday, Valera assembled the banners and laid out the posts himself, using our templates, without a designer. The result is a brand that doesn't dictate form. It holds meaning. Recognizable in any season, intuitive to its own author, and endlessly flexible in the details.</p>
+                      <figure class="pv-icon">
+                        <img width="206" height="206" loading="lazy" src="../../assets/brands/valera/valera-kv.png" alt="" aria-hidden="true" />
+                      </figure>
+                    </div>
+                    <div class="pv-actions">
+                      <div class="pv-action">
+                        <div class="pv-action__bar"></div>
+                        <a class="pv-action__btn" href="../../assets/brands/valera/valera-project-images.zip" download>Download project images</a>
+                      </div>
+                      <div class="pv-action">
+                        <div class="pv-action__bar"></div>
+                        <button class="pv-action__btn next-project-btn" type="button" data-section="brands" data-slug="valera" data-next-url="../index.html">Next project</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <!-- ── MOBILE LAYOUT ──────────────────────────── -->
+
+    <!-- Fixed top bar: project title + close -->
+    <div class="project-bar" id="project-bar">
+      <span class="project-bar__title">Valera the era</span>
+      <a class="project-bar__close" href="../index.html" aria-label="Close project">[X]</a>
+    </div>
+
+    <!-- Scrollable project content -->
+    <div class="mobile-project">
+      <!-- Cover: silent looping video, autoplays in view -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-cover.mp4"></video>
+
+      <!-- About block -->
+      <div class="mobile-project__block">
+        <span class="mobile-project__label">About</span>
+        <p class="mobile-project__text">Valera the era is Valera's personal brand—a DJ, musician, and former professional interviewer for BBC Russia who decided to move from other people's stories to his own creative work. The brand was meant to be a platform for all his future projects—music, performances, media. Instead of an image built around one release or show, he needed a system that could grow with him.</p>
+      </div>
+
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-01.webp" alt="Valera the era visual 01" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-02.webp" alt="Valera the era visual 02" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/brands/valera/valera-03.webp" alt="Valera the era visual 03" />
+      </figure>
+      <!-- valera-04: plays once scrolled into view, muted (silent clip), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-04.mp4"></video>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-05.webp" alt="Valera the era visual 05" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-06.webp" alt="Valera the era visual 06" />
+      </figure>
+      <!-- valera-07: plays once scrolled into view, muted (silent clip), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-07.mp4"></video>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/brands/valera/valera-08.webp" alt="Valera the era visual 08" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-09.webp" alt="Valera the era visual 09" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-10.webp" alt="Valera the era visual 10" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-11.webp" alt="Valera the era visual 11" />
+      </figure>
+      <!-- valera-12: plays once scrolled into view, muted (silent clip), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-12.mp4"></video>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/brands/valera/valera-13.webp" alt="Valera the era visual 13" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-14.webp" alt="Valera the era visual 14" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-15.webp" alt="Valera the era visual 15" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-16.webp" alt="Valera the era visual 16" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="1080" height="1440" loading="lazy" src="../../assets/brands/valera/valera-17.webp" alt="Valera the era visual 17" />
+      </figure>
+      <!-- valera-18: plays once scrolled into view, muted (silent clip), no player chrome -->
+      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-18.mp4"></video>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-19.webp" alt="Valera the era visual 19" />
+      </figure>
+      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+        <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-20.webp" alt="Valera the era visual 20" />
+      </figure>
+
+      <!-- Challenge / Solution blocks -->
+      <div class="mobile-project__blocks">
+        <div class="mobile-project__block">
+          <span class="mobile-project__label">Challenge</span>
+          <p class="mobile-project__text">Valera didn't need an image built around one release. He needed a brand that could carry an entire cultural creative project—performances, merch, music, social media. It had to scale across any medium while keeping a recognizable character. To get to the core of it, instead of starting from a ready-made brief, I conducted several deep interviews with Valera myself—not about the project, but about him: his motives and character. Those conversations quickly surfaced two key images—the screen and music. The idea of film, meant to connect them into a material metaphor, didn't come right away. Once it did, everything came together into a single system that absorbed both images and became the foundation of the identity.</p>
+        </div>
+
+        <!-- Solution outer group: Solution block + Download/Next buttons (40px gap, right-aligned) -->
+        <div class="mobile-solution-group">
+          <div class="mobile-project__block mobile-project__block--divider">
+            <span class="mobile-project__label">Solution</span>
+            <div class="mobile-project__solution">
+              <p class="mobile-project__text">We didn't build the identity around ready-made graphics. Instead, we built it on the meanings found in deep interviews with Valera. From there came two key images, music and the screen, which formed three pillars: Veil—distance and concealment that invites you closer; Center—the circle, the vinyl, focus and community; Signal—text as the main carrier of meaning. These pillars grew into a flexible system: modular typography, polyethylene as a material metaphor, scan-effect textures, progressive blur, a sticker system, and adaptable photo content. The brand book itself was designed as a fashion magazine—a format that matches Valera's own vibe—so the guidelines read like an editorial, not a manual. The system turned out so clear that for his own birthday, Valera assembled the banners and laid out the posts himself, using our templates, without a designer. The result is a brand that doesn't dictate form. It holds meaning. Recognizable in any season, intuitive to its own author, and endlessly flexible in the details.</p>
+              <img width="206" height="206" loading="lazy" class="mobile-project__icon" src="../../assets/brands/valera/valera-kv.png" alt="" aria-hidden="true" />
+            </div>
+          </div>
+
+          <!-- Download / Next buttons—right-aligned with text column -->
+          <div class="mobile-project__actions">
+            <div class="mobile-project__action">
+              <div class="mobile-project__action-bar"></div>
+              <a href="../../assets/brands/valera/valera-project-images.zip" download>Download project images</a>
+            </div>
+            <div class="mobile-project__action">
+              <div class="mobile-project__action-bar"></div>
+              <button class="next-project-btn" type="button" data-section="brands" data-slug="valera" data-next-url="../index.html">Next project</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu overlay -->
+    <div class="menu-overlay" id="menu-overlay" aria-hidden="true"></div>
+
+    <div class="mobile-menu" id="mobile-menu" role="dialog" aria-label="Navigation menu" aria-modal="true">
+      <div class="menu-banner" id="menu-banner" hidden>
+        <img loading="lazy" class="menu-banner__bg" src="" alt="" />
+        <div class="menu-banner__title">
+          <p>AI design</p>
+          <p>visual trends</p>
+          <p>2026</p>
+        </div>
+        <span class="menu-banner__cta">Download free</span>
+        <svg class="menu-banner__arrow" width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M1 11L11 1M11 1H4M11 1V8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <nav class="menu-tabs">
+        <a href="../../inhouse/index.html">Inhouse</a>
+        <a href="../../brands/index.html" aria-current="page">Brands</a>
+        <a href="../../archive/index.html">Archive</a>
+        <a href="../../about/index.html">About</a>
+      </nav>
+    </div>
+
+    <!-- Mobile bottom bar -->
+    <nav class="mobile-bar" aria-label="Mobile navigation">
+      <a class="mobile-bar__brand" href="../../index.html" aria-label="Andrey Ubeyvolk home">
+        <img width="129" height="16" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
+      </a>
+      <button class="mobile-bar__menu" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
+    </nav>
+
+    <script src="../../scroll.js"></script>
+    <script src="../../project-order.js"></script>
+    <script src="../../main.js"></script>
+    <script src="../../menu.js"></script>
+    <script src="../../video-player.js"></script>
+    <script>
+      // Cursor-following caption for tagged slides. data-tip holds the
+      // lines separated by "|"; each line renders as its own black
+      // rectangle, stacked flush. Appears lower-right of the cursor after
+      // it rests ~1s over the slide. One shared element on <body>.
+      (function () {
+        var DELAY = 1000;
+        var slots = document.querySelectorAll('.vp-tipslot[data-tip]');
+        if (!slots.length) return;
+        var tip = document.createElement('div');
+        tip.className = 'vp-tip';
+        document.body.appendChild(tip);
+        var timer = null, cx = 0, cy = 0, active = null;
+        function show() {
+          if (!active) return;
+          tip.innerHTML = '';
+          active.getAttribute('data-tip').split('|').forEach(function (line) {
+            var s = document.createElement('span');
+            s.textContent = line.trim();
+            tip.appendChild(s);
+          });
+          var off = 16;
+          var tw = tip.offsetWidth, th = tip.offsetHeight;
+          var left = cx + off, top = cy + off;
+          if (left + tw > window.innerWidth - 8) left = cx - off - tw;
+          if (top + th > window.innerHeight - 8) top = cy - off - th;
+          if (left < 8) left = 8;
+          if (top < 8) top = 8;
+          tip.style.left = left + 'px';
+          tip.style.top = top + 'px';
+          tip.classList.add('is-visible');
+        }
+        slots.forEach(function (slot) {
+          slot.addEventListener('mousemove', function (e) {
+            active = slot;
+            cx = e.clientX;
+            cy = e.clientY;
+            tip.classList.remove('is-visible');
+            clearTimeout(timer);
+            timer = setTimeout(show, DELAY);
+          });
+          slot.addEventListener('mouseleave', function () {
+            if (active === slot) active = null;
+            clearTimeout(timer);
+            tip.classList.remove('is-visible');
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
