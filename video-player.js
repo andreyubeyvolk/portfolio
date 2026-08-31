@@ -199,4 +199,39 @@
       video.play().catch(function () {});
     }
   });
+
+  // ── One-shot videos: silent, autoplay once scrolled into view, plays
+  // a single pass (no loop attribute). On end, a centered replay button
+  // (.vp-once__replay) fades in; clicking it restarts from the start.
+  document.querySelectorAll('.vp-once').forEach(function (wrap) {
+    var video = wrap.querySelector('.vp-once__video');
+    var replay = wrap.querySelector('.vp-once__replay');
+    if (!video) return;
+
+    video.addEventListener('ended', function () {
+      wrap.classList.add('is-ended');
+    });
+
+    if (replay) {
+      replay.addEventListener('click', function () {
+        wrap.classList.remove('is-ended');
+        video.currentTime = 0;
+        video.play().catch(function () {});
+      });
+    }
+
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            video.play().catch(function () {});
+            observer.disconnect();
+          }
+        });
+      }, { threshold: 0.5 });
+      observer.observe(video);
+    } else {
+      video.play().catch(function () {});
+    }
+  });
 })();

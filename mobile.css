@@ -375,9 +375,14 @@
     overflow: hidden;
   }
 
+  /* Same blur+grain treatment as the desktop preview (see archive/index.html)
+     instead of a flat opacity fade — the card overlay itself lives outside
+     .site-shell in the DOM, so this never touches it. */
   body.card-is-open .site-shell {
-    opacity: 0.1;
+    filter: blur(10px) saturate(0.85);
+    opacity: 0.6;
     pointer-events: none;
+    transition: filter 0.3s ease, opacity 0.3s ease;
   }
 
   /* ── Archive page ── */

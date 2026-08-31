@@ -1,0 +1,129 @@
+ARCHIVE DATA — рабочий список карточек Archive
+================================================
+
+Как заполнять: один блок на картинку, блоки разделены пустой строкой.
+Поля: Заголовок / Теги / Описание — каждое на своей строке.
+Теги — через запятую, можно оставить пустым, если не нужны.
+
+Порядок блоков в этом файле = порядок карточек на странице.
+Хочешь вставить новую карточку между существующими — просто вставь
+блок в нужное место файла, ничего пересчитывать/переименовывать не надо.
+
+Пример:
+archive-longread-01.webp
+Заголовок: Text Longread Intensive
+Теги: Web
+Описание: Wow
+
+archive-disruptive-series-02.webp
+Заголовок: Disruptive Series
+Теги: AI, Merch
+Описание: Кадр 2 — деталь принта на спине.
+
+Имя файла — по конвенции:
+  archive-тема.webp              — одна отдельная картинка
+  archive-тема-01.webp, -02...   — несколько ОТДЕЛЬНЫХ карточек на одну тему
+                                    (каждая свой блок, свой заголовок)
+  archive-тема-series-01.webp,   — НАСТОЯЩАЯ серия: одна карточка в сетке,
+  -series-02...                    внутри — горизонтальный скролл по всем
+                                    фото серии (см. обсуждение в чате)
+
+------------------------------------------------
+
+archive-longread-01.webp
+Заголовок: Text Longread 01
+Описание: Work from Sergey Gurov’s intensive “Grids. Text-Based Longread.”
+
+archive-longread-02.webp
+Заголовок: Text Longread 02
+Описание: Work from Sergey Gurov’s intensive “Grids. Text-Based Longread.”
+
+archive-longread-03.webp
+Заголовок: Text Longread 03
+Описание: Work from Sergey Gurov’s intensive “Grids. Text-Based Longread.”
+
+archive-longread-04.webp
+Заголовок: Text Longread 04
+Описание: Work from Sergey Gurov’s intensive “Grids. Text-Based Longread.”
+
+
+------------------------------------------------
+
+archive-oyashi-01.webp
+Заголовок: Oyashi 01
+Описание: Logo lettering development for a cosmetics brand Oyashi.
+
+
+archive-oyashi-02.webp
+Заголовок: Oyashi 02
+Описание: Logo lettering development for a cosmetics brand Oyashi.
+
+------------------------------------------------
+
+archive-nature-01.webp
+Заголовок: Textures and typography 01
+Описание: Experiments with typography and layout inspired by natural textures and botanical forms.
+
+archive-nature-02.webp
+Заголовок: Textures and typography 02
+Описание: Experiments with typography and layout inspired by natural textures and botanical forms.
+
+archive-nature-03.webp
+Заголовок: Textures and typography 03
+Описание: Experiments with typography and layout inspired by natural textures and botanical forms.
+
+archive-nature-04.webp
+Заголовок: Textures and typography 04
+Описание: Experiments with typography and layout inspired by natural textures and botanical forms.
+
+archive-nature-05.web
+Заголовок: Textures and typography 05
+Описание: Experiments with typography and layout inspired by natural textures and botanical forms.
+
+------------------------------------------------
+
+archive-tantra.webp
+Заголовок: Tantra lecture
+Описание: Poster concept for a lecture on Tantra and Sexual Magic.
+
+------------------------------------------------
+
+archive-transportation-series-01.webp
+Заголовок: Transportation 01
+Теги: AI, Photostyle, MidJourney, Identity
+Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+
+archive-transportation-series-02.webp
+Заголовок: Transportation 02
+Теги: AI, Photostyle, MidJourney, Identity
+Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+
+archive-transportation-series-03.webp
+Заголовок: Transportation 03
+Теги: AI, Photostyle, MidJourney, Identity
+Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+
+archive-transportation-series-04.webp
+Заголовок: Transportation 04
+Теги: AI, Photostyle, MidJourney, Identity
+Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+
+archive-transportation-series-05.webp
+Заголовок: Transportation 05
+Теги: AI, Photostyle, MidJourney, Identity
+Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+
+archive-transportation-series-06.webp
+Заголовок: Transportation 06
+Теги: AI, Photostyle, MidJourney, Identity
+Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+
+archive-transportation-series-07.webp
+Заголовок: Transportation 07
+Теги: AI, Photostyle, MidJourney, Identity
+Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+
+archive-transportation-series-08.webp
+Заголовок: Transportation 08
+Теги: AI, Photostyle, MidJourney, Identity
+Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.

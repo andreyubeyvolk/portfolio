@@ -158,10 +158,18 @@
         display: none;
       }
 
+      /* Background treatment behind the preview: blur + grain (like
+         House of Walk's viewer shutter) instead of a flat opacity fade.
+         .archive-preview itself lives inside .content-pane, as a sibling
+         of .content-pane__scroll, not inside it—so blurring the scroll
+         wrapper (plus nav/intro) never touches the preview content itself. */
       body.is-preview-open .site-nav,
-      body.is-preview-open .section-intro {
-        opacity: 0.1;
+      body.is-preview-open .section-intro,
+      body.is-preview-open .content-pane__scroll {
+        filter: blur(10px) saturate(0.85);
+        opacity: 0.6;
         pointer-events: none;
+        transition: filter 0.3s ease, opacity 0.3s ease;
       }
 
       @media (max-width: 980px) {
@@ -223,9 +231,36 @@
           display: none !important;
         }
       }
+
+      /* Grain layer over the blurred background (see feTurbulence defs
+         right after <body>)—same recipe as House of Walk: fractal noise
+         through an alpha-only color matrix, blended with mix-blend-mode.
+         Sits above the blurred site-shell/nav/intro but below every
+         preview/card overlay (all of which use z-index 10 or higher). */
+      .grain-layer {
+        position: fixed;
+        inset: -20%;
+        z-index: 5;
+        filter: url(#archive-grain);
+        opacity: 0;
+        mix-blend-mode: overlay;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      body.is-preview-open .grain-layer,
+      body.card-is-open .grain-layer {
+        opacity: 0.12;
+      }
     </style>
   </head>
   <body class="archive-page">
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <filter id="archive-grain">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="n" />
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0" />
+      </filter>
+    </svg>
+    <div class="grain-layer" aria-hidden="true"></div>
     <main class="site-shell page-grid">
       <aside class="site-nav" aria-label="Main navigation">
         <a class="brand" href="../index.html" aria-label="Andrey Ubeyvolk home">
@@ -251,138 +286,115 @@
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="1205" height="1200" data-preview data-description="A tote system designed for a branding lecture series at Nimax. The brief was simple: green field, hard typography, and event logistics treated as part of the object—not printed on it. Result is a functional artifact that doubles as a poster." src="../assets/archive/frame-49-4.jpg" alt="Nimax tote archive project" />
+                <img class="has-outline" width="1080" height="1080" data-preview data-description="Work from Sergey Gurov's intensive &quot;Grids. Text-Based Longread.&quot;" src="../assets/archive/archive-textlongread-01.webp" alt="Text Longread 01 archive project" />
               </div>
-              <span class="archive-title">Nimax Tote</span>
+              <span class="archive-title">Text Longread 01</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="442" height="520" loading="lazy" data-preview data-tags="AI, MidJourney, Figma Weave" data-description="Black hoodie merch for a startup accelerator: venture-sector typography stretched across the sleeve, a small chest badge with the cohort number, and a deliberately institutional back print." src="../assets/archive/frame-49.jpg" alt="Startup hoodie archive project" />
+                <img class="has-outline" width="1080" height="1080" loading="lazy" data-preview data-description="Work from Sergey Gurov's intensive &quot;Grids. Text-Based Longread.&quot;" src="../assets/archive/archive-textlongread-02.webp" alt="Text Longread 02 archive project" />
               </div>
-              <span class="archive-title">Startup Hoodie</span>
+              <span class="archive-title">Text Longread 02</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="1500" height="972" loading="lazy" data-preview data-tags="AI, MidJourney, Figma Weave" data-description="Editorial for Vogue España—red floral fabric expanding into the landscape until fabric and terrain become indistinguishable. Shot by Txema Yeste. AI was used to extend the frame and reconstruct the background environment without altering the subject." src="../assets/archive/txema-yeste-vogue-spain-mayowa-nicholas-2019-5-1500x972.jpg" alt="Botanical editorial archive project" />
+                <img class="has-outline" width="1080" height="1080" loading="lazy" data-preview data-description="Work from Sergey Gurov's intensive &quot;Grids. Text-Based Longread.&quot;" src="../assets/archive/archive-textlongread-03.webp" alt="Text Longread 03 archive project" />
               </div>
-              <span class="archive-title">Botanical Editorial</span>
+              <span class="archive-title">Text Longread 03</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="444" height="526" loading="lazy" data-preview data-description="A soft product portrait for a city tote, balancing Cyrillic lettering, icon graphics, and a quiet studio pose." src="../assets/archive/frame-49-2.jpg" alt="Stickerburg tote archive project" />
+                <img class="has-outline" width="1080" height="1080" loading="lazy" data-preview data-description="Work from Sergey Gurov's intensive &quot;Grids. Text-Based Longread.&quot;" src="../assets/archive/archive-textlongread-04.webp" alt="Text Longread 04 archive project" />
               </div>
-              <span class="archive-title">Stickerburg Tote</span>
+              <span class="archive-title">Text Longread 04</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="2168" height="1440" loading="lazy" data-preview data-description="Beauty packaging concept for Lucente—a fictional luxury skincare line. Split composition: botanical on the left, product on the right. Serif logotype kept deliberately restrained against the richness of the visual. AI generated all product renders and background textures." src="../assets/archive/archive-lucente.jpg" alt="Lucente packaging archive project" />
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Logo lettering development for a cosmetics brand Oyashi." src="../assets/archive/archive-oyashi-01.webp" alt="Oyashi 01 archive project" />
               </div>
-              <span class="archive-title">Lucente Beauty</span>
+              <span class="archive-title">Oyashi 01</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="900" height="1181" loading="lazy" data-preview data-description="Washed grey long sleeve with tonal back print, sleeve text, and a deliberately faded graphic system." src="../assets/archive/frame-49-7.jpg" alt="Sois Libre longsleeve archive project" />
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Logo lettering development for a cosmetics brand Oyashi." src="../assets/archive/archive-oyashi-02.webp" alt="Oyashi 02 archive project" />
               </div>
-              <span class="archive-title">Sois Libre</span>
+              <span class="archive-title">Oyashi 02</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="442" height="440" loading="lazy" data-preview data-description="Outdoor merch for a trail-running community. Grey tee, white back mark, and dataset-style labels in the corner—the kind of visual language borrowed from technical gear, not fashion. AI was used to composite the environment and adjust ambient light." src="../assets/archive/frame-49-1.jpg" alt="Quarry tee archive project" />
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Experiments with typography and layout inspired by natural textures and botanical forms." src="../assets/archive/archive-nature-01.webp" alt="Textures and typography 01 archive project" />
               </div>
-              <span class="archive-title">Quarry Tee</span>
+              <span class="archive-title">Textures and typography 01</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="442" height="440" loading="lazy" data-preview data-description="Black field with a small editorial spread—app screens, stickers, brand assets and publication fragments arranged as one system. The goal was to show how a single brand language scales from digital product to printed object without losing density or tone." src="../assets/archive/frame-49-6.jpg" alt="Pocket publication archive project" />
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Experiments with typography and layout inspired by natural textures and botanical forms." src="../assets/archive/archive-nature-02.webp" alt="Textures and typography 02 archive project" />
               </div>
-              <span class="archive-title">Pocket Publication</span>
+              <span class="archive-title">Textures and typography 02</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="442" height="440" loading="lazy" data-preview data-description="Black T-shirt mockup with sharp white venture graphics and sleeve typography on a grey technical backdrop." src="../assets/archive/frame-49-3.jpg" alt="Disruptive tee archive project" />
+                <img class="has-outline" width="1080" height="1080" loading="lazy" data-preview data-description="Experiments with typography and layout inspired by natural textures and botanical forms." src="../assets/archive/archive-nature-03.webp" alt="Textures and typography 03 archive project" />
               </div>
-              <span class="archive-title">Disruptive Tee</span>
+              <span class="archive-title">Textures and typography 03</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="444" height="628" loading="lazy" data-preview data-tags="AI, MidJourney, Figma Weave" data-description="Magazine cover experiment with bold masthead, plastic texture, barcode, and layered white graphic marks." src="../assets/archive/frame-49-5.jpg" alt="Valera cover archive project" />
+                <img class="has-outline" width="1080" height="1080" loading="lazy" data-preview data-description="Experiments with typography and layout inspired by natural textures and botanical forms." src="../assets/archive/archive-nature-04.webp" alt="Textures and typography 04 archive project" />
               </div>
-              <span class="archive-title">Valera Cover</span>
+              <span class="archive-title">Textures and typography 04</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="442" height="440" loading="lazy" data-preview data-description="Embroidered patch series for an urban transit brand—tight grid, high contrast, minimal palette." src="../assets/archive/frame-49-3.jpg" alt="Transit patch archive project" />
+                <img class="has-outline" width="1080" height="1080" loading="lazy" data-preview data-description="Experiments with typography and layout inspired by natural textures and botanical forms." src="../assets/archive/archive-nature-05.webp" alt="Textures and typography 05 archive project" />
               </div>
-              <span class="archive-title">Transit Patch</span>
+              <span class="archive-title">Textures and typography 05</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="442" height="440" loading="lazy" data-preview data-description="Editorial layout study: column-based type system, rough scan textures, and deliberate misregistration." src="../assets/archive/frame-49-6.jpg" alt="Field notes archive project" />
+                <img class="has-outline" width="1080" height="1528" loading="lazy" data-preview data-description="Poster concept for a lecture on Tantra and Sexual Magic." src="../assets/archive/archive-tantra.webp" alt="Tantra lecture archive project" />
               </div>
-              <span class="archive-title">Field Notes</span>
+              <span class="archive-title">Tantra Lecture</span>
             </a>
 
+            <!-- Transportation: a true series (see naming convention in
+                 archive-data.txt)—one grid card, opens on frame 01. Frames
+                 02-08 aren't their own grid cards; they live in the hidden
+                 .archive-series-extra block right after this one so they
+                 still register as [data-preview] items in DOM order, ready
+                 to page through via ArrowLeft/ArrowRight (desktop) or the
+                 swipe carousel (phone). NOTE: this is the sequential-paging
+                 version, not yet the horizontal-scroll/drag/magnet carousel
+                 discussed separately—that's still a bigger follow-up build. -->
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="900" height="1181" loading="lazy" data-preview data-description="Washed jersey with a small chest mark and a tonal back system—quiet merch for a quiet audience." src="../assets/archive/frame-49-7.jpg" alt="Soft club tee archive project" />
+                <img width="1920" height="1440" loading="lazy" data-preview data-title="Transportation 01" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-01.webp" alt="Transportation archive project" />
               </div>
-              <span class="archive-title">Soft Club Tee</span>
-            </a>
-
-            <a class="archive-card" href="#">
-              <div class="archive-card__cover">
-                <img width="444" height="526" loading="lazy" data-preview data-description="Product still life in natural light—texture study with ceramic, paper, and a single dried stem." src="../assets/archive/frame-49-2.jpg" alt="Still life archive project" />
-              </div>
-              <span class="archive-title">Still Life 01</span>
-            </a>
-
-            <a class="archive-card" href="#">
-              <div class="archive-card__cover">
-                <img width="442" height="440" loading="lazy" data-preview data-description="Five-panel cap with laser-cut logo, reflective tape detail, and a runner's wordmark along the brim." src="../assets/archive/frame-49-1.jpg" alt="Open run cap archive project" />
-              </div>
-              <span class="archive-title">Open Run Cap</span>
-            </a>
-
-            <a class="archive-card" href="#">
-              <div class="archive-card__cover">
-                <img width="1500" height="972" loading="lazy" data-preview data-description="Fashion editorial frame where fabric and flora collapse into a single material—movement locked in still image." src="../assets/archive/txema-yeste-vogue-spain-mayowa-nicholas-2019-5-1500x972.jpg" alt="Bloom spread archive project" />
-              </div>
-              <span class="archive-title">Bloom Spread</span>
-            </a>
-
-            <a class="archive-card" href="#">
-              <div class="archive-card__cover">
-                <img width="1205" height="1200" loading="lazy" data-preview data-description="Brand system on black—logotype, grid, and a sticker sheet used as a single composition." src="../assets/archive/frame-49-4.jpg" alt="Dark format archive project" />
-              </div>
-              <span class="archive-title">Dark Format</span>
-            </a>
-
-            <a class="archive-card" href="#">
-              <div class="archive-card__cover">
-                <img width="442" height="520" loading="lazy" data-preview data-description="Layered garment mockup where two typefaces and two weights compete for the same surface." src="../assets/archive/frame-49.jpg" alt="Overlap hoodie archive project" />
-              </div>
-              <span class="archive-title">Overlap Hoodie</span>
-            </a>
-
-            <a class="archive-card" href="#">
-              <div class="archive-card__cover">
-                <img width="444" height="526" loading="lazy" data-preview data-description="Pocket-format publication: hand-numbered, folded once, content dense enough to fold again." src="../assets/archive/frame-49-2.jpg" alt="Index card archive project" />
-              </div>
-              <span class="archive-title">Index Card</span>
+              <span class="archive-title">Transportation</span>
             </a>
 
           </article>
+
+          <div class="archive-series-extra" hidden aria-hidden="true">
+            <img width="1920" height="1440" data-preview data-title="Transportation 02" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-02.webp" alt="Transportation 02 archive project" />
+            <img width="1920" height="1440" data-preview data-title="Transportation 03" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-03.webp" alt="Transportation 03 archive project" />
+            <img width="1920" height="1440" data-preview data-title="Transportation 04" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-04.webp" alt="Transportation 04 archive project" />
+            <img width="1920" height="1440" data-preview data-title="Transportation 05" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-05.webp" alt="Transportation 05 archive project" />
+            <img width="1920" height="1440" data-preview data-title="Transportation 06" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-06.webp" alt="Transportation 06 archive project" />
+            <img width="1920" height="1440" data-preview data-title="Transportation 07" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-07.webp" alt="Transportation 07 archive project" />
+            <img width="1920" height="1440" data-preview data-title="Transportation 08" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-08.webp" alt="Transportation 08 archive project" />
+          </div>
 
           <button class="load-more-btn" type="button">Load more</button>
         </div>
@@ -450,12 +462,13 @@
     <script src="./load-more.js"></script>
     <script>
       var items = document.querySelectorAll('[data-preview]');
+      var itemsArr = Array.prototype.slice.call(items);
+      var currentPreviewImg = null;
       var overlay = document.querySelector('.archive-preview');
       var previewImg = document.querySelector('.preview-image');
       var previewTitle = document.querySelector('.preview-title');
       var previewTagsEl = document.querySelector('.preview-tags');
       var closeBtn = document.querySelector('.preview-close');
-      var grid = document.querySelector('.archive-grid');
       var previewInner = document.querySelector('.archive-preview__inner');
       var previewText = document.querySelector('.preview-text');
       var previewTextContent = previewText.querySelector('p');
@@ -606,10 +619,12 @@
         slideTitles = [];
         sourceImgs = [];
         items.forEach(function (img) {
+          // Series continuation frames (see .archive-series-extra) have no
+          // wrapping .archive-card—they carry their own data-title instead.
           var card = img.closest('.archive-card');
-          if (!card || card.classList.contains('archive-card--more')) return;
-          var titleEl = card.querySelector('.archive-title');
-          slideTitles.push(titleEl ? titleEl.textContent : '');
+          if (card && card.classList.contains('archive-card--more')) return;
+          var titleEl = card ? card.querySelector('.archive-title') : null;
+          slideTitles.push(img.dataset.title || (titleEl ? titleEl.textContent : ''));
           sourceImgs.push(img);
 
           var slide = document.createElement('div');
@@ -674,7 +689,6 @@
 
       function closePreview() {
         overlay.hidden = true;
-        grid.style.opacity = '1';
         document.body.classList.remove('is-preview-open');
         activeArchiveTitle = null;
         document.body.style.removeProperty('--preview-scroll-top');
@@ -738,8 +752,44 @@
         });
       }
 
-      items.forEach(function (img) {
+      // Opens the desktop preview overlay for a given [data-preview] image —
+      // shared by card clicks and the ArrowLeft/ArrowRight nav below, so
+      // both paths stay in sync (title, tags, description, fit, outline).
+      function openPreviewFor(img) {
+        // Series continuation frames (see .archive-series-extra) carry their
+        // own data-title and aren't wrapped in a real .archive-card—card,
+        // and therefore activeArchiveTitle, end up null for those, which
+        // alignPreviewScrollbar() already guards against.
         var card = img.closest('.archive-card');
+        var isVertical = img.naturalHeight >= img.naturalWidth;
+        currentPreviewImg = img;
+        activeArchiveTitle = card ? card.querySelector('.archive-title') : null;
+        previewImg.src = img.src;
+        previewImg.classList.toggle('has-outline', img.classList.contains('has-outline'));
+        previewTitle.textContent = img.dataset.title || (activeArchiveTitle ? activeArchiveTitle.textContent : '');
+        var tags = img.dataset.tags || '';
+        if (previewTagsEl) {
+          previewTagsEl.textContent = tags;
+          previewTagsEl.hidden = !tags;
+        }
+        previewTextContent.textContent = img.dataset.description || '';
+        overlay.style.removeProperty('--preview-width');
+        overlay.style.removeProperty('--preview-image-height');
+        overlay.hidden = false;
+        document.body.classList.add('is-preview-open');
+        alignPreviewScrollbar();
+        window.dispatchEvent(new Event('resize'));
+        overlay.classList.toggle('is-vertical', isVertical);
+        overlay.classList.toggle('is-horizontal', !isVertical);
+        syncPreviewSize();
+      }
+
+      items.forEach(function (img) {
+        // Series continuation frames (.archive-series-extra) have no
+        // wrapping .archive-card—they're never directly clickable in the
+        // grid, only reachable via ArrowLeft/ArrowRight or the phone swipe.
+        var card = img.closest('.archive-card');
+        if (!card) return;
         card.addEventListener('click', function (event) {
           event.preventDefault();
           if (isMobile()) {
@@ -747,27 +797,22 @@
             else openTabletCard(card, img);
             return;
           }
-          var isVertical = img.naturalHeight >= img.naturalWidth;
-          activeArchiveTitle = card.querySelector('.archive-title');
-          previewImg.src = img.src;
-          previewTitle.textContent = activeArchiveTitle ? activeArchiveTitle.textContent : '';
-          var tags = img.dataset.tags || '';
-          if (previewTagsEl) {
-            previewTagsEl.textContent = tags;
-            previewTagsEl.hidden = !tags;
-          }
-          previewTextContent.textContent = img.dataset.description || '';
-          overlay.style.removeProperty('--preview-width');
-          overlay.style.removeProperty('--preview-image-height');
-          overlay.hidden = false;
-          grid.style.opacity = '0.15';
-          document.body.classList.add('is-preview-open');
-          alignPreviewScrollbar();
-          window.dispatchEvent(new Event('resize'));
-          overlay.classList.toggle('is-vertical', isVertical);
-          overlay.classList.toggle('is-horizontal', !isVertical);
-          syncPreviewSize();
+          openPreviewFor(img);
         });
+      });
+
+      // ArrowLeft/ArrowRight step through the same [data-preview] sequence
+      // while the desktop preview is open — wraps at both ends.
+      document.addEventListener('keydown', function (event) {
+        if (overlay.hidden || isMobile()) return;
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        var idx = itemsArr.indexOf(currentPreviewImg);
+        if (idx === -1) return;
+        event.preventDefault();
+        var nextIdx = event.key === 'ArrowRight'
+          ? (idx + 1) % itemsArr.length
+          : (idx - 1 + itemsArr.length) % itemsArr.length;
+        openPreviewFor(itemsArr[nextIdx]);
       });
 
       closeBtn.addEventListener('click', closePreview);
