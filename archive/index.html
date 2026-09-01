@@ -229,6 +229,12 @@
       }
 
       .filmstrip-frame__title {
+        height: 18px; /* matches .close-button/.preview-close, same reason
+          as .project-header: a [0000] <sup> badge can run a bit taller
+          than plain text—let it overflow past this box instead of
+          stretching every frame's title plaque to a different height
+          than the close button's, which read as a visible "step" between
+          the two white plaques */
         background: #fff;
         margin: 0;
         font: inherit;
@@ -442,10 +448,8 @@
       }
       body.is-preview-open .grain-layer,
       body.card-is-open .grain-layer {
-        opacity: 0.3; /* lower than before (was 0.48) on purpose—that value
-          was tuned against mix-blend-mode:overlay, which was quietly
-          eating most of its own strength; normal blend shows the same
-          filter output far more directly at a much lower number */
+        opacity: 0.15; /* halved from 0.3 now that normal blend actually
+          shows it—still confirms via the same mechanism on mobile */
       }
     </style>
   </head>
@@ -637,6 +641,41 @@
                 <img width="1080" height="1080" loading="lazy" data-preview data-link="https://youtu.be/2k6q46Zgn14?si=pLnqRwONnPPBsIKS" data-description="A short philosophical story presented as an audiovisual longread. In it, I explore productivity and burnout as they collide with spiritual seeking and enlightenment. Watch on YouTube[LINK]." src="../assets/archive/archive-bug-06.webp" alt="Bug 06 archive project" />
               </div>
               <span class="archive-title">Bug<sup class="archive-num">[0006]</sup></span>
+            </a>
+
+            <a class="archive-card" href="#">
+              <div class="archive-card__cover">
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Merch and visuals for the Suai Kitty Club sports coaching project." src="../assets/archive/archive-suaimerch-01.webp" alt="Suai Kitty Club 01 archive project" />
+              </div>
+              <span class="archive-title">Suai Kitty Club<sup class="archive-num">[0001]</sup></span>
+            </a>
+
+            <a class="archive-card" href="#">
+              <div class="archive-card__cover">
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Merch and visuals for the Suai Kitty Club sports coaching project." src="../assets/archive/archive-suaimerch-02.webp" alt="Suai Kitty Club 02 archive project" />
+              </div>
+              <span class="archive-title">Suai Kitty Club<sup class="archive-num">[0002]</sup></span>
+            </a>
+
+            <a class="archive-card" href="#">
+              <div class="archive-card__cover">
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Merch and visuals for the Suai Kitty Club sports coaching project." src="../assets/archive/archive-suaimerch-03.webp" alt="Suai Kitty Club 03 archive project" />
+              </div>
+              <span class="archive-title">Suai Kitty Club<sup class="archive-num">[0003]</sup></span>
+            </a>
+
+            <a class="archive-card" href="#">
+              <div class="archive-card__cover">
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Merch and visuals for the Suai Kitty Club sports coaching project." src="../assets/archive/archive-suaimerch-04.webp" alt="Suai Kitty Club 04 archive project" />
+              </div>
+              <span class="archive-title">Suai Kitty Club<sup class="archive-num">[0004]</sup></span>
+            </a>
+
+            <a class="archive-card" href="#">
+              <div class="archive-card__cover">
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Merch and visuals for the Suai Kitty Club sports coaching project." src="../assets/archive/archive-suaimerch-05.webp" alt="Suai Kitty Club 05 archive project" />
+              </div>
+              <span class="archive-title">Suai Kitty Club<sup class="archive-num">[0005]</sup></span>
             </a>
 
           </article>

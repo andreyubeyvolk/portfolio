@@ -4,6 +4,9 @@ ARCHIVE DATA — рабочий список карточек Archive
 Как заполнять: один блок на картинку, блоки разделены пустой строкой.
 Поля: Заголовок / Теги / Описание — каждое на своей строке.
 Теги — через запятую, можно оставить пустым, если не нужны.
+Ссылка — необязательное поле, URL. Если есть — в описании пишешь [LINK]
+там, где должна быть кликабельная ссылка (серым верхним индексом).
+Описание можно сократить до "-//-", если оно совпадает с предыдущим блоком.
 
 Порядок блоков в этом файле = порядок карточек на странице.
 Хочешь вставить новую карточку между существующими — просто вставь
@@ -126,4 +129,58 @@ archive-transportation-series-07.webp
 archive-transportation-series-08.webp
 Заголовок: Transportation[0008]
 Теги: AI, Photostyle, MidJourney, Identity
+Описание: -//-
+
+------------------------------------------------
+
+archive-suaimerch-01.webp
+Заголовок: Suai Kitty Club[0001]
+Описание: Merch and visuals for the Suai Kitty Club sports coaching project.
+
+archive-suaimerch-02.webp
+Заголовок: Suai Kitty Club[0002]
+Описание: -//-
+
+archive-suaimerch-03.webp
+Заголовок: Suai Kitty Club[0003]
+Описание: -//-
+
+archive-suaimerch-04.webp
+Заголовок: Suai Kitty Club[0004]
+Описание: -//-
+
+archive-suaimerch-05.webp
+Заголовок: Suai Kitty Club[0005]
+Описание: -//-
+
+------------------------------------------------
+
+archive-bug-01.webp
+Заголовок: Bug[0001]
+Ссылка: https://youtu.be/2k6q46Zgn14?si=pLnqRwONnPPBsIKS
+Описание: A short philosophical story presented as an audiovisual longread. In it, I explore productivity and burnout as they collide with spiritual seeking and enlightenment. Watch on YouTube[LINK].
+
+archive-bug-02.webp
+Заголовок: Bug[0002]
+Ссылка: https://youtu.be/2k6q46Zgn14?si=pLnqRwONnPPBsIKS
+Описание: -//-
+
+archive-bug-03.webp
+Заголовок: Bug[0003]
+Ссылка: https://youtu.be/2k6q46Zgn14?si=pLnqRwONnPPBsIKS
+Описание: -//-
+
+archive-bug-04.webp
+Заголовок: Bug[0004]
+Ссылка: https://youtu.be/2k6q46Zgn14?si=pLnqRwONnPPBsIKS
+Описание: -//-
+
+archive-bug-05.webp
+Заголовок: Bug[0005]
+Ссылка: https://youtu.be/2k6q46Zgn14?si=pLnqRwONnPPBsIKS
+Описание: -//-
+
+archive-bug-06.webp
+Заголовок: Bug[0006]
+Ссылка: https://youtu.be/2k6q46Zgn14?si=pLnqRwONnPPBsIKS
 Описание: -//-
