@@ -91,6 +91,12 @@
       }
 
       .archive-preview .project-header {
+        position: relative; /* lifts it above .preview-media in paint order
+          (see z-index below)—.preview-media's own -2px margin-top, meant
+          to close a sub-pixel hairline gap, was instead letting the image
+          (later in DOM, so painted on top by default) clip a couple mm
+          off the bottom of the title text wherever they overlapped */
+        z-index: 2;
         background: #fff;
         box-sizing: border-box;
         display: flex;
@@ -287,21 +293,30 @@
          than a button. Fades back out immediately on mouseleave (no delay
          on the way out, only on the way in). */
       .filmstrip-edge__arrow {
-        width: 28px;
-        height: 28px;
+        width: 40px;
+        height: 40px;
         margin: 0 12px;
+        border-radius: 50%;
+        /* Dark scrim behind the stroke so it stays legible over any photo,
+           not just dark ones—at the very end of the strip the last frame
+           sits directly under this zone with no buffer, and a plain white
+           stroke could vanish against a light photo there. */
+        background: rgba(0, 0, 0, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         color: #fff;
         opacity: 0;
         transition: opacity 0.25s ease;
         pointer-events: none;
       }
       .filmstrip-edge__arrow svg {
-        width: 100%;
-        height: 100%;
+        width: 20px;
+        height: 20px;
         display: block;
       }
       .filmstrip-edge:hover .filmstrip-edge__arrow {
-        opacity: 0.55;
+        opacity: 1;
         transition: opacity 0.25s ease 0.35s;
       }
 
@@ -332,7 +347,7 @@
       body.is-preview-open .site-nav,
       body.is-preview-open .section-intro,
       body.is-preview-open .content-pane__scroll {
-        opacity: 0.1;
+        opacity: 0.08;
         pointer-events: none;
         transition: opacity 0.3s ease;
       }
@@ -414,7 +429,7 @@
       }
       body.is-preview-open .grain-layer,
       body.card-is-open .grain-layer {
-        opacity: 0.38;
+        opacity: 0.48;
       }
     </style>
   </head>
@@ -442,7 +457,7 @@
 
       <section class="section-intro intro" aria-label="Archive section introduction">
         <p class="section-page-title">Archive</p>
-        <p>Single projects and visual experiments across design, AI, and other mediums—a running record of the tools, workflows and ideas I keep testing.</p>
+        <p>Single projects and visual experiments across design, AI, and other mediums.</p>
       </section>
 
       <section class="content-pane" aria-label="Archive projects">
@@ -546,8 +561,25 @@
               <div class="archive-card__cover">
                 <img data-group="transportation" width="1920" height="1440" loading="lazy" data-preview data-title="Transportation" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-01.webp" alt="Transportation archive project" />
               </div>
-              <span class="archive-title">Transportation</span>
+              <span class="archive-title">Transportation<sup class="archive-num">[1/8]</sup></span>
             </a>
+
+            <!-- hidden (display:none, doesn't consume a grid cell) but kept
+                 as a direct grid child so it stays immediately after the
+                 Transportation card in DOM order—this contiguity is what
+                 the mobile flat swipe sequence (buildTrack) relies on; the
+                 Bug cards used to sit between them here and broke it,
+                 making Transportation 2-8 seem to vanish after Bug's 6
+                 slides finally ran out. -->
+            <div class="archive-series-extra" hidden aria-hidden="true">
+              <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0002]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-02.webp" alt="Transportation 02 archive project" />
+              <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0003]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-03.webp" alt="Transportation 03 archive project" />
+              <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0004]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-04.webp" alt="Transportation 04 archive project" />
+              <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0005]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-05.webp" alt="Transportation 05 archive project" />
+              <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0006]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-06.webp" alt="Transportation 06 archive project" />
+              <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0007]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-07.webp" alt="Transportation 07 archive project" />
+              <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0008]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-08.webp" alt="Transportation 08 archive project" />
+            </div>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
@@ -592,16 +624,6 @@
             </a>
 
           </article>
-
-          <div class="archive-series-extra" hidden aria-hidden="true">
-            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0002]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-02.webp" alt="Transportation 02 archive project" />
-            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0003]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-03.webp" alt="Transportation 03 archive project" />
-            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0004]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-04.webp" alt="Transportation 04 archive project" />
-            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0005]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-05.webp" alt="Transportation 05 archive project" />
-            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0006]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-06.webp" alt="Transportation 06 archive project" />
-            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0007]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-07.webp" alt="Transportation 07 archive project" />
-            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation[0008]" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-08.webp" alt="Transportation 08 archive project" />
-          </div>
 
           <button class="load-more-btn" type="button">Load more</button>
         </div>
@@ -1273,6 +1295,15 @@
         currentPreviewImg = img;
         overlay.hidden = false;
         document.body.classList.add('is-preview-open');
+        // The originally clicked <a class="archive-card"> keeps keyboard
+        // focus after it opens the preview—invisible at first, but the
+        // instant you press an arrow key, the browser's focus-visible
+        // heuristic draws its outline on that still-focused (and still
+        // dimmed-but-present) card behind the overlay. Blurring it here
+        // means every subsequent arrow step opens on nothing focused.
+        if (document.activeElement && document.activeElement.blur) {
+          document.activeElement.blur();
+        }
 
         if (img.dataset.group) {
           overlay.classList.add('is-filmstrip');

@@ -130,6 +130,13 @@
       "wheel",
       (event) => {
         if (!mq.matches) return;
+        // The archive preview overlay (single-image or the series
+        // filmstrip) sits as a *sibling* of the pane, not inside it, so
+        // pane.contains(event.target) never catches wheeling over it—this
+        // global handler kept scrolling the dimmed background grid
+        // underneath even with a photo open. Both preview modes add this
+        // class on open (see openPreviewFor in archive/index.html).
+        if (document.body.classList.contains("is-preview-open")) return;
         if (pane.contains(event.target)) return; // already over the pane: let native scroll run
         if (pane.scrollHeight <= pane.clientHeight) return; // nothing to scroll
 

@@ -48,6 +48,24 @@ a {
   text-decoration: none;
 }
 
+/* Site-wide hover feedback for inline text links (bio copy, project
+   Challenge/Solution prose, archive descriptions, the [LINK] reference
+   style, etc.)—same black-bg/white-text treatment already used for nav,
+   close buttons and social links, just generalized to any link inside
+   running text. Scoped to "p a" rather than a bare "a:hover" on purpose:
+   an unscoped rule would also catch every image-wrapping card link
+   (.archive-card, .inhouse-card, ...) across the site's project grids,
+   painting a black box behind photo thumbnails on hover—those already
+   have their own, different hover treatment on a child element instead.
+   (hover:hover) keeps this off touch devices, where hover has no
+   real "point and reveal" meaning and can otherwise stick after a tap. */
+@media (hover: hover) {
+  p a:hover {
+    color: #fff;
+    background-color: #000;
+  }
+}
+
 button {
   color: inherit;
   font: inherit;
@@ -1053,7 +1071,7 @@ body::-webkit-scrollbar-thumb:active {
     transition: opacity 0.18s ease;
   }
   body.card-is-open .site-shell {
-    opacity: 0.1;
+    opacity: 0.08;
     pointer-events: none;
     transition: opacity 0.3s ease;
   }

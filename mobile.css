@@ -337,6 +337,10 @@
     flex: 0 0 100%;
     min-width: 0;
     scroll-snap-align: start;
+    scroll-snap-stop: always; /* forces the swipe to stop at every slide,
+      even on a fast/hard fling—without this, a strong swipe's momentum
+      could sail straight past several slides to wherever it naturally
+      decelerated, skipping photos instead of landing on the very next one */
     display: flex;
     flex-direction: column;
     background: #fff;
@@ -386,7 +390,7 @@
     transition: opacity 0.18s ease;
   }
   body.card-is-open .site-shell {
-    opacity: 0.1;
+    opacity: 0.08;
     pointer-events: none;
     transition: opacity 0.3s ease;
   }
@@ -537,10 +541,10 @@
     pointer-events: none;
   }
 
-  /* Card already dims the grid to 0.1; opening the menu on top must not
+  /* Card already dims the grid to 0.08; opening the menu on top must not
      pull it back up to 0.4. The card itself dims via .card-panel::after. */
   body.card-is-open.menu-is-open .site-shell {
-    opacity: 0.1;
+    opacity: 0.08;
   }
 
   body.menu-is-open .card-overlay {
