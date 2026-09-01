@@ -377,9 +377,16 @@
 
   /* Opacity fade + grain on top (see archive/index.html)—no blur. The card
      overlay itself lives outside .site-shell in the DOM, so this never
-     touches it. */
+     touches it. Base transition is unconditional (see archive/index.html
+     for why: a transition declared only inside the dimmed-state rule never
+     gets to animate the close, since the element stops matching that rule
+     the instant the class is removed). Faster close than open: "fast but
+     smooth". */
+  .site-shell {
+    transition: opacity 0.18s ease;
+  }
   body.card-is-open .site-shell {
-    opacity: 0.15;
+    opacity: 0.1;
     pointer-events: none;
     transition: opacity 0.3s ease;
   }

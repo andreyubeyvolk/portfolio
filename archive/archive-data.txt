@@ -31,99 +31,99 @@ archive-disruptive-series-02.webp
 ------------------------------------------------
 
 archive-longread-01.webp
-Заголовок: Text Longread 01
+Заголовок: Longread[0001]
 Описание: Work from Sergey Gurov’s intensive “Grids. Text-Based Longread.”
 
 archive-longread-02.webp
-Заголовок: Text Longread 02
+Заголовок: Longread[0002]
 Описание: Work from Sergey Gurov’s intensive “Grids. Text-Based Longread.”
 
 archive-longread-03.webp
-Заголовок: Text Longread 03
+Заголовок: Longread[0003]
 Описание: Work from Sergey Gurov’s intensive “Grids. Text-Based Longread.”
 
 archive-longread-04.webp
-Заголовок: Text Longread 04
+Заголовок: Longread[0004]
 Описание: Work from Sergey Gurov’s intensive “Grids. Text-Based Longread.”
 
 
 ------------------------------------------------
 
 archive-oyashi-01.webp
-Заголовок: Oyashi 01
+Заголовок: Oyashi[0001]
 Описание: Logo lettering development for a cosmetics brand Oyashi.
 
 
 archive-oyashi-02.webp
-Заголовок: Oyashi 02
+Заголовок: Oyashi[0002]
 Описание: Logo lettering development for a cosmetics brand Oyashi.
 
 ------------------------------------------------
 
 archive-nature-01.webp
-Заголовок: Textures and typography 01
+Заголовок: Textures[0001]
 Описание: Experiments with typography and layout inspired by natural textures and botanical forms.
 
 archive-nature-02.webp
-Заголовок: Textures and typography 02
+Заголовок: Textures[0002]
 Описание: Experiments with typography and layout inspired by natural textures and botanical forms.
 
 archive-nature-03.webp
-Заголовок: Textures and typography 03
+Заголовок: Textures[0003]
 Описание: Experiments with typography and layout inspired by natural textures and botanical forms.
 
 archive-nature-04.webp
-Заголовок: Textures and typography 04
+Заголовок: Textures[0004]
 Описание: Experiments with typography and layout inspired by natural textures and botanical forms.
 
 archive-nature-05.web
-Заголовок: Textures and typography 05
+Заголовок: Textures[0005]
 Описание: Experiments with typography and layout inspired by natural textures and botanical forms.
 
 ------------------------------------------------
 
 archive-tantra.webp
-Заголовок: Tantra lecture
+Заголовок: Tantra
 Описание: Poster concept for a lecture on Tantra and Sexual Magic.
 
 ------------------------------------------------
 
 archive-transportation-series-01.webp
-Заголовок: Transportation 01
+Заголовок: Transportation
 Теги: AI, Photostyle, MidJourney, Identity
 Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
 
 archive-transportation-series-02.webp
-Заголовок: Transportation 02
+Заголовок: Transportation[0002]
 Теги: AI, Photostyle, MidJourney, Identity
-Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+Описание: -//-
 
 archive-transportation-series-03.webp
-Заголовок: Transportation 03
+Заголовок: Transportation[0003]
 Теги: AI, Photostyle, MidJourney, Identity
-Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+Описание: -//-
 
 archive-transportation-series-04.webp
-Заголовок: Transportation 04
+Заголовок: Transportation[0004]
 Теги: AI, Photostyle, MidJourney, Identity
-Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+Описание: -//-
 
 archive-transportation-series-05.webp
-Заголовок: Transportation 05
+Заголовок: Transportation[0005]
 Теги: AI, Photostyle, MidJourney, Identity
-Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+Описание: -//-
 
 archive-transportation-series-06.webp
-Заголовок: Transportation 06
+Заголовок: Transportation[0006]
 Теги: AI, Photostyle, MidJourney, Identity
-Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+Описание: -//-
 
 archive-transportation-series-07.webp
-Заголовок: Transportation 07
+Заголовок: Transportation[0007]
 Теги: AI, Photostyle, MidJourney, Identity
-Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+Описание: -//-
 
 archive-transportation-series-08.webp
-Заголовок: Transportation 08
+Заголовок: Transportation[0008]
 Теги: AI, Photostyle, MidJourney, Identity
-Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+Описание: -//-

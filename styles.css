@@ -638,6 +638,18 @@ body::-webkit-scrollbar-thumb:active {
   background-color: #000;
 }
 
+/* Small gray superscript badge—used for the "[0001]"-style numbering tail
+   on archive titles, and reused as-is for an inline "[LINK]" reference in
+   a description (see renderTitleInto/renderDescriptionInto in
+   archive/index.html). #9F9F9F is the site's existing muted/caption gray
+   (already used by .preview-tags), not a new color. */
+.archive-num {
+  color: #9f9f9f;
+  font-size: 0.7em;
+  vertical-align: super;
+  text-decoration: none;
+}
+
 /* ─── One-shot video (vp-once): silent, autoplay once in view, plays a
    single pass (no loop). On end, a centered replay button appears;
    clicking it restarts from the beginning. New, additive component—
@@ -1032,9 +1044,16 @@ body::-webkit-scrollbar-thumb:active {
 
   /* Opacity fade + grain on top (see archive/index.html)—no blur. The card
      overlay itself lives outside .site-shell in the DOM, so this never
-     touches it. */
+     touches it. Base transition is unconditional (see archive/index.html
+     for why: a transition declared only inside the dimmed-state rule never
+     gets to animate the close, since the element stops matching that rule
+     the instant the class is removed). Faster close than open: "fast but
+     smooth". */
+  .site-shell {
+    transition: opacity 0.18s ease;
+  }
   body.card-is-open .site-shell {
-    opacity: 0.15;
+    opacity: 0.1;
     pointer-events: none;
     transition: opacity 0.3s ease;
   }
