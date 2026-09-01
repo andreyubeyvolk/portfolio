@@ -315,7 +315,13 @@
     white-space: nowrap;
   }
 
-  /* Horizontal swipe ribbon — magnetic snap, 16px gaps between cards. */
+  /* Horizontal swipe ribbon — magnetic snap, 16px gaps between cards.
+     No -webkit-overflow-scrolling:touch here on purpose: iOS momentum
+     scrolling let a fast flick glide well past scroll-snap-stop's own
+     per-slide braking, covering 2+ cards in one swipe. Without it, the
+     strip only moves as far as the finger actually drags—slower, more
+     "viscous", and combined with mandatory snap + stop:always it can't
+     overshoot past the very next slide. */
   .card-track {
     display: flex;
     flex-direction: row;
@@ -325,7 +331,6 @@
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
     overscroll-behavior-x: contain;
-    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
 
@@ -390,7 +395,8 @@
     transition: opacity 0.18s ease;
   }
   body.card-is-open .site-shell {
-    opacity: 0.08;
+    opacity: 0.06; /* phone only—deliberately lower than tablet's 0.08
+      (styles.css), per feedback specific to this breakpoint */
     pointer-events: none;
     transition: opacity 0.3s ease;
   }
@@ -541,10 +547,10 @@
     pointer-events: none;
   }
 
-  /* Card already dims the grid to 0.08; opening the menu on top must not
+  /* Card already dims the grid to 0.06; opening the menu on top must not
      pull it back up to 0.4. The card itself dims via .card-panel::after. */
   body.card-is-open.menu-is-open .site-shell {
-    opacity: 0.08;
+    opacity: 0.06;
   }
 
   body.menu-is-open .card-overlay {

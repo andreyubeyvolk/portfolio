@@ -97,6 +97,12 @@
           (later in DOM, so painted on top by default) clip a couple mm
           off the bottom of the title text wherever they overlapped */
         z-index: 2;
+        height: 18px; /* matches .close-button's own height so the two
+          white plaques line up. A title carrying a [0000]/[1/8] <sup>
+          badge naturally runs a bit taller than plain text—rather than
+          clip it to fit, let it overflow past this box's edge (no
+          overflow:hidden here); it stays fully visible either way since
+          the whole header already paints above the photo via z-index. */
         background: #fff;
         box-sizing: border-box;
         display: flex;
@@ -423,13 +429,23 @@
         z-index: 5;
         filter: url(#archive-grain);
         opacity: 0;
-        mix-blend-mode: overlay;
+        /* normal, not overlay: overlay blends against whatever's behind
+           it, so its visible strength rides on that background's own
+           luminance—stacked on an already-dimmed (opacity ~0.08) grid,
+           the result was nearly imperceptible. The filter itself already
+           outputs translucent black noise (see feColorMatrix below), so
+           painting it as-is (normal) shows the grain directly instead of
+           having its visibility depend on what it's sitting over. */
+        mix-blend-mode: normal;
         pointer-events: none;
         transition: opacity 0.3s ease;
       }
       body.is-preview-open .grain-layer,
       body.card-is-open .grain-layer {
-        opacity: 0.48;
+        opacity: 0.3; /* lower than before (was 0.48) on purpose—that value
+          was tuned against mix-blend-mode:overlay, which was quietly
+          eating most of its own strength; normal blend shows the same
+          filter output far more directly at a much lower number */
       }
     </style>
   </head>
