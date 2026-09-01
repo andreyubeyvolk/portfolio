@@ -229,6 +229,12 @@
       }
 
       .filmstrip-frame__title {
+        position: relative; /* same fix as .project-header: lifts the title
+          above .filmstrip-frame__media in paint order, since that media's
+          own -2px margin-top (hairline-gap trick) otherwise lets the image
+          (later in DOM, painted on top by default) clip the bottom of the
+          title text wherever they overlap */
+        z-index: 2;
         height: 18px; /* matches .close-button/.preview-close, same reason
           as .project-header: a [0000] <sup> badge can run a bit taller
           than plain text—let it overflow past this box instead of
@@ -300,36 +306,57 @@
         display: flex;
       }
 
-      /* Hint chevron: hidden until the zone is hovered a moment, then eases
-         in—translucent stroke, not filled, so it reads as a hint rather
-         than a button. Fades back out immediately on mouseleave (no delay
-         on the way out, only on the way in). */
-      .filmstrip-edge__arrow {
-        width: 40px;
-        height: 40px;
-        margin: 0 12px;
-        border-radius: 50%;
-        /* Dark scrim behind the stroke so it stays legible over any photo,
-           not just dark ones—at the very end of the strip the last frame
-           sits directly under this zone with no buffer, and a plain white
-           stroke could vanish against a light photo there. */
-        background: rgba(0, 0, 0, 0.35);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
+      /* Hint glyph: hidden until the zone is hovered a moment, then eases
+         in. Plain text "<"/">"—no circle, no icon—same house gray as the
+         [0000] number badges (#9f9f9f) with a little transparency on top,
+         so it reads consistently on both light and dark photos without
+         needing a scrim behind it. Fades back out immediately on
+         mouseleave (no delay on the way out, only on the way in). */
+      .filmstrip-edge__arrow,
+      .preview-nav__arrow {
+        margin: 0 6px;
+        font-family: inherit;
+        font-weight: 500;
+        font-size: 1.25rem;
+        line-height: 1;
+        color: rgba(159, 159, 159, 0.85);
         opacity: 0;
         transition: opacity 0.25s ease;
         pointer-events: none;
       }
-      .filmstrip-edge__arrow svg {
-        width: 20px;
-        height: 20px;
-        display: block;
-      }
-      .filmstrip-edge:hover .filmstrip-edge__arrow {
+      .filmstrip-edge:hover .filmstrip-edge__arrow,
+      .preview-nav:hover .preview-nav__arrow {
         opacity: 1;
         transition: opacity 0.25s ease 0.35s;
+      }
+
+      /* Per-photo prev/next hover arrows—the single-image counterpart to
+         the filmstrip edge zones above (same glyph, same gray, same hover
+         reveal), but pinned to the rendered photo's own left/right edges
+         (via .preview-media's position:relative + overflow:hidden) rather
+         than the wider content-pane area, and switching is instant—no
+         scroll/ease, that's a filmstrip-only concept. */
+      .preview-nav {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 64px;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        z-index: 3;
+      }
+      .preview-nav--prev {
+        left: 0;
+        justify-content: flex-start;
+      }
+      .preview-nav--next {
+        right: 0;
+        justify-content: flex-end;
       }
 
       body.is-preview-open .content-pane__scroll.custom-scroll::-webkit-scrollbar {
@@ -344,13 +371,12 @@
         display: none;
       }
 
-      /* Background treatment behind the preview: plain opacity fade + grain
-         on top (see feTurbulence defs right after <body>)—no blur. The
-         transition lives here, unconditionally, not just in the dimmed
-         state below—when the class is removed on close, the element stops
-         matching that rule at the very same instant the opacity reverts,
-         so a transition declared only there never gets to animate the
-         close. Faster than the open (0.18s vs 0.3s): "fast but smooth". */
+      /* Background treatment behind the preview: plain opacity fade, no
+         blur. The transition lives here, unconditionally, not just in the
+         dimmed state below—when the class is removed on close, the element
+         stops matching that rule at the very same instant the opacity
+         reverts, so a transition declared only there never gets to animate
+         the close. Faster than the open (0.18s vs 0.3s): "fast but smooth". */
       .site-nav,
       .section-intro,
       .content-pane__scroll {
@@ -423,44 +449,9 @@
           display: none !important;
         }
       }
-
-      /* Grain layer over the blurred background (see feTurbulence defs
-         right after <body>)—same recipe as House of Walk: fractal noise
-         through an alpha-only color matrix, blended with mix-blend-mode.
-         Sits above the blurred site-shell/nav/intro but below every
-         preview/card overlay (all of which use z-index 10 or higher). */
-      .grain-layer {
-        position: fixed;
-        inset: -20%;
-        z-index: 5;
-        filter: url(#archive-grain);
-        opacity: 0;
-        /* normal, not overlay: overlay blends against whatever's behind
-           it, so its visible strength rides on that background's own
-           luminance—stacked on an already-dimmed (opacity ~0.08) grid,
-           the result was nearly imperceptible. The filter itself already
-           outputs translucent black noise (see feColorMatrix below), so
-           painting it as-is (normal) shows the grain directly instead of
-           having its visibility depend on what it's sitting over. */
-        mix-blend-mode: normal;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-      }
-      body.is-preview-open .grain-layer,
-      body.card-is-open .grain-layer {
-        opacity: 0.15; /* halved from 0.3 now that normal blend actually
-          shows it—still confirms via the same mechanism on mobile */
-      }
     </style>
   </head>
   <body class="archive-page">
-    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
-      <filter id="archive-grain">
-        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="n" />
-        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0" />
-      </filter>
-    </svg>
-    <div class="grain-layer" aria-hidden="true"></div>
     <main class="site-shell page-grid">
       <aside class="site-nav" aria-label="Main navigation">
         <a class="brand" href="../index.html" aria-label="Andrey Ubeyvolk home">
@@ -692,6 +683,8 @@
             </header>
             <div class="preview-media">
               <img loading="lazy" class="preview-image" src="" alt="">
+              <button class="preview-nav preview-nav--prev" type="button" aria-label="Previous photo"><span class="preview-nav__arrow">&lt;</span></button>
+              <button class="preview-nav preview-nav--next" type="button" aria-label="Next photo"><span class="preview-nav__arrow">&gt;</span></button>
             </div>
             <div class="preview-text">
               <p></p>
@@ -706,18 +699,10 @@
                regular single-image card. -->
           <div class="archive-preview__filmstrip"></div>
           <div class="filmstrip-edge filmstrip-edge--left" aria-hidden="true">
-            <span class="filmstrip-edge__arrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M15 5l-7 7 7 7" />
-              </svg>
-            </span>
+            <span class="filmstrip-edge__arrow">&lt;</span>
           </div>
           <div class="filmstrip-edge filmstrip-edge--right" aria-hidden="true">
-            <span class="filmstrip-edge__arrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 5l7 7-7 7" />
-              </svg>
-            </span>
+            <span class="filmstrip-edge__arrow">&gt;</span>
           </div>
         </div>
       </section>
@@ -827,6 +812,8 @@
       var previewFilmstrip = document.querySelector('.archive-preview__filmstrip');
       var filmstripEdgeLeft = document.querySelector('.filmstrip-edge--left');
       var filmstripEdgeRight = document.querySelector('.filmstrip-edge--right');
+      var previewNavPrev = document.querySelector('.preview-nav--prev');
+      var previewNavNext = document.querySelector('.preview-nav--next');
       var filmstripFrames = []; // [{frame, img}] for the currently open series
 
       // ── Archive card overlay ─────────────────────────────────────
@@ -1246,6 +1233,15 @@
         filmstripDrag.active = false;
         previewFilmstrip.classList.remove('is-dragging');
         filmstripMagnetCheck();
+        // Clear the "was a drag" flag after this gesture's own click event
+        // (the one the browser fires right after pointerup, on whatever's
+        // under the cursor) has had a chance to consume it—see the
+        // overlay's click-to-close guard below. Clearing it synchronously
+        // here instead would be fine for that, but left it stale for every
+        // *later*, unrelated click too—permanently blocking the edge-zone
+        // arrow buttons after just one drag, since they only ever check
+        // this same flag.
+        setTimeout(function () { filmstripDrag.moved = false; }, 0);
       }
       previewFilmstrip.addEventListener('pointerup', endFilmstripDrag);
       previewFilmstrip.addEventListener('pointercancel', endFilmstripDrag);
@@ -1319,6 +1315,15 @@
       // means jumping to that frame's actual offsetLeft, not a fixed stride.
       function currentFilmstripIndex() {
         var scrollLeft = previewFilmstrip.scrollLeft;
+        var max = Math.max(0, previewFilmstrip.scrollWidth - previewFilmstrip.clientWidth);
+        // Scrolled (or magnet-settled) as far right as the browser allows:
+        // treat that as "on the last frame" outright. When the last frame
+        // is narrower than the viewport, its own offsetLeft sits *past*
+        // this natural max—the browser simply can't scroll further right
+        // to reach it—so the offsetLeft loop below would under-report the
+        // index by one and stepPreview() would think there's still a frame
+        // left to step to, silently doing nothing at the true end.
+        if (scrollLeft >= max - 1) return filmstripFrames.length - 1;
         var idx = 0;
         for (var i = 0; i < filmstripFrames.length; i++) {
           if (filmstripFrames[i].frame.offsetLeft <= scrollLeft + 8) idx = i;
@@ -1335,7 +1340,7 @@
       function filmstripEdgeClick(dir) {
         return function () {
           if (filmstripDrag.moved) return; // was a drag, not a tap
-          stepFilmstrip(dir);
+          stepPreview(dir);
         };
       }
       if (filmstripEdgeLeft) filmstripEdgeLeft.addEventListener('click', filmstripEdgeClick(-1));
@@ -1394,6 +1399,39 @@
         syncPreviewSize();
       }
 
+      // Shared prev/next navigation—used by the keyboard arrows, the
+      // filmstrip edge zones, and the per-photo hover arrows below. Inside
+      // an open filmstrip, stepping past its first/last frame doesn't stop
+      // there: it keeps going straight into the previous/next item of the
+      // whole flat catalog (frames of the same series are always
+      // contiguous in itemsArr—see the .archive-series-extra placement
+      // note elsewhere in this file), so "last frame of the carousel"
+      // never reads as a dead end. Outside a filmstrip it's just a direct
+      // catalog-to-catalog jump—no scroll/ease, that's filmstrip-only.
+      function stepPreview(dir) {
+        if (overlay.classList.contains('is-filmstrip')) {
+          var frameIdx = currentFilmstripIndex();
+          var nextFrameIdx = frameIdx + dir;
+          if (nextFrameIdx >= 0 && nextFrameIdx < filmstripFrames.length) {
+            stepFilmstrip(dir);
+            return;
+          }
+          var groupFlatIdx = itemsArr.indexOf(currentPreviewImg);
+          if (groupFlatIdx === -1) return;
+          var targetIdx = dir === 1
+            ? (groupFlatIdx + filmstripFrames.length) % itemsArr.length
+            : (groupFlatIdx - 1 + itemsArr.length) % itemsArr.length;
+          openPreviewFor(itemsArr[targetIdx]);
+          return;
+        }
+        var flatIdx = itemsArr.indexOf(currentPreviewImg);
+        if (flatIdx === -1) return;
+        var nextFlatIdx = dir === 1
+          ? (flatIdx + 1) % itemsArr.length
+          : (flatIdx - 1 + itemsArr.length) % itemsArr.length;
+        openPreviewFor(itemsArr[nextFlatIdx]);
+      }
+
       items.forEach(function (img) {
         // Series continuation frames (.archive-series-extra) have no
         // wrapping .archive-card—they're never directly clickable in the
@@ -1411,31 +1449,40 @@
         });
       });
 
-      // ArrowLeft/ArrowRight while the desktop preview is open. In filmstrip
-      // mode they step through the open series (same one-frame move as the
-      // edge zones); otherwise they wrap through the flat [data-preview]
-      // sequence, jumping straight to the next/previous grid item.
+      // ArrowLeft/ArrowRight (and Space, forward-only) while the desktop
+      // preview is open—same stepPreview used by the filmstrip edge zones
+      // and the per-photo hover arrows, so they all stay in sync at series
+      // boundaries.
       document.addEventListener('keydown', function (event) {
         if (overlay.hidden || isMobile()) return;
-        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-        event.preventDefault();
-        if (overlay.classList.contains('is-filmstrip')) {
-          stepFilmstrip(event.key === 'ArrowRight' ? 1 : -1);
+        if (event.key === ' ') {
+          event.preventDefault(); // don't let Space also scroll the page behind the overlay
+          stepPreview(1);
           return;
         }
-        var idx = itemsArr.indexOf(currentPreviewImg);
-        if (idx === -1) return;
-        var nextIdx = event.key === 'ArrowRight'
-          ? (idx + 1) % itemsArr.length
-          : (idx - 1 + itemsArr.length) % itemsArr.length;
-        openPreviewFor(itemsArr[nextIdx]);
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        stepPreview(event.key === 'ArrowRight' ? 1 : -1);
+      });
+
+      if (previewNavPrev) previewNavPrev.addEventListener('click', function (event) {
+        event.stopPropagation();
+        stepPreview(-1);
+      });
+      if (previewNavNext) previewNavNext.addEventListener('click', function (event) {
+        event.stopPropagation();
+        stepPreview(1);
       });
 
       closeBtn.addEventListener('click', closePreview);
 
       overlay.addEventListener('click', function (event) {
         if (overlay.classList.contains('is-filmstrip')) {
-          if (event.target === closeBtn || closeBtn.contains(event.target)) closePreview();
+          if (event.target === closeBtn || closeBtn.contains(event.target)) { closePreview(); return; }
+          if (filmstripDrag.moved) return; // was a drag/pan, not a click-to-close
+          if (event.target.closest('.filmstrip-frame')) return; // clicked an actual photo/frame
+          if (event.target.closest('.filmstrip-edge')) return; // edge nav zones handle stepping themselves
+          closePreview();
           return;
         }
         if (!previewInner.contains(event.target)) closePreview();
