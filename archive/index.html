@@ -146,6 +146,163 @@
         margin-left: auto;
       }
 
+      /* Close button lives outside .archive-preview__inner now (a plain
+         .archive-preview child) so it stays visible in both single-image
+         and filmstrip mode. Wider white backing (not just a thin sliver)
+         so it reads as its own deliberate chip, inset from the edge to
+         match the filmstrip's own right mask. */
+      .archive-preview > .preview-close {
+        position: absolute;
+        top: 0;
+        right: var(--page-margin, 16px);
+        z-index: 6;
+        background: #fff;
+        padding-left: 16px;
+      }
+
+      /* ── Series filmstrip ──────────────────────────────────────────
+         Horizontal-scrolling row of every frame in an opened series (see
+         data-group on the source [data-preview] images). Each frame keeps
+         its own natural size—capped only if it would overflow the
+         available height or width, never scaled up—so the row is
+         intentionally uneven; frames share a common top line, not a
+         common height. Three ways to move: drag, wheel, or the invisible
+         edge zones (click steps one frame). No CSS scroll-snap—it fought
+         every programmatic scroll (wheel, drag, even native trackpad
+         panning got snapped back mid-gesture and chained onto the page
+         behind it). Magnetism, easing and settling are hand-rolled in JS
+         instead (see the filmstrip interaction block), so they can be
+         gentle and never fight a live gesture. */
+      .archive-preview__filmstrip {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: var(--page-margin, 16px); /* incoming frames emerge from behind
+          this inset "mask" edge, not the raw viewport edge—left stays flush
+          since frame 1 is meant to sit right at the container's own edge */
+        bottom: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-x: contain; /* don't chain onto the page behind
+          once a native (e.g. trackpad) scroll hits either end */
+        scrollbar-width: none;
+        cursor: grab;
+        align-items: flex-start;
+      }
+      .archive-preview__filmstrip::-webkit-scrollbar {
+        display: none;
+      }
+      .archive-preview__filmstrip.is-dragging {
+        cursor: grabbing;
+        user-select: none;
+      }
+      .archive-preview.is-filmstrip .archive-preview__filmstrip {
+        display: flex;
+      }
+      .archive-preview.is-filmstrip .archive-preview__inner {
+        display: none;
+      }
+
+      .filmstrip-frame {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        margin-right: var(--page-margin, 16px);
+      }
+      .filmstrip-frame:last-child {
+        margin-right: 0; /* last frame ends flush against the mask edge—the
+          edge zone is a fixed overlay on top of the content, not part of
+          the scrollable width, so it needs no room reserved for it here */
+      }
+
+      .filmstrip-frame__title {
+        background: #fff;
+        margin: 0;
+        font: inherit;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        box-sizing: border-box;
+        overflow-wrap: anywhere;
+        white-space: nowrap;
+      }
+
+      .filmstrip-frame__media {
+        margin-top: -2px;
+      }
+      .filmstrip-frame__media img {
+        display: block;
+        width: auto;
+        height: auto;
+      }
+
+      .filmstrip-frame__text {
+        background: #fff;
+        margin: 0;
+        padding: 0;
+        overflow-wrap: anywhere;
+      }
+      .filmstrip-frame__text p {
+        margin: 0;
+      }
+
+      .filmstrip-frame__tags {
+        display: block;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        color: #9f9f9f;
+        background: #fff;
+        padding-top: 4px;
+      }
+      .filmstrip-frame__tags[hidden] {
+        display: none;
+      }
+
+      .filmstrip-edge {
+        display: none;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 72px;
+        z-index: 4;
+        cursor: pointer;
+        align-items: center;
+      }
+      .filmstrip-edge--left {
+        left: 0;
+        justify-content: flex-start;
+      }
+      .filmstrip-edge--right {
+        right: var(--page-margin, 16px);
+        justify-content: flex-end;
+      }
+      .archive-preview.is-filmstrip .filmstrip-edge {
+        display: flex;
+      }
+
+      /* Hint chevron: hidden until the zone is hovered a moment, then eases
+         in—translucent stroke, not filled, so it reads as a hint rather
+         than a button. Fades back out immediately on mouseleave (no delay
+         on the way out, only on the way in). */
+      .filmstrip-edge__arrow {
+        width: 28px;
+        height: 28px;
+        margin: 0 12px;
+        color: #fff;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+        pointer-events: none;
+      }
+      .filmstrip-edge__arrow svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .filmstrip-edge:hover .filmstrip-edge__arrow {
+        opacity: 0.55;
+        transition: opacity 0.25s ease 0.35s;
+      }
+
       body.is-preview-open .content-pane__scroll.custom-scroll::-webkit-scrollbar {
         display: none;
       }
@@ -158,18 +315,14 @@
         display: none;
       }
 
-      /* Background treatment behind the preview: blur + grain (like
-         House of Walk's viewer shutter) instead of a flat opacity fade.
-         .archive-preview itself lives inside .content-pane, as a sibling
-         of .content-pane__scroll, not inside it—so blurring the scroll
-         wrapper (plus nav/intro) never touches the preview content itself. */
+      /* Background treatment behind the preview: plain opacity fade + grain
+         on top (see feTurbulence defs right after <body>)—no blur. */
       body.is-preview-open .site-nav,
       body.is-preview-open .section-intro,
       body.is-preview-open .content-pane__scroll {
-        filter: blur(10px) saturate(0.85);
-        opacity: 0.6;
+        opacity: 0.27;
         pointer-events: none;
-        transition: filter 0.3s ease, opacity 0.3s ease;
+        transition: opacity 0.3s ease;
       }
 
       @media (max-width: 980px) {
@@ -249,7 +402,7 @@
       }
       body.is-preview-open .grain-layer,
       body.card-is-open .grain-layer {
-        opacity: 0.12;
+        opacity: 0.28;
       }
     </style>
   </head>
@@ -286,28 +439,28 @@
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img class="has-outline" width="1080" height="1080" data-preview data-description="Work from Sergey Gurov's intensive &quot;Grids. Text-Based Longread.&quot;" src="../assets/archive/archive-textlongread-01.webp" alt="Text Longread 01 archive project" />
+                <img width="1080" height="1080" data-preview data-description="Work from Sergey Gurov's intensive &quot;Grids. Text-Based Longread.&quot;" src="../assets/archive/archive-textlongread-01.webp" alt="Text Longread 01 archive project" />
               </div>
               <span class="archive-title">Text Longread 01</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img class="has-outline" width="1080" height="1080" loading="lazy" data-preview data-description="Work from Sergey Gurov's intensive &quot;Grids. Text-Based Longread.&quot;" src="../assets/archive/archive-textlongread-02.webp" alt="Text Longread 02 archive project" />
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Work from Sergey Gurov's intensive &quot;Grids. Text-Based Longread.&quot;" src="../assets/archive/archive-textlongread-02.webp" alt="Text Longread 02 archive project" />
               </div>
               <span class="archive-title">Text Longread 02</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img class="has-outline" width="1080" height="1080" loading="lazy" data-preview data-description="Work from Sergey Gurov's intensive &quot;Grids. Text-Based Longread.&quot;" src="../assets/archive/archive-textlongread-03.webp" alt="Text Longread 03 archive project" />
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Work from Sergey Gurov's intensive &quot;Grids. Text-Based Longread.&quot;" src="../assets/archive/archive-textlongread-03.webp" alt="Text Longread 03 archive project" />
               </div>
               <span class="archive-title">Text Longread 03</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img class="has-outline" width="1080" height="1080" loading="lazy" data-preview data-description="Work from Sergey Gurov's intensive &quot;Grids. Text-Based Longread.&quot;" src="../assets/archive/archive-textlongread-04.webp" alt="Text Longread 04 archive project" />
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Work from Sergey Gurov's intensive &quot;Grids. Text-Based Longread.&quot;" src="../assets/archive/archive-textlongread-04.webp" alt="Text Longread 04 archive project" />
               </div>
               <span class="archive-title">Text Longread 04</span>
             </a>
@@ -342,28 +495,28 @@
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img class="has-outline" width="1080" height="1080" loading="lazy" data-preview data-description="Experiments with typography and layout inspired by natural textures and botanical forms." src="../assets/archive/archive-nature-03.webp" alt="Textures and typography 03 archive project" />
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Experiments with typography and layout inspired by natural textures and botanical forms." src="../assets/archive/archive-nature-03.webp" alt="Textures and typography 03 archive project" />
               </div>
               <span class="archive-title">Textures and typography 03</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img class="has-outline" width="1080" height="1080" loading="lazy" data-preview data-description="Experiments with typography and layout inspired by natural textures and botanical forms." src="../assets/archive/archive-nature-04.webp" alt="Textures and typography 04 archive project" />
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Experiments with typography and layout inspired by natural textures and botanical forms." src="../assets/archive/archive-nature-04.webp" alt="Textures and typography 04 archive project" />
               </div>
               <span class="archive-title">Textures and typography 04</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img class="has-outline" width="1080" height="1080" loading="lazy" data-preview data-description="Experiments with typography and layout inspired by natural textures and botanical forms." src="../assets/archive/archive-nature-05.webp" alt="Textures and typography 05 archive project" />
+                <img width="1080" height="1080" loading="lazy" data-preview data-description="Experiments with typography and layout inspired by natural textures and botanical forms." src="../assets/archive/archive-nature-05.webp" alt="Textures and typography 05 archive project" />
               </div>
               <span class="archive-title">Textures and typography 05</span>
             </a>
 
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img class="has-outline" width="1080" height="1528" loading="lazy" data-preview data-description="Poster concept for a lecture on Tantra and Sexual Magic." src="../assets/archive/archive-tantra.webp" alt="Tantra lecture archive project" />
+                <img width="1080" height="1528" loading="lazy" data-preview data-description="Poster concept for a lecture on Tantra and Sexual Magic." src="../assets/archive/archive-tantra.webp" alt="Tantra lecture archive project" />
               </div>
               <span class="archive-title">Tantra Lecture</span>
             </a>
@@ -379,7 +532,7 @@
                  discussed separately—that's still a bigger follow-up build. -->
             <a class="archive-card" href="#">
               <div class="archive-card__cover">
-                <img width="1920" height="1440" loading="lazy" data-preview data-title="Transportation 01" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-01.webp" alt="Transportation archive project" />
+                <img data-group="transportation" width="1920" height="1440" loading="lazy" data-preview data-title="Transportation 01" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-01.webp" alt="Transportation archive project" />
               </div>
               <span class="archive-title">Transportation</span>
             </a>
@@ -387,23 +540,24 @@
           </article>
 
           <div class="archive-series-extra" hidden aria-hidden="true">
-            <img width="1920" height="1440" data-preview data-title="Transportation 02" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-02.webp" alt="Transportation 02 archive project" />
-            <img width="1920" height="1440" data-preview data-title="Transportation 03" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-03.webp" alt="Transportation 03 archive project" />
-            <img width="1920" height="1440" data-preview data-title="Transportation 04" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-04.webp" alt="Transportation 04 archive project" />
-            <img width="1920" height="1440" data-preview data-title="Transportation 05" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-05.webp" alt="Transportation 05 archive project" />
-            <img width="1920" height="1440" data-preview data-title="Transportation 06" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-06.webp" alt="Transportation 06 archive project" />
-            <img width="1920" height="1440" data-preview data-title="Transportation 07" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-07.webp" alt="Transportation 07 archive project" />
-            <img width="1920" height="1440" data-preview data-title="Transportation 08" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-08.webp" alt="Transportation 08 archive project" />
+            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation 02" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-02.webp" alt="Transportation 02 archive project" />
+            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation 03" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-03.webp" alt="Transportation 03 archive project" />
+            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation 04" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-04.webp" alt="Transportation 04 archive project" />
+            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation 05" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-05.webp" alt="Transportation 05 archive project" />
+            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation 06" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-06.webp" alt="Transportation 06 archive project" />
+            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation 07" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-07.webp" alt="Transportation 07 archive project" />
+            <img data-group="transportation" width="1920" height="1440" data-preview data-title="Transportation 08" data-tags="AI, Photostyle, MidJourney, Identity" data-description="Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation." src="../assets/archive/archive-transportation-series-08.webp" alt="Transportation 08 archive project" />
           </div>
 
           <button class="load-more-btn" type="button">Load more</button>
         </div>
 
         <div class="archive-preview" hidden>
+          <button class="close-button preview-close"><span>[X]</span></button>
+
           <div class="archive-preview__inner">
             <header class="content-pane__header project-header">
               <h1 class="preview-title"></h1>
-              <button class="close-button preview-close"><span>[X]</span></button>
             </header>
             <div class="preview-media">
               <img loading="lazy" class="preview-image" src="" alt="">
@@ -412,6 +566,27 @@
               <p></p>
             </div>
             <span class="preview-tags" hidden></span>
+          </div>
+
+          <!-- Series filmstrip: horizontal-scrolling row of every frame in
+               the opened series (see data-group on the source images).
+               Populated by openFilmstripFor() in the script below; empty
+               and hidden (via .archive-preview:not(.is-filmstrip)) for a
+               regular single-image card. -->
+          <div class="archive-preview__filmstrip"></div>
+          <div class="filmstrip-edge filmstrip-edge--left" aria-hidden="true">
+            <span class="filmstrip-edge__arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 5l-7 7 7 7" />
+              </svg>
+            </span>
+          </div>
+          <div class="filmstrip-edge filmstrip-edge--right" aria-hidden="true">
+            <span class="filmstrip-edge__arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
           </div>
         </div>
       </section>
@@ -475,6 +650,10 @@
       var previewHeader = document.querySelector('.archive-preview .project-header');
       var contentPane = document.querySelector('.content-pane');
       var activeArchiveTitle = null;
+      var previewFilmstrip = document.querySelector('.archive-preview__filmstrip');
+      var filmstripEdgeLeft = document.querySelector('.filmstrip-edge--left');
+      var filmstripEdgeRight = document.querySelector('.filmstrip-edge--right');
+      var filmstripFrames = []; // [{frame, img}] for the currently open series
 
       // ── Archive card overlay ─────────────────────────────────────
       // Phones (≤640px): horizontal swipe carousel — the header (title + [X])
@@ -752,20 +931,258 @@
         });
       }
 
+      // ── Series filmstrip ──────────────────────────────────────────
+      // Builds one .filmstrip-frame per image sharing the clicked image's
+      // data-group, in DOM order (real card + its .archive-series-extra
+      // continuation frames). Each frame keeps its own <title, media, text,
+      // tags>, mirroring the single-image preview's fields exactly.
+      function buildFilmstripFrame(img) {
+        var frame = document.createElement('div');
+        frame.className = 'filmstrip-frame';
+
+        var title = document.createElement('h2');
+        title.className = 'filmstrip-frame__title';
+        title.textContent = img.dataset.title || '';
+
+        var mediaWrap = document.createElement('div');
+        mediaWrap.className = 'filmstrip-frame__media';
+        var im = document.createElement('img');
+        // Eager, not lazy: these only get created when the series is
+        // actually opened (openFilmstripFor), so the user is looking at
+        // them right now. loading="lazy" here left the fit sizing waiting
+        // indefinitely on a load event the browser never bothered firing—
+        // frame 0 stayed at its unsized natural width (a description
+        // paragraph's full unwrapped line), spilling past the container.
+        im.src = img.src;
+        im.alt = img.alt || '';
+        mediaWrap.appendChild(im);
+
+        var text = document.createElement('div');
+        text.className = 'filmstrip-frame__text';
+        var p = document.createElement('p');
+        p.textContent = img.dataset.description || '';
+        text.appendChild(p);
+
+        var tagsVal = img.dataset.tags || '';
+        var tagsEl = document.createElement('span');
+        tagsEl.className = 'filmstrip-frame__tags';
+        tagsEl.textContent = tagsVal;
+        tagsEl.hidden = !tagsVal;
+
+        frame.appendChild(title);
+        frame.appendChild(mediaWrap);
+        frame.appendChild(text);
+        frame.appendChild(tagsEl);
+        return { frame: frame, img: im };
+      }
+
+      // Per-frame sizing: each frame's own natural size, capped only if it
+      // would overflow the filmstrip's available height (after that frame's
+      // own title/text/tags) or the filmstrip's available width—never
+      // upscaled. This is why frames end up uneven in height: they share a
+      // top line (flex-start), not a common row height.
+      function fitFilmstripFrame(entry) {
+        var naturalW = entry.img.naturalWidth;
+        var naturalH = entry.img.naturalHeight;
+        if (!naturalW || !naturalH) return;
+        var chromeH = entry.frame.querySelector('.filmstrip-frame__title').offsetHeight
+          + entry.frame.querySelector('.filmstrip-frame__text').offsetHeight;
+        var tagsEl = entry.frame.querySelector('.filmstrip-frame__tags');
+        if (!tagsEl.hidden) chromeH += tagsEl.offsetHeight;
+        var availableHeight = previewFilmstrip.clientHeight - chromeH;
+        var availableWidth = previewFilmstrip.clientWidth - 32;
+        var h = Math.min(naturalH, availableHeight);
+        var w = h * (naturalW / naturalH);
+        if (w > availableWidth) {
+          w = availableWidth;
+          h = w * (naturalH / naturalW);
+        }
+        w = Math.round(w);
+        h = Math.round(h);
+        entry.img.style.width = w + 'px';
+        entry.img.style.height = h + 'px';
+        entry.frame.style.width = w + 'px';
+      }
+
+      function fitAllFilmstripFrames() {
+        filmstripFrames.forEach(fitFilmstripFrame);
+      }
+      // Registered once—fitAllFilmstripFrames() no-ops when nothing's open,
+      // so this never needs adding/removing per-open (no listener leak).
+      window.addEventListener('resize', fitAllFilmstripFrames);
+
+      function openFilmstripFor(img) {
+        var group = img.dataset.group;
+        var frames = itemsArr.filter(function (i) { return i.dataset.group === group; });
+        previewFilmstrip.innerHTML = '';
+        filmstripFrames = frames.map(buildFilmstripFrame);
+        filmstripFrames.forEach(function (entry) {
+          previewFilmstrip.appendChild(entry.frame);
+          if (entry.img.complete && entry.img.naturalWidth) {
+            fitFilmstripFrame(entry);
+          } else {
+            entry.img.addEventListener('load', function () { fitFilmstripFrame(entry); }, { once: true });
+          }
+        });
+        previewFilmstrip.scrollLeft = 0;
+      }
+
+      // ── Filmstrip interaction: drag, wheel, edge click-zones ────────
+      // scroll-snap-type fights any *instant* (non-smooth) scrollLeft write
+      // that doesn't land exactly on a snap-aligned offset—including every
+      // incremental step a drag or wheel tick makes—snapping straight back
+      // to the nearest snap point (frame 0) before it ever paints. Suspend
+      // snapping for the duration of a drag/wheel gesture and only restore
+      // it once the gesture actually settles, so the magnetism still kicks
+      // in at rest without fighting the live pan.
+      var filmstripDrag = { active: false, startX: 0, startScroll: 0, moved: false };
+
+      previewFilmstrip.addEventListener('pointerdown', function (e) {
+        filmstripStopEase();
+        filmstripDrag.active = true;
+        filmstripDrag.moved = false;
+        filmstripDrag.startX = e.clientX;
+        filmstripDrag.startScroll = previewFilmstrip.scrollLeft;
+        previewFilmstrip.classList.add('is-dragging');
+        try { previewFilmstrip.setPointerCapture(e.pointerId); } catch (err) {}
+      });
+      previewFilmstrip.addEventListener('pointermove', function (e) {
+        if (!filmstripDrag.active) return;
+        var dx = e.clientX - filmstripDrag.startX;
+        if (Math.abs(dx) > 4) filmstripDrag.moved = true;
+        // 1:1 with the cursor while actively dragging—no easing here, that
+        // would feel laggy under the hand. Easing/magnetism only kick in
+        // once the drag actually ends (see endFilmstripDrag below).
+        previewFilmstrip.scrollLeft = filmstripDrag.startScroll - dx;
+      });
+      function endFilmstripDrag() {
+        if (!filmstripDrag.active) return;
+        filmstripDrag.active = false;
+        previewFilmstrip.classList.remove('is-dragging');
+        filmstripMagnetCheck();
+      }
+      previewFilmstrip.addEventListener('pointerup', endFilmstripDrag);
+      previewFilmstrip.addEventListener('pointercancel', endFilmstripDrag);
+
+      // ── Smooth, hand-rolled scroll easing (replaces CSS scroll-snap,
+      // which fought every instant/incremental scrollLeft write—wheel
+      // ticks, drag, even native trackpad panning—snapping straight back
+      // to frame 0 mid-gesture and chaining onto the page behind it).
+      // filmstripEaseTo lerps toward a target every frame; wheel ticks
+      // keep extending that target, so motion stays continuous instead of
+      // jumping by a raw, jerky deltaY each tick. Once the eased position
+      // actually catches up to a settled target, it checks for a nearby
+      // frame edge to softly pull into (the "magnet"), but only within a
+      // small radius—never a long-distance yank.
+      var filmstripAnim = { raf: null, target: 0 };
+      var FILMSTRIP_MAGNET_RADIUS = 48; // px—only pulls if already this close
+
+      function filmstripStopEase() {
+        if (filmstripAnim.raf) {
+          cancelAnimationFrame(filmstripAnim.raf);
+          filmstripAnim.raf = null;
+        }
+      }
+
+      function filmstripEaseTo(target) {
+        var max = Math.max(0, previewFilmstrip.scrollWidth - previewFilmstrip.clientWidth);
+        filmstripAnim.target = Math.max(0, Math.min(max, target));
+        if (filmstripAnim.raf) return;
+        function tick() {
+          var current = previewFilmstrip.scrollLeft;
+          var diff = filmstripAnim.target - current;
+          if (Math.abs(diff) < 0.5) {
+            previewFilmstrip.scrollLeft = filmstripAnim.target;
+            filmstripAnim.raf = null;
+            filmstripMagnetCheck();
+            return;
+          }
+          previewFilmstrip.scrollLeft = current + diff * 0.22;
+          filmstripAnim.raf = requestAnimationFrame(tick);
+        }
+        filmstripAnim.raf = requestAnimationFrame(tick);
+      }
+
+      function filmstripMagnetCheck() {
+        if (!filmstripFrames.length || filmstripDrag.active) return;
+        var scrollLeft = previewFilmstrip.scrollLeft;
+        var max = Math.max(0, previewFilmstrip.scrollWidth - previewFilmstrip.clientWidth);
+        var nearest = null, nearestDist = Infinity;
+        filmstripFrames.forEach(function (entry) {
+          var d = Math.abs(entry.frame.offsetLeft - scrollLeft);
+          if (d < nearestDist) { nearestDist = d; nearest = entry.frame.offsetLeft; }
+        });
+        if (Math.abs(max - scrollLeft) < nearestDist) { nearestDist = Math.abs(max - scrollLeft); nearest = max; }
+        if (nearest !== null && nearestDist > 1 && nearestDist <= FILMSTRIP_MAGNET_RADIUS) {
+          filmstripEaseTo(nearest);
+        }
+      }
+
+      // Vertical wheel input (a normal mouse wheel) pans the strip
+      // horizontally, eased; a genuine horizontal trackpad swipe (deltaX
+      // already dominant) is left entirely to the browser's own native
+      // two-finger panning—no JS, no preventDefault.
+      previewFilmstrip.addEventListener('wheel', function (e) {
+        if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+        e.preventDefault();
+        var base = filmstripAnim.raf ? filmstripAnim.target : previewFilmstrip.scrollLeft;
+        filmstripEaseTo(base + e.deltaY);
+      }, { passive: false });
+
+      // Frames have variable widths (natural size), so "step one frame"
+      // means jumping to that frame's actual offsetLeft, not a fixed stride.
+      function currentFilmstripIndex() {
+        var scrollLeft = previewFilmstrip.scrollLeft;
+        var idx = 0;
+        for (var i = 0; i < filmstripFrames.length; i++) {
+          if (filmstripFrames[i].frame.offsetLeft <= scrollLeft + 8) idx = i;
+        }
+        return idx;
+      }
+      function stepFilmstrip(dir) {
+        if (!filmstripFrames.length) return;
+        filmstripStopEase();
+        var idx = currentFilmstripIndex();
+        var next = Math.max(0, Math.min(filmstripFrames.length - 1, idx + dir));
+        previewFilmstrip.scrollTo({ left: filmstripFrames[next].frame.offsetLeft, behavior: 'smooth' });
+      }
+      function filmstripEdgeClick(dir) {
+        return function () {
+          if (filmstripDrag.moved) return; // was a drag, not a tap
+          stepFilmstrip(dir);
+        };
+      }
+      if (filmstripEdgeLeft) filmstripEdgeLeft.addEventListener('click', filmstripEdgeClick(-1));
+      if (filmstripEdgeRight) filmstripEdgeRight.addEventListener('click', filmstripEdgeClick(1));
+
       // Opens the desktop preview overlay for a given [data-preview] image —
       // shared by card clicks and the ArrowLeft/ArrowRight nav below, so
       // both paths stay in sync (title, tags, description, fit, outline).
+      // Images carrying data-group open the horizontal filmstrip instead of
+      // the single-image view (see openFilmstripFor above).
       function openPreviewFor(img) {
+        currentPreviewImg = img;
+        overlay.hidden = false;
+        document.body.classList.add('is-preview-open');
+
+        if (img.dataset.group) {
+          overlay.classList.add('is-filmstrip');
+          activeArchiveTitle = null;
+          openFilmstripFor(img);
+          window.dispatchEvent(new Event('resize'));
+          return;
+        }
+        overlay.classList.remove('is-filmstrip');
+        filmstripFrames = [];
+
         // Series continuation frames (see .archive-series-extra) carry their
         // own data-title and aren't wrapped in a real .archive-card—card,
         // and therefore activeArchiveTitle, end up null for those, which
         // alignPreviewScrollbar() already guards against.
         var card = img.closest('.archive-card');
         var isVertical = img.naturalHeight >= img.naturalWidth;
-        currentPreviewImg = img;
         activeArchiveTitle = card ? card.querySelector('.archive-title') : null;
         previewImg.src = img.src;
-        previewImg.classList.toggle('has-outline', img.classList.contains('has-outline'));
         previewTitle.textContent = img.dataset.title || (activeArchiveTitle ? activeArchiveTitle.textContent : '');
         var tags = img.dataset.tags || '';
         if (previewTagsEl) {
@@ -775,8 +1192,6 @@
         previewTextContent.textContent = img.dataset.description || '';
         overlay.style.removeProperty('--preview-width');
         overlay.style.removeProperty('--preview-image-height');
-        overlay.hidden = false;
-        document.body.classList.add('is-preview-open');
         alignPreviewScrollbar();
         window.dispatchEvent(new Event('resize'));
         overlay.classList.toggle('is-vertical', isVertical);
@@ -801,14 +1216,20 @@
         });
       });
 
-      // ArrowLeft/ArrowRight step through the same [data-preview] sequence
-      // while the desktop preview is open — wraps at both ends.
+      // ArrowLeft/ArrowRight while the desktop preview is open. In filmstrip
+      // mode they step through the open series (same one-frame move as the
+      // edge zones); otherwise they wrap through the flat [data-preview]
+      // sequence, jumping straight to the next/previous grid item.
       document.addEventListener('keydown', function (event) {
         if (overlay.hidden || isMobile()) return;
         if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        if (overlay.classList.contains('is-filmstrip')) {
+          stepFilmstrip(event.key === 'ArrowRight' ? 1 : -1);
+          return;
+        }
         var idx = itemsArr.indexOf(currentPreviewImg);
         if (idx === -1) return;
-        event.preventDefault();
         var nextIdx = event.key === 'ArrowRight'
           ? (idx + 1) % itemsArr.length
           : (idx - 1 + itemsArr.length) % itemsArr.length;
@@ -818,6 +1239,10 @@
       closeBtn.addEventListener('click', closePreview);
 
       overlay.addEventListener('click', function (event) {
+        if (overlay.classList.contains('is-filmstrip')) {
+          if (event.target === closeBtn || closeBtn.contains(event.target)) closePreview();
+          return;
+        }
         if (!previewInner.contains(event.target)) closePreview();
       });
 
@@ -826,7 +1251,7 @@
       });
 
       window.addEventListener('resize', function () {
-        if (!overlay.hidden) {
+        if (!overlay.hidden && !overlay.classList.contains('is-filmstrip')) {
           alignPreviewScrollbar();
           // Two passes: image size depends on text height, text width (hence
           // its wrapped height) depends on image width — one pass can leave the

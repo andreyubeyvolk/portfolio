@@ -375,14 +375,13 @@
     overflow: hidden;
   }
 
-  /* Same blur+grain treatment as the desktop preview (see archive/index.html)
-     instead of a flat opacity fade — the card overlay itself lives outside
-     .site-shell in the DOM, so this never touches it. */
+  /* Opacity fade + grain on top (see archive/index.html)—no blur. The card
+     overlay itself lives outside .site-shell in the DOM, so this never
+     touches it. */
   body.card-is-open .site-shell {
-    filter: blur(10px) saturate(0.85);
-    opacity: 0.6;
+    opacity: 0.27;
     pointer-events: none;
-    transition: filter 0.3s ease, opacity 0.3s ease;
+    transition: opacity 0.3s ease;
   }
 
   /* ── Archive page ── */
