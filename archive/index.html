@@ -234,6 +234,8 @@
         display: block;
         width: auto;
         height: auto;
+        -webkit-user-drag: none;
+        user-select: none;
       }
 
       .filmstrip-frame__text {
@@ -320,7 +322,7 @@
       body.is-preview-open .site-nav,
       body.is-preview-open .section-intro,
       body.is-preview-open .content-pane__scroll {
-        opacity: 0.27;
+        opacity: 0.15;
         pointer-events: none;
         transition: opacity 0.3s ease;
       }
@@ -870,6 +872,13 @@
         overlay.hidden = true;
         document.body.classList.remove('is-preview-open');
         activeArchiveTitle = null;
+        // Without this, a still-running eased scroll (mid wheel/drag
+        // magnetism when the user closed) kept ticking in the background
+        // and immediately fought the fresh scrollLeft=0 the next time the
+        // same (or any) series was opened—reopening looked like it
+        // "remembered" the old scroll position, but it was really just
+        // this stale animation racing the reset.
+        filmstripStopEase();
         document.body.style.removeProperty('--preview-scroll-top');
         overlay.style.removeProperty('--preview-width');
         overlay.style.removeProperty('--preview-image-height');
@@ -955,6 +964,11 @@
         // paragraph's full unwrapped line), spilling past the container.
         im.src = img.src;
         im.alt = img.alt || '';
+        // Images are natively draggable in every browser by default—that
+        // hijacks a click-drag into the OS's own image drag-and-drop
+        // before it ever reaches pointermove, which is why panning did
+        // nothing (the grab cursor is just a static CSS style, unrelated).
+        im.draggable = false;
         mediaWrap.appendChild(im);
 
         var text = document.createElement('div');
