@@ -414,11 +414,11 @@ archive-dnb-04.webp
 ------------------------------------------------
 
 archive-noir-01.webp
-Заголовок: Noire Souvenir[0001]
+Заголовок: Noir Souvenir[0001]
 Описание: Fragments of a presentation for a clothing brand concept, inspired by "Gamaliel: The Diary of a Vampire" by Kenneth Grant.
 
 archive-noir-02.webp
-Заголовок: Noire Souvenir[0002]
+Заголовок: Noir Souvenir[0002]
 Описание: -//-
 
 ------------------------------------------------
