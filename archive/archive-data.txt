@@ -458,3 +458,27 @@ archive-daedalus-01.webp
 archive-daedalus-02.webp
 Заголовок: Daedalus[0002]
 Описание: -//-
+
+------------------------------------------------
+
+archive-stig.webp
+Заголовок: STIG
+Описание: Logo and identity for the Continental Sports Tech Startup Challenge, designed to source, evaluate, and elevate high-potential sports technology and digital startups from Europe, Russia, the CIS, and the Baltic states.
+
+------------------------------------------------
+
+archive-modular-01.webp
+Заголовок: Modular[0001]
+Описание: Longread design created during Sergey Gurov's intensive "Grids. Modular Longread."
+
+archive-modular-02.webp
+Заголовок: Modular[0002]
+Описание: -//-
+
+archive-modular-03.webp
+Заголовок: Modular[0003]
+Описание: -//-
+
+archive-modular-04.webp
+Заголовок: Modular[0004]
+Описание: -//-
