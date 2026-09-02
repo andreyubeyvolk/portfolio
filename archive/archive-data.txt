@@ -378,3 +378,83 @@ archive-elvis-02.webp
 archive-elvis-03.webp
 Заголовок: ELVEES-NeoTek[0003]
 Описание: -//-
+
+------------------------------------------------
+
+archive-dune-01.webp
+Заголовок: Dune[0001]
+Описание: Packaging concept for incense, inspired by the aesthetics and ideology of interstellar travel from the world of Dune.
+
+archive-dune-02.webp
+Заголовок: Dune[0002]
+Описание: -//-
+
+archive-dune-03.webp
+Заголовок: Dune[0003]
+Описание: -//-
+
+------------------------------------------------
+
+archive-dnb-01.webp
+Заголовок: DnB Mix[0001]
+Описание: Visuals supporting my drum and bass mix, made during Sergey Gurov's typography intensive "Play with Typography: Decomposition and Composition." The concept draws on the "Ethical Manifesto of Digital Space"—five human rights for an increasingly technologized future.
+
+archive-dnb-02.webp
+Заголовок: DnB Mix[0002]
+Описание: -//-
+
+archive-dnb-03.webp
+Заголовок: DnB Mix[0003]
+Описание: -//-
+
+archive-dnb-04.webp
+Заголовок: DnB Mix[0004]
+Описание: -//-
+
+------------------------------------------------
+
+archive-noir-01.webp
+Заголовок: Noire Souvenir[0001]
+Описание: Fragments of a presentation for a clothing brand concept, inspired by "Gamaliel: The Diary of a Vampire" by Kenneth Grant.
+
+archive-noir-02.webp
+Заголовок: Noire Souvenir[0002]
+Описание: -//-
+
+------------------------------------------------
+
+archive-burnout-01.webp
+Заголовок: Burnout[0001]
+Ссылка: https://youtu.be/Dd7dVirj4HY?si=mS1KbavVTLcTpTLa
+Описание: Visuals created for my video lecture "Generating Creative Potential," on creative development and overcoming burnout. Watch on YouTube[LINK].
+
+archive-burnout-02.webp
+Заголовок: Burnout[0002]
+Ссылка: https://youtu.be/Dd7dVirj4HY?si=mS1KbavVTLcTpTLa
+Описание: -//-
+
+archive-burnout-03.webp
+Заголовок: Burnout[0003]
+Ссылка: https://youtu.be/Dd7dVirj4HY?si=mS1KbavVTLcTpTLa
+Описание: -//-
+
+archive-burnout-04.webp
+Заголовок: Burnout[0004]
+Ссылка: https://youtu.be/Dd7dVirj4HY?si=mS1KbavVTLcTpTLa
+Описание: -//-
+
+------------------------------------------------
+
+archive-fatum.webp
+Заголовок: Fatum
+Описание: Lettering and typography for a poetry video by Russian poet and musician Varvara Rubanovskaya.
+
+------------------------------------------------
+
+archive-daedalus-01.webp
+Заголовок: Daedalus[0001]
+Описание: Illustrations and graphics for "Daedalus," created for French DJ and producer Madeon as part of The Architects—the collective name he uses to credit his core team of visual collaborators, designers, and creative directors.
+
+archive-daedalus-02.webp
+Заголовок: Daedalus[0002]
+Описание: -//-
