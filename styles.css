@@ -14,6 +14,15 @@
   box-sizing: border-box;
 }
 
+/* Applied by video-player.js on a video load error (bad connection, dropped
+   request)—hides that gallery slot entirely rather than leaving a broken
+   player visible. !important since it needs to win over whatever box-model
+   rules the slot's own class (.pv-cover/.pv-wide/.pv-pair__photo, each
+   redeclared per project page) already has. */
+.media-load-error {
+  display: none !important;
+}
+
 html,
 body {
   height: 100%;
@@ -585,8 +594,11 @@ body::-webkit-scrollbar-thumb:active {
 }
 
 /* Cards without a built target (href dropped, set by main.js) aren't links —
-   don't present the interactive hover affordance. */
-.inhouse-card--pending:hover .inhouse-title {
+   don't present the interactive hover affordance. Compound selector (not
+   just source order) so this keeps winning over .inhouse-card:hover above
+   regardless of how the rules ever get reordered—same fix already applied
+   to .archive-card.archive-card--more for the identical reason. */
+.inhouse-card.inhouse-card--pending:hover .inhouse-title {
   color: inherit;
   background-color: transparent;
 }
@@ -1185,10 +1197,6 @@ body::-webkit-scrollbar-thumb:active {
 
   .custom-scrollbar {
     display: none;
-  }
-
-  .home-portrait {
-    margin-bottom: 28px;
   }
 
   .reel-card {

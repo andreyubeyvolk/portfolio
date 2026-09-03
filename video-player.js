@@ -13,6 +13,24 @@
   // data-src-portrait / data-src-landscape (switched at the 981px
   // breakpoint) — the responsive switch only runs if both are present.
 
+  // ── Error fallback ───────────────────────────────────────────────
+  // If a video's source fails to load (bad connection, dropped request—
+  // this has happened for real), don't leave a broken/blank player
+  // sitting in the page. Hide the whole gallery slot it lives in
+  // (.pv-cover / .pv-wide / .pv-pair__photo, whichever wraps it) so the
+  // page just continues to the next photo/video instead of showing a
+  // dead box. Applies to every <video> regardless of type (.vp, .vp-bare,
+  // .vp-once), so this runs once up front rather than inside each
+  // type-specific init below.
+  document.querySelectorAll('video').forEach(function (video) {
+    video.addEventListener('error', function () {
+      var slot = video.closest('.pv-cover, .pv-wide, .pv-pair__photo')
+        || video.closest('.vp, .vp-bare, .vp-once')
+        || video;
+      slot.classList.add('media-load-error');
+    }, { once: true });
+  });
+
   function initPlayer(vp) {
     var video = vp.querySelector('.vp__video');
     var seek = vp.querySelector('[data-role="seek"]');

@@ -1215,6 +1215,14 @@
       var previewNavPrev = document.querySelector('.preview-nav--prev');
       var previewNavNext = document.querySelector('.preview-nav--next');
       var filmstripFrames = []; // [{frame, img}] for the currently open series
+      // Last frame index requested via stepFilmstrip (keyboard/edge-click),
+      // so a rapid repeat step chains off the *intended* target instead of
+      // re-reading scrollLeft mid-flight (native smooth-scroll takes ~300ms
+      // to settle, and a second step before then would otherwise see a
+      // transitional position and silently compute the same target again).
+      // Invalidated (null) by drag/wheel, which move the strip by a
+      // different mechanism and make this tracked value stale.
+      var filmstripStepTarget = null;
 
       // ── Archive card overlay ─────────────────────────────────────
       // Phones (≤640px): horizontal swipe carousel — the header (title + [X])
@@ -1393,6 +1401,7 @@
 
       function openMobileCard(card, img) {
         cardPanel.style.width = '';
+        tabletImg = null; // this open makes any leftover tablet-mode reference stale
         clearCardBody();
         buildTrack();
         var idx = sourceImgs.indexOf(img);
@@ -1430,6 +1439,11 @@
         cardOverlay.hidden = true;
         document.body.classList.remove('card-is-open');
         cardPanel.style.width = '';
+        // Otherwise a later resize back up past the tablet breakpoint,
+        // while a *phone* card happens to be open, falls into this stale
+        // reference (the resize handler's `else if (tabletImg)` branch)
+        // and re-fits the panel to a detached, unrelated image.
+        tabletImg = null;
       }
 
       if (cardCloseBtn) cardCloseBtn.addEventListener('click', closeCard);
@@ -1463,7 +1477,6 @@
         // "remembered" the old scroll position, but it was really just
         // this stale animation racing the reset.
         filmstripStopEase();
-        document.body.style.removeProperty('--preview-scroll-top');
         overlay.style.removeProperty('--preview-width');
         overlay.style.removeProperty('--preview-image-height');
         previewImg.style.width = '';
@@ -1471,13 +1484,6 @@
         previewHeader.style.width = '';
         previewText.style.width = '';
         previewInner.style.alignItems = '';
-      }
-
-      function alignPreviewScrollbar() {
-        if (!activeArchiveTitle) return;
-        var paneTop = contentPane.getBoundingClientRect().top;
-        var titleTop = activeArchiveTitle.getBoundingClientRect().top;
-        document.body.style.setProperty('--preview-scroll-top', Math.max(0, titleTop - paneTop) + 'px');
       }
 
       function fitPreviewImage() {
@@ -1612,6 +1618,8 @@
       function openFilmstripFor(img) {
         var group = img.dataset.group;
         var frames = itemsArr.filter(function (i) { return i.dataset.group === group; });
+        var entryIdx = Math.max(0, frames.indexOf(img));
+        filmstripStepTarget = null; // fresh series—any earlier tracked step target no longer applies
         previewFilmstrip.innerHTML = '';
         filmstripFrames = frames.map(buildFilmstripFrame);
         filmstripFrames.forEach(function (entry) {
@@ -1622,7 +1630,19 @@
             entry.img.addEventListener('load', function () { fitFilmstripFrame(entry); }, { once: true });
           }
         });
-        previewFilmstrip.scrollLeft = 0;
+        if (entryIdx === 0) {
+          previewFilmstrip.scrollLeft = 0; // always correct immediately—frame 0 sits at offset 0 regardless of any other frame's load/fit timing
+        } else {
+          // Entering mid-series (e.g. stepping backward off the item right
+          // after this series lands on its *last* frame, not its first).
+          // offsetLeft here depends on every preceding frame's width, which
+          // may still be mid-fit for a frame that hasn't finished loading—
+          // one rAF lets any already-cached frames (the common case) settle
+          // first, landing much closer than always defaulting to frame 0.
+          requestAnimationFrame(function () {
+            previewFilmstrip.scrollLeft = filmstripFrames[entryIdx].frame.offsetLeft;
+          });
+        }
       }
 
       // ── Filmstrip interaction: drag, wheel, edge click-zones ────────
@@ -1637,6 +1657,7 @@
 
       previewFilmstrip.addEventListener('pointerdown', function (e) {
         filmstripStopEase();
+        filmstripStepTarget = null; // dragging moves the strip by a different mechanism—invalidate the keyboard-step tracker
         filmstripDrag.active = true;
         filmstripDrag.moved = false;
         filmstripDrag.startX = e.clientX;
@@ -1737,6 +1758,7 @@
         var delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
         if (!delta) return;
         e.preventDefault();
+        filmstripStepTarget = null; // wheel moves the strip by a different mechanism—invalidate the keyboard-step tracker
         var base = filmstripAnim.raf ? filmstripAnim.target : previewFilmstrip.scrollLeft;
         filmstripEaseTo(base + delta);
       }, { passive: false });
@@ -1763,8 +1785,9 @@
       function stepFilmstrip(dir) {
         if (!filmstripFrames.length) return;
         filmstripStopEase();
-        var idx = currentFilmstripIndex();
+        var idx = filmstripStepTarget !== null ? filmstripStepTarget : currentFilmstripIndex();
         var next = Math.max(0, Math.min(filmstripFrames.length - 1, idx + dir));
+        filmstripStepTarget = next;
         previewFilmstrip.scrollTo({ left: filmstripFrames[next].frame.offsetLeft, behavior: 'smooth' });
       }
       function filmstripEdgeClick(dir) {
@@ -1815,8 +1838,8 @@
 
         // Series continuation frames (see .archive-series-extra) carry their
         // own data-title and aren't wrapped in a real .archive-card—card,
-        // and therefore activeArchiveTitle, end up null for those, which
-        // alignPreviewScrollbar() already guards against.
+        // and therefore activeArchiveTitle, end up null for those (renderTitleInto
+        // below falls back to img.dataset.title in that case).
         var card = img.closest('.archive-card');
         var isVertical = img.naturalHeight >= img.naturalWidth;
         activeArchiveTitle = card ? card.querySelector('.archive-title') : null;
@@ -1840,7 +1863,6 @@
         // box size in place until syncPreviewSize below has the *new*
         // image actually decoded means there's nothing to snap through—
         // the box only ever moves once, straight to the right size.
-        alignPreviewScrollbar();
         overlay.classList.toggle('is-vertical', isVertical);
         overlay.classList.toggle('is-horizontal', !isVertical);
         syncPreviewSize();
@@ -1903,6 +1925,12 @@
       document.addEventListener('keydown', function (event) {
         if (overlay.hidden || isMobile()) return;
         if (event.key === ' ') {
+          // Space is also how a focused <button>/<a> natively activates
+          // itself—if the close button or a nav arrow has focus (e.g. via
+          // Tab), let Space click IT instead of hijacking the keystroke to
+          // step the photo out from under the user's expected action.
+          var tag = event.target && event.target.tagName;
+          if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return;
           event.preventDefault(); // don't let Space also scroll the page behind the overlay
           stepPreview(1);
           return;
@@ -1941,7 +1969,6 @@
 
       window.addEventListener('resize', function () {
         if (!overlay.hidden && !overlay.classList.contains('is-filmstrip')) {
-          alignPreviewScrollbar();
           // Two passes: image size depends on text height, text width (hence
           // its wrapped height) depends on image width — one pass can leave the
           // image over-budget and spilling onto the text. Second pass converges.
