@@ -596,8 +596,8 @@ body::-webkit-scrollbar-thumb:active {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 38px; /* 48px, 20% shorter — desktop/tablet only, mobile.css
-    sets its own height for the phone breakpoint */
+  height: 30px; /* 48px, 20% shorter, then another 8px off — desktop/
+    tablet only, mobile.css sets its own height for the phone breakpoint */
   margin-top: 40px;
   background: #fff;
   border: none;
@@ -652,11 +652,19 @@ body::-webkit-scrollbar-thumb:active {
   display: flex;
   flex-direction: column;
   gap: 0;
+  opacity: 1;
+  transition: opacity 0.7s ease-out;
 }
 
 .archive-card.archive-card--more {
   display: none; /* compound selector, not source order, since it ties
     on specificity with .archive-card's own display:flex above */
+}
+
+.archive-card.archive-card--revealing {
+  opacity: 0; /* starting state for a just-unhidden Load more batch—see
+    load-more.js, which flips this off a couple frames later so the
+    opacity:1 above actually has something to transition from */
 }
 
 .archive-card__cover {

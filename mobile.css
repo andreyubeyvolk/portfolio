@@ -338,6 +338,20 @@
     display: none;
   }
 
+  /* One-time hint that the deck swipes sideways (see openMobileCard in
+     the inline script—gated behind a localStorage flag so it only ever
+     plays once per browser). A pure CSS transform, not a real scroll: it
+     never touches scrollLeft, so it can't fight scroll-snap or leave the
+     track mid-scroll. */
+  @keyframes card-track-swipe-hint {
+    0%, 100% { transform: translateX(0); }
+    30% { transform: translateX(-28px); }
+    62% { transform: translateX(10px); }
+  }
+  .card-track.is-swipe-hint {
+    animation: card-track-swipe-hint 0.9s ease-in-out;
+  }
+
   .card-slide {
     flex: 0 0 100%;
     min-width: 0;

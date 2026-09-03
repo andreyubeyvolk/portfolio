@@ -94,7 +94,7 @@ archive-tantra.webp
 archive-transportation-series-01.webp
 Заголовок: Transportation
 Теги: AI, Photostyle, MidJourney, Identity
-Описание: Photography style for the Transporting visual identity within Sumsub. A highly scalable yet distinctive photographic style designed for fast-paced marketing. Trust-building blue tones convey a sense of technology and innovation.
+Описание: Photography style for Sumsub's Transporting identity—scalable, distinctive, built for fast-paced marketing. Trust-building blue tones evoke technology and innovation.
 
 archive-transportation-series-02.webp
 Заголовок: Transportation[0002]
@@ -211,7 +211,7 @@ archive-gmchpink.webp
 
 archive-disruptive-01.webp
 Заголовок: Disruptive[0001]
-Описание: Merch for the Disruptive.VC project. Disruptive.VC drives AI transformation for corporations, helping them adopt generative artificial intelligence. Since 2013, the firm has combined advisory, corporate accelerators and venture scouting to help established businesses compete through innovation rather than simply outsourcing it to startups.
+Описание: Merch for Disruptive.VC—driving corporate AI transformation since 2013 through advisory, accelerators and venture scouting that help businesses innovate instead of outsourcing it.
 
 archive-disruptive-02.webp
 Заголовок: Disruptive[0002]
@@ -221,7 +221,7 @@ archive-disruptive-02.webp
 
 archive-undrcvr-01.webp
 Заголовок: UNDRCVR[0001]
-Описание: Graphic design for UNDRCVR—transparent waterproof shoe covers protecting against rain and bad weather. The print mixes graffiti spray marks with a gothic logotype and cryptic text on secrecy, playing on the brand's "undercover" name.
+Описание: Graphic design for UNDRCVR—transparent waterproof shoe covers against rain. The print mixes graffiti spray marks with a gothic logotype and cryptic text on secrecy, playing on the brand's name.
 
 archive-undrcvr-02.webp
 Заголовок: UNDRCVR[0002]
@@ -289,7 +289,7 @@ archive-postpunk.webp
 archive-antonlisin-01.webp
 Заголовок: Anton Lisin[0001]
 Ссылка: https://www.behance.net/gallery/59187559/Graphics-for-Anton-Lisin
-Описание: Graphics for a collection by fashion designer Anton Lisin. Anton previously modeled for Gosha Rubchinskiy before launching his own brand. The project won a Behance ribbon in the Fashion category[LINK].
+Описание: Graphics for a collection by fashion designer Anton Lisin, who once modeled for Gosha Rubchinskiy before starting his own brand. The project won a Behance ribbon in Fashion[LINK].
 
 archive-antonlisin-02.webp
 Заголовок: Anton Lisin[0002]
@@ -338,7 +338,7 @@ archive-ovohome.webp
 archive-yamiyami-series-01.webp
 Заголовок: YamiYami Case
 Ссылка: https://soundcloud.com/andrey-ubeyvolk/andrey-ubeyvolk-x-yami-yami-podcast?si=57a8bf20268144f8a331500304619c9e&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing
-Описание: Packaging design for a special limited sushi case from YamiYami, a well-known food delivery service in St. Petersburg. A dedicated music mix was also recorded for the occasion—listen on SoundCloud[LINK].
+Описание: Packaging design for a limited sushi case from YamiYami, a well-known St. Petersburg food delivery service. A dedicated music mix was recorded for the occasion—listen on SoundCloud[LINK].
 
 archive-yamiyami-series-02.webp
 Заголовок: YamiYami Case[0002]
@@ -397,7 +397,7 @@ archive-dune-03.webp
 
 archive-dnb-01.webp
 Заголовок: DnB Mix[0001]
-Описание: Visuals supporting my drum and bass mix, made during Sergey Gurov's typography intensive "Play with Typography: Decomposition and Composition." The concept draws on the "Ethical Manifesto of Digital Space"—five human rights for an increasingly technologized future.
+Описание: Visuals for my drum and bass mix, made during Sergey Gurov's typography intensive. The concept draws on the "Ethical Manifesto of Digital Space"—five rights for a technologized future.
 
 archive-dnb-02.webp
 Заголовок: DnB Mix[0002]
@@ -453,7 +453,7 @@ archive-fatum.webp
 
 archive-daedalus-01.webp
 Заголовок: Daedalus[0001]
-Описание: Illustrations and graphics for "Daedalus," created for French DJ and producer Madeon as part of The Architects—the collective name he uses to credit his core team of visual collaborators, designers, and creative directors.
+Описание: Illustrations and graphics for "Daedalus," created for French DJ and producer Madeon, released under The Architects—the name he uses to credit his core visual collaborators and creative directors.
 
 archive-daedalus-02.webp
 Заголовок: Daedalus[0002]
@@ -463,7 +463,7 @@ archive-daedalus-02.webp
 
 archive-stig.webp
 Заголовок: STIG
-Описание: Logo and identity for the Continental Sports Tech Startup Challenge, designed to source, evaluate, and elevate high-potential sports technology and digital startups from Europe, Russia, the CIS, and the Baltic states.
+Описание: Logo and identity for the Continental Sports Tech Startup Challenge—sourcing and elevating high-potential sports tech and digital startups from Europe, Russia, the CIS and the Baltics.
 
 ------------------------------------------------
 
