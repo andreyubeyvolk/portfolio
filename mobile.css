@@ -49,13 +49,20 @@
   }
 
   /* ── Mobile nav bar ── */
+  /* left/right insets (not a fixed width + centering transform) so the
+     gap to the screen edge is always the same var(--page-margin) on any
+     phone width—the old width:326px + translateX(-50%) instead gave a
+     margin that grew with viewport width, and on anything narrower than
+     ~326px + 2*page-margin the bar would actually overflow past the
+     edges. Logo/Menu inside just sit at their own ends via
+     justify-content:space-between, so they naturally track the bar's
+     now-fluid width. */
   .mobile-bar {
     display: flex;
     position: fixed;
     bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 326px;
+    left: var(--page-margin, 16px);
+    right: var(--page-margin, 16px);
     height: 40px;
     background: #171717;
     align-items: center;
@@ -588,13 +595,17 @@
   }
 
   /* ── Full mobile menu ── */
+  /* Same left/right insets as .mobile-bar above (not a fixed width +
+     centering transform)—this panel is meant to visually grow straight
+     up out of the bar via the clip-path mask below, so it has to share
+     the exact same edges on every phone width, not just whichever width
+     happens to make 326px land near var(--page-margin) either side. */
   .mobile-menu {
     display: block;
     position: fixed;
     bottom: 120px; /* 80px from bottom + 40px bar height */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 326px;
+    left: var(--page-margin, 16px);
+    right: var(--page-margin, 16px);
     height: calc(100vh - 200px);
     height: calc(100dvh - 200px);
     background: #fff;

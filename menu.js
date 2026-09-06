@@ -44,8 +44,16 @@
       menuBtn.textContent = 'Close';
       menuBtn.setAttribute('aria-expanded', 'true');
     }
-    // Move focus into the dialog (first nav link).
-    if (menuLinks.length) menuLinks[0].focus();
+    // Move focus into the dialog (first nav link). Deferred a frame: a
+    // synchronous .focus() right here forces the browser to resolve
+    // focusability (was just un-inert'd) before it's painted anything—a
+    // forced style/layout flush landing on the exact frame the clip-path
+    // slide-out is supposed to start moving. One rAF later, the class
+    // toggle above has already been through a normal paint and this no
+    // longer competes with the animation's first frame.
+    if (menuLinks.length) {
+      requestAnimationFrame(function () { menuLinks[0].focus(); });
+    }
   }
 
   function close() {
@@ -55,8 +63,8 @@
     if (menuBtn) {
       menuBtn.textContent = 'Menu';
       menuBtn.setAttribute('aria-expanded', 'false');
-      // Return focus to the trigger so keyboard users aren't dropped at the top.
-      if (wasOpen) menuBtn.focus();
+      // Same deferral as open() above, same reason.
+      if (wasOpen) requestAnimationFrame(function () { menuBtn.focus(); });
     }
   }
 
