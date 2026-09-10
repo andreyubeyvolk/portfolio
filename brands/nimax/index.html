@@ -233,31 +233,137 @@
         margin: 0;
       }
 
-      /* Cursor-following caption for the two banner clips the Nimax team
-         made themselves. A compact black plaque with white text (like the
-         site's menu hovers) that appears to the right of the cursor once
-         it rests ~1s over the clip. Positioned/toggled by the inline
-         script near the end of the page; lives on <body> (position:fixed)
-         so the card's overflow never clips it. */
-      .vp-tip {
-        position: fixed;
-        z-index: 200;
-        margin: 0;
-        padding: 2px;
-        background: #000;
-        color: #fff;
+      /* Info-note: tap/click button + sliding caption bar for the two
+         banner clips the Nimax team made themselves. Replaces the old
+         cursor-follow hover tooltip—that was invisible on touch devices,
+         so mobile visitors never saw the caption at all. Built by
+         info-note.js from the host's data-note attribute; only the look
+         lives here (copy this block, along with the .info-note markup
+         and the info-note.js include, to any other project's photos that
+         need the same caption pattern). Host needs position:relative +
+         overflow:hidden—every .pv-cover/.pv-wide/.pv-pair__photo slot
+         already has both, but this rule covers a bare/standalone host too
+         (e.g. wrapping a .vp-bare video directly in the flat mobile-project
+         list, which has neither on its own). */
+      .info-note {
+        position: relative;
+        overflow: hidden;
+      }
+      .info-note__bar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 3;
+        display: flex;
+        align-items: stretch;
+        height: 20px; /* matches the i/X glyph's own 18px height, +1px
+          breathing room top and bottom */
         font-family: 'Inter', sans-serif;
+      }
+      .info-note__toggle {
+        position: relative; /* anchors the ::before tap-target and the hover sheen */
+        flex: 0 0 auto;
+        width: 32px;
+        height: 20px;
+        background: #171717; /* same black as .mobile-bar/.mobile-menu, not a flat #000 */
+        color: #fff;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: inherit;
         font-weight: 700;
         font-size: 0.9375rem;
-        line-height: 1.2;
-        letter-spacing: -0.2px;
-        white-space: nowrap;
-        opacity: 0;
-        transition: opacity 0.15s ease;
+        line-height: 1;
+        overflow: hidden; /* keeps the hover sheen below inside the button's own box */
+      }
+      /* One-shot sheen on hover—a narrow light streak sweeps across the
+         button and is gone, rather than sitting lit up for as long as the
+         cursor stays put. Plays exactly once per hover-in: :hover starts
+         the animation, iteration-count defaults to 1, so it runs through
+         and stops—it doesn't loop while still hovered, and re-triggers
+         cleanly next time :hover reapplies (mouse leaves and comes back). */
+      .info-note__toggle::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        /* A thin, crisp diagonal line, not a soft gradient glow—tight
+           47-53% band at near-full opacity instead of a wide, faint one. */
+        background: linear-gradient(115deg, transparent 47%, rgba(255, 255, 255, 0.9) 50%, transparent 53%);
+        transform: translateX(-120%);
         pointer-events: none;
       }
-      .vp-tip.is-visible {
+      @media (hover: hover) {
+        .info-note__toggle:hover::after {
+          animation: info-note-sheen 0.45s ease-in;
+        }
+      }
+      @keyframes info-note-sheen {
+        from { transform: translateX(-120%); }
+        to { transform: translateX(120%); }
+      }
+      /* Tap target bigger than the now-small visible button (48px, fixed
+         and centered via translate rather than an inset, so it doesn't
+         depend on the button's own 32x20 box). */
+      .info-note__toggle::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 48px;
+        height: 48px;
+        transform: translate(-50%, -50%);
+      }
+      .info-note__panel {
+        flex: 1 1 auto;
+        min-width: 0; /* flex items default to a content-based min-width—
+          without this, a long single-line caption pushes the row (and the
+          bar) wider than the photo instead of actually getting clipped */
+        background: #171717; /* same black as .mobile-bar/.mobile-menu, not a flat #000 */
+        color: #fff;
+        display: flex;
+        align-items: center;
+        padding: 0 2px;
+        overflow: hidden;
+        /* Opacity only—no translateX. A slide offset made the panel look
+           like it was springing loose from the button on open and peeling
+           away from it on close; it's meant to read as fixed right next
+           to the button the whole time, just fading its content in/out.
+           Also sidesteps the clip-path-over-video jank from the earlier
+           version: opacity is compositor-only, no repaint of what's
+           underneath, regardless of what that is. */
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+      .info-note.is-note-open .info-note__panel {
         opacity: 1;
+        pointer-events: auto;
+      }
+      .info-note__text {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis; /* graceful fallback if a caption is too
+          long for the photo's width even after the mobile font shrink
+          below, instead of silently spilling past the edge */
+        font-weight: 700;
+        font-size: 0.9375rem;
+        letter-spacing: -0.2px;
+        line-height: 1.2;
+      }
+
+      @media (max-width: 640px) {
+        /* Smaller type so the caption actually fits narrower phone
+           widths instead of running past the photo's edge. */
+        .info-note__icon,
+        .info-note__text {
+          font-size: 0.75rem;
+        }
       }
 
     </style>
@@ -345,7 +451,7 @@
             </figure>
 
             <div class="pv-pair">
-              <div class="pv-pair__photo vp-tipslot" data-tip="Made by the Nimax team, following the new style guide">
+              <div class="pv-pair__photo info-note" data-note="Made by Nimax, following the new style guide">
                 <!-- nimax-11: plays once scrolled into view, muted (silent clip), no player chrome -->
                 <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-11.mp4"></video>
               </div>
@@ -375,13 +481,13 @@
               <figure class="pv-pair__photo">
                 <img width="1080" height="1440" loading="lazy" src="../../assets/brands/nimax/nimax-17.webp" alt="Nimax visual 17" />
               </figure>
-              <div class="pv-pair__photo vp-tipslot" data-tip="Made by the Nimax team, following the new style guide">
+              <div class="pv-pair__photo info-note" data-note="Made by Nimax, following the new style guide">
                 <!-- nimax-18: plays once scrolled into view, muted (silent clip), no player chrome -->
                 <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-18.mp4"></video>
               </div>
             </div>
 
-            <figure class="pv-wide">
+            <figure class="pv-wide info-note" data-note="Made by Nimax, following the new style guide">
               <img width="2160" height="1440" loading="lazy" src="../../assets/brands/nimax/nimax-19.webp" alt="Nimax visual 19" />
             </figure>
 
@@ -501,7 +607,9 @@
         <img width="2160" height="1440" loading="lazy" src="../../assets/brands/nimax/nimax-10.webp" alt="Nimax visual 10" />
       </figure>
       <!-- nimax-11: plays once scrolled into view, muted (silent clip), no player chrome -->
-      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-11.mp4"></video>
+      <div class="info-note" data-note="Made by Nimax, following the new style guide">
+        <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-11.mp4"></video>
+      </div>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1081" height="1442" loading="lazy" src="../../assets/brands/nimax/nimax-12.webp" alt="Nimax visual 12" />
       </figure>
@@ -521,8 +629,10 @@
         <img width="1080" height="1440" loading="lazy" src="../../assets/brands/nimax/nimax-17.webp" alt="Nimax visual 17" />
       </figure>
       <!-- nimax-18: plays once scrolled into view, muted (silent clip), no player chrome -->
-      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-18.mp4"></video>
-      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+      <div class="info-note" data-note="Made by Nimax, following the new style guide">
+        <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-18.mp4"></video>
+      </div>
+      <figure class="mobile-project__photo info-note" data-note="Made by Nimax, following the new style guide" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/brands/nimax/nimax-19.webp" alt="Nimax visual 19" />
       </figure>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
@@ -612,49 +722,6 @@
     <script src="../../main.js"></script>
     <script src="../../menu.js"></script>
     <script src="../../video-player.js"></script>
-    <script>
-      // Cursor-following caption for the two team-made banner clips.
-      // Shows a black plaque to the lower-right of the cursor once it has
-      // rested ~1s over a clip; any movement hides it and restarts the
-      // wait. One shared element on <body> so the card never clips it.
-      (function () {
-        var DELAY = 1000;
-        var slots = document.querySelectorAll('.vp-tipslot[data-tip]');
-        if (!slots.length) return;
-        var tip = document.createElement('div');
-        tip.className = 'vp-tip';
-        document.body.appendChild(tip);
-        var timer = null, cx = 0, cy = 0, active = null;
-        function show() {
-          if (!active) return;
-          tip.textContent = active.getAttribute('data-tip');
-          var off = 16;
-          var tw = tip.offsetWidth, th = tip.offsetHeight;
-          var left = cx + off, top = cy + off;
-          if (left + tw > window.innerWidth - 8) left = cx - off - tw;
-          if (top + th > window.innerHeight - 8) top = cy - off - th;
-          if (left < 8) left = 8;
-          if (top < 8) top = 8;
-          tip.style.left = left + 'px';
-          tip.style.top = top + 'px';
-          tip.classList.add('is-visible');
-        }
-        slots.forEach(function (slot) {
-          slot.addEventListener('mousemove', function (e) {
-            active = slot;
-            cx = e.clientX;
-            cy = e.clientY;
-            tip.classList.remove('is-visible');
-            clearTimeout(timer);
-            timer = setTimeout(show, DELAY);
-          });
-          slot.addEventListener('mouseleave', function () {
-            if (active === slot) active = null;
-            clearTimeout(timer);
-            tip.classList.remove('is-visible');
-          });
-        });
-      })();
-    </script>
+    <script src="../../info-note.js"></script>
   </body>
 </html>

@@ -550,6 +550,50 @@ body::-webkit-scrollbar-thumb:active {
   background-color: #000;
 }
 
+/* "See all projects", Mail and YouTube sit directly under the reel-card
+   player—16px grid-gap partially closed by their own -10px margin-top,
+   leaving a 6px residual gap. On hover, bleed the black background up
+   through that residual so the highlight reads flush with the player's
+   bottom edge instead of stopping short of it. A ::before, not a bigger
+   margin/padding, so the link's own box and text position never move.
+   Mail/YouTube only keep this on the desktop grid: below 980px the layout
+   goes to block flow and "See all projects" (which keeps its bleed at
+   every width) lands between them and the player, so they're no longer
+   the row actually touching it. */
+.home-projects-link,
+.home-socials :nth-child(1),
+.home-socials :nth-child(4) {
+  position: relative;
+}
+.home-projects-link::before,
+.home-socials :nth-child(1)::before,
+.home-socials :nth-child(4)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 6px;
+  pointer-events: none;
+  /* Same timing as the element's own background-color transition below—
+     without this the bleed strip (no transition = instant) and the main
+     hover fade (150ms) visibly fell out of sync, reading as two separate
+     hover states landing a beat apart instead of one flush highlight. */
+  transition: background-color 150ms ease;
+}
+.home-projects-link:hover::before,
+.home-socials :nth-child(1):hover::before,
+.home-socials :nth-child(4):hover::before {
+  background: #000;
+}
+
+@media (max-width: 980px) {
+  .home-socials :nth-child(1)::before,
+  .home-socials :nth-child(4)::before {
+    display: none;
+  }
+}
+
 .inhouse-page {
   background: #F5F4F4;
 }

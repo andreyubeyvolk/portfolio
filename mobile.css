@@ -550,6 +550,16 @@
     transition: opacity 0.3s ease;
   }
 
+  /* .site-shell's own pointer-events:none (below) stops taps on the dimmed
+     page, but a touch-scroll swipe doesn't need a tap target—body itself
+     is the scrollable element (overflow:auto, above), so it kept scrolling
+     right through the menu overlay. Locking body's overflow while the menu
+     is open is what actually stops that; the page stays visually frozen
+     at its current scroll position, not reset to the top. */
+  body.menu-is-open {
+    overflow: hidden;
+  }
+
   body.menu-is-open .site-shell {
     opacity: 0.4;
     pointer-events: none;
@@ -612,7 +622,13 @@
     z-index: 101;
     overflow: hidden;
 
-    /* Mask: clips upward from the bar */
+    /* Mask: clips upward from the bar. (A transform:translateY() version
+       was tried here instead, to sidestep clip-path's per-frame repaint
+       cost—but a position:fixed element animating via transform, combined
+       with body's overflow:hidden toggle for the scroll lock below, is a
+       known problem spot on real mobile Safari: the fixed element can
+       render off/blank instead of tracking the viewport. Reverted—a
+       working menu that isn't perfectly smooth beats an invisible one.) */
     clip-path: inset(100% 0 0 0);
     pointer-events: none;
     transition: clip-path 0.4s cubic-bezier(0.16, 1, 0.3, 1);

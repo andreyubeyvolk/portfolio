@@ -37,7 +37,24 @@
     });
   });
 
+  // The elements that fade via opacity when the menu opens (see mobile.css)
+  // are big—easily the whole page's content. Promoting them to their own
+  // compositing layer only for the ~300ms the fade actually runs (not
+  // permanently—these are too large to keep that memory cost around all
+  // the time) means the layer already exists by the time the transition
+  // starts, instead of the browser paying that promotion cost mid-fade.
+  var dimTargets = document.querySelectorAll('.site-shell, .project-bar, .mobile-project');
+  var dimWillChangeTimer = null;
+  function primeDimLayers() {
+    clearTimeout(dimWillChangeTimer);
+    dimTargets.forEach(function (el) { el.style.willChange = 'opacity'; });
+    dimWillChangeTimer = setTimeout(function () {
+      dimTargets.forEach(function (el) { el.style.willChange = ''; });
+    }, 350);
+  }
+
   function open() {
+    primeDimLayers();
     document.body.classList.add('menu-is-open');
     if (menu) menu.removeAttribute('inert');
     if (menuBtn) {
@@ -58,6 +75,7 @@
 
   function close() {
     var wasOpen = document.body.classList.contains('menu-is-open');
+    primeDimLayers();
     document.body.classList.remove('menu-is-open');
     if (menu) menu.setAttribute('inert', '');
     if (menuBtn) {
