@@ -427,8 +427,14 @@
   }
 
   /* ── Archive page ── */
+  /* Intro as a 4-column row, matching the label+content split used in the
+     section's own body (e.g. .about-section__label / __content): title in
+     column 1, description spanning the remaining 3. */
   .archive-page .section-intro.intro {
-    display: block;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 8px;
+    align-items: start;
     padding: 0;
     margin-bottom: 0;
     min-height: calc(33.33vh - 16px);
@@ -436,7 +442,8 @@
 
   .section-intro p.section-page-title {
     display: block;
-    margin: 0 0 10px;
+    grid-column: 1 / 2;
+    margin: 0;
   }
 
   .archive-page .section-intro.intro p {
@@ -445,6 +452,10 @@
     line-height: 1.2;
     letter-spacing: -0.4px;
     color: #171717;
+  }
+
+  .archive-page .section-intro.intro p:not(.section-page-title) {
+    grid-column: 2 / -1;
   }
 
   .archive-page .archive-grid {
@@ -470,9 +481,13 @@
 
 
   /* ── Inhouse page ── */
+  /* Same 4-column title/description split as the archive intro above. */
   .inhouse-page .section-intro.intro,
   .brands-page .section-intro.intro {
-    display: block;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 8px;
+    align-items: start;
     padding: 0;
     margin-bottom: 0;
     min-height: calc(33.33vh - 16px);
@@ -491,6 +506,11 @@
   .inhouse-page .section-intro.intro p:last-child,
   .brands-page .section-intro.intro p:last-child {
     margin-bottom: 0;
+  }
+
+  .inhouse-page .section-intro.intro p:not(.section-page-title),
+  .brands-page .section-intro.intro p:not(.section-page-title) {
+    grid-column: 2 / -1;
   }
 
   .inhouse-page .inhouse-grid,
@@ -751,8 +771,15 @@
 
   /* ── About page ── */
 
-  /* Intro text: two paras, no extra top padding (site-shell already has 16px), then 96px gap before content */
+  /* Intro text: no extra top padding (site-shell already has 16px), then
+     96px gap before content. Same 4-column title/description split as the
+     other section intros above—title in column 1, description spanning
+     the remaining 3. */
   .about-page .section-intro.home-intro {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 8px;
+    align-items: start;
     padding-top: 0;
     margin-bottom: 0;
   }
@@ -763,6 +790,10 @@
 
   .about-page .section-intro.home-intro p:last-child {
     margin-bottom: 0;
+  }
+
+  .about-page .section-intro.home-intro p:not(.section-page-title) {
+    grid-column: 2 / -1;
   }
 
   /* Reset desktop article grid → plain column */
