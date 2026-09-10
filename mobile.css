@@ -116,14 +116,32 @@
     margin: 0 0 16px;
   }
 
+  /* Same 4-column title/content split as the other section intros (see
+     the archive/inhouse/about rules)—here the "label" column is the
+     portrait photo instead of a text title. Homepage has no .about-page
+     ancestor, so this base rule is what it actually uses; the About page
+     (which reuses .home-intro for its own text-only intro) overrides
+     display/columns again under .about-page further down, so the two
+     never fight over the same properties. */
   .section-intro.home-intro {
-    display: block;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 8px;
+    align-items: start;
     padding: 0;
-    margin-bottom: 0;
+    margin-bottom: 28px; /* was on .home-portrait itself—moved to the
+      container so the gap before the next section is consistent
+      regardless of which grid item (photo or text) ends up taller */
     min-height: calc(33.33vh - 16px);
   }
 
   .section-intro.home-intro p {
+    grid-column: 2 / -1;
+    grid-row: 1; /* the paragraph comes before .home-portrait in the HTML,
+      but needs to sit in the *later* column—without an explicit row,
+      default sparse grid packing places this first (row 1, cols 2-4) and
+      then can't backtrack to fit the portrait into row 1's now-passed
+      column 1, pushing it down to row 2 instead */
     font-size: 0.9375rem;
     line-height: 1.2;
     letter-spacing: -0.4px;
@@ -132,16 +150,13 @@
   }
 
   .home-portrait {
+    grid-column: 1 / 2;
+    grid-row: 1;
     width: 77px;
     height: 77px;
     aspect-ratio: 1 / 1;
     overflow: hidden;
     margin: 0;
-    margin-top: 16px;
-    margin-bottom: 28px; /* styles.css used to also declare this (in its
-      own leftover phone-width block), but this file loads after it and
-      wins on equal specificity—that copy was dead weight, moved the real
-      value here where it actually takes effect */
   }
 
   .home-portrait img {
