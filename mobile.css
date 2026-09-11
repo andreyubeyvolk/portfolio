@@ -126,7 +126,8 @@
   .section-intro.home-intro {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    column-gap: 8px;
+    column-gap: 16px; /* matches --page-margin so the photo-to-text gap
+      reads the same as the edge-to-photo gap */
     align-items: start;
     padding: 0;
     margin-bottom: 28px; /* was on .home-portrait itself—moved to the
@@ -152,8 +153,7 @@
   .home-portrait {
     grid-column: 1 / 2;
     grid-row: 1;
-    width: 77px;
-    height: 77px;
+    width: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
     margin: 0;

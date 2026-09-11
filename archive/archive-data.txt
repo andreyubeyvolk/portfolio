@@ -482,3 +482,9 @@ archive-modular-03.webp
 archive-modular-04.webp
 Заголовок: Modular[0004]
 Описание: -//-
+
+------------------------------------------------
+
+archive-friday.webp
+Заголовок: Friday
+Описание: Visual communication concept for a Random Coffee format within the company's internal corporate communications.
