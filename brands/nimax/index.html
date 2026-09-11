@@ -379,7 +379,7 @@
          the mobile flat list (no side-by-side pairs there). */
       :root {
         --reveal-distance: 70px;
-        --reveal-duration: 1000ms;
+        --reveal-duration: 1200ms;
         --reveal-easing: cubic-bezier(0.16, 1, 0.3, 1);
         --reveal-stagger: 60ms;
       }
@@ -936,9 +936,9 @@
       <div class="rp-field">
         <div class="rp-field__row">
           <label for="rp-duration">Длительность (мс)</label>
-          <input type="number" id="rp-duration-num" class="rp-num" value="1000" min="100" max="2000" step="10">
+          <input type="number" id="rp-duration-num" class="rp-num" value="1200" min="100" max="2000" step="10">
         </div>
-        <input type="range" id="rp-duration" min="100" max="2000" step="10" value="1000">
+        <input type="range" id="rp-duration" min="100" max="2000" step="10" value="1200">
       </div>
 
       <div class="rp-field">
@@ -990,34 +990,52 @@
          the mobile .mobile-project flat list. Observes every
          .pv-wide/.pv-pair__photo (desktop) and .mobile-project__photo
          (mobile); once revealed, an item stays revealed (observer
-         unwatches it). -->
+         unwatches it). Desktop and mobile get separate observers since
+         they use different trigger-offset percentages—desktop's is
+         tunable from the panel below, mobile's is fixed (the panel
+         itself is desktop-only, so there's nothing to tune it live from
+         while at a mobile viewport width anyway). -->
     <script>
       (function () {
-        var items = document.querySelectorAll('.project-content .pv-wide, .project-content .pv-pair__photo, .mobile-project__photo');
-        items.forEach(function (el) { el.classList.add('reveal'); });
+        var desktopItems = document.querySelectorAll('.project-content .pv-wide, .project-content .pv-pair__photo');
+        var mobileItems = document.querySelectorAll('.mobile-project__photo');
+        desktopItems.forEach(function (el) { el.classList.add('reveal'); });
+        mobileItems.forEach(function (el) { el.classList.add('reveal'); });
 
-        var triggerPercent = 15;
-        var observer;
+        var MOBILE_TRIGGER_PERCENT = 10;
+        var desktopTriggerPercent = 15;
+        var desktopObserver;
 
-        function buildObserver() {
-          if (observer) observer.disconnect();
-          observer = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-revealed');
-                observer.unobserve(entry.target);
-              }
-            });
-          }, { rootMargin: '0px 0px -' + triggerPercent + '% 0px', threshold: 0 });
-          items.forEach(function (el) { observer.observe(el); });
+        function revealCallback(entries, observer) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-revealed');
+              observer.unobserve(entry.target);
+            }
+          });
         }
-        buildObserver();
 
-        // Exposed for the tuning panel below to rebuild the observer
-        // when the trigger-offset slider moves.
+        function buildDesktopObserver() {
+          if (desktopObserver) desktopObserver.disconnect();
+          desktopObserver = new IntersectionObserver(revealCallback, {
+            rootMargin: '0px 0px -' + desktopTriggerPercent + '% 0px',
+            threshold: 0
+          });
+          desktopItems.forEach(function (el) { desktopObserver.observe(el); });
+        }
+        buildDesktopObserver();
+
+        var mobileObserver = new IntersectionObserver(revealCallback, {
+          rootMargin: '0px 0px -' + MOBILE_TRIGGER_PERCENT + '% 0px',
+          threshold: 0
+        });
+        mobileItems.forEach(function (el) { mobileObserver.observe(el); });
+
+        // Exposed for the tuning panel below to rebuild the desktop
+        // observer when the trigger-offset slider moves.
         window.__revealSetTrigger = function (percent) {
-          triggerPercent = percent;
-          buildObserver();
+          desktopTriggerPercent = percent;
+          buildDesktopObserver();
         };
       })();
     </script>
@@ -1035,7 +1053,10 @@
         var root = document.documentElement;
         var toggle = document.getElementById('reveal-panel-toggle');
         var panel = document.getElementById('reveal-panel');
-        var STORAGE_KEY = 'nimaxRevealTuning';
+        // Bumped whenever the committed defaults change, so a browser
+        // with older cached slider values doesn't silently mask the new
+        // defaults on next load.
+        var STORAGE_KEY = 'nimaxRevealTuning_v2';
 
         var controls = {
           distance: document.getElementById('rp-distance'),
