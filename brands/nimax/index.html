@@ -1153,12 +1153,11 @@
          document/window scroll)—so it listens on both. -->
     <script>
       (function () {
-        // Desktop parallax turned off for now (kept on mobile)—so only
-        // .mobile-project__photo is observed. .pv-cover/.pv-wide/
-        // .pv-pair__photo stay out of the hosts list entirely rather
-        // than being toggled off, since re-adding them later is a
-        // one-line change.
-        var hosts = document.querySelectorAll('.mobile-project__photo');
+        // Parallax off everywhere for now (desktop and mobile)—so the
+        // hosts list is empty. The panel/controls stay in place in case
+        // it's worth revisiting later; re-enabling is a one-line change
+        // (put the selector(s) back here).
+        var hosts = [];
         var items = [];
         hosts.forEach(function (host) {
           var media = host.querySelector('img, video');
