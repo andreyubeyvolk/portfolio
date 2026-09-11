@@ -122,9 +122,28 @@
   // while hovering the pane itself. Desktop layout only: below 981px the
   // page already scrolls natively (body overflow-y:auto), so there's
   // nothing to redirect there.
+  let lenis = null;
+
   if (scrollPanes.length === 1) {
     const pane = scrollPanes[0];
     const mq = window.matchMedia("(min-width: 981px)");
+
+    // ── Smooth scroll (Lenis), desktop only ──
+    // Animates the pane's own scrollTop with easing instead of jumping
+    // straight to the wheel delta—Lenis wraps native scroll rather than
+    // faking it with transforms, so the custom scrollbar's `scroll`
+    // listener above keeps working unmodified. Requires the Lenis
+    // script (loaded from a CDN in the page's own <head>/script
+    // includes) to already be on the page; pages that haven't added it
+    // yet just keep today's plain scroll—this guard is what makes it
+    // safe to roll out one page at a time instead of everywhere at once.
+    if (mq.matches && typeof window.Lenis === "function") {
+      lenis = new window.Lenis({
+        wrapper: pane,
+        content: pane.firstElementChild,
+        autoRaf: true,
+      });
+    }
 
     window.addEventListener(
       "wheel",
@@ -140,7 +159,11 @@
         if (pane.contains(event.target)) return; // already over the pane: let native scroll run
         if (pane.scrollHeight <= pane.clientHeight) return; // nothing to scroll
 
-        pane.scrollTop += event.deltaY;
+        if (lenis) {
+          lenis.scrollTo(pane.scrollTop + event.deltaY, { immediate: false });
+        } else {
+          pane.scrollTop += event.deltaY;
+        }
         event.preventDefault();
       },
       { passive: false }
