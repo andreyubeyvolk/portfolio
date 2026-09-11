@@ -1073,11 +1073,13 @@
          page scrolls, on both the desktop .project-content gallery and
          the mobile .mobile-project flat list. Observes every
          .pv-wide/.pv-pair__photo (desktop) and .mobile-project__photo
-         (mobile), plus text on desktop only—About (.pv-row--about),
-         Challenge/Solution (.pv-info .pv-row), and the Download/Next
-         actions row (.pv-actions)—and on mobile, .mobile-project__block.
-         Text fades only, no rise, since --reveal-distance is zeroed on
-         its container (see the CSS above). Once revealed, an item stays
+         (mobile), plus text on desktop only—About (.pv-row--about) and
+         Challenge/Solution (.pv-info .pv-row)—and on mobile,
+         .mobile-project__block. The Download/Next actions row
+         (.pv-actions) isn't its own entry: it's a descendant of the
+         Solution row, so it fades in together with that text. Text
+         fades only, no rise, since --reveal-distance is zeroed on its
+         container (see the CSS above). Once revealed, an item stays
          revealed (observer
          unwatches it). Desktop and mobile get separate observers since
          they use different trigger-offset percentages—desktop's is
@@ -1086,7 +1088,12 @@
          while at a mobile viewport width anyway). -->
     <script>
       (function () {
-        var desktopItems = document.querySelectorAll('.project-content .pv-wide, .project-content .pv-pair__photo, .pv-row--about, .pv-info .pv-row, .pv-actions');
+        // .pv-actions (Download/Next) is deliberately NOT its own entry
+        // here—it's a descendant of the Solution .pv-row, which is
+        // already observed below, so it fades in together with the
+        // Solution text instead of waiting for its own (much later,
+        // since it sits at the very bottom of a long block) trigger.
+        var desktopItems = document.querySelectorAll('.project-content .pv-wide, .project-content .pv-pair__photo, .pv-row--about, .pv-info .pv-row');
         var mobileItems = document.querySelectorAll('.mobile-project__photo, .mobile-project__blocks .mobile-project__block');
         desktopItems.forEach(function (el) { el.classList.add('reveal'); });
         mobileItems.forEach(function (el) { el.classList.add('reveal'); });
