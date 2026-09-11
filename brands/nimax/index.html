@@ -402,6 +402,18 @@
       .pv-pair__photo.reveal:nth-child(2) {
         transition-delay: var(--reveal-stagger);
       }
+      /* Mobile gets its own (shorter) rise distance—the same 70px reads
+         as a much bigger jump on a small screen than on desktop, and
+         mobile's earlier trigger point means the item is still being
+         carried up by the user's own scroll at the same time it's
+         self-animating, so the two motions stack. A local override here
+         beats the panel's :root inline value for anything inside
+         .mobile-project, since inheritance looks at the nearest
+         declaration, not which one is inline (the panel is desktop-only
+         anyway, so there's nothing to tune this from live). */
+      .mobile-project {
+        --reveal-distance: 28px;
+      }
       /* Text (About/Challenge/Solution/actions) reveals via opacity
          only—zeroing the shared --reveal-distance here means .reveal's
          own translateY becomes a no-op, so the same duration/easing/
