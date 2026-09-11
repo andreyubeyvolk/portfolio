@@ -15,9 +15,39 @@
   // fits on the narrowest slot this pattern is used on (a mobile portrait
   // .pv-pair__photo, ~343px wide) without truncating. No period at the
   // end if the note is a single sentence.
+  // A standalone bare video (not already inside a .pv-cover/.pv-wide/
+  // .pv-pair__photo box with its own fixed aspect-ratio) sizes itself via
+  // the browser's normal height:auto flow, which can round to a
+  // sub-pixel value slightly off from the host's own box—so the bar,
+  // pinned to the host's bottom edge, can end up a hairline below the
+  // video's actual painted edge. Fix: give the host an explicit
+  // aspect-ratio (from the video's real dimensions) and absolutely
+  // position the video inside it with the same 1px overscan used by
+  // every other video-in-a-box on the site, so bar and video always
+  // share the exact same bottom edge regardless of rounding.
+  function fixBareVideoEdge(host) {
+    if (host.classList.contains('pv-cover') || host.classList.contains('pv-wide') || host.classList.contains('pv-pair__photo')) return;
+    var video = host.querySelector(':scope > video.vp-bare');
+    if (!video) return;
+
+    function apply() {
+      if (!video.videoWidth || !video.videoHeight) return;
+      host.style.aspectRatio = video.videoWidth + ' / ' + video.videoHeight;
+      video.style.position = 'absolute';
+      video.style.inset = '-1px';
+      video.style.width = 'calc(100% + 2px)';
+      video.style.height = 'calc(100% + 2px)';
+      video.style.objectFit = 'cover';
+    }
+    if (video.readyState >= 1) apply();
+    else video.addEventListener('loadedmetadata', apply, { once: true });
+  }
+
   document.querySelectorAll('.info-note[data-note]').forEach(function (host) {
     var text = host.getAttribute('data-note');
     if (!text) return;
+
+    fixBareVideoEdge(host);
 
     var bar = document.createElement('div');
     bar.className = 'info-note__bar';

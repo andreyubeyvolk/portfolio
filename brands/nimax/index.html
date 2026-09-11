@@ -366,6 +366,201 @@
         }
       }
 
+      /* ── Scroll reveal (desktop + mobile, TUNING IN PROGRESS) ──
+         Gallery photos fade + rise into view as they scroll into the
+         viewport, on both the desktop .project-content gallery and the
+         mobile .mobile-project flat list. Values below are the starting
+         defaults; while the reveal-panel script near </body> is still in
+         the page, they're live-tunable from its ⚙ button (desktop only—
+         the panel itself stays hidden under 640px, see its own CSS)—once
+         the numbers are locked in, hardcode the winners here and delete
+         the whole panel (CSS block, markup, and script). The pair-stagger
+         rule below only matches .pv-pair__photo, so it has no effect on
+         the mobile flat list (no side-by-side pairs there). */
+      :root {
+        --reveal-distance: 70px;
+        --reveal-duration: 1000ms;
+        --reveal-easing: cubic-bezier(0.16, 1, 0.3, 1);
+        --reveal-stagger: 60ms;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(var(--reveal-distance));
+        transition: opacity var(--reveal-duration) var(--reveal-easing),
+                    transform var(--reveal-duration) var(--reveal-easing);
+      }
+      .reveal.is-revealed {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      /* Second photo in a pair rises a beat after the first, instead of
+         both landing in perfect sync—reads less mechanical. */
+      .pv-pair__photo.reveal:nth-child(2) {
+        transition-delay: var(--reveal-stagger);
+      }
+
+      /* ── TEMPORARY dev tool: reveal tuning panel look. Delete along
+         with the panel markup/script once values are final. ── */
+      #reveal-panel-toggle {
+        position: fixed;
+        bottom: 16px;
+        left: 16px;
+        z-index: 9999;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 0;
+        background: #262626;
+        color: #ccc;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+      #reveal-panel {
+        position: fixed;
+        bottom: 60px;
+        left: 16px;
+        z-index: 9999;
+        width: 260px;
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+        background: #262626;
+        color: #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        font-family: 'Inter', sans-serif;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      }
+      #reveal-panel h3 {
+        margin: 0 0 12px;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        color: #ccc;
+      }
+      #reveal-panel .rp-field {
+        margin-bottom: 12px;
+      }
+      #reveal-panel .rp-field__row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 5px;
+      }
+      #reveal-panel .rp-field__row label {
+        margin: 0;
+        font-size: 0.75rem;
+        color: #aaa;
+      }
+      /* Number input: manual entry alongside the slider, right-aligned so
+         every field's value lines up in a column down the panel's edge. */
+      #reveal-panel .rp-num {
+        width: 52px;
+        flex: 0 0 auto;
+        background: #2a2a2a;
+        color: #bbb;
+        border: 1px solid #454545;
+        border-radius: 4px;
+        padding: 2px 5px;
+        font-family: inherit;
+        font-size: 0.75rem;
+        text-align: right;
+        -moz-appearance: textfield;
+      }
+      #reveal-panel .rp-num::-webkit-outer-spin-button,
+      #reveal-panel .rp-num::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      /* Gray, squarish slider—no browser-default blue accent or round
+         white thumb. Track and thumb both muted, thumb just barely
+         rounded rather than a full circle. */
+      #reveal-panel input[type="range"] {
+        display: block;
+        width: 100%;
+        margin: 0;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 3px;
+        background: #454545;
+        border-radius: 2px;
+        outline: none;
+      }
+      #reveal-panel input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 13px;
+        height: 13px;
+        border-radius: 3px;
+        background: #767676;
+        border: 1px solid #3a3a3a;
+        cursor: pointer;
+        margin-top: -5px;
+      }
+      #reveal-panel input[type="range"]::-moz-range-track {
+        height: 3px;
+        background: #454545;
+        border-radius: 2px;
+      }
+      #reveal-panel input[type="range"]::-moz-range-thumb {
+        width: 13px;
+        height: 13px;
+        border-radius: 3px;
+        background: #767676;
+        border: 1px solid #3a3a3a;
+        cursor: pointer;
+      }
+      #reveal-panel select {
+        width: 100%;
+        margin-top: 4px;
+        background: #2a2a2a;
+        color: #bbb;
+        border: 1px solid #454545;
+        border-radius: 4px;
+        padding: 4px;
+        font-size: 0.75rem;
+      }
+      #reveal-panel select:focus,
+      #reveal-panel .rp-num:focus {
+        outline: none;
+        border-color: #767676;
+      }
+      .reveal-panel__actions {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .reveal-panel__actions button {
+        flex: 1;
+        background: #2a2a2a;
+        color: #bbb;
+        border: 1px solid #454545;
+        border-radius: 4px;
+        padding: 6px;
+        cursor: pointer;
+        font-size: 0.75rem;
+      }
+      #reveal-panel textarea {
+        width: 100%;
+        background: #202020;
+        color: #999;
+        border: 1px solid #454545;
+        border-radius: 4px;
+        font-family: 'SFMono-Regular', Consolas, monospace;
+        font-size: 0.625rem;
+        padding: 6px;
+        resize: vertical;
+      }
+      @media (max-width: 640px) {
+        #reveal-panel-toggle,
+        #reveal-panel {
+          display: none;
+        }
+      }
+
     </style>
   </head>
   <body class="project-page">
@@ -721,11 +916,235 @@
       <button class="mobile-bar__menu" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
     </nav>
 
+    <!-- ══════════════════════════════════════════════════════════════
+         TEMPORARY: reveal-animation tuning panel. Desktop only, hidden
+         under 640px. Delete this whole block (through the closing
+         comment near the scripts below) once the animation values are
+         locked in for real. ══════════════════════════════════════════ -->
+    <button id="reveal-panel-toggle" type="button" aria-label="Toggle animation tuning panel" aria-expanded="false">⚙</button>
+    <div id="reveal-panel" hidden>
+      <h3>Настройка анимации</h3>
+
+      <div class="rp-field">
+        <div class="rp-field__row">
+          <label for="rp-distance">Дистанция (px)</label>
+          <input type="number" id="rp-distance-num" class="rp-num" value="70" min="0" max="150" step="2">
+        </div>
+        <input type="range" id="rp-distance" min="0" max="150" step="2" value="70">
+      </div>
+
+      <div class="rp-field">
+        <div class="rp-field__row">
+          <label for="rp-duration">Длительность (мс)</label>
+          <input type="number" id="rp-duration-num" class="rp-num" value="1000" min="100" max="2000" step="10">
+        </div>
+        <input type="range" id="rp-duration" min="100" max="2000" step="10" value="1000">
+      </div>
+
+      <div class="rp-field">
+        <div class="rp-field__row">
+          <label for="rp-easing">Плавность</label>
+        </div>
+        <select id="rp-easing">
+          <option value="cubic-bezier(0.16, 1, 0.3, 1)" selected>Плавное замедление</option>
+          <option value="ease-out">Замедление к концу</option>
+          <option value="ease-in-out">Плавно туда-сюда</option>
+          <option value="cubic-bezier(0.34, 1.56, 0.64, 1)">Лёгкий отскок</option>
+          <option value="linear">Линейно</option>
+        </select>
+      </div>
+
+      <div class="rp-field">
+        <div class="rp-field__row">
+          <label for="rp-stagger">Задержка пары (мс)</label>
+          <input type="number" id="rp-stagger-num" class="rp-num" value="60" min="0" max="300" step="10">
+        </div>
+        <input type="range" id="rp-stagger" min="0" max="300" step="10" value="60">
+      </div>
+
+      <div class="rp-field">
+        <div class="rp-field__row">
+          <label for="rp-trigger">Точка срабатывания (%)</label>
+          <input type="number" id="rp-trigger-num" class="rp-num" value="15" min="0" max="40" step="1">
+        </div>
+        <input type="range" id="rp-trigger" min="0" max="40" step="1" value="15">
+      </div>
+
+      <div class="reveal-panel__actions">
+        <button type="button" id="rp-replay">Заново</button>
+        <button type="button" id="rp-copy">Скопировать JSON</button>
+      </div>
+      <textarea id="rp-json" readonly rows="5"></textarea>
+    </div>
+    <!-- ══════════════════════════════════════════════════════════════ -->
+
     <script src="../../scroll.js"></script>
     <script src="../../project-order.js"></script>
     <script src="../../main.js"></script>
     <script src="../../menu.js"></script>
     <script src="../../video-player.js"></script>
     <script src="../../info-note.js"></script>
+
+    <!-- ── Scroll reveal: fades + rises gallery photos into view as the
+         page scrolls, on both the desktop .project-content gallery and
+         the mobile .mobile-project flat list. Observes every
+         .pv-wide/.pv-pair__photo (desktop) and .mobile-project__photo
+         (mobile); once revealed, an item stays revealed (observer
+         unwatches it). -->
+    <script>
+      (function () {
+        var items = document.querySelectorAll('.project-content .pv-wide, .project-content .pv-pair__photo, .mobile-project__photo');
+        items.forEach(function (el) { el.classList.add('reveal'); });
+
+        var triggerPercent = 15;
+        var observer;
+
+        function buildObserver() {
+          if (observer) observer.disconnect();
+          observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-revealed');
+                observer.unobserve(entry.target);
+              }
+            });
+          }, { rootMargin: '0px 0px -' + triggerPercent + '% 0px', threshold: 0 });
+          items.forEach(function (el) { observer.observe(el); });
+        }
+        buildObserver();
+
+        // Exposed for the tuning panel below to rebuild the observer
+        // when the trigger-offset slider moves.
+        window.__revealSetTrigger = function (percent) {
+          triggerPercent = percent;
+          buildObserver();
+        };
+      })();
+    </script>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         TEMPORARY: reveal tuning panel logic. Delete along with the
+         panel's markup and CSS once the animation values are final.
+         Live-updates the --reveal-* custom properties on :root as the
+         sliders move, remembers the last-used values in localStorage
+         (so a reload doesn't reset your progress), and "Copy JSON"
+         hands you the current values to paste back for me to hardcode
+         site-wide. ══════════════════════════════════════════════════ -->
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var toggle = document.getElementById('reveal-panel-toggle');
+        var panel = document.getElementById('reveal-panel');
+        var STORAGE_KEY = 'nimaxRevealTuning';
+
+        var controls = {
+          distance: document.getElementById('rp-distance'),
+          duration: document.getElementById('rp-duration'),
+          easing: document.getElementById('rp-easing'),
+          stagger: document.getElementById('rp-stagger'),
+          trigger: document.getElementById('rp-trigger')
+        };
+        // Number inputs mirror the sliders for manual entry—keyed the
+        // same as controls so load()/save() can loop over both.
+        var numbers = {
+          distance: document.getElementById('rp-distance-num'),
+          duration: document.getElementById('rp-duration-num'),
+          stagger: document.getElementById('rp-stagger-num'),
+          trigger: document.getElementById('rp-trigger-num')
+        };
+        var jsonBox = document.getElementById('rp-json');
+
+        function applyAll(source) {
+          // Keep slider and number input in sync, whichever one changed.
+          Object.keys(numbers).forEach(function (key) {
+            if (source === numbers[key]) {
+              controls[key].value = numbers[key].value;
+            } else {
+              numbers[key].value = controls[key].value;
+            }
+          });
+          root.style.setProperty('--reveal-distance', controls.distance.value + 'px');
+          root.style.setProperty('--reveal-duration', controls.duration.value + 'ms');
+          root.style.setProperty('--reveal-easing', controls.easing.value);
+          root.style.setProperty('--reveal-stagger', controls.stagger.value + 'ms');
+          if (window.__revealSetTrigger) window.__revealSetTrigger(Number(controls.trigger.value));
+          updateJSON();
+          save();
+        }
+
+        function updateJSON() {
+          jsonBox.value = JSON.stringify({
+            distance: Number(controls.distance.value),
+            duration: Number(controls.duration.value),
+            easing: controls.easing.value,
+            stagger: Number(controls.stagger.value),
+            triggerPercent: Number(controls.trigger.value)
+          }, null, 2);
+        }
+
+        function save() {
+          try {
+            var out = {};
+            Object.keys(controls).forEach(function (key) { out[key] = controls[key].value; });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
+          } catch (e) {}
+        }
+
+        function load() {
+          try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+            var saved = JSON.parse(raw);
+            Object.keys(controls).forEach(function (key) {
+              if (saved[key] != null) controls[key].value = saved[key];
+            });
+          } catch (e) {}
+        }
+
+        Object.keys(controls).forEach(function (key) {
+          controls[key].addEventListener('input', function (e) { applyAll(e.target); });
+        });
+        Object.keys(numbers).forEach(function (key) {
+          numbers[key].addEventListener('input', function (e) { applyAll(e.target); });
+        });
+
+        toggle.addEventListener('click', function () {
+          var isHidden = panel.hasAttribute('hidden');
+          if (isHidden) {
+            panel.removeAttribute('hidden');
+            toggle.setAttribute('aria-expanded', 'true');
+          } else {
+            panel.setAttribute('hidden', '');
+            toggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        document.getElementById('rp-replay').addEventListener('click', function () {
+          document.querySelectorAll('.reveal.is-revealed').forEach(function (el) {
+            el.classList.remove('is-revealed');
+          });
+          if (window.__revealSetTrigger) window.__revealSetTrigger(Number(controls.trigger.value));
+        });
+
+        document.getElementById('rp-copy').addEventListener('click', function (e) {
+          var btn = e.currentTarget;
+          var restore = btn.textContent;
+          function done(ok) {
+            btn.textContent = ok ? 'Copied!' : 'Copy failed';
+            setTimeout(function () { btn.textContent = restore; }, 1200);
+          }
+          jsonBox.select();
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(jsonBox.value).then(function () { done(true); }, function () { done(false); });
+          } else {
+            try { done(document.execCommand('copy')); } catch (e) { done(false); }
+          }
+        });
+
+        load();
+        applyAll();
+      })();
+    </script>
+    <!-- ══════════════════════════════════════════════════════════════ -->
   </body>
 </html>
