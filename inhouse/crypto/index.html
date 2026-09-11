@@ -406,6 +406,108 @@
       }
       .vp.is-idle { cursor: none; }
 
+      /* Info-note: tap/click button + sliding caption bar for photos that
+         need a short attribution or note. Built by info-note.js from the
+         host's data-note attribute; only the look lives here (copy this
+         block, along with the .info-note markup and the info-note.js
+         include, to any other project's photos that need the same
+         caption pattern). Host needs position:relative + overflow:hidden—
+         every .pv-cover/.pv-wide/.pv-pair__photo slot already has both. */
+      .info-note {
+        position: relative;
+        overflow: hidden;
+      }
+      .info-note__bar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 3;
+        display: flex;
+        align-items: stretch;
+        height: 20px;
+        font-family: 'Inter', sans-serif;
+      }
+      .info-note__toggle {
+        position: relative;
+        flex: 0 0 auto;
+        width: 32px;
+        height: 20px;
+        background: #171717;
+        color: #fff;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        line-height: 1;
+        overflow: hidden;
+      }
+      .info-note__toggle::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(115deg, transparent 47%, rgba(255, 255, 255, 0.9) 50%, transparent 53%);
+        transform: translateX(-120%);
+        pointer-events: none;
+      }
+      @media (hover: hover) {
+        .info-note__toggle:hover::after {
+          animation: info-note-sheen 0.45s ease-in;
+        }
+      }
+      @keyframes info-note-sheen {
+        from { transform: translateX(-120%); }
+        to { transform: translateX(120%); }
+      }
+      .info-note__toggle::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 48px;
+        height: 48px;
+        transform: translate(-50%, -50%);
+      }
+      .info-note__panel {
+        flex: 1 1 auto;
+        min-width: 0;
+        background: #171717;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        padding: 0 2px;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+      .info-note.is-note-open .info-note__panel {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .info-note__text {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        letter-spacing: -0.2px;
+        line-height: 1.2;
+      }
+
+      @media (max-width: 640px) {
+        .info-note__icon,
+        .info-note__text {
+          font-size: 0.75rem;
+        }
+      }
     </style>
   </head>
   <body class="project-page">
@@ -498,7 +600,7 @@
             </div>
 
             <!-- Gallery -->
-            <figure class="pv-wide">
+            <figure class="pv-wide info-note" data-note="All 3D objects generated with AI">
               <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-01.webp" alt="Crypto identity visual 01" />
             </figure>
 
@@ -616,7 +718,7 @@
               <figure class="pv-pair__photo">
                 <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-28.webp" alt="Crypto identity visual 28" />
               </figure>
-              <figure class="pv-pair__photo">
+              <figure class="pv-pair__photo info-note" data-note="Consistent AI-generated character style">
                 <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-29.webp" alt="Crypto identity visual 29" />
               </figure>
             </div>
@@ -634,7 +736,7 @@
               </figure>
             </div>
 
-            <figure class="pv-wide">
+            <figure class="pv-wide info-note" data-note="How I created custom merch for TOKEN2049">
               <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-conf-1.webp" alt="Crypto identity conference visual 1" />
             </figure>
 
@@ -642,7 +744,7 @@
               <figure class="pv-pair__photo">
                 <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-conf-2.webp" alt="Crypto identity conference visual 2" />
               </figure>
-              <figure class="pv-pair__photo">
+              <figure class="pv-pair__photo info-note" data-note="Checking print quality at the booth">
                 <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-conf-3.webp" alt="Crypto identity conference visual 3" />
               </figure>
             </div>
@@ -761,7 +863,7 @@
         </div>
       </div>
 
-      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+      <figure class="mobile-project__photo info-note" data-note="All 3D objects generated with AI" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-01.webp" alt="Crypto identity visual 01" />
       </figure>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
@@ -846,7 +948,7 @@
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-28.webp" alt="Crypto identity visual 28" />
       </figure>
-      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+      <figure class="mobile-project__photo info-note" data-note="Consistent AI-generated character style" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-29.webp" alt="Crypto identity visual 29" />
       </figure>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
@@ -858,13 +960,13 @@
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-32.webp" alt="Crypto identity visual 32" />
       </figure>
-      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+      <figure class="mobile-project__photo info-note" data-note="How I created custom merch for TOKEN2049" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-conf-1.webp" alt="Crypto identity conference visual 1" />
       </figure>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-conf-2.webp" alt="Crypto identity conference visual 2" />
       </figure>
-      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+      <figure class="mobile-project__photo info-note" data-note="Checking print quality at the booth" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/crypto/crypto-conf-3.webp" alt="Crypto identity conference visual 3" />
       </figure>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
@@ -940,5 +1042,6 @@
     <script src="../../main.js"></script>
     <script src="../../menu.js"></script>
     <script src="../../video-player.js"></script>
+    <script src="../../info-note.js"></script>
   </body>
 </html>

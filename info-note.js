@@ -9,6 +9,12 @@
   // overflow:hidden (every .pv-cover/.pv-wide/.pv-pair__photo gallery slot
   // already is). This script builds the toggle button + sliding panel and
   // appends them; nothing else to hand-write per instance.
+  //
+  // data-note max length: 48 characters. The panel is a single line with
+  // no wrap (text-overflow: ellipsis)—48 is the safe ceiling that still
+  // fits on the narrowest slot this pattern is used on (a mobile portrait
+  // .pv-pair__photo, ~343px wide) without truncating. No period at the
+  // end if the note is a single sentence.
   document.querySelectorAll('.info-note[data-note]').forEach(function (host) {
     var text = host.getAttribute('data-note');
     if (!text) return;
