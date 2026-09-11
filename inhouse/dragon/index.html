@@ -233,6 +233,108 @@
         margin: 0;
       }
 
+      /* Info-note: tap/click button + sliding caption bar for photos that
+         need a short attribution or note. Built by info-note.js from the
+         host's data-note attribute; only the look lives here (copy this
+         block, along with the .info-note markup and the info-note.js
+         include, to any other project's photos that need the same
+         caption pattern). Host needs position:relative + overflow:hidden—
+         every .pv-cover/.pv-wide/.pv-pair__photo slot already has both. */
+      .info-note {
+        position: relative;
+        overflow: hidden;
+      }
+      .info-note__bar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 3;
+        display: flex;
+        align-items: stretch;
+        height: 20px;
+        font-family: 'Inter', sans-serif;
+      }
+      .info-note__toggle {
+        position: relative;
+        flex: 0 0 auto;
+        width: 32px;
+        height: 20px;
+        background: #171717;
+        color: #fff;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        line-height: 1;
+        overflow: hidden;
+      }
+      .info-note__toggle::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(115deg, transparent 47%, rgba(255, 255, 255, 0.9) 50%, transparent 53%);
+        transform: translateX(-120%);
+        pointer-events: none;
+      }
+      @media (hover: hover) {
+        .info-note__toggle:hover::after {
+          animation: info-note-sheen 0.45s ease-in;
+        }
+      }
+      @keyframes info-note-sheen {
+        from { transform: translateX(-120%); }
+        to { transform: translateX(120%); }
+      }
+      .info-note__toggle::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 48px;
+        height: 48px;
+        transform: translate(-50%, -50%);
+      }
+      .info-note__panel {
+        flex: 1 1 auto;
+        min-width: 0;
+        background: #171717;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        padding: 0 2px;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+      .info-note.is-note-open .info-note__panel {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .info-note__text {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        letter-spacing: -0.2px;
+        line-height: 1.2;
+      }
+
+      @media (max-width: 640px) {
+        .info-note__icon,
+        .info-note__text {
+          font-size: 0.75rem;
+        }
+      }
     </style>
   </head>
   <body class="project-page">
@@ -310,7 +412,7 @@
             </figure>
 
             <div class="pv-pair">
-              <div class="pv-pair__photo">
+              <div class="pv-pair__photo info-note" data-note="Animation and KV made in 3D, without AI">
                 <!-- dragon-09: plays once scrolled into view, muted (silent clip), no player chrome -->
                 <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/dragon/dragon-09.mp4"></video>
               </div>
@@ -437,7 +539,9 @@
         <img width="2160" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-08.webp" alt="AI Secures APAC visual 08" />
       </figure>
       <!-- dragon-09: plays once scrolled into view, muted (silent clip), no player chrome -->
-      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/dragon/dragon-09.mp4"></video>
+      <div class="info-note" data-note="Animation and KV made in 3D, without AI">
+        <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/inhouse/dragon/dragon-09.mp4"></video>
+      </div>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/inhouse/dragon/dragon-10.webp" alt="AI Secures APAC visual 10" />
       </figure>
@@ -535,5 +639,6 @@
     <script src="../../main.js"></script>
     <script src="../../menu.js"></script>
     <script src="../../video-player.js"></script>
+    <script src="../../info-note.js"></script>
   </body>
 </html>
