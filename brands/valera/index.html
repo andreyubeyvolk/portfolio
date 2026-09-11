@@ -272,6 +272,108 @@
         opacity: 1;
       }
 
+      /* Info-note: tap/click button + sliding caption bar for photos that
+         need a short attribution or note. Built by info-note.js from the
+         host's data-note attribute; only the look lives here (copy this
+         block, along with the .info-note markup and the info-note.js
+         include, to any other project's photos that need the same
+         caption pattern). Host needs position:relative + overflow:hidden—
+         every .pv-cover/.pv-wide/.pv-pair__photo slot already has both. */
+      .info-note {
+        position: relative;
+        overflow: hidden;
+      }
+      .info-note__bar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 3;
+        display: flex;
+        align-items: stretch;
+        height: 20px;
+        font-family: 'Inter', sans-serif;
+      }
+      .info-note__toggle {
+        position: relative;
+        flex: 0 0 auto;
+        width: 32px;
+        height: 20px;
+        background: #171717;
+        color: #fff;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        line-height: 1;
+        overflow: hidden;
+      }
+      .info-note__toggle::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(115deg, transparent 47%, rgba(255, 255, 255, 0.9) 50%, transparent 53%);
+        transform: translateX(-120%);
+        pointer-events: none;
+      }
+      @media (hover: hover) {
+        .info-note__toggle:hover::after {
+          animation: info-note-sheen 0.45s ease-in;
+        }
+      }
+      @keyframes info-note-sheen {
+        from { transform: translateX(-120%); }
+        to { transform: translateX(120%); }
+      }
+      .info-note__toggle::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 48px;
+        height: 48px;
+        transform: translate(-50%, -50%);
+      }
+      .info-note__panel {
+        flex: 1 1 auto;
+        min-width: 0;
+        background: #171717;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        padding: 0 2px;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+      .info-note.is-note-open .info-note__panel {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .info-note__text {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        letter-spacing: -0.2px;
+        line-height: 1.2;
+      }
+
+      @media (max-width: 640px) {
+        .info-note__icon,
+        .info-note__text {
+          font-size: 0.75rem;
+        }
+      }
     </style>
   </head>
   <body class="project-page">
@@ -315,7 +417,7 @@
             </div>
 
             <!-- Gallery -->
-            <figure class="pv-wide">
+            <figure class="pv-wide info-note" data-note="Searching for the brand core / main idea">
               <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-01.webp" alt="Valera the era visual 01" />
             </figure>
 
@@ -359,12 +461,12 @@
               <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-10.webp" alt="Valera the era visual 10" />
             </figure>
 
-            <figure class="pv-wide vp-tipslot" data-tip="Birthday poster,|laid out with Valera">
+            <figure class="pv-wide vp-tipslot info-note" data-tip="Birthday poster,|laid out with Valera" data-note="Posters for the party in a church">
               <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-11.webp" alt="Valera the era visual 11" />
             </figure>
 
             <div class="pv-pair">
-              <div class="pv-pair__photo vp-tipslot" data-tip="Party photos—assembled|by Valera himself">
+              <div class="pv-pair__photo vp-tipslot info-note" data-tip="Party photos—assembled|by Valera himself" data-note="Banners made by the client using my templates">
                 <!-- valera-12: plays once scrolled into view, muted (silent clip), no player chrome -->
                 <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-12.mp4"></video>
               </div>
@@ -462,7 +564,7 @@
         <p class="mobile-project__text">Valera the era is Valera's personal brand—a DJ, musician, and former professional interviewer for BBC Russia who decided to move from other people's stories to his own creative work. The brand was meant to be a platform for all his future projects—music, performances, media. Instead of an image built around one release or show, he needed a system that could grow with him.</p>
       </div>
 
-      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+      <figure class="mobile-project__photo info-note" data-note="Searching for the brand core / main idea" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-01.webp" alt="Valera the era visual 01" />
       </figure>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
@@ -490,11 +592,13 @@
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-10.webp" alt="Valera the era visual 10" />
       </figure>
-      <figure class="mobile-project__photo" style="background:#d3d3d3;">
+      <figure class="mobile-project__photo info-note" data-note="Posters for the party in a church" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-11.webp" alt="Valera the era visual 11" />
       </figure>
       <!-- valera-12: plays once scrolled into view, muted (silent clip), no player chrome -->
-      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-12.mp4"></video>
+      <div class="info-note" data-note="Banners made by the client using my templates">
+        <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/valera/valera-12.mp4"></video>
+      </div>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/brands/valera/valera-13.webp" alt="Valera the era visual 13" />
       </figure>
@@ -588,6 +692,7 @@
     <script src="../../main.js"></script>
     <script src="../../menu.js"></script>
     <script src="../../video-player.js"></script>
+    <script src="../../info-note.js"></script>
     <script>
       // Cursor-following caption for tagged slides. data-tip holds the
       // lines separated by "|"; each line renders as its own black
