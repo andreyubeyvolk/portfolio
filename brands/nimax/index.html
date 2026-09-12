@@ -217,6 +217,12 @@
         opacity: 1;
       }
 
+      /* Same "to top" tap target on mobile—no hover there, so no rotate
+         or tooltip, just the affordance. */
+      .mobile-project__icon {
+        cursor: pointer;
+      }
+
       /* Actions: Download + Next project, two equal columns */
       .pv-actions {
         display: flex;
@@ -782,7 +788,7 @@
             <span class="mobile-project__label">Solution</span>
             <div class="mobile-project__solution">
               <p class="mobile-project__text">The core decision was to refresh Nimax's dark theme—opening it up toward a lighter, more technological future, and updating the color palette. Nimax's own groundwork became the foundation, including their base of 3D illustrations, the signature move carried into the new vibe. The dark base gave way to a light one, with vivid mint as the primary color and purple as a secondary accent, paired with the TT Hoves typeface. Aggressive caps were dropped from headlines, graphic tags were simplified, and large rounded shapes softened the system—while sharpness stayed where it holds the character: typography, dividing lines, type shifts. The system made it to physical objects too, with several merch items, including tote bags, actually shipping. Banner carousels now feature banners the Nimax team built on their own, without me, but within the style that was set—proof of how it kept living on. Sparking this change feels meaningful: the brand is now lighter, more modern, and more digital, with a foundation for its continued evolution.</p>
-              <img width="206" height="206" loading="lazy" class="mobile-project__icon" src="../../assets/brands/nimax/nimax-kv.png" alt="" aria-hidden="true" />
+              <img width="206" height="206" loading="lazy" class="mobile-project__icon" src="../../assets/brands/nimax/nimax-kv.png" alt="Scroll to top" role="button" tabindex="0" />
             </div>
           </div>
 
@@ -941,38 +947,45 @@
     </script>
 
     <!-- ── TEST: "To top" on the Solution icon (nimax only for now, see
-         if the approach reads well before rolling out further). Hover
-         rotates the icon itself (pure CSS, see .pv-icon:hover img
-         above) and shows a cursor-following "To top ↑" tooltip. Click
-         scrolls back to the very top—the desktop project pane, or on
-         mobile (below the 981px breakpoint) the page itself, since it
-         scrolls natively there instead. -->
+         if the approach reads well before rolling out further). On
+         desktop, hovering the icon rotates it (pure CSS, see
+         .pv-icon:hover img above) and shows a cursor-following
+         "To top ↑" tooltip; on mobile there's no hover to speak of, so
+         the matching .mobile-project__icon just gets the same tap
+         target. Either way, clicking/tapping scrolls back to the very
+         top—the desktop project pane, or on mobile (below the 981px
+         breakpoint) the page itself, since it scrolls natively there
+         instead. -->
     <script>
       (function () {
         var icon = document.querySelector('.pv-icon');
-        if (!icon) return;
+        var mobileIcon = document.querySelector('.mobile-project__icon');
+        if (!icon && !mobileIcon) return;
 
-        var tip = document.createElement('div');
-        tip.className = 'pv-icon-tip';
-        tip.textContent = 'To top ↑';
-        document.body.appendChild(tip);
+        var tip = null;
+        if (icon) {
+          tip = document.createElement('div');
+          tip.className = 'pv-icon-tip';
+          tip.textContent = 'To top ↑';
+          document.body.appendChild(tip);
 
-        icon.addEventListener('mousemove', function (e) {
-          var off = 16;
-          var left = e.clientX + off;
-          var top = e.clientY + off;
-          var tw = tip.offsetWidth, th = tip.offsetHeight;
-          if (left + tw > window.innerWidth - 8) left = e.clientX - off - tw;
-          if (top + th > window.innerHeight - 8) top = e.clientY - off - th;
-          if (left < 8) left = 8;
-          if (top < 8) top = 8;
-          tip.style.left = left + 'px';
-          tip.style.top = top + 'px';
-          tip.classList.add('is-visible');
-        });
-        icon.addEventListener('mouseleave', function () {
-          tip.classList.remove('is-visible');
-        });
+          icon.addEventListener('mousemove', function (e) {
+            var off = 16;
+            var left = e.clientX + off;
+            var top = e.clientY + off;
+            var tw = tip.offsetWidth, th = tip.offsetHeight;
+            if (left + tw > window.innerWidth - 8) left = e.clientX - off - tw;
+            if (top + th > window.innerHeight - 8) top = e.clientY - off - th;
+            if (left < 8) left = 8;
+            if (top < 8) top = 8;
+            tip.style.left = left + 'px';
+            tip.style.top = top + 'px';
+            tip.classList.add('is-visible');
+          });
+          icon.addEventListener('mouseleave', function () {
+            tip.classList.remove('is-visible');
+          });
+        }
 
         var pane = document.querySelector('.project-scroll');
         var desktopQuery = window.matchMedia('(min-width: 981px)');
@@ -1000,10 +1013,10 @@
 
         var isAnimating = false;
 
-        icon.addEventListener('click', function () {
+        function scrollProjectToTop() {
           if (isAnimating) return;
           isAnimating = true;
-          tip.classList.remove('is-visible');
+          if (tip) tip.classList.remove('is-visible');
 
           if (desktopQuery.matches && pane) {
             // Lenis's own autoRaf loop keeps running the whole time, and
@@ -1035,7 +1048,20 @@
               function () { isAnimating = false; }
             );
           }
-        });
+        }
+
+        if (icon) icon.addEventListener('click', scrollProjectToTop);
+        if (mobileIcon) {
+          mobileIcon.addEventListener('click', scrollProjectToTop);
+          // role="button" on a plain <img> needs its own Enter/Space
+          // handling—native buttons get this for free, this doesn't.
+          mobileIcon.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              scrollProjectToTop();
+            }
+          });
+        }
       })();
     </script>
   </body>
