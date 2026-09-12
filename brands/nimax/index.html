@@ -55,8 +55,6 @@
         overflow: hidden;
         background: #d3d3d3;
         margin: 0;
-      }
-      .pv-cover {
         position: relative;
       }
       .pv-cover img,
@@ -248,8 +246,8 @@
         margin: 0;
       }
 
-      /* Info-note: tap/click button + sliding caption bar for the two
-         banner clips the Nimax team made themselves. Replaces the old
+      /* Info-note: tap/click button + sliding caption bar for photos/clips
+         that need a short attribution or note. Replaces the old
          cursor-follow hover tooltip—that was invisible on touch devices,
          so mobile visitors never saw the caption at all. Built by
          info-note.js from the host's data-note attribute; only the look
@@ -390,34 +388,6 @@
          has no effect on the mobile flat list (no side-by-side pairs
          there). */
 
-      /* ── TEMPORARY: cursor lens-distortion test on the logo ──
-         .brand already exists in styles.css (width/margin/etc.)—this
-         just adds position:relative on top, needed to place the warped
-         duplicate. The duplicate sits pixel-for-pixel on top of the
-         real logo, run through the SVG filter defined near the end of
-         the page, and is only visible through a small circular mask
-         that tracks the cursor (see the script there for the lerp that
-         makes it trail smoothly instead of snapping). */
-      .brand {
-        position: relative;
-      }
-      /* styles.css fades the whole logo to 0.7 opacity on hover (site-
-         wide link convention)—here that fights the lens effect, which
-         wants the logo staying fully solid while you look at the
-         distortion, so cancel it just on this page. */
-      .brand:hover {
-        opacity: 1;
-      }
-      .brand-mark--lens {
-        position: absolute;
-        top: 0;
-        left: 0;
-        filter: url(#nimax-lens);
-        -webkit-mask-image: radial-gradient(circle 26px at var(--lens-x, -999px) var(--lens-y, -999px), #000 55%, transparent 100%);
-        mask-image: radial-gradient(circle 26px at var(--lens-x, -999px) var(--lens-y, -999px), #000 55%, transparent 100%);
-        pointer-events: none;
-      }
-
       :root {
         --reveal-distance: 70px;
         --reveal-duration: 1400ms;
@@ -473,31 +443,11 @@
   </head>
   <body class="project-page">
 
-    <!-- TEMPORARY: SVG filter for the logo lens-distortion test (see
-         .brand-mark--lens above and the script near </body>). Turbulence
-         + displacement gives a "warped glass" ripple rather than a true
-         optical magnifier—simpler than a real lens shader, and plenty
-         convincing for a small hover bubble. Scale is deliberately mild
-         since the logo itself is only 16px tall. -->
-    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
-      <filter id="nimax-lens">
-        <feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="2" seed="7" result="noise" />
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="16" xChannelSelector="R" yChannelSelector="G" />
-      </filter>
-    </svg>
-
     <!-- ── DESKTOP LAYOUT ─────────────────────────── -->
     <main class="site-shell page-grid">
       <aside class="site-nav" aria-label="Main navigation">
-        <!-- TEMPORARY: cursor lens-distortion test (see the SVG filter,
-             CSS, and script near the end of the page). The second img is
-             a warped duplicate, visible only through a small circular
-             mask that follows the cursor—so hovering the wordmark shows
-             a little bubble of glass-like distortion sliding across it,
-             while the rest stays crisp. -->
         <a class="brand" href="../../index.html" aria-label="Andrey Ubeyvolk home">
           <img width="129" height="16" class="brand-mark" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
-          <img width="129" height="16" class="brand-mark brand-mark--lens" src="../../assets/logo.svg" alt="" aria-hidden="true" />
         </a>
         <nav class="nav-list">
           <a href="../../inhouse/index.html">Inhouse</a>
@@ -576,10 +526,10 @@
             <div class="pv-pair">
               <div class="pv-pair__photo info-note" data-note="Made by Nimax, following the new style guide">
                 <!-- nimax-11: plays once scrolled into view, muted (silent clip), no player chrome -->
-                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-11.mp4"></video>
+                <video class="vp-bare" playsinline muted loop preload="none" src="../../assets/brands/nimax/nimax-11.mp4"></video>
               </div>
               <figure class="pv-pair__photo">
-                <img width="1081" height="1442" loading="lazy" src="../../assets/brands/nimax/nimax-12.webp" alt="Nimax visual 12" />
+                <img width="1080" height="1440" loading="lazy" src="../../assets/brands/nimax/nimax-12.webp" alt="Nimax visual 12" />
               </figure>
             </div>
 
@@ -606,7 +556,7 @@
               </figure>
               <div class="pv-pair__photo info-note" data-note="Made by Nimax, following the new style guide">
                 <!-- nimax-18: plays once scrolled into view, muted (silent clip), no player chrome -->
-                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-18.mp4"></video>
+                <video class="vp-bare" playsinline muted loop preload="none" src="../../assets/brands/nimax/nimax-18.mp4"></video>
               </div>
             </div>
 
@@ -625,7 +575,7 @@
 
             <!-- nimax-22: plays once scrolled into view, muted (silent clip), no player chrome -->
             <div class="info-note" data-note="Custom merch concept for the team">
-              <video class="vp-bare" width="1808" height="1080" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-22.mp4"></video>
+              <video class="vp-bare" width="1808" height="1080" playsinline muted loop preload="none" src="../../assets/brands/nimax/nimax-22.mp4"></video>
             </div>
 
             <div class="pv-pair">
@@ -733,10 +683,10 @@
       </figure>
       <!-- nimax-11: plays once scrolled into view, muted (silent clip), no player chrome -->
       <div class="info-note" data-note="Made by Nimax, following the new style guide">
-        <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-11.mp4"></video>
+        <video class="vp-bare" playsinline muted loop preload="none" src="../../assets/brands/nimax/nimax-11.mp4"></video>
       </div>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
-        <img width="1081" height="1442" loading="lazy" src="../../assets/brands/nimax/nimax-12.webp" alt="Nimax visual 12" />
+        <img width="1080" height="1440" loading="lazy" src="../../assets/brands/nimax/nimax-12.webp" alt="Nimax visual 12" />
       </figure>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/brands/nimax/nimax-13.webp" alt="Nimax visual 13" />
@@ -755,7 +705,7 @@
       </figure>
       <!-- nimax-18: plays once scrolled into view, muted (silent clip), no player chrome -->
       <div class="info-note" data-note="Made by Nimax, following the new style guide">
-        <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-18.mp4"></video>
+        <video class="vp-bare" playsinline muted loop preload="none" src="../../assets/brands/nimax/nimax-18.mp4"></video>
       </div>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/brands/nimax/nimax-19.webp" alt="Nimax visual 19" />
@@ -768,7 +718,7 @@
       </figure>
       <!-- nimax-22: plays once scrolled into view, muted (silent clip), no player chrome -->
       <div class="info-note" data-note="Custom merch concept for the team">
-        <video class="vp-bare" width="1808" height="1080" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-22.mp4"></video>
+        <video class="vp-bare" width="1808" height="1080" playsinline muted loop preload="none" src="../../assets/brands/nimax/nimax-22.mp4"></video>
       </div>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/brands/nimax/nimax-23.webp" alt="Nimax visual 23" />
@@ -852,38 +802,35 @@
     <script src="../../video-player.js"></script>
     <script src="../../info-note.js"></script>
 
-    <!-- ── TEMPORARY: cursor lens-distortion on the logo. Tracks the
-         mouse over .brand, lerping the mask's center toward the cursor
-         each frame (instead of snapping straight to it) so it trails
-         smoothly—more "liquid glass," less "cursor tooltip." Resets to
-         off-element on mouseleave so the mask fully closes. -->
+    <!-- ── TEMPORARY: predictive preload for autoplay-on-scroll videos.
+         These three (nimax-11/18/22) carry preload="none" in the HTML
+         so nothing fetches at page load—video-player.js's own .vp-bare
+         observer (threshold 0.5, no rootMargin) still owns the actual
+         play() call, unchanged. This is a second, separate observer
+         with a big rootMargin that fires about a screen-height early
+         and switches preload to "auto" + calls load(), so the browser
+         has a running start buffering by the time playback actually
+         begins—avoiding both "load nothing until scrolled into view"
+         (decode starts cold, jank) and "load everything on page load"
+         (wastes bandwidth on videos never reached). Safe either way:
+         if this fires late for some reason, play() itself still starts
+         loading on demand—same as today, never worse. -->
     <script>
       (function () {
-        var brand = document.querySelector('.brand');
-        var lens = brand ? brand.querySelector('.brand-mark--lens') : null;
-        if (!brand || !lens) return;
+        var videos = Array.from(document.querySelectorAll('.vp-bare[preload="none"]'));
+        if (!videos.length || !('IntersectionObserver' in window)) return;
 
-        var targetX = -999, targetY = -999;
-        var curX = -999, curY = -999;
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            var video = entry.target;
+            video.preload = 'auto';
+            video.load();
+            observer.unobserve(video);
+          });
+        }, { rootMargin: '0px 0px 100% 0px' });
 
-        brand.addEventListener('mousemove', function (e) {
-          var rect = brand.getBoundingClientRect();
-          targetX = e.clientX - rect.left;
-          targetY = e.clientY - rect.top;
-        });
-        brand.addEventListener('mouseleave', function () {
-          targetX = -999;
-          targetY = -999;
-        });
-
-        function tick() {
-          curX += (targetX - curX) * 0.2;
-          curY += (targetY - curY) * 0.2;
-          brand.style.setProperty('--lens-x', curX.toFixed(1) + 'px');
-          brand.style.setProperty('--lens-y', curY.toFixed(1) + 'px');
-          requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
+        videos.forEach(function (video) { observer.observe(video); });
       })();
     </script>
 
@@ -900,7 +847,7 @@
          container (see the CSS above). Once revealed, an item stays
          revealed (observer
          unwatches it). Desktop and mobile get separate observers since
-         they use different trigger-offset percentages. -->
+         they watch different element sets. -->
     <script>
       (function () {
         // .pv-actions (Download/Next) is deliberately NOT its own entry
@@ -949,61 +896,6 @@
           threshold: 0
         });
         mobileItems.forEach(function (el) { mobileObserver.observe(el); });
-      })();
-    </script>
-
-    <!-- ── Parallax: subtle, continuous shift of each photo/video within
-         its own cropped frame as it travels through the viewport—unlike
-         the reveal above, this isn't a one-shot trigger, it keeps
-         running for as long as the item is on screen. The media element
-         is scaled up so the shift never exposes empty space at an edge.
-         Works with either scroll source on this site: the desktop
-         custom-scrollbar pane (.project-scroll, scrolled via its own
-         scrollTop by scroll.js) and the mobile flat list (plain
-         document/window scroll)—so it listens on both. -->
-    <script>
-      (function () {
-        // Parallax off everywhere for now (desktop and mobile)—so the
-        // hosts list is empty. Re-enabling later is a one-line change
-        // (put the selector(s) back here).
-        var hosts = [];
-        var items = [];
-        hosts.forEach(function (host) {
-          var media = host.querySelector('img, video');
-          if (media) items.push({ host: host, media: media });
-        });
-
-        var enabled = true;
-        var shift = 20;
-        var scale = 112;
-
-        function update() {
-          if (!enabled) return;
-          var vh = window.innerHeight;
-          items.forEach(function (item) {
-            var rect = item.host.getBoundingClientRect();
-            if (rect.bottom < 0 || rect.top > vh) return;
-            var center = rect.top + rect.height / 2;
-            var progress = (center - vh / 2) / (vh / 2);
-            if (progress > 1) progress = 1;
-            if (progress < -1) progress = -1;
-            var y = (progress * shift).toFixed(2);
-            item.media.style.transform = 'scale(' + (scale / 100) + ') translateY(' + y + 'px)';
-          });
-        }
-
-        var ticking = false;
-        function onScroll() {
-          if (ticking) return;
-          ticking = true;
-          requestAnimationFrame(function () { update(); ticking = false; });
-        }
-
-        var scrollEl = document.querySelector('.project-scroll');
-        if (scrollEl) scrollEl.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('resize', onScroll, { passive: true });
-        update();
       })();
     </script>
   </body>
