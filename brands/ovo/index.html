@@ -186,11 +186,60 @@
       .pv-icon {
         margin: 0;
         line-height: 0;
+        display: block;
+        align-self: flex-start; /* .pv-solution__body is a column flex
+          container, which stretches children to its full width by
+          default—without this, the button's hit/hover area (and its
+          :hover state) covered the whole row, not just the icon */
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
       }
       .pv-icon img {
         display: block;
         height: 103px;
         width: auto; /* keep the icon's own aspect, no cropping */
+        transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      /* Counter-clockwise nudge on hover—just enough to read as "alive"
+         without looking like the icon is spinning up for something. */
+      .pv-icon:hover img {
+        transform: rotate(-5deg);
+      }
+
+      /* Cursor-following "To top" tooltip for the Solution icon. Shows
+         immediately on hover (no dwell delay, unlike valera's vp-tip
+         caption pattern)—it's labeling a single, already-obvious click
+         target, not surfacing hidden info. Matches the site's own
+         text-selection look: black rectangle, white text (see
+         ::selection in styles.css). Built/toggled by the inline script
+         near the end of the page; lives on <body> (position:fixed) so
+         nothing clips it. */
+      .pv-icon-tip {
+        position: fixed;
+        z-index: 200;
+        background: #000;
+        color: #fff;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        letter-spacing: -0.2px;
+        line-height: 1.2;
+        padding: 0px 2px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+      }
+      .pv-icon-tip.is-visible {
+        opacity: 1;
+      }
+
+      /* Same "to top" tap target on mobile—no hover there, so no rotate
+         or tooltip, just the affordance. */
+      .mobile-project__icon {
+        cursor: pointer;
       }
 
       /* Actions: Download + Next project, two equal columns */
@@ -686,7 +735,7 @@
 
             <!-- ovo-10: showreel-style clip with real audio, muted by default -->
             <div class="vp" data-state="paused" data-muted="true" data-autoplay="scroll">
-              <video class="vp__video" playsinline muted loop preload="metadata" src="../../assets/brands/ovo/ovo-10.mp4"></video>
+              <video class="vp__video" width="1620" height="1080" playsinline muted loop preload="none" src="../../assets/brands/ovo/ovo-10.mp4"></video>
 
               <div class="vp__hit" data-role="toggle"></div>
 
@@ -822,9 +871,9 @@
                   <div class="pv-solution">
                     <div class="pv-solution__body">
                       <p>The core device became the ruler—a tool that measures not just a room, but the depth of the studio's immersion into it. Instead of plain dividing lines, the identity is built from rulers and their related marks and forms: technical, deliberate, precise. Worn scan textures and translucent tracing paper were layered in to carry the hand of the atelier—the craft behind every project. These elements resolve into three pillars—Depth, Level, Atelier—expressed through an editorial-leaning architectural identity, scalable ruler graphics, and one decisive accent: red. The result is a system precise enough to read as architecture, and expressive enough to read as character.</p>
-                      <figure class="pv-icon">
+                      <button type="button" class="pv-icon" aria-label="Scroll to top">
                         <img width="206" height="206" loading="lazy" src="../../assets/brands/ovo/ovo-kv.png" alt="" aria-hidden="true" />
-                      </figure>
+                      </button>
                     </div>
                     <div class="pv-actions">
                       <div class="pv-action">
@@ -896,7 +945,7 @@
       </figure>
       <!-- ovo-10: showreel-style clip with real audio, muted by default -->
       <div class="vp" data-state="paused" data-muted="true" data-autoplay="scroll">
-        <video class="vp__video" playsinline muted loop preload="metadata" src="../../assets/brands/ovo/ovo-10.mp4"></video>
+        <video class="vp__video" width="1620" height="1080" playsinline muted loop preload="none" src="../../assets/brands/ovo/ovo-10.mp4"></video>
 
         <div class="vp__hit" data-role="toggle"></div>
 
@@ -1006,7 +1055,7 @@
             <span class="mobile-project__label">Solution</span>
             <div class="mobile-project__solution">
               <p class="mobile-project__text">The core device became the ruler—a tool that measures not just a room, but the depth of the studio's immersion into it. Instead of plain dividing lines, the identity is built from rulers and their related marks and forms: technical, deliberate, precise. Worn scan textures and translucent tracing paper were layered in to carry the hand of the atelier—the craft behind every project. These elements resolve into three pillars—Depth, Level, Atelier—expressed through an editorial-leaning architectural identity, scalable ruler graphics, and one decisive accent: red. The result is a system precise enough to read as architecture, and expressive enough to read as character.</p>
-              <img width="206" height="206" loading="lazy" class="mobile-project__icon" src="../../assets/brands/ovo/ovo-kv.png" alt="" aria-hidden="true" />
+              <img width="206" height="206" loading="lazy" class="mobile-project__icon" src="../../assets/brands/ovo/ovo-kv.png" alt="Scroll to top" role="button" tabindex="0" />
             </div>
           </div>
 
@@ -1066,10 +1115,11 @@
     <script src="../../info-note.js"></script>
 
     <!-- ── Predictive preload for autoplay-on-scroll videos.
-         Autoplay-on-scroll .vp-bare videos carry preload="none" in the
-         HTML so nothing fetches at page load—video-player.js's own
-         .vp-bare observer (threshold 0.5, no rootMargin) still owns the
-         actual play() call, unchanged. This is a second, separate
+         Autoplay-on-scroll videos—.vp-bare and .vp (ovo-10, which also
+         has data-autoplay="scroll")—carry preload="none" in the HTML so
+         nothing fetches at page load; video-player.js's own observers
+         (threshold 0.5, no rootMargin) still own the actual play() call,
+         unchanged. This is a second, separate
          observer with a big rootMargin that fires about a screen-height
          early and switches preload to "auto" + calls load(), so the
          browser has a running start buffering by the time playback
@@ -1080,7 +1130,7 @@
          starts loading on demand—same as before, never worse. -->
     <script>
       (function () {
-        var videos = Array.from(document.querySelectorAll('.vp-bare[preload="none"]'));
+        var videos = Array.from(document.querySelectorAll('video[preload="none"]'));
         if (!videos.length || !('IntersectionObserver' in window)) return;
 
         var observer = new IntersectionObserver(function (entries) {
@@ -1100,8 +1150,10 @@
     <!-- ── Scroll reveal: fades + rises gallery photos into view as the
          page scrolls, on both the desktop .project-content gallery and
          the mobile .mobile-project flat list. Observes every
-         .pv-wide/.pv-pair__photo (desktop) and .mobile-project__photo
-         (mobile)—excluding the cover, which is already on screen the
+         .pv-wide/.pv-pair__photo/.vp (desktop) and .mobile-project__photo/
+         .vp (mobile)—the .vp is ovo-10's showreel player, a direct child
+         of the gallery like a .pv-wide but not one itself—excluding the
+         cover, which is already on screen the
          instant the page loads and has nothing to "reveal" itself
          from—plus text on desktop only—About (.pv-row--about) and
          Challenge/Solution (.pv-info .pv-row)—and on mobile,
@@ -1119,8 +1171,8 @@
         // already observed below, so it fades in together with the
         // Solution text instead of waiting for its own (much later,
         // since it sits at the very bottom of a long block) trigger.
-        var desktopItems = document.querySelectorAll('.project-content .pv-wide, .project-content .pv-pair__photo, .pv-row--about, .pv-info .pv-row');
-        var mobileItems = document.querySelectorAll('.mobile-project__photo:not(:first-child), .mobile-project__blocks .mobile-project__block');
+        var desktopItems = document.querySelectorAll('.project-content .pv-wide, .project-content .pv-pair__photo, .project-content > .vp, .pv-row--about, .pv-info .pv-row');
+        var mobileItems = document.querySelectorAll('.mobile-project__photo:not(:first-child), .mobile-project > .vp, .mobile-project__blocks .mobile-project__block');
         desktopItems.forEach(function (el) { el.classList.add('reveal'); });
         mobileItems.forEach(function (el) { el.classList.add('reveal'); });
 
@@ -1160,6 +1212,123 @@
           threshold: 0
         });
         mobileItems.forEach(function (el) { mobileObserver.observe(el); });
+      })();
+    </script>
+
+    <!-- ── "To top" on the Solution icon. On desktop, hovering the icon
+         rotates it (pure CSS, see .pv-icon:hover img above) and shows a
+         cursor-following "To top ↑" tooltip; on mobile there's no hover
+         to speak of, so the matching .mobile-project__icon just gets
+         the same tap target. Either way, clicking/tapping scrolls back
+         to the very top—the desktop project pane, or on mobile (below
+         the 981px breakpoint) the page itself, since it scrolls
+         natively there instead. -->
+    <script>
+      (function () {
+        var icon = document.querySelector('.pv-icon');
+        var mobileIcon = document.querySelector('.mobile-project__icon');
+        if (!icon && !mobileIcon) return;
+
+        var tip = null;
+        if (icon) {
+          tip = document.createElement('div');
+          tip.className = 'pv-icon-tip';
+          tip.textContent = 'To top ↑';
+          document.body.appendChild(tip);
+
+          icon.addEventListener('mousemove', function (e) {
+            var off = 16;
+            var left = e.clientX + off;
+            var top = e.clientY + off;
+            var tw = tip.offsetWidth, th = tip.offsetHeight;
+            if (left + tw > window.innerWidth - 8) left = e.clientX - off - tw;
+            if (top + th > window.innerHeight - 8) top = e.clientY - off - th;
+            if (left < 8) left = 8;
+            if (top < 8) top = 8;
+            tip.style.left = left + 'px';
+            tip.style.top = top + 'px';
+            tip.classList.add('is-visible');
+          });
+          icon.addEventListener('mouseleave', function () {
+            tip.classList.remove('is-visible');
+          });
+        }
+
+        var pane = document.querySelector('.project-scroll');
+        var desktopQuery = window.matchMedia('(min-width: 981px)');
+
+        // Hand-rolled rAF tween instead of Lenis's own scrollTo—driving
+        // the pane's scrollTop directly guarantees one continuous
+        // monotonic curve for the whole trip. easeOutQuint: launches
+        // fast, then a long, smooth glide all the way to a dead
+        // stop—no hard brake at the end.
+        function easeOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
+        function animateScrollTo(getPos, setPos, target, duration, onDone) {
+          var start = getPos();
+          var change = target - start;
+          if (!change) { if (onDone) onDone(); return; }
+          var startTime = null;
+          function step(now) {
+            if (startTime === null) startTime = now;
+            var t = Math.min((now - startTime) / duration, 1);
+            setPos(start + change * easeOutQuint(t));
+            if (t < 1) requestAnimationFrame(step);
+            else if (onDone) onDone();
+          }
+          requestAnimationFrame(step);
+        }
+
+        var isAnimating = false;
+
+        function scrollProjectToTop() {
+          if (isAnimating) return;
+          isAnimating = true;
+          if (tip) tip.classList.remove('is-visible');
+
+          if (desktopQuery.matches && pane) {
+            // Lenis's own autoRaf loop keeps running the whole time, and
+            // writing straight to pane.scrollTop bypasses it entirely—
+            // Lenis's internal notion of "current scroll" falls out of
+            // sync with the real one, and re-converging the two produced
+            // a visible stutter right near the end. (lenisInstance.stop()
+            // looked like the fix, but it sets overflow:clip on the
+            // pane—that silently no-ops every scrollTop write for as
+            // long as it's called, which is worse.) Routing each frame
+            // through Lenis's own scrollTo with immediate:true instead
+            // makes Lenis itself the one writing scrollTop, so its
+            // internal state never drifts from reality in the first
+            // place—nothing to resync, nothing to fight.
+            var setPos = pane.lenisInstance
+              ? function (v) { pane.lenisInstance.scrollTo(v, { immediate: true }); }
+              : function (v) { pane.scrollTop = v; };
+            animateScrollTo(
+              function () { return pane.scrollTop; },
+              setPos,
+              0, 1400,
+              function () { isAnimating = false; }
+            );
+          } else {
+            animateScrollTo(
+              function () { return window.scrollY; },
+              function (v) { window.scrollTo(0, v); },
+              0, 1400,
+              function () { isAnimating = false; }
+            );
+          }
+        }
+
+        if (icon) icon.addEventListener('click', scrollProjectToTop);
+        if (mobileIcon) {
+          mobileIcon.addEventListener('click', scrollProjectToTop);
+          // role="button" on a plain <img> needs its own Enter/Space
+          // handling—native buttons get this for free, this doesn't.
+          mobileIcon.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              scrollProjectToTop();
+            }
+          });
+        }
       })();
     </script>
   </body>

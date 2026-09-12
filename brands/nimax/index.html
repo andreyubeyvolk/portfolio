@@ -132,7 +132,7 @@
         line-height: 1.2;
       }
 
-      /* Solution block: 2px full-width divider, 4px gap, then the row */
+      /* Solution block: 2px full-width divider, 2px gap, then the row */
       .pv-solution-block {
         display: flex;
         flex-direction: column;
@@ -189,9 +189,9 @@
         transform: rotate(-5deg);
       }
 
-      /* TEST: cursor-following "To top" tooltip for the Solution icon.
-         Shows immediately on hover (no dwell delay, unlike valera's
-         vp-tip caption pattern)—it's labeling a single, already-obvious
+      /* Cursor-following "To top" tooltip for the Solution icon. Shows
+         immediately on hover (no dwell delay, unlike valera's vp-tip
+         caption pattern)—it's labeling a single, already-obvious
          click target, not surfacing hidden info. Matches the site's own
          text-selection look: black rectangle, white text (see
          ::selection in styles.css). Built/toggled by the inline script
@@ -862,7 +862,7 @@
          loading on demand—same as today, never worse. -->
     <script>
       (function () {
-        var videos = Array.from(document.querySelectorAll('.vp-bare[preload="none"]'));
+        var videos = Array.from(document.querySelectorAll('video[preload="none"]'));
         if (!videos.length || !('IntersectionObserver' in window)) return;
 
         var observer = new IntersectionObserver(function (entries) {
@@ -946,16 +946,14 @@
       })();
     </script>
 
-    <!-- ── TEST: "To top" on the Solution icon (nimax only for now, see
-         if the approach reads well before rolling out further). On
-         desktop, hovering the icon rotates it (pure CSS, see
-         .pv-icon:hover img above) and shows a cursor-following
-         "To top ↑" tooltip; on mobile there's no hover to speak of, so
-         the matching .mobile-project__icon just gets the same tap
-         target. Either way, clicking/tapping scrolls back to the very
-         top—the desktop project pane, or on mobile (below the 981px
-         breakpoint) the page itself, since it scrolls natively there
-         instead. -->
+    <!-- ── "To top" on the Solution icon. On desktop, hovering the icon
+         rotates it (pure CSS, see .pv-icon:hover img above) and shows a
+         cursor-following "To top ↑" tooltip; on mobile there's no hover
+         to speak of, so the matching .mobile-project__icon just gets
+         the same tap target. Either way, clicking/tapping scrolls back
+         to the very top—the desktop project pane, or on mobile (below
+         the 981px breakpoint) the page itself, since it scrolls
+         natively there instead. -->
     <script>
       (function () {
         var icon = document.querySelector('.pv-icon');

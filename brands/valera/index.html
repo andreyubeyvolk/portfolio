@@ -166,11 +166,60 @@
       .pv-icon {
         margin: 0;
         line-height: 0;
+        display: block;
+        align-self: flex-start; /* .pv-solution__body is a column flex
+          container, which stretches children to its full width by
+          default—without this, the button's hit/hover area (and its
+          :hover state) covered the whole row, not just the icon */
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
       }
       .pv-icon img {
         display: block;
         height: 103px;
         width: auto; /* keep the icon's own aspect, no cropping */
+        transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      /* Counter-clockwise nudge on hover—just enough to read as "alive"
+         without looking like the icon is spinning up for something. */
+      .pv-icon:hover img {
+        transform: rotate(-5deg);
+      }
+
+      /* Cursor-following "To top" tooltip for the Solution icon. Shows
+         immediately on hover (no dwell delay, unlike this page's own
+         vp-tip caption pattern below)—it's labeling a single,
+         already-obvious click target, not surfacing hidden info.
+         Matches the site's own text-selection look: black rectangle,
+         white text (see ::selection in styles.css). Built/toggled by
+         the inline script near the end of the page; lives on <body>
+         (position:fixed) so nothing clips it. */
+      .pv-icon-tip {
+        position: fixed;
+        z-index: 200;
+        background: #000;
+        color: #fff;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        letter-spacing: -0.2px;
+        line-height: 1.2;
+        padding: 0px 2px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+      }
+      .pv-icon-tip.is-visible {
+        opacity: 1;
+      }
+
+      /* Same "to top" tap target on mobile—no hover there, so no rotate
+         or tooltip, just the affordance. */
+      .mobile-project__icon {
+        cursor: pointer;
       }
 
       /* Actions: Download + Next project, two equal columns */
@@ -522,12 +571,12 @@
               <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-10.webp" alt="Valera the era visual 10" />
             </figure>
 
-            <figure class="pv-wide vp-tipslot info-note" data-tip="Birthday poster,|laid out with Valera" data-note="Posters for the party in a church">
+            <figure class="pv-wide info-note" data-note="Posters for the party in a church">
               <img width="2160" height="1440" loading="lazy" src="../../assets/brands/valera/valera-11.webp" alt="Valera the era visual 11" />
             </figure>
 
             <div class="pv-pair">
-              <div class="pv-pair__photo vp-tipslot info-note" data-tip="Party photos—assembled|by Valera himself" data-note="Banners made by the client using my templates">
+              <div class="pv-pair__photo info-note" data-note="Banners made by the client using my templates">
                 <!-- valera-12: plays once scrolled into view, muted (silent clip), no player chrome -->
                 <video class="vp-bare" width="810" height="1080" playsinline muted loop preload="none" src="../../assets/brands/valera/valera-12.mp4"></video>
               </div>
@@ -582,9 +631,9 @@
                   <div class="pv-solution">
                     <div class="pv-solution__body">
                       <p>We didn't build the identity around ready-made graphics. Instead, we built it on the meanings found in deep interviews with Valera. From there came two key images, music and the screen, which formed three pillars: Veil—distance and concealment that invites you closer; Center—the circle, the vinyl, focus and community; Signal—text as the main carrier of meaning. These pillars grew into a flexible system: modular typography, polyethylene as a material metaphor, scan-effect textures, progressive blur, a sticker system, and adaptable photo content. The brand book itself was designed as a fashion magazine—a format that matches Valera's own vibe—so the guidelines read like an editorial, not a manual. The system turned out so clear that for his own birthday, Valera assembled the banners and laid out the posts himself, using our templates, without a designer. The result is a brand that doesn't dictate form. It holds meaning. Recognizable in any season, intuitive to its own author, and endlessly flexible in the details.</p>
-                      <figure class="pv-icon">
+                      <button type="button" class="pv-icon" aria-label="Scroll to top">
                         <img width="206" height="206" loading="lazy" src="../../assets/brands/valera/valera-kv.png" alt="" aria-hidden="true" />
-                      </figure>
+                      </button>
                     </div>
                     <div class="pv-actions">
                       <div class="pv-action">
@@ -697,7 +746,7 @@
             <span class="mobile-project__label">Solution</span>
             <div class="mobile-project__solution">
               <p class="mobile-project__text">We didn't build the identity around ready-made graphics. Instead, we built it on the meanings found in deep interviews with Valera. From there came two key images, music and the screen, which formed three pillars: Veil—distance and concealment that invites you closer; Center—the circle, the vinyl, focus and community; Signal—text as the main carrier of meaning. These pillars grew into a flexible system: modular typography, polyethylene as a material metaphor, scan-effect textures, progressive blur, a sticker system, and adaptable photo content. The brand book itself was designed as a fashion magazine—a format that matches Valera's own vibe—so the guidelines read like an editorial, not a manual. The system turned out so clear that for his own birthday, Valera assembled the banners and laid out the posts himself, using our templates, without a designer. The result is a brand that doesn't dictate form. It holds meaning. Recognizable in any season, intuitive to its own author, and endlessly flexible in the details.</p>
-              <img width="206" height="206" loading="lazy" class="mobile-project__icon" src="../../assets/brands/valera/valera-kv.png" alt="" aria-hidden="true" />
+              <img width="206" height="206" loading="lazy" class="mobile-project__icon" src="../../assets/brands/valera/valera-kv.png" alt="Scroll to top" role="button" tabindex="0" />
             </div>
           </div>
 
@@ -771,7 +820,7 @@
          starts loading on demand—same as before, never worse. -->
     <script>
       (function () {
-        var videos = Array.from(document.querySelectorAll('.vp-bare[preload="none"]'));
+        var videos = Array.from(document.querySelectorAll('video[preload="none"]'));
         if (!videos.length || !('IntersectionObserver' in window)) return;
 
         var observer = new IntersectionObserver(function (entries) {
@@ -851,6 +900,123 @@
           threshold: 0
         });
         mobileItems.forEach(function (el) { mobileObserver.observe(el); });
+      })();
+    </script>
+
+    <!-- ── "To top" on the Solution icon. On desktop, hovering the icon
+         rotates it (pure CSS, see .pv-icon:hover img above) and shows a
+         cursor-following "To top ↑" tooltip; on mobile there's no hover
+         to speak of, so the matching .mobile-project__icon just gets
+         the same tap target. Either way, clicking/tapping scrolls back
+         to the very top—the desktop project pane, or on mobile (below
+         the 981px breakpoint) the page itself, since it scrolls
+         natively there instead. -->
+    <script>
+      (function () {
+        var icon = document.querySelector('.pv-icon');
+        var mobileIcon = document.querySelector('.mobile-project__icon');
+        if (!icon && !mobileIcon) return;
+
+        var tip = null;
+        if (icon) {
+          tip = document.createElement('div');
+          tip.className = 'pv-icon-tip';
+          tip.textContent = 'To top ↑';
+          document.body.appendChild(tip);
+
+          icon.addEventListener('mousemove', function (e) {
+            var off = 16;
+            var left = e.clientX + off;
+            var top = e.clientY + off;
+            var tw = tip.offsetWidth, th = tip.offsetHeight;
+            if (left + tw > window.innerWidth - 8) left = e.clientX - off - tw;
+            if (top + th > window.innerHeight - 8) top = e.clientY - off - th;
+            if (left < 8) left = 8;
+            if (top < 8) top = 8;
+            tip.style.left = left + 'px';
+            tip.style.top = top + 'px';
+            tip.classList.add('is-visible');
+          });
+          icon.addEventListener('mouseleave', function () {
+            tip.classList.remove('is-visible');
+          });
+        }
+
+        var pane = document.querySelector('.project-scroll');
+        var desktopQuery = window.matchMedia('(min-width: 981px)');
+
+        // Hand-rolled rAF tween instead of Lenis's own scrollTo—driving
+        // the pane's scrollTop directly guarantees one continuous
+        // monotonic curve for the whole trip. easeOutQuint: launches
+        // fast, then a long, smooth glide all the way to a dead
+        // stop—no hard brake at the end.
+        function easeOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
+        function animateScrollTo(getPos, setPos, target, duration, onDone) {
+          var start = getPos();
+          var change = target - start;
+          if (!change) { if (onDone) onDone(); return; }
+          var startTime = null;
+          function step(now) {
+            if (startTime === null) startTime = now;
+            var t = Math.min((now - startTime) / duration, 1);
+            setPos(start + change * easeOutQuint(t));
+            if (t < 1) requestAnimationFrame(step);
+            else if (onDone) onDone();
+          }
+          requestAnimationFrame(step);
+        }
+
+        var isAnimating = false;
+
+        function scrollProjectToTop() {
+          if (isAnimating) return;
+          isAnimating = true;
+          if (tip) tip.classList.remove('is-visible');
+
+          if (desktopQuery.matches && pane) {
+            // Lenis's own autoRaf loop keeps running the whole time, and
+            // writing straight to pane.scrollTop bypasses it entirely—
+            // Lenis's internal notion of "current scroll" falls out of
+            // sync with the real one, and re-converging the two produced
+            // a visible stutter right near the end. (lenisInstance.stop()
+            // looked like the fix, but it sets overflow:clip on the
+            // pane—that silently no-ops every scrollTop write for as
+            // long as it's called, which is worse.) Routing each frame
+            // through Lenis's own scrollTo with immediate:true instead
+            // makes Lenis itself the one writing scrollTop, so its
+            // internal state never drifts from reality in the first
+            // place—nothing to resync, nothing to fight.
+            var setPos = pane.lenisInstance
+              ? function (v) { pane.lenisInstance.scrollTo(v, { immediate: true }); }
+              : function (v) { pane.scrollTop = v; };
+            animateScrollTo(
+              function () { return pane.scrollTop; },
+              setPos,
+              0, 1400,
+              function () { isAnimating = false; }
+            );
+          } else {
+            animateScrollTo(
+              function () { return window.scrollY; },
+              function (v) { window.scrollTo(0, v); },
+              0, 1400,
+              function () { isAnimating = false; }
+            );
+          }
+        }
+
+        if (icon) icon.addEventListener('click', scrollProjectToTop);
+        if (mobileIcon) {
+          mobileIcon.addEventListener('click', scrollProjectToTop);
+          // role="button" on a plain <img> needs its own Enter/Space
+          // handling—native buttons get this for free, this doesn't.
+          mobileIcon.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              scrollProjectToTop();
+            }
+          });
+        }
       })();
     </script>
     <script>
