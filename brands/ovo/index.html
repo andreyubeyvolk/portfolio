@@ -23,7 +23,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../../styles.css" />
     <link rel="stylesheet" href="../../mobile.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.css" />
     <style>
+      /* Base text metrics: 18px line-height at the 16px base size is 1.125
+         unitless (house rule: line-height stays unitless, not px).
+         Cascades to anything that doesn't set its own line-height/
+         letter-spacing, e.g. .section-intro p and .nav-list a. */
+      body {
+        line-height: 1.125;
+        letter-spacing: -0.5px;
+      }
+
       /* ─── Desktop project layout ─── */
 
       .project-content {
@@ -40,8 +50,6 @@
         overflow: hidden;
         background: #d3d3d3;
         margin: 0;
-      }
-      .pv-cover {
         position: relative;
       }
       .pv-cover img,
@@ -143,11 +151,11 @@
         line-height: 1.2;
       }
 
-      /* Solution block: 2px full-width divider, 4px gap, then the row */
+      /* Solution block: 2px full-width divider, 2px gap, then the row */
       .pv-solution-block {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 2px;
       }
 
       .pv-divider {
@@ -195,7 +203,7 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 1px;
       }
 
       .pv-action__bar {
@@ -538,6 +546,59 @@
           font-size: 0.75rem;
         }
       }
+
+      /* ── Scroll reveal (desktop + mobile) ──
+         Gallery photos fade + rise into view as they scroll into the
+         viewport, on both the desktop .project-content gallery and the
+         mobile .mobile-project flat list. The pair-stagger rule below only
+         matches .pv-pair__photo, so it has no effect on the mobile flat
+         list (no side-by-side pairs there). */
+
+      :root {
+        --reveal-distance: 70px;
+        --reveal-duration: 1400ms;
+        --reveal-easing: cubic-bezier(0.16, 1, 0.3, 1);
+        --reveal-stagger: 60ms;
+        --reveal-opacity-from: 0.3;
+      }
+      .reveal {
+        opacity: var(--reveal-opacity-from, 0);
+        transform: translateY(var(--reveal-distance));
+        transition: opacity var(--reveal-duration) var(--reveal-easing),
+                    transform var(--reveal-duration) var(--reveal-easing);
+      }
+      .reveal.is-revealed {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      /* Second photo in a pair rises a beat after the first, instead of
+         both landing in perfect sync—reads less mechanical. */
+      .pv-pair__photo.reveal:nth-child(2) {
+        transition-delay: var(--reveal-stagger);
+      }
+      /* Mobile gets its own (shorter) rise distance—the same 70px reads
+         as a much bigger jump on a small screen than on desktop, and
+         mobile's earlier trigger point means the item is still being
+         carried up by the user's own scroll at the same time it's
+         self-animating, so the two motions stack. Also its own (longer,
+         gentler) duration, and starts from 30% opacity instead of fully
+         transparent—less contrast to cross reads as smoother. */
+      .mobile-project {
+        --reveal-distance: 28px;
+        --reveal-duration: 1600ms;
+        --reveal-opacity-from: 0.3;
+      }
+      /* Text (About/Challenge/Solution/actions) gets its own, more
+         visible rise + a lower starting opacity than photos, since a
+         pure opacity-only fade from 30% read as too subtle here.
+         .pv-actions (Download/Next buttons) is a descendant of
+         .pv-info, so it inherits this without needing its own line. */
+      .pv-info,
+      .pv-row--about,
+      .mobile-project__blocks {
+        --reveal-distance: 10px;
+        --reveal-opacity-from: 0.2;
+      }
     </style>
   </head>
   <body class="project-page">
@@ -615,7 +676,7 @@
                 <img width="1080" height="1440" loading="lazy" src="../../assets/brands/ovo/ovo-08.webp" alt="OVO Bureau visual 08" />
               </figure>
               <div class="pv-pair__photo">
-                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/ovo/ovo-video-2.mp4"></video>
+                <video class="vp-bare" width="810" height="1080" playsinline muted loop preload="none" src="../../assets/brands/ovo/ovo-video-2.mp4"></video>
               </div>
             </div>
 
@@ -695,7 +756,7 @@
                 <img width="1080" height="1440" loading="lazy" src="../../assets/brands/ovo/ovo-16.webp" alt="OVO Bureau visual 16" />
               </figure>
               <div class="pv-pair__photo">
-                <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/ovo/ovo-video-1.mp4"></video>
+                <video class="vp-bare" width="810" height="1080" playsinline muted loop preload="none" src="../../assets/brands/ovo/ovo-video-1.mp4"></video>
               </div>
             </div>
 
@@ -829,7 +890,7 @@
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/brands/ovo/ovo-08.webp" alt="OVO Bureau visual 08" />
       </figure>
-      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/ovo/ovo-video-2.mp4"></video>
+      <video class="vp-bare" width="810" height="1080" playsinline muted loop preload="none" src="../../assets/brands/ovo/ovo-video-2.mp4"></video>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/brands/ovo/ovo-11.webp" alt="OVO Bureau visual 11" />
       </figure>
@@ -897,7 +958,7 @@
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/brands/ovo/ovo-16.webp" alt="OVO Bureau visual 16" />
       </figure>
-      <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/ovo/ovo-video-1.mp4"></video>
+      <video class="vp-bare" width="810" height="1080" playsinline muted loop preload="none" src="../../assets/brands/ovo/ovo-video-1.mp4"></video>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="2160" height="1440" loading="lazy" src="../../assets/brands/ovo/ovo-18.webp" alt="OVO Bureau visual 18" />
       </figure>
@@ -996,11 +1057,108 @@
       <button class="mobile-bar__menu" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
     </nav>
 
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
     <script src="../../scroll.js"></script>
     <script src="../../project-order.js"></script>
     <script src="../../main.js"></script>
     <script src="../../menu.js"></script>
     <script src="../../video-player.js"></script>
     <script src="../../info-note.js"></script>
+
+    <!-- ── Predictive preload for autoplay-on-scroll videos.
+         Autoplay-on-scroll .vp-bare videos carry preload="none" in the
+         HTML so nothing fetches at page load—video-player.js's own
+         .vp-bare observer (threshold 0.5, no rootMargin) still owns the
+         actual play() call, unchanged. This is a second, separate
+         observer with a big rootMargin that fires about a screen-height
+         early and switches preload to "auto" + calls load(), so the
+         browser has a running start buffering by the time playback
+         actually begins—avoiding both "load nothing until scrolled into
+         view" (decode starts cold, jank) and "load everything on page
+         load" (wastes bandwidth on videos never reached). Safe either
+         way: if this fires late for some reason, play() itself still
+         starts loading on demand—same as before, never worse. -->
+    <script>
+      (function () {
+        var videos = Array.from(document.querySelectorAll('.vp-bare[preload="none"]'));
+        if (!videos.length || !('IntersectionObserver' in window)) return;
+
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            var video = entry.target;
+            video.preload = 'auto';
+            video.load();
+            observer.unobserve(video);
+          });
+        }, { rootMargin: '0px 0px 100% 0px' });
+
+        videos.forEach(function (video) { observer.observe(video); });
+      })();
+    </script>
+
+    <!-- ── Scroll reveal: fades + rises gallery photos into view as the
+         page scrolls, on both the desktop .project-content gallery and
+         the mobile .mobile-project flat list. Observes every
+         .pv-wide/.pv-pair__photo (desktop) and .mobile-project__photo
+         (mobile), plus text on desktop only—About (.pv-row--about) and
+         Challenge/Solution (.pv-info .pv-row)—and on mobile,
+         .mobile-project__block. The Download/Next actions row
+         (.pv-actions) isn't its own entry: it's a descendant of the
+         Solution row, so it fades in together with that text. Text
+         fades only, no rise, since --reveal-distance is zeroed on its
+         container (see the CSS above). Once revealed, an item stays
+         revealed (observer unwatches it). Desktop and mobile get
+         separate observers since they watch different element sets. -->
+    <script>
+      (function () {
+        // .pv-actions (Download/Next) is deliberately NOT its own entry
+        // here—it's a descendant of the Solution .pv-row, which is
+        // already observed below, so it fades in together with the
+        // Solution text instead of waiting for its own (much later,
+        // since it sits at the very bottom of a long block) trigger.
+        var desktopItems = document.querySelectorAll('.project-content .pv-wide, .project-content .pv-pair__photo, .pv-row--about, .pv-info .pv-row');
+        var mobileItems = document.querySelectorAll('.mobile-project__photo, .mobile-project__blocks .mobile-project__block');
+        desktopItems.forEach(function (el) { el.classList.add('reveal'); });
+        mobileItems.forEach(function (el) { el.classList.add('reveal'); });
+
+        var DESKTOP_TRIGGER_PERCENT = 5;
+        var MOBILE_TRIGGER_PERCENT = 5;
+
+        // The bug this guards against: an early trigger point + a long
+        // duration means the fade can finish *before* a loading="lazy"
+        // image has actually fetched—so the item lands fully opaque and
+        // "in position" while the image is still blank, showing the
+        // host's #d3d3d3 placeholder background through it. Fix: don't
+        // add is-revealed until the image is actually loaded (or errors,
+        // so a broken image doesn't stay invisible forever).
+        function revealCallback(entries, observer) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            observer.unobserve(entry.target);
+            var img = entry.target.querySelector('img');
+            if (img && !img.complete) {
+              var reveal = function () { entry.target.classList.add('is-revealed'); };
+              img.addEventListener('load', reveal, { once: true });
+              img.addEventListener('error', reveal, { once: true });
+            } else {
+              entry.target.classList.add('is-revealed');
+            }
+          });
+        }
+
+        var desktopObserver = new IntersectionObserver(revealCallback, {
+          rootMargin: '0px 0px -' + DESKTOP_TRIGGER_PERCENT + '% 0px',
+          threshold: 0
+        });
+        desktopItems.forEach(function (el) { desktopObserver.observe(el); });
+
+        var mobileObserver = new IntersectionObserver(revealCallback, {
+          rootMargin: '0px 0px -' + MOBILE_TRIGGER_PERCENT + '% 0px',
+          threshold: 0
+        });
+        mobileItems.forEach(function (el) { mobileObserver.observe(el); });
+      })();
+    </script>
   </body>
 </html>

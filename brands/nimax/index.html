@@ -23,17 +23,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../../styles.css" />
     <link rel="stylesheet" href="../../mobile.css" />
-    <!-- TEMPORARY: Lenis smooth-scroll, testing on this page first
-         before rolling out site-wide. See scroll.js for the actual
-         wiring—this just loads the library itself. -->
+    <!-- Lenis smooth-scroll library. See scroll.js for the actual wiring. -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.css" />
     <style>
-      /* Test on this page: base text metrics tweaked from the site
-         default (line-height 1.25 / letter-spacing 0)—18px line-height
-         at the 16px base size is 1.125 unitless (house rule: line-height
-         stays unitless, not px). Cascades to anything that doesn't set
-         its own line-height/letter-spacing, e.g. .section-intro p and
-         .nav-list a. */
+      /* Base text metrics: 18px line-height at the 16px base size is 1.125
+         unitless (house rule: line-height stays unitless, not px).
+         Cascades to anything that doesn't set its own line-height/
+         letter-spacing, e.g. .section-intro p and .nav-list a. */
       body {
         line-height: 1.125;
         letter-spacing: -0.5px;
@@ -802,7 +798,7 @@
     <script src="../../video-player.js"></script>
     <script src="../../info-note.js"></script>
 
-    <!-- ── TEMPORARY: predictive preload for autoplay-on-scroll videos.
+    <!-- ── Predictive preload for autoplay-on-scroll videos.
          These three (nimax-11/18/22) carry preload="none" in the HTML
          so nothing fetches at page load—video-player.js's own .vp-bare
          observer (threshold 0.5, no rootMargin) still owns the actual
