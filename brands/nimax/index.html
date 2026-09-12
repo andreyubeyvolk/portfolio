@@ -28,6 +28,17 @@
          wiring—this just loads the library itself. -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.css" />
     <style>
+      /* Test on this page: base text metrics tweaked from the site
+         default (line-height 1.25 / letter-spacing 0)—18px line-height
+         at the 16px base size is 1.125 unitless (house rule: line-height
+         stays unitless, not px). Cascades to anything that doesn't set
+         its own line-height/letter-spacing, e.g. .section-intro p and
+         .nav-list a. */
+      body {
+        line-height: 1.125;
+        letter-spacing: -0.5px;
+      }
+
       /* ─── Desktop project layout ─── */
 
       .project-content {
@@ -131,7 +142,7 @@
       .pv-solution-block {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 2px;
       }
 
       .pv-divider {
@@ -179,7 +190,7 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 1px;
       }
 
       .pv-action__bar {
@@ -370,25 +381,52 @@
         }
       }
 
-      /* ── Scroll reveal (desktop + mobile, TUNING IN PROGRESS) ──
+      /* ── Scroll reveal (desktop + mobile) ──
          Gallery photos fade + rise into view as they scroll into the
          viewport, on both the desktop .project-content gallery and the
-         mobile .mobile-project flat list. Values below are the starting
-         defaults; while the reveal-panel script near </body> is still in
-         the page, they're live-tunable from its ⚙ button (desktop only—
-         the panel itself stays hidden under 640px, see its own CSS)—once
-         the numbers are locked in, hardcode the winners here and delete
-         the whole panel (CSS block, markup, and script). The pair-stagger
-         rule below only matches .pv-pair__photo, so it has no effect on
-         the mobile flat list (no side-by-side pairs there). */
+         mobile .mobile-project flat list. Values below are final (the
+         live-tuning panel this was dialed in with has been removed).
+         The pair-stagger rule below only matches .pv-pair__photo, so it
+         has no effect on the mobile flat list (no side-by-side pairs
+         there). */
+
+      /* ── TEMPORARY: cursor lens-distortion test on the logo ──
+         .brand already exists in styles.css (width/margin/etc.)—this
+         just adds position:relative on top, needed to place the warped
+         duplicate. The duplicate sits pixel-for-pixel on top of the
+         real logo, run through the SVG filter defined near the end of
+         the page, and is only visible through a small circular mask
+         that tracks the cursor (see the script there for the lerp that
+         makes it trail smoothly instead of snapping). */
+      .brand {
+        position: relative;
+      }
+      /* styles.css fades the whole logo to 0.7 opacity on hover (site-
+         wide link convention)—here that fights the lens effect, which
+         wants the logo staying fully solid while you look at the
+         distortion, so cancel it just on this page. */
+      .brand:hover {
+        opacity: 1;
+      }
+      .brand-mark--lens {
+        position: absolute;
+        top: 0;
+        left: 0;
+        filter: url(#nimax-lens);
+        -webkit-mask-image: radial-gradient(circle 26px at var(--lens-x, -999px) var(--lens-y, -999px), #000 55%, transparent 100%);
+        mask-image: radial-gradient(circle 26px at var(--lens-x, -999px) var(--lens-y, -999px), #000 55%, transparent 100%);
+        pointer-events: none;
+      }
+
       :root {
         --reveal-distance: 70px;
         --reveal-duration: 1400ms;
         --reveal-easing: cubic-bezier(0.16, 1, 0.3, 1);
         --reveal-stagger: 60ms;
+        --reveal-opacity-from: 0.3;
       }
       .reveal {
-        opacity: 0;
+        opacity: var(--reveal-opacity-from, 0);
         transform: translateY(var(--reveal-distance));
         transition: opacity var(--reveal-duration) var(--reveal-easing),
                     transform var(--reveal-duration) var(--reveal-easing);
@@ -406,231 +444,60 @@
          as a much bigger jump on a small screen than on desktop, and
          mobile's earlier trigger point means the item is still being
          carried up by the user's own scroll at the same time it's
-         self-animating, so the two motions stack. A local override here
-         beats the panel's :root inline value for anything inside
-         .mobile-project, since inheritance looks at the nearest
+         self-animating, so the two motions stack. Also its own (longer,
+         gentler) duration, and starts from 30% opacity instead of fully
+         transparent—less contrast to cross reads as smoother. A local
+         override here beats the panel's :root inline value for anything
+         inside .mobile-project, since inheritance looks at the nearest
          declaration, not which one is inline (the panel is desktop-only
          anyway, so there's nothing to tune this from live). */
       .mobile-project {
         --reveal-distance: 28px;
+        --reveal-duration: 1600ms;
+        --reveal-opacity-from: 0.3;
       }
-      /* Text (About/Challenge/Solution/actions) reveals via opacity
-         only—zeroing the shared --reveal-distance here means .reveal's
-         own translateY becomes a no-op, so the same duration/easing/
-         observer logic applies without a separate code path.
+      /* Text (About/Challenge/Solution/actions) gets its own, more
+         visible rise + a lower starting opacity than photos, since a
+         pure opacity-only fade from 30% read as too subtle here.
          .pv-actions (Download/Next buttons) is a descendant of
          .pv-info, so it inherits this without needing its own line. */
       .pv-info,
       .pv-row--about,
       .mobile-project__blocks {
-        --reveal-distance: 0px;
+        --reveal-distance: 10px;
+        --reveal-opacity-from: 0.2;
       }
 
-      /* ── TEMPORARY dev tool: reveal tuning panel look. Delete along
-         with the panel markup/script once values are final. ── */
-      #reveal-panel-toggle {
-        position: fixed;
-        bottom: 16px;
-        left: 16px;
-        z-index: 9999;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        border: 0;
-        background: #262626;
-        color: #ccc;
-        font-size: 1rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      }
-      #reveal-panel {
-        position: fixed;
-        bottom: 60px;
-        left: 16px;
-        z-index: 9999;
-        width: 260px;
-        max-height: calc(100vh - 80px);
-        overflow-y: auto;
-        background: #262626;
-        color: #ccc;
-        border-radius: 8px;
-        padding: 16px;
-        font-family: 'Inter', sans-serif;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-      }
-      #reveal-panel h3 {
-        margin: 0 0 12px;
-        font-size: 0.8125rem;
-        font-weight: 700;
-        color: #ccc;
-      }
-      .rp-tabs {
-        display: flex;
-        gap: 4px;
-        margin-bottom: 12px;
-      }
-      .rp-tab {
-        flex: 1;
-        background: #2a2a2a;
-        color: #888;
-        border: 1px solid #454545;
-        border-radius: 4px;
-        padding: 6px 4px;
-        cursor: pointer;
-        font-family: inherit;
-        font-size: 0.6875rem;
-        font-weight: 700;
-      }
-      .rp-tab.is-active {
-        background: #3a3a3a;
-        color: #ddd;
-        border-color: #6b6b6b;
-      }
-      #reveal-panel .rp-note {
-        margin: 0 0 12px;
-        font-size: 0.6875rem;
-        line-height: 1.4;
-        color: #888;
-      }
-      #reveal-panel .rp-field {
-        margin-bottom: 12px;
-      }
-      #reveal-panel .rp-field__row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        margin-bottom: 5px;
-      }
-      #reveal-panel .rp-field__row label {
-        margin: 0;
-        font-size: 0.75rem;
-        color: #aaa;
-      }
-      /* Number input: manual entry alongside the slider, right-aligned so
-         every field's value lines up in a column down the panel's edge. */
-      #reveal-panel .rp-num {
-        width: 52px;
-        flex: 0 0 auto;
-        background: #2a2a2a;
-        color: #bbb;
-        border: 1px solid #454545;
-        border-radius: 4px;
-        padding: 2px 5px;
-        font-family: inherit;
-        font-size: 0.75rem;
-        text-align: right;
-        -moz-appearance: textfield;
-      }
-      #reveal-panel .rp-num::-webkit-outer-spin-button,
-      #reveal-panel .rp-num::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
-      /* Gray, squarish slider—no browser-default blue accent or round
-         white thumb. Track and thumb both muted, thumb just barely
-         rounded rather than a full circle. */
-      #reveal-panel input[type="range"] {
-        display: block;
-        width: 100%;
-        margin: 0;
-        -webkit-appearance: none;
-        appearance: none;
-        height: 3px;
-        background: #454545;
-        border-radius: 2px;
-        outline: none;
-      }
-      #reveal-panel input[type="range"]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 13px;
-        height: 13px;
-        border-radius: 3px;
-        background: #767676;
-        border: 1px solid #3a3a3a;
-        cursor: pointer;
-        margin-top: -5px;
-      }
-      #reveal-panel input[type="range"]::-moz-range-track {
-        height: 3px;
-        background: #454545;
-        border-radius: 2px;
-      }
-      #reveal-panel input[type="range"]::-moz-range-thumb {
-        width: 13px;
-        height: 13px;
-        border-radius: 3px;
-        background: #767676;
-        border: 1px solid #3a3a3a;
-        cursor: pointer;
-      }
-      #reveal-panel select {
-        width: 100%;
-        margin-top: 4px;
-        background: #2a2a2a;
-        color: #bbb;
-        border: 1px solid #454545;
-        border-radius: 4px;
-        padding: 4px;
-        font-size: 0.75rem;
-      }
-      #reveal-panel select:focus,
-      #reveal-panel .rp-num:focus {
-        outline: none;
-        border-color: #767676;
-      }
-      #reveal-panel input[type="checkbox"] {
-        width: 15px;
-        height: 15px;
-        margin: 0;
-        accent-color: #767676;
-      }
-      .reveal-panel__actions {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 8px;
-      }
-      .reveal-panel__actions button {
-        flex: 1;
-        background: #2a2a2a;
-        color: #bbb;
-        border: 1px solid #454545;
-        border-radius: 4px;
-        padding: 6px;
-        cursor: pointer;
-        font-size: 0.75rem;
-      }
-      #reveal-panel textarea {
-        width: 100%;
-        background: #202020;
-        color: #999;
-        border: 1px solid #454545;
-        border-radius: 4px;
-        font-family: 'SFMono-Regular', Consolas, monospace;
-        font-size: 0.625rem;
-        padding: 6px;
-        resize: vertical;
-      }
-      @media (max-width: 640px) {
-        #reveal-panel-toggle,
-        #reveal-panel {
-          display: none;
-        }
-      }
 
     </style>
   </head>
   <body class="project-page">
 
+    <!-- TEMPORARY: SVG filter for the logo lens-distortion test (see
+         .brand-mark--lens above and the script near </body>). Turbulence
+         + displacement gives a "warped glass" ripple rather than a true
+         optical magnifier—simpler than a real lens shader, and plenty
+         convincing for a small hover bubble. Scale is deliberately mild
+         since the logo itself is only 16px tall. -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <filter id="nimax-lens">
+        <feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="2" seed="7" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="16" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </svg>
+
     <!-- ── DESKTOP LAYOUT ─────────────────────────── -->
     <main class="site-shell page-grid">
       <aside class="site-nav" aria-label="Main navigation">
+        <!-- TEMPORARY: cursor lens-distortion test (see the SVG filter,
+             CSS, and script near the end of the page). The second img is
+             a warped duplicate, visible only through a small circular
+             mask that follows the cursor—so hovering the wordmark shows
+             a little bubble of glass-like distortion sliding across it,
+             while the rest stays crisp. -->
         <a class="brand" href="../../index.html" aria-label="Andrey Ubeyvolk home">
           <img width="129" height="16" class="brand-mark" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
+          <img width="129" height="16" class="brand-mark brand-mark--lens" src="../../assets/logo.svg" alt="" aria-hidden="true" />
         </a>
         <nav class="nav-list">
           <a href="../../inhouse/index.html">Inhouse</a>
@@ -758,7 +625,7 @@
 
             <!-- nimax-22: plays once scrolled into view, muted (silent clip), no player chrome -->
             <div class="info-note" data-note="Custom merch concept for the team">
-              <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-22.mp4"></video>
+              <video class="vp-bare" width="1808" height="1080" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-22.mp4"></video>
             </div>
 
             <div class="pv-pair">
@@ -901,7 +768,7 @@
       </figure>
       <!-- nimax-22: plays once scrolled into view, muted (silent clip), no player chrome -->
       <div class="info-note" data-note="Custom merch concept for the team">
-        <video class="vp-bare" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-22.mp4"></video>
+        <video class="vp-bare" width="1808" height="1080" playsinline muted loop preload="metadata" src="../../assets/brands/nimax/nimax-22.mp4"></video>
       </div>
       <figure class="mobile-project__photo" style="background:#d3d3d3;">
         <img width="1080" height="1440" loading="lazy" src="../../assets/brands/nimax/nimax-23.webp" alt="Nimax visual 23" />
@@ -977,102 +844,6 @@
       <button class="mobile-bar__menu" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
     </nav>
 
-    <!-- ══════════════════════════════════════════════════════════════
-         TEMPORARY: reveal-animation tuning panel. Desktop only, hidden
-         under 640px. Delete this whole block (through the closing
-         comment near the scripts below) once the animation values are
-         locked in for real. ══════════════════════════════════════════ -->
-    <button id="reveal-panel-toggle" type="button" aria-label="Toggle animation tuning panel" aria-expanded="false">⚙</button>
-    <div id="reveal-panel" hidden>
-      <div class="rp-tabs">
-        <button type="button" class="rp-tab is-active" data-tab="reveal">Появление</button>
-        <button type="button" class="rp-tab" data-tab="parallax">Параллакс</button>
-      </div>
-
-      <div class="rp-tabpanel" data-tabpanel="reveal">
-        <p class="rp-note">Фото: проявление + сдвиг вверх. Текст (Challenge/Solution): только через прозрачность, без сдвига.</p>
-
-        <div class="rp-field">
-          <div class="rp-field__row">
-            <label for="rp-distance">Дистанция фото (px)</label>
-            <input type="number" id="rp-distance-num" class="rp-num" value="70" min="0" max="150" step="2">
-          </div>
-          <input type="range" id="rp-distance" min="0" max="150" step="2" value="70">
-        </div>
-
-        <div class="rp-field">
-          <div class="rp-field__row">
-            <label for="rp-duration">Длительность (мс)</label>
-            <input type="number" id="rp-duration-num" class="rp-num" value="1400" min="100" max="2000" step="10">
-          </div>
-          <input type="range" id="rp-duration" min="100" max="2000" step="10" value="1400">
-        </div>
-
-        <div class="rp-field">
-          <div class="rp-field__row">
-            <label for="rp-easing">Плавность</label>
-          </div>
-          <select id="rp-easing">
-            <option value="cubic-bezier(0.16, 1, 0.3, 1)" selected>Плавное замедление</option>
-            <option value="ease-out">Замедление к концу</option>
-            <option value="ease-in-out">Плавно туда-сюда</option>
-            <option value="cubic-bezier(0.34, 1.56, 0.64, 1)">Лёгкий отскок</option>
-            <option value="linear">Линейно</option>
-          </select>
-        </div>
-
-        <div class="rp-field">
-          <div class="rp-field__row">
-            <label for="rp-stagger">Задержка пары (мс)</label>
-            <input type="number" id="rp-stagger-num" class="rp-num" value="60" min="0" max="300" step="10">
-          </div>
-          <input type="range" id="rp-stagger" min="0" max="300" step="10" value="60">
-        </div>
-
-        <div class="rp-field">
-          <div class="rp-field__row">
-            <label for="rp-trigger">Точка срабатывания, десктоп (%)</label>
-            <input type="number" id="rp-trigger-num" class="rp-num" value="10" min="0" max="40" step="1">
-          </div>
-          <input type="range" id="rp-trigger" min="0" max="40" step="1" value="10">
-        </div>
-      </div>
-
-      <div class="rp-tabpanel" data-tabpanel="parallax" hidden>
-        <p class="rp-note">Пока скроллишь, фото/видео чуть сдвигается внутри своей рамки—как будто заезжает под маску кропа. Едва заметно, работает постоянно, не только при появлении.</p>
-
-        <div class="rp-field">
-          <div class="rp-field__row">
-            <label for="rp-parallax-enabled">Включить параллакс</label>
-            <input type="checkbox" id="rp-parallax-enabled" checked>
-          </div>
-        </div>
-
-        <div class="rp-field">
-          <div class="rp-field__row">
-            <label for="rp-parallax-shift">Сдвиг (px)</label>
-            <input type="number" id="rp-parallax-shift-num" class="rp-num" value="20" min="0" max="60" step="1">
-          </div>
-          <input type="range" id="rp-parallax-shift" min="0" max="60" step="1" value="20">
-        </div>
-
-        <div class="rp-field">
-          <div class="rp-field__row">
-            <label for="rp-parallax-scale">Масштаб (%)</label>
-            <input type="number" id="rp-parallax-scale-num" class="rp-num" value="112" min="100" max="140" step="1">
-          </div>
-          <input type="range" id="rp-parallax-scale" min="100" max="140" step="1" value="112">
-        </div>
-      </div>
-
-      <div class="reveal-panel__actions">
-        <button type="button" id="rp-replay">Заново</button>
-        <button type="button" id="rp-copy">Скопировать JSON</button>
-      </div>
-      <textarea id="rp-json" readonly rows="7"></textarea>
-    </div>
-    <!-- ══════════════════════════════════════════════════════════════ -->
-
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
     <script src="../../scroll.js"></script>
     <script src="../../project-order.js"></script>
@@ -1080,6 +851,41 @@
     <script src="../../menu.js"></script>
     <script src="../../video-player.js"></script>
     <script src="../../info-note.js"></script>
+
+    <!-- ── TEMPORARY: cursor lens-distortion on the logo. Tracks the
+         mouse over .brand, lerping the mask's center toward the cursor
+         each frame (instead of snapping straight to it) so it trails
+         smoothly—more "liquid glass," less "cursor tooltip." Resets to
+         off-element on mouseleave so the mask fully closes. -->
+    <script>
+      (function () {
+        var brand = document.querySelector('.brand');
+        var lens = brand ? brand.querySelector('.brand-mark--lens') : null;
+        if (!brand || !lens) return;
+
+        var targetX = -999, targetY = -999;
+        var curX = -999, curY = -999;
+
+        brand.addEventListener('mousemove', function (e) {
+          var rect = brand.getBoundingClientRect();
+          targetX = e.clientX - rect.left;
+          targetY = e.clientY - rect.top;
+        });
+        brand.addEventListener('mouseleave', function () {
+          targetX = -999;
+          targetY = -999;
+        });
+
+        function tick() {
+          curX += (targetX - curX) * 0.2;
+          curY += (targetY - curY) * 0.2;
+          brand.style.setProperty('--lens-x', curX.toFixed(1) + 'px');
+          brand.style.setProperty('--lens-y', curY.toFixed(1) + 'px');
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      })();
+    </script>
 
     <!-- ── Scroll reveal: fades + rises gallery photos into view as the
          page scrolls, on both the desktop .project-content gallery and
@@ -1094,10 +900,7 @@
          container (see the CSS above). Once revealed, an item stays
          revealed (observer
          unwatches it). Desktop and mobile get separate observers since
-         they use different trigger-offset percentages—desktop's is
-         tunable from the panel below, mobile's is fixed (the panel
-         itself is desktop-only, so there's nothing to tune it live from
-         while at a mobile viewport width anyway). -->
+         they use different trigger-offset percentages. -->
     <script>
       (function () {
         // .pv-actions (Download/Next) is deliberately NOT its own entry
@@ -1110,9 +913,8 @@
         desktopItems.forEach(function (el) { el.classList.add('reveal'); });
         mobileItems.forEach(function (el) { el.classList.add('reveal'); });
 
+        var DESKTOP_TRIGGER_PERCENT = 5;
         var MOBILE_TRIGGER_PERCENT = 5;
-        var desktopTriggerPercent = 10;
-        var desktopObserver;
 
         // The bug this guards against: an early trigger point + a long
         // duration means the fade can finish *before* a loading="lazy"
@@ -1136,28 +938,17 @@
           });
         }
 
-        function buildDesktopObserver() {
-          if (desktopObserver) desktopObserver.disconnect();
-          desktopObserver = new IntersectionObserver(revealCallback, {
-            rootMargin: '0px 0px -' + desktopTriggerPercent + '% 0px',
-            threshold: 0
-          });
-          desktopItems.forEach(function (el) { desktopObserver.observe(el); });
-        }
-        buildDesktopObserver();
+        var desktopObserver = new IntersectionObserver(revealCallback, {
+          rootMargin: '0px 0px -' + DESKTOP_TRIGGER_PERCENT + '% 0px',
+          threshold: 0
+        });
+        desktopItems.forEach(function (el) { desktopObserver.observe(el); });
 
         var mobileObserver = new IntersectionObserver(revealCallback, {
           rootMargin: '0px 0px -' + MOBILE_TRIGGER_PERCENT + '% 0px',
           threshold: 0
         });
         mobileItems.forEach(function (el) { mobileObserver.observe(el); });
-
-        // Exposed for the tuning panel below to rebuild the desktop
-        // observer when the trigger-offset slider moves.
-        window.__revealSetTrigger = function (percent) {
-          desktopTriggerPercent = percent;
-          buildDesktopObserver();
-        };
       })();
     </script>
 
@@ -1173,8 +964,7 @@
     <script>
       (function () {
         // Parallax off everywhere for now (desktop and mobile)—so the
-        // hosts list is empty. The panel/controls stay in place in case
-        // it's worth revisiting later; re-enabling is a one-line change
+        // hosts list is empty. Re-enabling later is a one-line change
         // (put the selector(s) back here).
         var hosts = [];
         var items = [];
@@ -1202,10 +992,6 @@
           });
         }
 
-        function clear() {
-          items.forEach(function (item) { item.media.style.transform = ''; });
-        }
-
         var ticking = false;
         function onScroll() {
           if (ticking) return;
@@ -1218,211 +1004,7 @@
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onScroll, { passive: true });
         update();
-
-        // Exposed for the tuning panel below.
-        window.__parallaxSetShift = function (px) { shift = px; update(); };
-        window.__parallaxSetScale = function (pct) { scale = pct; update(); };
-        window.__parallaxSetEnabled = function (on) {
-          enabled = on;
-          if (on) update();
-          else clear();
-        };
       })();
     </script>
-
-    <!-- ══════════════════════════════════════════════════════════════
-         TEMPORARY: reveal tuning panel logic. Delete along with the
-         panel's markup and CSS once the animation values are final.
-         Live-updates the --reveal-* custom properties on :root as the
-         sliders move, remembers the last-used values in localStorage
-         (so a reload doesn't reset your progress), and "Copy JSON"
-         hands you the current values to paste back for me to hardcode
-         site-wide. ══════════════════════════════════════════════════ -->
-    <script>
-      (function () {
-        var root = document.documentElement;
-        var toggle = document.getElementById('reveal-panel-toggle');
-        var panel = document.getElementById('reveal-panel');
-        // Bumped whenever the committed defaults change, so a browser
-        // with older cached slider values doesn't silently mask the new
-        // defaults on next load.
-        var STORAGE_KEY = 'nimaxRevealTuning_v3';
-
-        var controls = {
-          distance: document.getElementById('rp-distance'),
-          duration: document.getElementById('rp-duration'),
-          easing: document.getElementById('rp-easing'),
-          stagger: document.getElementById('rp-stagger'),
-          trigger: document.getElementById('rp-trigger')
-        };
-        // Number inputs mirror the sliders for manual entry—keyed the
-        // same as controls so load()/save() can loop over both.
-        var numbers = {
-          distance: document.getElementById('rp-distance-num'),
-          duration: document.getElementById('rp-duration-num'),
-          stagger: document.getElementById('rp-stagger-num'),
-          trigger: document.getElementById('rp-trigger-num')
-        };
-        // Parallax tab: same slider+number pairing pattern, plus its own
-        // on/off checkbox (no number counterpart for that one).
-        var parallaxControls = {
-          shift: document.getElementById('rp-parallax-shift'),
-          scale: document.getElementById('rp-parallax-scale')
-        };
-        var parallaxNumbers = {
-          shift: document.getElementById('rp-parallax-shift-num'),
-          scale: document.getElementById('rp-parallax-scale-num')
-        };
-        var parallaxEnabledBox = document.getElementById('rp-parallax-enabled');
-        var jsonBox = document.getElementById('rp-json');
-
-        function applyAll(source) {
-          // Keep slider and number input in sync, whichever one changed.
-          Object.keys(numbers).forEach(function (key) {
-            if (source === numbers[key]) {
-              controls[key].value = numbers[key].value;
-            } else {
-              numbers[key].value = controls[key].value;
-            }
-          });
-          root.style.setProperty('--reveal-distance', controls.distance.value + 'px');
-          root.style.setProperty('--reveal-duration', controls.duration.value + 'ms');
-          root.style.setProperty('--reveal-easing', controls.easing.value);
-          root.style.setProperty('--reveal-stagger', controls.stagger.value + 'ms');
-          if (window.__revealSetTrigger) window.__revealSetTrigger(Number(controls.trigger.value));
-          updateJSON();
-          save();
-        }
-
-        function applyParallax(source) {
-          Object.keys(parallaxNumbers).forEach(function (key) {
-            if (source === parallaxNumbers[key]) {
-              parallaxControls[key].value = parallaxNumbers[key].value;
-            } else {
-              parallaxNumbers[key].value = parallaxControls[key].value;
-            }
-          });
-          if (window.__parallaxSetShift) window.__parallaxSetShift(Number(parallaxControls.shift.value));
-          if (window.__parallaxSetScale) window.__parallaxSetScale(Number(parallaxControls.scale.value));
-          updateJSON();
-          save();
-        }
-
-        function applyParallaxEnabled() {
-          if (window.__parallaxSetEnabled) window.__parallaxSetEnabled(parallaxEnabledBox.checked);
-          updateJSON();
-          save();
-        }
-
-        function updateJSON() {
-          jsonBox.value = JSON.stringify({
-            reveal: {
-              distance: Number(controls.distance.value),
-              duration: Number(controls.duration.value),
-              easing: controls.easing.value,
-              stagger: Number(controls.stagger.value),
-              triggerPercent: Number(controls.trigger.value)
-            },
-            parallax: {
-              enabled: parallaxEnabledBox.checked,
-              shift: Number(parallaxControls.shift.value),
-              scale: Number(parallaxControls.scale.value)
-            }
-          }, null, 2);
-        }
-
-        function save() {
-          try {
-            var out = {};
-            Object.keys(controls).forEach(function (key) { out[key] = controls[key].value; });
-            var parallaxOut = { enabled: parallaxEnabledBox.checked };
-            Object.keys(parallaxControls).forEach(function (key) { parallaxOut[key] = parallaxControls[key].value; });
-            out.parallax = parallaxOut;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
-          } catch (e) {}
-        }
-
-        function load() {
-          try {
-            var raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) return;
-            var saved = JSON.parse(raw);
-            Object.keys(controls).forEach(function (key) {
-              if (saved[key] != null) controls[key].value = saved[key];
-            });
-            if (saved.parallax) {
-              Object.keys(parallaxControls).forEach(function (key) {
-                if (saved.parallax[key] != null) parallaxControls[key].value = saved.parallax[key];
-              });
-              if (saved.parallax.enabled != null) parallaxEnabledBox.checked = saved.parallax.enabled;
-            }
-          } catch (e) {}
-        }
-
-        Object.keys(controls).forEach(function (key) {
-          controls[key].addEventListener('input', function (e) { applyAll(e.target); });
-        });
-        Object.keys(numbers).forEach(function (key) {
-          numbers[key].addEventListener('input', function (e) { applyAll(e.target); });
-        });
-        Object.keys(parallaxControls).forEach(function (key) {
-          parallaxControls[key].addEventListener('input', function (e) { applyParallax(e.target); });
-        });
-        Object.keys(parallaxNumbers).forEach(function (key) {
-          parallaxNumbers[key].addEventListener('input', function (e) { applyParallax(e.target); });
-        });
-        parallaxEnabledBox.addEventListener('change', applyParallaxEnabled);
-
-        document.querySelectorAll('.rp-tab').forEach(function (tab) {
-          tab.addEventListener('click', function () {
-            document.querySelectorAll('.rp-tab').forEach(function (t) { t.classList.remove('is-active'); });
-            tab.classList.add('is-active');
-            var target = tab.getAttribute('data-tab');
-            document.querySelectorAll('.rp-tabpanel').forEach(function (panelEl) {
-              panelEl.hidden = panelEl.getAttribute('data-tabpanel') !== target;
-            });
-          });
-        });
-
-        toggle.addEventListener('click', function () {
-          var isHidden = panel.hasAttribute('hidden');
-          if (isHidden) {
-            panel.removeAttribute('hidden');
-            toggle.setAttribute('aria-expanded', 'true');
-          } else {
-            panel.setAttribute('hidden', '');
-            toggle.setAttribute('aria-expanded', 'false');
-          }
-        });
-
-        document.getElementById('rp-replay').addEventListener('click', function () {
-          document.querySelectorAll('.reveal.is-revealed').forEach(function (el) {
-            el.classList.remove('is-revealed');
-          });
-          if (window.__revealSetTrigger) window.__revealSetTrigger(Number(controls.trigger.value));
-        });
-
-        document.getElementById('rp-copy').addEventListener('click', function (e) {
-          var btn = e.currentTarget;
-          var restore = btn.textContent;
-          function done(ok) {
-            btn.textContent = ok ? 'Copied!' : 'Copy failed';
-            setTimeout(function () { btn.textContent = restore; }, 1200);
-          }
-          jsonBox.select();
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(jsonBox.value).then(function () { done(true); }, function () { done(false); });
-          } else {
-            try { done(document.execCommand('copy')); } catch (e) { done(false); }
-          }
-        });
-
-        load();
-        applyAll();
-        applyParallax();
-        applyParallaxEnabled();
-      })();
-    </script>
-    <!-- ══════════════════════════════════════════════════════════════ -->
   </body>
 </html>

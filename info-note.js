@@ -25,22 +25,33 @@
   // position the video inside it with the same 1px overscan used by
   // every other video-in-a-box on the site, so bar and video always
   // share the exact same bottom edge regardless of rounding.
+  //
+  // This reads the video's width/height HTML attributes (not
+  // videoWidth/videoHeight, which stay 0 until the browser has actually
+  // fetched metadata over the network). Applying it synchronously off
+  // the attributes—rather than waiting for a loadedmetadata event that
+  // can fire mid-scroll—avoids a real layout jump: an earlier version
+  // waited for loadedmetadata, so the host sat at a default ~2:1 video
+  // box until metadata arrived, then snapped to its true aspect ratio,
+  // visibly jolting the page if that happened while the video was
+  // scrolling into view. So: every standalone bare video must carry
+  // width/height attributes matching its real pixel size (same as any
+  // <img>) for this to work—there's nothing to fall back on otherwise.
   function fixBareVideoEdge(host) {
     if (host.classList.contains('pv-cover') || host.classList.contains('pv-wide') || host.classList.contains('pv-pair__photo')) return;
     var video = host.querySelector(':scope > video.vp-bare');
     if (!video) return;
 
-    function apply() {
-      if (!video.videoWidth || !video.videoHeight) return;
-      host.style.aspectRatio = video.videoWidth + ' / ' + video.videoHeight;
-      video.style.position = 'absolute';
-      video.style.inset = '-1px';
-      video.style.width = 'calc(100% + 2px)';
-      video.style.height = 'calc(100% + 2px)';
-      video.style.objectFit = 'cover';
-    }
-    if (video.readyState >= 1) apply();
-    else video.addEventListener('loadedmetadata', apply, { once: true });
+    var w = video.width;
+    var h = video.height;
+    if (!w || !h) return;
+
+    host.style.aspectRatio = w + ' / ' + h;
+    video.style.position = 'absolute';
+    video.style.inset = '-1px';
+    video.style.width = 'calc(100% + 2px)';
+    video.style.height = 'calc(100% + 2px)';
+    video.style.objectFit = 'cover';
   }
 
   document.querySelectorAll('.info-note[data-note]').forEach(function (host) {
