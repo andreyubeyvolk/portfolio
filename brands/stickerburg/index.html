@@ -24,6 +24,9 @@
     <link rel="stylesheet" href="../../styles.css" />
     <link rel="stylesheet" href="../../mobile.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.css" />
+    <!-- Spray-can graffiti + logo hover-scrub—shared across all of Brands,
+         see graffiti.css/graffiti.js/logo-scrub.js. -->
+    <link rel="stylesheet" href="../../graffiti.css" />
     <style>
       /* Base text metrics: 18px line-height at the 16px base size is 1.125
          unitless (house rule: line-height stays unitless, not px).
@@ -434,8 +437,18 @@
     <!-- ── DESKTOP LAYOUT ─────────────────────────── -->
     <main class="site-shell page-grid">
       <aside class="site-nav" aria-label="Main navigation">
-        <a class="brand" href="../../index.html" aria-label="Andrey Ubeyvolk home">
+        <!-- Logo hover-scrub (shared across Brands): hover scrubs across
+             7 brush-stroke logo variants left-to-right; click still goes
+             home. See ../../logo-scrub.js. -->
+        <a class="brand" id="brand-scrub" href="../../index.html" aria-label="Andrey Ubeyvolk home">
           <img width="129" height="16" class="brand-mark" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
+          <img class="brand-mark brand-mark--brush" src="../../assets/logo/logo-01.svg" alt="" aria-hidden="true" />
+          <img class="brand-mark brand-mark--brush" src="../../assets/logo/logo-02.svg" alt="" aria-hidden="true" />
+          <img class="brand-mark brand-mark--brush" src="../../assets/logo/logo-03.svg" alt="" aria-hidden="true" />
+          <img class="brand-mark brand-mark--brush" src="../../assets/logo/logo-04.svg" alt="" aria-hidden="true" />
+          <img class="brand-mark brand-mark--brush" src="../../assets/logo/logo-05.svg" alt="" aria-hidden="true" />
+          <img class="brand-mark brand-mark--brush" src="../../assets/logo/logo-06.svg" alt="" aria-hidden="true" />
+          <img class="brand-mark brand-mark--brush" src="../../assets/logo/logo-07.svg" alt="" aria-hidden="true" />
         </a>
         <nav class="nav-list">
           <a href="../../inhouse/index.html">Inhouse</a>
@@ -996,5 +1009,11 @@
         }
       })();
     </script>
+
+    <!-- Logo hover-scrub + spray-can graffiti—shared across all of
+         Brands, see logo-scrub.js/graffiti.js (and graffiti.css, linked
+         in <head>). -->
+    <script src="../../logo-scrub.js"></script>
+    <script src="../../graffiti.js"></script>
   </body>
 </html>
