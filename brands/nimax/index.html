@@ -167,11 +167,54 @@
       .pv-icon {
         margin: 0;
         line-height: 0;
+        display: block;
+        align-self: flex-start; /* .pv-solution__body is a column flex
+          container, which stretches children to its full width by
+          default—without this, the button's hit/hover area (and its
+          :hover state) covered the whole row, not just the icon */
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
       }
       .pv-icon img {
         display: block;
         height: 103px;
         width: auto; /* keep the icon's own aspect, no cropping */
+        transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      /* Counter-clockwise nudge on hover—just enough to read as "alive"
+         without looking like the icon is spinning up for something. */
+      .pv-icon:hover img {
+        transform: rotate(-5deg);
+      }
+
+      /* TEST: cursor-following "To top" tooltip for the Solution icon.
+         Shows immediately on hover (no dwell delay, unlike valera's
+         vp-tip caption pattern)—it's labeling a single, already-obvious
+         click target, not surfacing hidden info. Matches the site's own
+         text-selection look: black rectangle, white text (see
+         ::selection in styles.css). Built/toggled by the inline script
+         near the end of the page; lives on <body> (position:fixed) so
+         nothing clips it. */
+      .pv-icon-tip {
+        position: fixed;
+        z-index: 200;
+        background: #000;
+        color: #fff;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 0.9375rem;
+        letter-spacing: -0.2px;
+        line-height: 1.2;
+        padding: 0px 2px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+      }
+      .pv-icon-tip.is-visible {
+        opacity: 1;
       }
 
       /* Actions: Download + Next project, two equal columns */
@@ -603,9 +646,9 @@
                   <div class="pv-solution">
                     <div class="pv-solution__body">
                       <p>The core decision was to refresh Nimax's dark theme—opening it up toward a lighter, more technological future, and updating the color palette. Nimax's own groundwork became the foundation, including their base of 3D illustrations, the signature move carried into the new vibe. The dark base gave way to a light one, with vivid mint as the primary color and purple as a secondary accent, paired with the TT Hoves typeface. Aggressive caps were dropped from headlines, graphic tags were simplified, and large rounded shapes softened the system—while sharpness stayed where it holds the character: typography, dividing lines, type shifts. The system made it to physical objects too, with several merch items, including tote bags, actually shipping. Banner carousels now feature banners the Nimax team built on their own, without me, but within the style that was set—proof of how it kept living on. Sparking this change feels meaningful: the brand is now lighter, more modern, and more digital, with a foundation for its continued evolution.</p>
-                      <figure class="pv-icon">
+                      <button type="button" class="pv-icon" aria-label="Scroll to top">
                         <img width="206" height="206" loading="lazy" src="../../assets/brands/nimax/nimax-kv.png" alt="" aria-hidden="true" />
-                      </figure>
+                      </button>
                     </div>
                     <div class="pv-actions">
                       <div class="pv-action">
@@ -834,7 +877,9 @@
          page scrolls, on both the desktop .project-content gallery and
          the mobile .mobile-project flat list. Observes every
          .pv-wide/.pv-pair__photo (desktop) and .mobile-project__photo
-         (mobile), plus text on desktop only—About (.pv-row--about) and
+         (mobile)—excluding the cover, which is already on screen the
+         instant the page loads and has nothing to "reveal" itself
+         from—plus text on desktop only—About (.pv-row--about) and
          Challenge/Solution (.pv-info .pv-row)—and on mobile,
          .mobile-project__block. The Download/Next actions row
          (.pv-actions) isn't its own entry: it's a descendant of the
@@ -852,7 +897,7 @@
         // Solution text instead of waiting for its own (much later,
         // since it sits at the very bottom of a long block) trigger.
         var desktopItems = document.querySelectorAll('.project-content .pv-wide, .project-content .pv-pair__photo, .pv-row--about, .pv-info .pv-row');
-        var mobileItems = document.querySelectorAll('.mobile-project__photo, .mobile-project__blocks .mobile-project__block');
+        var mobileItems = document.querySelectorAll('.mobile-project__photo:not(:first-child), .mobile-project__blocks .mobile-project__block');
         desktopItems.forEach(function (el) { el.classList.add('reveal'); });
         mobileItems.forEach(function (el) { el.classList.add('reveal'); });
 
@@ -892,6 +937,105 @@
           threshold: 0
         });
         mobileItems.forEach(function (el) { mobileObserver.observe(el); });
+      })();
+    </script>
+
+    <!-- ── TEST: "To top" on the Solution icon (nimax only for now, see
+         if the approach reads well before rolling out further). Hover
+         rotates the icon itself (pure CSS, see .pv-icon:hover img
+         above) and shows a cursor-following "To top ↑" tooltip. Click
+         scrolls back to the very top—the desktop project pane, or on
+         mobile (below the 981px breakpoint) the page itself, since it
+         scrolls natively there instead. -->
+    <script>
+      (function () {
+        var icon = document.querySelector('.pv-icon');
+        if (!icon) return;
+
+        var tip = document.createElement('div');
+        tip.className = 'pv-icon-tip';
+        tip.textContent = 'To top ↑';
+        document.body.appendChild(tip);
+
+        icon.addEventListener('mousemove', function (e) {
+          var off = 16;
+          var left = e.clientX + off;
+          var top = e.clientY + off;
+          var tw = tip.offsetWidth, th = tip.offsetHeight;
+          if (left + tw > window.innerWidth - 8) left = e.clientX - off - tw;
+          if (top + th > window.innerHeight - 8) top = e.clientY - off - th;
+          if (left < 8) left = 8;
+          if (top < 8) top = 8;
+          tip.style.left = left + 'px';
+          tip.style.top = top + 'px';
+          tip.classList.add('is-visible');
+        });
+        icon.addEventListener('mouseleave', function () {
+          tip.classList.remove('is-visible');
+        });
+
+        var pane = document.querySelector('.project-scroll');
+        var desktopQuery = window.matchMedia('(min-width: 981px)');
+
+        // Hand-rolled rAF tween instead of Lenis's own scrollTo—driving
+        // the pane's scrollTop directly guarantees one continuous
+        // monotonic curve for the whole trip. easeOutQuint: launches
+        // fast, then a long, smooth glide all the way to a dead
+        // stop—no hard brake at the end.
+        function easeOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
+        function animateScrollTo(getPos, setPos, target, duration, onDone) {
+          var start = getPos();
+          var change = target - start;
+          if (!change) { if (onDone) onDone(); return; }
+          var startTime = null;
+          function step(now) {
+            if (startTime === null) startTime = now;
+            var t = Math.min((now - startTime) / duration, 1);
+            setPos(start + change * easeOutQuint(t));
+            if (t < 1) requestAnimationFrame(step);
+            else if (onDone) onDone();
+          }
+          requestAnimationFrame(step);
+        }
+
+        var isAnimating = false;
+
+        icon.addEventListener('click', function () {
+          if (isAnimating) return;
+          isAnimating = true;
+          tip.classList.remove('is-visible');
+
+          if (desktopQuery.matches && pane) {
+            // Lenis's own autoRaf loop keeps running the whole time, and
+            // writing straight to pane.scrollTop bypasses it entirely—
+            // Lenis's internal notion of "current scroll" falls out of
+            // sync with the real one, and re-converging the two produced
+            // a visible stutter right near the end. (lenisInstance.stop()
+            // looked like the fix, but it sets overflow:clip on the
+            // pane—that silently no-ops every scrollTop write for as
+            // long as it's called, which is worse.) Routing each frame
+            // through Lenis's own scrollTo with immediate:true instead
+            // makes Lenis itself the one writing scrollTop, so its
+            // internal state never drifts from reality in the first
+            // place—nothing to resync, nothing to fight.
+            var setPos = pane.lenisInstance
+              ? function (v) { pane.lenisInstance.scrollTo(v, { immediate: true }); }
+              : function (v) { pane.scrollTop = v; };
+            animateScrollTo(
+              function () { return pane.scrollTop; },
+              setPos,
+              0, 1400,
+              function () { isAnimating = false; }
+            );
+          } else {
+            animateScrollTo(
+              function () { return window.scrollY; },
+              function (v) { window.scrollTo(0, v); },
+              0, 1400,
+              function () { isAnimating = false; }
+            );
+          }
+        });
       })();
     </script>
   </body>

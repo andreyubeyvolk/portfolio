@@ -143,6 +143,11 @@
         content: pane.firstElementChild,
         autoRaf: true,
       });
+      // Exposed on the pane (not window) so a page-specific script can
+      // pause/resume this exact instance—e.g. around a hand-rolled
+      // scrollTop tween of its own, so Lenis's autoRaf loop isn't still
+      // live and quietly resyncing/fighting the last few frames of it.
+      pane.lenisInstance = lenis;
     }
 
     window.addEventListener(
@@ -160,7 +165,17 @@
         if (pane.scrollHeight <= pane.clientHeight) return; // nothing to scroll
 
         if (lenis) {
-          lenis.scrollTo(pane.scrollTop + event.deltaY, { immediate: false });
+          // Forward the real wheel event onto the pane instead of
+          // nudging a scrollTo target from the current scrollTop:
+          // Lenis's own wheel listener (bound to the pane, not window)
+          // never sees wheel events that start outside it, so this was
+          // the only way to reach it—but scrollTo() by itself doesn't
+          // build velocity across consecutive ticks the way Lenis's
+          // native wheel handling does, so scrolling from outside the
+          // pane felt visibly slower than scrolling directly over it.
+          // Re-dispatching the same event lets Lenis process it with
+          // the exact same physics either way.
+          pane.dispatchEvent(new WheelEvent("wheel", event));
         } else {
           pane.scrollTop += event.deltaY;
         }

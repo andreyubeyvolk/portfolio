@@ -792,7 +792,9 @@
          page scrolls, on both the desktop .project-content gallery and
          the mobile .mobile-project flat list. Observes every
          .pv-wide/.pv-pair__photo (desktop) and .mobile-project__photo
-         (mobile), plus text on desktop only—About (.pv-row--about) and
+         (mobile)—excluding the cover, which is already on screen the
+         instant the page loads and has nothing to "reveal" itself
+         from—plus text on desktop only—About (.pv-row--about) and
          Challenge/Solution (.pv-info .pv-row)—and on mobile,
          .mobile-project__block. The Download/Next actions row
          (.pv-actions) isn't its own entry: it's a descendant of the
@@ -809,7 +811,7 @@
         // Solution text instead of waiting for its own (much later,
         // since it sits at the very bottom of a long block) trigger.
         var desktopItems = document.querySelectorAll('.project-content .pv-wide, .project-content .pv-pair__photo, .pv-row--about, .pv-info .pv-row');
-        var mobileItems = document.querySelectorAll('.mobile-project__photo, .mobile-project__blocks .mobile-project__block');
+        var mobileItems = document.querySelectorAll('.mobile-project__photo:not(:first-child), .mobile-project__blocks .mobile-project__block');
         desktopItems.forEach(function (el) { el.classList.add('reveal'); });
         mobileItems.forEach(function (el) { el.classList.add('reveal'); });
 
