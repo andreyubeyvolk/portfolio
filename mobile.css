@@ -76,6 +76,7 @@
     align-items: center;
     height: 40px;
     text-decoration: none;
+    margin-left: -2px; /* nudge 2px closer to the left edge */
   }
 
   /* Text wordmark—same type as .mobile-bar__menu opposite it (same
@@ -122,7 +123,8 @@
     height: 40px;
     width: 80px;
     margin-right: -16px;
-    padding: 0 16px 0 0;
+    padding: 0 14px 0 0; /* 2px less than the 16px hit-box inset—nudges the
+                            visible text 2px closer to the right edge */
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -671,11 +673,16 @@
   .mobile-menu {
     display: block;
     position: fixed;
-    bottom: 160px; /* 80px from bottom + 40px bar height + 40px raised */
+    bottom: 120px; /* 80px from bottom + 40px bar height—stays flush against
+                      the bar; raising the panel is done via extra height
+                      below (top edge), not by lifting bottom, or the panel
+                      detaches from the bar with a visible gap under it */
     left: var(--page-margin, 16px);
     right: var(--page-margin, 16px);
-    height: calc(100vh - 200px);
-    height: calc(100dvh - 200px);
+    height: calc(100vh - 160px); /* 40px taller than the original 200px
+                                     subtrahend—raises the top edge 40px
+                                     while the bottom stays flush with the bar */
+    height: calc(100dvh - 160px);
     background: #fff;
     z-index: 101;
     overflow: hidden;

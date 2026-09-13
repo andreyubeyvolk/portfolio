@@ -164,6 +164,7 @@ img {
   width: 100%;
   padding: 0;
   color: inherit;
+  line-height: 1.2;
   transition: color 150ms ease, background-color 150ms ease;
 }
 
@@ -190,6 +191,7 @@ img {
 .section-intro p {
   max-width: 100%;
   margin: 0 0 8px;
+  line-height: 1.2;
 }
 
 .intro-media {
@@ -517,6 +519,7 @@ body::-webkit-scrollbar-thumb:active {
   background: none;
   background-image: none;
   font: inherit;
+  line-height: 1.2;
   color: inherit;
   text-decoration: none;
   text-align: left;
@@ -547,6 +550,7 @@ body::-webkit-scrollbar-thumb:active {
   width: 100%;
   margin-top: -10px;
   color: inherit;
+  line-height: 1.2;
   text-decoration: none;
   transition: color 150ms ease, background-color 150ms ease;
 }

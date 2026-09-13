@@ -133,10 +133,10 @@ const CHECKS = [
     hint: "missing window.GRAFFITI_CLEAR_EFFECT = 'wipe' before graffiti.js loads",
   },
   {
-    name: 'Google Fonts font-display: optional (not swap)',
+    name: 'Google Fonts font-display: fallback (not swap/optional)',
     files: ALL_PAGES,
-    pattern: /family=Inter[^"]*display=optional/,
-    hint: 'Google Fonts link is missing or still using &display=swap—causes the font-swap "jump" on load',
+    pattern: /family=Inter[^"]*display=fallback/,
+    hint: 'Google Fonts link is missing or still using &display=swap/optional—fallback keeps the ~100ms invisible-text period short (avoiding a "swap" jump) while still swapping in Inter if it arrives within ~3s, so it does not get stuck on the fallback font for the whole pageview the way "optional" could',
   },
   {
     name: 'Lenis smooth-scroll (CSS + JS)',

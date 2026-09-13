@@ -20,7 +20,7 @@
     <title>About—Andrey Ubeyvolk</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=optional" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=fallback" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="../mobile.css" />
     <!-- Lenis smooth-scroll library. See scroll.js for the actual wiring. -->
@@ -80,6 +80,7 @@
         grid-column: 1 / 5;
         margin: 0;
         font: inherit;
+        line-height: 1.2;
       }
 
       .about-section__content {
@@ -109,6 +110,7 @@
         margin: 0;
         background: none;
         font: inherit;
+        line-height: 1.2;
         color: inherit;
         text-decoration: none;
         text-align: left;
@@ -152,11 +154,13 @@
       .service-row__desc {
         grid-column: 5 / 13;
         margin: 0;
+        line-height: 1.2;
       }
 
       /* Leading Team */
       .about-section__content > p {
         margin: 0;
+        line-height: 1.2;
       }
 
       /* Experience rows */
@@ -177,6 +181,11 @@
         padding-top: 0;
       }
 
+      .exp-row__company,
+      .exp-row__role,
+      .exp-row__years {
+        line-height: 1.2;
+      }
       .exp-row__company { grid-column: 1 / 5; }
       .exp-row__role    { grid-column: 5 / 9; }
       .exp-row__years   { grid-column: 9 / 13; }
@@ -193,6 +202,7 @@
         display: block;
         padding-top: 0;
         color: inherit;
+        line-height: 1.2;
         transition: color 150ms ease, background-color 150ms ease;
       }
 
