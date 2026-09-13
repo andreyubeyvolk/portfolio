@@ -1,10 +1,22 @@
-// ── Logo hover-scrub (desktop only via CSS gating on .site-nav—see
-// styles.css/mobile.css). Moving the cursor across the brand mark
-// divides its width into 7 zones and swaps in a different brush-stroke
-// rendering per zone; the <a>'s own click behavior (go home) is never
-// touched. Shared across every Brands page—see the matching #brand-scrub
-// CSS in graffiti.css.
+// ── Logo hover-scrub (desktop only). Moving the cursor across the
+// brand mark divides its width into 7 zones and swaps in a different
+// brush-stroke rendering per zone; the <a>'s own click behavior (go
+// home) is never touched. Shared across the whole site—see the
+// matching #brand-scrub CSS in graffiti.css.
 (function () {
+  // #brand-scrub itself is already hidden below this breakpoint (see
+  // styles.css/mobile.css), which makes the hover-scrub inert there on
+  // its own—but the idle-hint timer below listens on `window`, not on
+  // #brand-scrub, and touch input never fires 'mousemove' at all. That
+  // meant the 5s-idle timer effectively always fired on a phone (no
+  // mousemove ever arrives to keep re-arming it) and then just sat
+  // there forever (nothing ever calls hideTip() either, same reason)—
+  // a "Ctrl+click to tag!" hint for a desktop-only Ctrl+drag feature,
+  // permanently stuck on screen on mobile. Bailing out entirely here
+  // is simpler and more robust than gating just the idle-timer piece.
+  var desktopQuery = window.matchMedia('(min-width: 981px)');
+  if (!desktopQuery.matches) return;
+
   var brand = document.getElementById('brand-scrub');
   if (!brand) return;
   var brushes = brand.querySelectorAll('.brand-mark--brush');
