@@ -20,9 +20,17 @@
     <title>Archive—Andrey Ubeyvolk</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=optional" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="../mobile.css" />
+    <!-- Lenis smooth-scroll library. See scroll.js for the actual wiring. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.css" />
+    <!-- Scroll reveal (fade+rise gallery photos)—shared across every
+         project-template page, see scroll-reveal.css/scroll-reveal.js. -->
+    <link rel="stylesheet" href="../scroll-reveal.css" />
+    <!-- Spray-can graffiti + logo hover-scrub—shared site-wide, see
+         graffiti.css/graffiti.js/logo-scrub.js. -->
+    <link rel="stylesheet" href="../graffiti.css" />
     <style>
       /* ── Preview overlay ── */
       .archive-preview {
@@ -32,6 +40,17 @@
         right: 0;
         bottom: 0;
         z-index: 10;
+        /* Fades in/out with the dimmed background below (see body.is-
+           preview-open)—[hidden] still applies display:none, but only
+           after this transition has actually finished (see
+           openPreviewFor/closePreview), so there's something to
+           animate through rather than a hard cut. */
+        opacity: 0;
+        transition: opacity 0.24s ease;
+      }
+      .archive-preview.is-open {
+        opacity: 1;
+        transition: opacity 0.3s ease;
       }
 
       .archive-preview[hidden] {
@@ -376,11 +395,13 @@
          dimmed state below—when the class is removed on close, the element
          stops matching that rule at the very same instant the opacity
          reverts, so a transition declared only there never gets to animate
-         the close. Faster than the open (0.18s vs 0.3s): "fast but smooth". */
+         the close. Still a bit quicker than the open (0.24s vs 0.3s—was
+         0.18s, nudged up for a softer close), matching the preview panel's
+         own fade above. */
       .site-nav,
       .section-intro,
       .content-pane__scroll {
-        transition: opacity 0.18s ease;
+        transition: opacity 0.24s ease;
       }
       body.is-preview-open .site-nav,
       body.is-preview-open .section-intro,
@@ -454,8 +475,18 @@
   <body class="archive-page">
     <main class="site-shell page-grid">
       <aside class="site-nav" aria-label="Main navigation">
-        <a class="brand" href="../index.html" aria-label="Andrey Ubeyvolk home">
-          <img width="129" height="16" class="brand-mark" src="../assets/logo.svg" alt="Andrey Ubeyvolk" />
+        <!-- Logo hover-scrub (shared site-wide): hover scrubs across
+             7 brush-stroke logo variants left-to-right; click still
+             goes home. See ../logo-scrub.js. -->
+        <a class="brand" id="brand-scrub" href="../index.html" aria-label="Andrey Ubeyvolk home">
+          <span class="brand-mark brand-mark--text">Andrey Ubeyvolk</span>
+          <img class="brand-mark brand-mark--brush" src="../assets/logo/logo-01.svg" alt="" aria-hidden="true" />
+          <img class="brand-mark brand-mark--brush" src="../assets/logo/logo-02.svg" alt="" aria-hidden="true" />
+          <img class="brand-mark brand-mark--brush" src="../assets/logo/logo-03.svg" alt="" aria-hidden="true" />
+          <img class="brand-mark brand-mark--brush" src="../assets/logo/logo-04.svg" alt="" aria-hidden="true" />
+          <img class="brand-mark brand-mark--brush" src="../assets/logo/logo-05.svg" alt="" aria-hidden="true" />
+          <img class="brand-mark brand-mark--brush" src="../assets/logo/logo-06.svg" alt="" aria-hidden="true" />
+          <img class="brand-mark brand-mark--brush" src="../assets/logo/logo-07.svg" alt="" aria-hidden="true" />
         </a>
 
         <nav class="nav-list">
@@ -1140,7 +1171,8 @@
 
     <nav class="mobile-bar" aria-label="Mobile navigation">
       <a class="mobile-bar__brand" href="../index.html" aria-label="Andrey Ubeyvolk home">
-        <img width="129" height="16" src="../assets/logo.svg" alt="Andrey Ubeyvolk" />
+        <span class="brand-mark--text">Andrey Ubeyvolk</span>
+        <img class="mobile-brand-lettering" alt="" aria-hidden="true" />
       </a>
       <button class="mobile-bar__menu" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
     </nav>
@@ -1154,7 +1186,11 @@
       </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
     <script src="../scroll.js"></script>
+    <!-- Scroll reveal (fade+rise gallery photos)—shared across every
+         project-template page, see scroll-reveal.css/scroll-reveal.js. -->
+    <script src="../scroll-reveal.js"></script>
     <script src="../main.js"></script>
     <script src="../menu.js"></script>
     <script src="./load-more.js"></script>
@@ -1473,8 +1509,14 @@
         }
       });
 
+      var closeHideTimer = null;
       function closePreview() {
-        overlay.hidden = true;
+        // Start both fades right away (this class drop, and the
+        // background dim tied to is-preview-open below)—only the actual
+        // [hidden]=true (and the size-state cleanup, which would
+        // otherwise visibly snap the still-fading image) waits for the
+        // overlay's own opacity transition to actually finish.
+        overlay.classList.remove('is-open');
         document.body.classList.remove('is-preview-open');
         activeArchiveTitle = null;
         // Without this, a still-running eased scroll (mid wheel/drag
@@ -1484,13 +1526,17 @@
         // "remembered" the old scroll position, but it was really just
         // this stale animation racing the reset.
         filmstripStopEase();
-        overlay.style.removeProperty('--preview-width');
-        overlay.style.removeProperty('--preview-image-height');
-        previewImg.style.width = '';
-        previewImg.style.height = '';
-        previewHeader.style.width = '';
-        previewText.style.width = '';
-        previewInner.style.alignItems = '';
+        clearTimeout(closeHideTimer);
+        closeHideTimer = setTimeout(function () {
+          overlay.hidden = true;
+          overlay.style.removeProperty('--preview-width');
+          overlay.style.removeProperty('--preview-image-height');
+          previewImg.style.width = '';
+          previewImg.style.height = '';
+          previewHeader.style.width = '';
+          previewText.style.width = '';
+          previewInner.style.alignItems = '';
+        }, 260);
       }
 
       function fitPreviewImage() {
@@ -1820,9 +1866,25 @@
       // Images carrying data-group open the horizontal filmstrip instead of
       // the single-image view (see openFilmstripFor above).
       function openPreviewFor(img) {
+        // openPreviewFor is also how stepPreview swaps images inside an
+        // ALREADY-open preview (arrow keys, filmstrip nav)—only a fresh
+        // open (overlay was actually hidden) should play the fade-in;
+        // an image swap mid-session should just snap straight to the
+        // new image, no re-triggered fade.
+        var wasClosed = overlay.hidden;
+        clearTimeout(closeHideTimer);
         currentPreviewImg = img;
         overlay.hidden = false;
         document.body.classList.add('is-preview-open');
+        if (wasClosed) {
+          // Add the class a frame later, not in this same tick: the
+          // browser needs to have already painted opacity:0 (the base
+          // rule, now that [hidden] no longer forces display:none) before
+          // switching to opacity:1 has anything to transition from—doing
+          // both in one synchronous pass would just skip straight to the
+          // end state.
+          requestAnimationFrame(function () { overlay.classList.add('is-open'); });
+        }
         // The originally clicked <a class="archive-card"> keeps keyboard
         // focus after it opens the preview—invisible at first, but the
         // instant you press an arrow key, the browser's focus-visible
@@ -1986,5 +2048,13 @@
         }
       });
     </script>
+    <!-- Logo hover-scrub + spray-can graffiti—shared site-wide, see
+         logo-scrub.js/graffiti.js (and graffiti.css, linked in <head>). -->
+    <script>window.GRAFFITI_CLEAR_EFFECT = 'wipe';</script>
+    <script src="../logo-scrub.js"></script>
+    <script src="../graffiti.js"></script>
+    <!-- Mobile logo swipe-to-cycle—shared across the whole site,
+         see mobile-logo-swipe.js. -->
+    <script src="../mobile-logo-swipe.js"></script>
   </body>
 </html>

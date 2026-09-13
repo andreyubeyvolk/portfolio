@@ -20,24 +20,18 @@
     <title>Nimax—Andrey Ubeyvolk</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=optional" rel="stylesheet" />
     <link rel="stylesheet" href="../../styles.css" />
     <link rel="stylesheet" href="../../mobile.css" />
     <!-- Lenis smooth-scroll library. See scroll.js for the actual wiring. -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.css" />
+    <!-- Scroll reveal (fade+rise gallery photos)—shared across every
+         project-template page, see scroll-reveal.css/scroll-reveal.js. -->
+    <link rel="stylesheet" href="../../scroll-reveal.css" />
     <!-- Spray-can graffiti + logo hover-scrub—shared across all of Brands,
          see graffiti.css/graffiti.js/logo-scrub.js. -->
     <link rel="stylesheet" href="../../graffiti.css" />
     <style>
-      /* Base text metrics: 18px line-height at the 16px base size is 1.125
-         unitless (house rule: line-height stays unitless, not px).
-         Cascades to anything that doesn't set its own line-height/
-         letter-spacing, e.g. .section-intro p and .nav-list a. */
-      body {
-        line-height: 1.125;
-        letter-spacing: -0.5px;
-      }
-
       /* ─── Desktop project layout ─── */
 
       .project-content {
@@ -431,64 +425,6 @@
         }
       }
 
-      /* ── Scroll reveal (desktop + mobile) ──
-         Gallery photos fade + rise into view as they scroll into the
-         viewport, on both the desktop .project-content gallery and the
-         mobile .mobile-project flat list. Values below are final (the
-         live-tuning panel this was dialed in with has been removed).
-         The pair-stagger rule below only matches .pv-pair__photo, so it
-         has no effect on the mobile flat list (no side-by-side pairs
-         there). */
-
-      :root {
-        --reveal-distance: 70px;
-        --reveal-duration: 1400ms;
-        --reveal-easing: cubic-bezier(0.16, 1, 0.3, 1);
-        --reveal-stagger: 60ms;
-        --reveal-opacity-from: 0.3;
-      }
-      .reveal {
-        opacity: var(--reveal-opacity-from, 0);
-        transform: translateY(var(--reveal-distance));
-        transition: opacity var(--reveal-duration) var(--reveal-easing),
-                    transform var(--reveal-duration) var(--reveal-easing);
-      }
-      .reveal.is-revealed {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      /* Second photo in a pair rises a beat after the first, instead of
-         both landing in perfect sync—reads less mechanical. */
-      .pv-pair__photo.reveal:nth-child(2) {
-        transition-delay: var(--reveal-stagger);
-      }
-      /* Mobile gets its own (shorter) rise distance—the same 70px reads
-         as a much bigger jump on a small screen than on desktop, and
-         mobile's earlier trigger point means the item is still being
-         carried up by the user's own scroll at the same time it's
-         self-animating, so the two motions stack. Also its own (longer,
-         gentler) duration, and starts from 30% opacity instead of fully
-         transparent—less contrast to cross reads as smoother. A local
-         override here beats the panel's :root inline value for anything
-         inside .mobile-project, since inheritance looks at the nearest
-         declaration, not which one is inline (the panel is desktop-only
-         anyway, so there's nothing to tune this from live). */
-      .mobile-project {
-        --reveal-distance: 28px;
-        --reveal-duration: 1600ms;
-        --reveal-opacity-from: 0.3;
-      }
-      /* Text (About/Challenge/Solution/actions) gets its own, more
-         visible rise + a lower starting opacity than photos, since a
-         pure opacity-only fade from 30% read as too subtle here.
-         .pv-actions (Download/Next buttons) is a descendant of
-         .pv-info, so it inherits this without needing its own line. */
-      .pv-info,
-      .pv-row--about,
-      .mobile-project__blocks {
-        --reveal-distance: 10px;
-        --reveal-opacity-from: 0.2;
-      }
 
       /* Spray-can graffiti + logo hover-scrub CSS (#graffiti-canvas,
          #graffiti-pane-view, .graffiti-cursor, the settings panel,
@@ -505,7 +441,7 @@
              7 brush-stroke logo variants left-to-right; click still goes
              home. See ../../logo-scrub.js. -->
         <a class="brand" id="brand-scrub" href="../../index.html" aria-label="Andrey Ubeyvolk home">
-          <img width="129" height="16" class="brand-mark" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
+          <span class="brand-mark brand-mark--text">Andrey Ubeyvolk</span>
           <img class="brand-mark brand-mark--brush" src="../../assets/logo/logo-01.svg" alt="" aria-hidden="true" />
           <img class="brand-mark brand-mark--brush" src="../../assets/logo/logo-02.svg" alt="" aria-hidden="true" />
           <img class="brand-mark brand-mark--brush" src="../../assets/logo/logo-03.svg" alt="" aria-hidden="true" />
@@ -854,13 +790,17 @@
     <!-- Mobile bottom bar -->
     <nav class="mobile-bar" aria-label="Mobile navigation">
       <a class="mobile-bar__brand" href="../../index.html" aria-label="Andrey Ubeyvolk home">
-        <img width="129" height="16" src="../../assets/logo.svg" alt="Andrey Ubeyvolk" />
+        <span class="brand-mark--text">Andrey Ubeyvolk</span>
+        <img class="mobile-brand-lettering" alt="" aria-hidden="true" />
       </a>
       <button class="mobile-bar__menu" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
     </nav>
 
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
     <script src="../../scroll.js"></script>
+    <!-- Scroll reveal (fade+rise gallery photos)—shared across every
+         project-template page, see scroll-reveal.css/scroll-reveal.js. -->
+    <script src="../../scroll-reveal.js"></script>
     <script src="../../project-order.js"></script>
     <script src="../../main.js"></script>
     <script src="../../menu.js"></script>
@@ -915,178 +855,22 @@
          revealed (observer
          unwatches it). Desktop and mobile get separate observers since
          they watch different element sets. -->
-    <script>
-      (function () {
-        // .pv-actions (Download/Next) is deliberately NOT its own entry
-        // here—it's a descendant of the Solution .pv-row, which is
-        // already observed below, so it fades in together with the
-        // Solution text instead of waiting for its own (much later,
-        // since it sits at the very bottom of a long block) trigger.
-        var desktopItems = document.querySelectorAll('.project-content .pv-wide, .project-content .pv-pair__photo, .pv-row--about, .pv-info .pv-row');
-        var mobileItems = document.querySelectorAll('.mobile-project__photo:not(:first-child), .mobile-project__blocks .mobile-project__block');
-        desktopItems.forEach(function (el) { el.classList.add('reveal'); });
-        mobileItems.forEach(function (el) { el.classList.add('reveal'); });
 
-        var DESKTOP_TRIGGER_PERCENT = 5;
-        var MOBILE_TRIGGER_PERCENT = 5;
-
-        // The bug this guards against: an early trigger point + a long
-        // duration means the fade can finish *before* a loading="lazy"
-        // image has actually fetched—so the item lands fully opaque and
-        // "in position" while the image is still blank, showing the
-        // host's #d3d3d3 placeholder background through it. Fix: don't
-        // add is-revealed until the image is actually loaded (or errors,
-        // so a broken image doesn't stay invisible forever).
-        function revealCallback(entries, observer) {
-          entries.forEach(function (entry) {
-            if (!entry.isIntersecting) return;
-            observer.unobserve(entry.target);
-            var img = entry.target.querySelector('img');
-            if (img && !img.complete) {
-              var reveal = function () { entry.target.classList.add('is-revealed'); };
-              img.addEventListener('load', reveal, { once: true });
-              img.addEventListener('error', reveal, { once: true });
-            } else {
-              entry.target.classList.add('is-revealed');
-            }
-          });
-        }
-
-        var desktopObserver = new IntersectionObserver(revealCallback, {
-          rootMargin: '0px 0px -' + DESKTOP_TRIGGER_PERCENT + '% 0px',
-          threshold: 0
-        });
-        desktopItems.forEach(function (el) { desktopObserver.observe(el); });
-
-        var mobileObserver = new IntersectionObserver(revealCallback, {
-          rootMargin: '0px 0px -' + MOBILE_TRIGGER_PERCENT + '% 0px',
-          threshold: 0
-        });
-        mobileItems.forEach(function (el) { mobileObserver.observe(el); });
-      })();
-    </script>
-
-    <!-- ── "To top" on the Solution icon. On desktop, hovering the icon
-         rotates it (pure CSS, see .pv-icon:hover img above) and shows a
-         cursor-following "To top ↑" tooltip; on mobile there's no hover
-         to speak of, so the matching .mobile-project__icon just gets
-         the same tap target. Either way, clicking/tapping scrolls back
-         to the very top—the desktop project pane, or on mobile (below
-         the 981px breakpoint) the page itself, since it scrolls
-         natively there instead. -->
-    <script>
-      (function () {
-        var icon = document.querySelector('.pv-icon');
-        var mobileIcon = document.querySelector('.mobile-project__icon');
-        if (!icon && !mobileIcon) return;
-
-        var tip = null;
-        if (icon) {
-          tip = document.createElement('div');
-          tip.className = 'pv-icon-tip';
-          tip.textContent = 'To top ↑';
-          document.body.appendChild(tip);
-
-          icon.addEventListener('mousemove', function (e) {
-            var off = 16;
-            var left = e.clientX + off;
-            var top = e.clientY + off;
-            var tw = tip.offsetWidth, th = tip.offsetHeight;
-            if (left + tw > window.innerWidth - 8) left = e.clientX - off - tw;
-            if (top + th > window.innerHeight - 8) top = e.clientY - off - th;
-            if (left < 8) left = 8;
-            if (top < 8) top = 8;
-            tip.style.left = left + 'px';
-            tip.style.top = top + 'px';
-            tip.classList.add('is-visible');
-          });
-          icon.addEventListener('mouseleave', function () {
-            tip.classList.remove('is-visible');
-          });
-        }
-
-        var pane = document.querySelector('.project-scroll');
-        var desktopQuery = window.matchMedia('(min-width: 981px)');
-
-        // Hand-rolled rAF tween instead of Lenis's own scrollTo—driving
-        // the pane's scrollTop directly guarantees one continuous
-        // monotonic curve for the whole trip. easeOutQuint: launches
-        // fast, then a long, smooth glide all the way to a dead
-        // stop—no hard brake at the end.
-        function easeOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
-        function animateScrollTo(getPos, setPos, target, duration, onDone) {
-          var start = getPos();
-          var change = target - start;
-          if (!change) { if (onDone) onDone(); return; }
-          var startTime = null;
-          function step(now) {
-            if (startTime === null) startTime = now;
-            var t = Math.min((now - startTime) / duration, 1);
-            setPos(start + change * easeOutQuint(t));
-            if (t < 1) requestAnimationFrame(step);
-            else if (onDone) onDone();
-          }
-          requestAnimationFrame(step);
-        }
-
-        var isAnimating = false;
-
-        function scrollProjectToTop() {
-          if (isAnimating) return;
-          isAnimating = true;
-          if (tip) tip.classList.remove('is-visible');
-
-          if (desktopQuery.matches && pane) {
-            // Lenis's own autoRaf loop keeps running the whole time, and
-            // writing straight to pane.scrollTop bypasses it entirely—
-            // Lenis's internal notion of "current scroll" falls out of
-            // sync with the real one, and re-converging the two produced
-            // a visible stutter right near the end. (lenisInstance.stop()
-            // looked like the fix, but it sets overflow:clip on the
-            // pane—that silently no-ops every scrollTop write for as
-            // long as it's called, which is worse.) Routing each frame
-            // through Lenis's own scrollTo with immediate:true instead
-            // makes Lenis itself the one writing scrollTop, so its
-            // internal state never drifts from reality in the first
-            // place—nothing to resync, nothing to fight.
-            var setPos = pane.lenisInstance
-              ? function (v) { pane.lenisInstance.scrollTo(v, { immediate: true }); }
-              : function (v) { pane.scrollTop = v; };
-            animateScrollTo(
-              function () { return pane.scrollTop; },
-              setPos,
-              0, 1400,
-              function () { isAnimating = false; }
-            );
-          } else {
-            animateScrollTo(
-              function () { return window.scrollY; },
-              function (v) { window.scrollTo(0, v); },
-              0, 1400,
-              function () { isAnimating = false; }
-            );
-          }
-        }
-
-        if (icon) icon.addEventListener('click', scrollProjectToTop);
-        if (mobileIcon) {
-          mobileIcon.addEventListener('click', scrollProjectToTop);
-          // role="button" on a plain <img> needs its own Enter/Space
-          // handling—native buttons get this for free, this doesn't.
-          mobileIcon.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              scrollProjectToTop();
-            }
-          });
-        }
-      })();
-    </script>
+    <!-- "To top" on the Solution icon—shared across every project-
+         template page, see ../../to-top.js. -->
+    <script src="../../to-top.js"></script>
 
     <!-- Logo hover-scrub + spray-can graffiti—shared across all of
          Brands, see logo-scrub.js/graffiti.js (and graffiti.css, linked
-         in <head>). -->
+         in <head>). Nimax-only for now: opts into the board-eraser
+         clear effect (see graffiti.js's CLEAR_EFFECT) instead of the
+         plain fade every other Brands page still gets—set before
+         graffiti.js loads so its one-time read of the flag sees it. -->
+    <script>window.GRAFFITI_CLEAR_EFFECT = 'wipe';</script>
     <script src="../../logo-scrub.js"></script>
     <script src="../../graffiti.js"></script>
+    <!-- Mobile logo swipe-to-cycle—shared across the whole site,
+         see mobile-logo-swipe.js. -->
+    <script src="../../mobile-logo-swipe.js"></script>
   </body>
 </html>

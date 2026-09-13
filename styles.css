@@ -38,8 +38,14 @@ body {
   font-family: "Inter", Arial, Helvetica, sans-serif;
   font-size: 1rem;
   font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: 0;
+  /* Tighter than the site's original 1.25/0 default—line-height went
+     1.25 -> 1.125 -> 1 across a couple of rounds of tightening; letter-
+     spacing settled at -0.5px. Components that need more breathing room
+     for actual multi-line copy (most paragraph-level text) set their
+     own looser line-height locally—this is the baseline for anything
+     that doesn't. */
+  line-height: 1;
+  letter-spacing: -0.5px;
 }
 
 ::selection {

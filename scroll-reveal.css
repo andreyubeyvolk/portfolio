@@ -1,0 +1,54 @@
+/* ── Scroll reveal (desktop + mobile) ── Gallery photos fade + rise
+   into view as they scroll into the viewport, on both the desktop
+   .project-content gallery and the mobile .mobile-project flat list.
+   Shared across every project-template page (Brands and Inhouse—same
+   markup, same class names). See scroll-reveal.js for the observer
+   that adds .reveal/.is-revealed. The pair-stagger rule below only
+   matches .pv-pair__photo, so it has no effect on the mobile flat list
+   (no side-by-side pairs there). */
+
+:root {
+  --reveal-distance: 70px;
+  --reveal-duration: 1400ms;
+  --reveal-easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --reveal-stagger: 60ms;
+  --reveal-opacity-from: 0.3;
+}
+.reveal {
+  opacity: var(--reveal-opacity-from, 0);
+  transform: translateY(var(--reveal-distance));
+  transition: opacity var(--reveal-duration) var(--reveal-easing),
+              transform var(--reveal-duration) var(--reveal-easing);
+}
+.reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Second photo in a pair rises a beat after the first, instead of
+   both landing in perfect sync—reads less mechanical. */
+.pv-pair__photo.reveal:nth-child(2) {
+  transition-delay: var(--reveal-stagger);
+}
+/* Mobile gets its own (shorter) rise distance—the same 70px reads
+   as a much bigger jump on a small screen than on desktop, and
+   mobile's earlier trigger point means the item is still being
+   carried up by the user's own scroll at the same time it's
+   self-animating, so the two motions stack. Also its own (longer,
+   gentler) duration, and starts from 30% opacity instead of fully
+   transparent—less contrast to cross reads as smoother. */
+.mobile-project {
+  --reveal-distance: 28px;
+  --reveal-duration: 1600ms;
+  --reveal-opacity-from: 0.3;
+}
+/* Text (About/Challenge/Solution/actions) gets its own, more
+   visible rise + a lower starting opacity than photos, since a
+   pure opacity-only fade from 30% read as too subtle here.
+   .pv-actions (Download/Next buttons) is a descendant of
+   .pv-info, so it inherits this without needing its own line. */
+.pv-info,
+.pv-row--about,
+.mobile-project__blocks {
+  --reveal-distance: 10px;
+  --reveal-opacity-from: 0.2;
+}

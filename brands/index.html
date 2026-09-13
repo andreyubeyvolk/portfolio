@@ -20,7 +20,7 @@
     <title>Brands—Andrey Ubeyvolk</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=optional" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.css" />
     <link rel="stylesheet" href="../mobile.css" />
     <!-- Spray-can graffiti + logo hover-scrub—shared across all of Brands,
@@ -34,7 +34,7 @@
              7 brush-stroke logo variants left-to-right; click still goes
              home. See ../logo-scrub.js. -->
         <a class="brand" id="brand-scrub" href="../index.html" aria-label="Andrey Ubeyvolk home">
-          <img width="129" height="16" class="brand-mark" src="../assets/logo.svg" alt="Andrey Ubeyvolk" />
+          <span class="brand-mark brand-mark--text">Andrey Ubeyvolk</span>
           <img class="brand-mark brand-mark--brush" src="../assets/logo/logo-01.svg" alt="" aria-hidden="true" />
           <img class="brand-mark brand-mark--brush" src="../assets/logo/logo-02.svg" alt="" aria-hidden="true" />
           <img class="brand-mark brand-mark--brush" src="../assets/logo/logo-03.svg" alt="" aria-hidden="true" />
@@ -118,7 +118,8 @@
 
     <nav class="mobile-bar" aria-label="Mobile navigation">
       <a class="mobile-bar__brand" href="../index.html" aria-label="Andrey Ubeyvolk home">
-        <img width="129" height="16" src="../assets/logo.svg" alt="Andrey Ubeyvolk" />
+        <span class="brand-mark--text">Andrey Ubeyvolk</span>
+        <img class="mobile-brand-lettering" alt="" aria-hidden="true" />
       </a>
       <button class="mobile-bar__menu" type="button" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
     </nav>
@@ -130,7 +131,11 @@
     <!-- Logo hover-scrub + spray-can graffiti—shared across all of
          Brands, see logo-scrub.js/graffiti.js (and graffiti.css, linked
          in <head>). -->
+    <script>window.GRAFFITI_CLEAR_EFFECT = 'wipe';</script>
     <script src="../logo-scrub.js"></script>
     <script src="../graffiti.js"></script>
+    <!-- Mobile logo swipe-to-cycle—shared across the whole site,
+         see mobile-logo-swipe.js. -->
+    <script src="../mobile-logo-swipe.js"></script>
   </body>
 </html>

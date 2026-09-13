@@ -35,23 +35,15 @@
     brushes.forEach(function (img) { img.classList.remove('is-active'); });
   });
 
-  // Nudges toward the hidden Ctrl+drag feature, from two distinct
-  // triggers that both show the same hint but anchor it
-  // differently:
-  //   - hovering the logo for a full second: pinned to the
-  //     cursor, right of it (same diagonal-offset-with-clamping
-  //     as the "To top" tooltip on project pages), so the cursor
-  //     itself never sits on top of it and hides it.
-  //   - five full seconds of mouse inactivity ANYWHERE on the
-  //     page: shown at wherever the cursor last was, since that's
-  //     not necessarily anywhere near the logo.
-  // Reuses .pv-icon-tip for the look (black rectangle, white
-  // text, Inter—see graffiti.css).
+  // Nudges toward the hidden Ctrl+drag feature: five full seconds of
+  // mouse inactivity anywhere on the page shows a hint at wherever the
+  // cursor was last, not anchored to the logo (idle can strike with the
+  // mouse sitting anywhere). Reuses .pv-icon-tip for the look (black
+  // rectangle, white text, Inter—see graffiti.css).
   var tip = document.createElement('div');
   tip.className = 'pv-icon-tip';
   tip.textContent = 'Ctrl+click to tag!';
   document.body.appendChild(tip);
-  var tipSource = null; // 'hover' | 'idle' | null—which trigger is currently showing it
   var lastMouseX = 0, lastMouseY = 0;
 
   function positionTipAt(x, y) {
@@ -66,44 +58,26 @@
     tip.style.left = left + 'px';
     tip.style.top = top + 'px';
   }
-  function showTip(source, x, y) {
+  function showTip(x, y) {
     positionTipAt(x, y);
     tip.classList.add('is-visible');
-    tipSource = source;
   }
   function hideTip() {
     tip.classList.remove('is-visible');
-    tipSource = null;
   }
 
-  var hoverTimer = null;
-  brand.addEventListener('mousemove', function (e) {
-    // Keep tracking the cursor while the hover tip is already up,
-    // same as "To top" does over its own icon.
-    if (tipSource === 'hover') positionTipAt(e.clientX, e.clientY);
-  });
-  brand.addEventListener('mouseenter', function () {
-    hoverTimer = setTimeout(function () { showTip('hover', lastMouseX, lastMouseY); }, 1000);
-  });
-  brand.addEventListener('mouseleave', function () {
-    clearTimeout(hoverTimer);
-    // Only dismiss it here if hovering is what showed it—if the
-    // idle trigger took over first (see below), leave that alone.
-    if (tipSource === 'hover') hideTip();
-  });
-
-  // Any mouse movement anywhere resets the idle clock; the tip
-  // only actually shows once a full 5s passes with none at all,
-  // at whatever position the cursor was left at.
+  // Any mouse movement anywhere dismisses the tip (if up) and resets
+  // the idle clock; it only actually shows once a full 5s passes with
+  // no movement at all.
   var idleTimer = null;
   function armIdleTimer() {
     clearTimeout(idleTimer);
-    idleTimer = setTimeout(function () { showTip('idle', lastMouseX, lastMouseY); }, 5000);
+    idleTimer = setTimeout(function () { showTip(lastMouseX, lastMouseY); }, 5000);
   }
   window.addEventListener('mousemove', function (e) {
     lastMouseX = e.clientX;
     lastMouseY = e.clientY;
-    if (tipSource === 'idle') hideTip();
+    hideTip();
     armIdleTimer();
   });
   armIdleTimer();

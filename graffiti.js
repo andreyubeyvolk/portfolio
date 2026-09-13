@@ -74,10 +74,9 @@
 // barely nudge it, real strokes get a snappier factor—filters
 // micro-jitter without reintroducing a laggy feel.
 //
-// Every tunable number lives in CFG below and is exposed live in
-// the bottom-right settings panel for dialing in by eye; its
-// "Copy JSON" button hands back the finished values to bake in
-// as new defaults.
+// Every tunable number lives in CFG below—no live settings panel
+// anymore (it was only ever a tuning aid; the values are dialed in and
+// baked in as the defaults now).
 //
 // Swap in a real exported brush stamp later by replacing the
 // `stampDot` scatter loop with drawImage() calls onto a loaded
@@ -130,10 +129,6 @@
     sheenWidth: 200,
     sheenLightness: 30
   };
-  // Snapshot for the panel's per-field reset icon—CFG itself gets
-  // edited live, so the original numbers need to live somewhere
-  // else to reset back to.
-  var DEFAULTS = Object.assign({}, CFG);
 
   // Fixed, viewport-sized: paint that lands outside .content-pane
   // (the sidebar/page background), which never scrolls.
@@ -196,7 +191,15 @@
 
   var card = document.querySelector('.content-pane');
   var cardRect = null;
-  function updateCardRect() { cardRect = card ? card.getBoundingClientRect() : null; }
+  // cardRect exists purely to protect a PANE-canvas page's own scroll
+  // container—its header bar, and the strip the pane-side canvas
+  // already owns—from ALSO getting painted by the fixed canvas. A page
+  // with no scrollable pane (the home page, 404) has no such
+  // competing system to protect: it's just an ordinary block of the
+  // page, so the fixed canvas should paint over it like anything else
+  // instead of leaving a dead unpaintable rectangle in the middle of
+  // the screen. Gated on `pane` existing, not just `card`.
+  function updateCardRect() { cardRect = (pane && card) ? card.getBoundingClientRect() : null; }
 
   // Real storage for pane paint: off-screen (never inserted into
   // the page), sized to the gallery's full scrollable height.
@@ -496,28 +499,85 @@
 
   // The only way any of this goes away now: reload/navigate, or
   // this explicit wipe (bound to Backspace/Delete/Space below).
-  // Eased out with a quick opacity fade (a compositor-only CSS
-  // transition—no extra rendering work) instead of a hard cut,
-  // then the pixels are actually cleared once invisible and the
-  // canvases fade back in already blank. Guarded against a second
-  // press mid-fade re-triggering the same cycle on top of itself.
+  // Guarded against a second press mid-clear re-triggering the same
+  // cycle on top of itself.
+  //
+  // Two interchangeable effects, picked per page by a global set
+  // BEFORE this script loads (window.GRAFFITI_CLEAR_EFFECT = 'wipe')
+  // so a page can try the new one without every other Brands page
+  // picking it up too:
+  //   - 'fade' (default): a quick opacity fade—a compositor-only CSS
+  //     transition, no extra rendering work.
+  //   - 'wipe': a board-eraser sweep, top-left to bottom-right, via an
+  //     animated CSS mask—still just a transform of two DOM elements,
+  //     no per-dot work, so it's exactly as cheap as the fade.
+  // Either way the pixels are actually cleared only once the canvases
+  // are fully hidden, then they reappear already blank.
+  var CLEAR_EFFECT = window.GRAFFITI_CLEAR_EFFECT === 'wipe' ? 'wipe' : 'fade';
   var clearing = false;
   function clearAll() {
     if (clearing) return;
     clearing = true;
-    // Fade the on-screen canvases—paneCanvas is the off-screen
-    // store now and was never visible to begin with, so fading
-    // that would do nothing.
-    var fading = [canvas, paneView];
-    fading.forEach(function (c) { c.style.opacity = '0'; });
-    setTimeout(function () {
+    // The on-screen canvases only—paneCanvas is the off-screen store
+    // now and was never visible to begin with, so animating that
+    // would do nothing.
+    var visible = [canvas, paneView];
+    var finish = function () {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       pctx.clearRect(0, 0, paneCanvas.width, paneCanvas.height);
       resetDripState();
       blitPane();
-      fading.forEach(function (c) { c.style.opacity = '1'; });
       clearing = false;
-    }, 260);
+    };
+    if (CLEAR_EFFECT === 'wipe') {
+      wipeAway(visible, finish);
+    } else {
+      visible.forEach(function (c) { c.style.opacity = '0'; });
+      setTimeout(function () {
+        finish();
+        visible.forEach(function (c) { c.style.opacity = '1'; });
+      }, 260);
+    }
+  }
+
+  // Board-eraser sweep: a soft diagonal band races from the top-left
+  // corner to the bottom-right, masking away everything it's already
+  // passed—reads as one broad, fast stroke wiping the tag left-to-
+  // right-and-down, the way a chalkboard actually gets erased, rather
+  // than a flat fade. Driven by rAF (a few hundred ms, ~20 frames) and
+  // a CSS mask rather than a registered custom property, so it doesn't
+  // depend on @property support—cheap either way, since it's just two
+  // elements' mask-image, not per-dot canvas work.
+  function wipeAway(elements, onDone) {
+    var DURATION = 850; // was 360—too quick to actually read as a sweep, more like a flash
+    var BAND = 4; // % width of the eraser edge—was 16 (then 26), narrowed further for a crisper, less-blurred line instead of a wide soft gradient
+    var start = null;
+    function frame(now) {
+      if (start === null) start = now;
+      var t = Math.min(1, (now - start) / DURATION);
+      var eased = 1 - Math.pow(1 - t, 2); // ease-out quad: gentler than the old cubic, which front-loaded almost the whole sweep into its first half and read as an instant cut followed by nothing
+      // "to bottom right" runs 0% at the top-left corner to 100% at the
+      // bottom-right—so the ALREADY-WIPED (transparent) stop has to sit
+      // at the LOW end and grow toward 100% as eased increases, or the
+      // sweep reads backwards (erasing bottom-right first, like it did
+      // before this fix). #000 stays put here as the not-yet-wiped side.
+      var pos = eased * (100 + BAND) - BAND;
+      var mask = 'linear-gradient(to bottom right, transparent ' + pos + '%, #000 ' + (pos + BAND) + '%)';
+      elements.forEach(function (el) {
+        el.style.webkitMaskImage = mask;
+        el.style.maskImage = mask;
+      });
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        onDone();
+        elements.forEach(function (el) {
+          el.style.webkitMaskImage = '';
+          el.style.maskImage = '';
+        });
+      }
+    }
+    requestAnimationFrame(frame);
   }
 
   function setCtrlMode(on) {
@@ -549,8 +609,8 @@
   window.addEventListener('keydown', function (e) {
     if (e.key === 'Control') { if (desktopQuery.matches) setCtrlMode(true); return; }
     if (e.key === 'Backspace' || e.key === 'Delete' || e.key === ' ') {
-      // The settings panel has its own inputs/textarea where these
-      // keys need to keep doing their normal editing job.
+      // If focus is in a text input/textarea anywhere on the page,
+      // these keys need to keep doing their normal editing job.
       var tag = document.activeElement ? document.activeElement.tagName : '';
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       e.preventDefault(); // Space otherwise scrolls the page, Backspace can navigate back
@@ -939,114 +999,4 @@
     flushBatch(pvctx);
   }
   tick();
-
-  // ── Settings panel: bottom-left gear toggles a live tuning
-  // panel bound directly to CFG—each field updates its value
-  // immediately on input. "Copy JSON" serializes the current CFG
-  // so the tuned numbers can be sent back and baked in above.
-  var FIELDS = [
-    ['lerpSlow', 'Сглаживание — медленно', 0, 1, 0.01],
-    ['lerpFast', 'Сглаживание — быстро', 0, 1, 0.01],
-    ['lerpSpeedRef', 'Порог скорости, px', 1, 30, 1],
-    ['capTilt', 'Наклон кэпа, рад', -3, 3, 0.05],
-    ['outerCountBase', 'Точек снаружи — база', 0, 300, 1],
-    ['outerCountSpread', 'Точек снаружи — разброс', 0, 300, 1],
-    ['outerCountMult', 'Точек снаружи — множитель', 0.5, 6, 0.1],
-    ['outerRadiusBase', 'Радиус снаружи — база', 1, 100, 1],
-    ['outerRadiusSpread', 'Радиус снаружи — разброс', 0, 150, 1],
-    ['outerRadiusMult', 'Радиус снаружи — множитель', 0.5, 6, 0.1],
-    ['coreCountBase', 'Точек ядра — база', 0, 300, 1],
-    ['coreCountSpread', 'Точек ядра — разброс', 0, 300, 1],
-    ['coreRadiusFrac', 'Радиус ядра — доля', 0.05, 1, 0.01],
-    ['dotAlphaOuterMin', 'Альфа снаружи — мин', 0, 1, 0.01],
-    ['dotAlphaOuterRange', 'Альфа снаружи — разброс', 0, 1, 0.01],
-    ['dotAlphaCoreMin', 'Альфа ядра — мин', 0, 1, 0.01],
-    ['dotAlphaCoreRange', 'Альфа ядра — разброс', 0, 1, 0.01],
-    ['widthWobbleRange', 'Вариация толщины, ±', 0, 15, 0.005],
-    ['cellSize', 'Размер ячейки плотности', 4, 150, 1],
-    ['crossAt', 'Порог перекрестья', 1, 20, 1],
-    ['crossBoost', 'Буст на перекрестье, ×', 1, 5, 0.1],
-    ['dripAt', 'Порог капли', 1, 40, 1],
-    ['dripFallMin', 'Скорость капли — мин', 0.05, 2, 0.01],
-    ['dripFallRange', 'Скорость капли — разброс', 0, 2, 0.01],
-    ['dripWobbleAccel', 'Виляние капли — accel', 0, 0.5, 0.005],
-    ['dripWobbleDamp', 'Виляние капли — damp', 0.5, 0.99, 0.01],
-    ['dripMaxDistMin', 'Длина капли — мин, px', 10, 300, 1],
-    ['dripMaxDistRange', 'Длина капли — разброс, px', 0, 300, 1],
-    ['surfaceAlpha', 'Альфа над пейном', 0.5, 5, 0.01],
-    ['edgeLiftMax', 'Сдвиг у края, px', 0, 30, 0.5],
-    ['edgeZone', 'Зона сдвига, px', 1, 60, 1],
-    ['sheenWidth', 'Ширина блика, px', 0, 400, 5],
-    ['sheenLightness', 'Яркость блика, 0–255', 0, 255, 1]
-  ];
-
-  var panelToggle = document.createElement('button');
-  panelToggle.type = 'button';
-  panelToggle.id = 'graffiti-settings-toggle';
-  panelToggle.setAttribute('aria-label', 'Настройки граффити');
-  panelToggle.textContent = '⚙';
-  document.body.appendChild(panelToggle);
-
-  var panel = document.createElement('div');
-  panel.id = 'graffiti-settings-panel';
-  panel.hidden = true;
-  panel.innerHTML =
-    '<div class="gs-title">Настройки тега</div>' +
-    '<div class="gs-fields">' +
-      FIELDS.map(function (f) {
-        return '<div class="gs-row">' +
-          '<label><span>' + f[1] + '</span>' +
-          '<input type="number" data-key="' + f[0] + '" min="' + f[2] + '" max="' + f[3] + '" step="' + f[4] + '" value="' + CFG[f[0]] + '"></label>' +
-          '<button type="button" class="gs-reset" data-reset-key="' + f[0] + '" title="Сбросить к дефолту" aria-label="Сбросить ' + f[1] + ' к дефолту">↺</button>' +
-          '</div>';
-      }).join('') +
-    '</div>' +
-    '<button type="button" class="gs-copy">Скопировать JSON</button>' +
-    '<textarea class="gs-json" readonly></textarea>';
-  document.body.appendChild(panel);
-
-  var jsonArea = panel.querySelector('.gs-json');
-  function refreshJson() { jsonArea.value = JSON.stringify(CFG, null, 2); }
-  // Outlines a field's row while its value differs from the
-  // baked-in default, so it's obvious at a glance what's actually
-  // been touched versus what's still stock.
-  function refreshModified(key) {
-    var input = panel.querySelector('input[data-key="' + key + '"]');
-    if (!input) return;
-    input.closest('.gs-row').classList.toggle('gs-row--modified', CFG[key] !== DEFAULTS[key]);
-  }
-  FIELDS.forEach(function (f) { refreshModified(f[0]); });
-  refreshJson();
-
-  panel.addEventListener('input', function (e) {
-    var key = e.target.getAttribute('data-key');
-    if (!key) return;
-    var v = parseFloat(e.target.value);
-    if (isNaN(v)) return;
-    CFG[key] = v;
-    refreshModified(key);
-    refreshJson();
-  });
-
-  panel.addEventListener('click', function (e) {
-    var key = e.target.getAttribute('data-reset-key');
-    if (!key) return;
-    CFG[key] = DEFAULTS[key];
-    var input = panel.querySelector('input[data-key="' + key + '"]');
-    if (input) input.value = DEFAULTS[key];
-    refreshModified(key);
-    refreshJson();
-  });
-
-  panel.querySelector('.gs-copy').addEventListener('click', function () {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(jsonArea.value).catch(function () { jsonArea.select(); });
-    } else {
-      jsonArea.select();
-    }
-  });
-
-  panelToggle.addEventListener('click', function () {
-    panel.hidden = !panel.hidden;
-  });
 })();

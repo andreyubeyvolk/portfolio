@@ -91,126 +91,6 @@ body.graffiti-mode * {
   cursor: none !important;
 }
 
-/* Tuning panel—not part of the effect itself, just a way to dial the
-   numbers in by eye and hand them back as a final JSON. Left untouched
-   by graffiti-mode's cursor:none, and usable whether or not Ctrl is
-   currently held. */
-#graffiti-settings-toggle {
-  position: fixed;
-  right: 16px;
-  bottom: 16px;
-  z-index: 10001;
-  width: 36px;
-  height: 36px;
-  border-radius: 4px;
-  border: 0;
-  background: #171717;
-  color: #fff;
-  font-size: 1.05rem;
-  line-height: 1;
-  cursor: pointer;
-}
-#graffiti-settings-panel {
-  position: fixed;
-  right: 16px;
-  bottom: 60px;
-  z-index: 10001;
-  width: 300px;
-  max-height: 75vh;
-  overflow-y: auto;
-  background: #fff;
-  border: 1px solid #d3d3d3;
-  border-radius: 8px;
-  padding: 12px;
-  font-family: 'Inter', sans-serif;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-}
-#graffiti-settings-panel[hidden] {
-  display: none;
-}
-.gs-title {
-  font-weight: 700;
-  font-size: 0.8125rem;
-  margin-bottom: 8px;
-}
-.gs-group-title {
-  font-weight: 700;
-  font-size: 0.6875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: #888;
-  margin: 10px 0 4px;
-}
-.gs-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 0;
-}
-.gs-row label {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-width: 0;
-}
-.gs-row span {
-  flex: 1;
-  font-size: 0.6875rem;
-  line-height: 1.3;
-}
-.gs-row input {
-  width: 68px;
-  font-size: 0.6875rem;
-  padding: 2px 4px;
-}
-.gs-reset {
-  flex: 0 0 auto;
-  width: 20px;
-  height: 20px;
-  border: 0;
-  border-radius: 4px;
-  background: none;
-  color: #888;
-  font-size: 0.75rem;
-  line-height: 1;
-  cursor: pointer;
-}
-.gs-reset:hover {
-  background: #f1f1f1;
-  color: #171717;
-}
-/* Marks a field whose value no longer matches its default, so it's
-   obvious at a glance what's actually been touched versus what's still
-   stock. */
-.gs-row--modified input {
-  outline: 2px solid #e67e22;
-  outline-offset: 0;
-  border-radius: 2px;
-}
-.gs-copy {
-  display: block;
-  width: 100%;
-  padding: 7px;
-  margin: 10px 0 8px;
-  background: #171717;
-  color: #fff;
-  border: 0;
-  border-radius: 4px;
-  font-family: inherit;
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-.gs-json {
-  width: 100%;
-  height: 110px;
-  font-family: monospace;
-  font-size: 0.625rem;
-  resize: vertical;
-}
-
 /* ── Logo hover-scrub—hovering the brand mark divides it into 7
    horizontal zones; each swaps in a different brush-stroke rendering of
    the same wordmark, so moving the cursor left-right scrubs through
@@ -218,6 +98,36 @@ body.graffiti-mode * {
    See logo-scrub.js. */
 #brand-scrub {
   position: relative;
+  /* The site-wide .brand fixes a 120px box sized for the flat logo.svg
+     image. The text mark below sizes itself to its own content instead
+     (the scrub images stack on top of it via position:absolute, so
+     they don't add to that width)—auto/none here let it do that rather
+     than clipping or wrapping the wordmark. A plain block element's
+     width:auto fills its containing block (the whole nav column)
+     rather than shrinking to its content—fit-content is what actually
+     shrink-wraps it to the text's own rendered length, which is also
+     what the hover-scrub math needs: it maps cursor X against this
+     element's own width to pick a brush zone, so the zones must span
+     just the letters, not the empty column space after them. */
+  width: fit-content;
+  max-width: 100%;
+}
+/* Base mark, text version (Brands only)—same type as the nav links
+   below it. Deliberately doesn't redeclare font-family/size/letter-
+   spacing: .nav-list a doesn't either, both just inherit straight from
+   body, and a couple of project pages tweak body's own letter-spacing
+   for that page—inheriting keeps this matching whichever value that
+   page uses instead of locking in one page's numbers. Only overrides
+   .brand's own font-weight:800 (sized for the old bold image-derived
+   look, not real text) back down to the nav's 700, plus the layout
+   bits real text needs that an <img> didn't. Swaps to one of the 7
+   brush strokes below on hover, exactly like the old flat-logo image
+   did. */
+#brand-scrub .brand-mark--text {
+  display: block;
+  width: auto;
+  white-space: nowrap;
+  font-weight: 700;
 }
 /* The site-wide .brand:hover rule dims the whole mark to 0.7 opacity—
    fine for a static logo, but it washed out every brush variant while

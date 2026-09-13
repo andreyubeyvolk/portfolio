@@ -78,19 +78,42 @@
     text-decoration: none;
   }
 
-  .mobile-bar__brand img {
+  /* Text wordmark—same type as .mobile-bar__menu opposite it (same
+     font-size/line-height/letter-spacing), just left-aligned instead
+     of right. Swaps out for one of the 7 brush-stroke letterings (see
+     mobile-logo-swipe.js) on a horizontal swipe across it. */
+  .mobile-bar__brand .brand-mark--text {
     display: block;
-    width: 123px;
-    height: auto;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .mobile-bar__brand .mobile-brand-lettering {
+    display: none;
+    height: 22px;
+    width: auto;
+    /* Same white-on-dark treatment the old flat logo.svg image had on
+       this bar—these SVGs are plain black ink, this just recolors
+       them for the #171717 background. */
     filter: brightness(0) invert(1);
+  }
+  .mobile-bar__brand.is-lettering .brand-mark--text {
+    display: none;
+  }
+  .mobile-bar__brand.is-lettering .mobile-brand-lettering {
+    display: block;
   }
 
   .mobile-bar__menu {
     font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: 0.9375rem;
-    line-height: 1;
-    letter-spacing: -0.4px;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
     color: #fff;
     background: none;
     border: none;
@@ -111,7 +134,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
     margin: 0 0 16px;
   }
@@ -145,7 +168,7 @@
       column 1, pushing it down to row 2 instead */
     font-size: 0.9375rem;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
     margin: 0 0 8px;
   }
@@ -215,7 +238,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #fff;
     pointer-events: none;
   }
@@ -241,7 +264,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: inherit;
     text-decoration: none;
     text-align: left;
@@ -265,7 +288,7 @@
   .home-socials a,
   .home-socials button {
     font-size: 0.9375rem;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     line-height: 1.2;
     border-top: 1px solid #171717;
     border-top-width: 1px;
@@ -465,7 +488,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
   }
 
@@ -491,7 +514,7 @@
   .archive-title {
     order: 0;
     font-size: 0.9375rem;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
   }
 
 
@@ -513,7 +536,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
     margin: 0 0 8px;
   }
@@ -555,7 +578,7 @@
   .inhouse-title {
     order: 0;
     font-size: 0.9375rem;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
   }
 
   .load-more-btn {
@@ -571,7 +594,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
     cursor: pointer;
   }
@@ -854,7 +877,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     margin: 0;
   }
 
@@ -868,7 +891,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     margin: 0;
   }
 
@@ -901,7 +924,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
     margin: 0;
   }
@@ -938,7 +961,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
     text-align: left;
   }
@@ -977,7 +1000,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     padding: 0 0 20px; /* 2px border + 0 + ~18px text + 20px = 40px tap target */
     border-top-width: 2px;
     position: relative;
@@ -1062,7 +1085,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
     text-align: left;
     text-decoration: none;
@@ -1102,7 +1125,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
   }
 
@@ -1115,7 +1138,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
     text-decoration: none;
     cursor: pointer;
@@ -1142,7 +1165,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
     margin: 0;
     min-height: calc(33.33vh - 56px); /* 56px = 40px project bar + 16px gap */
@@ -1197,7 +1220,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
   }
 
@@ -1206,7 +1229,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
     margin: 0;
     flex: 1;
@@ -1278,7 +1301,7 @@
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.5px;
     color: #171717;
     text-align: left;
     text-decoration: none;
