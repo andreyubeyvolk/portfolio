@@ -11,13 +11,16 @@
 // place), not seven—there's nothing here sized proportional to a
 // gallery or a session's browsing, just one small handle of state.
 //
-// Either swipe direction just advances to the next state, and the
-// plain text is one stop on that same 8-item loop (index 0)—not a
-// separate "unset" state outside it—so cycling all the way around
-// always lands back on it. The choice is kept in sessionStorage, so it
-// survives closing/reopening the mobile menu (and any other in-session
-// navigation) but resets on a fresh tab/session, same lifetime as the
-// rest of the site's per-viewer state.
+// The direction matters: a right swipe steps forward through the loop
+// (text -> lettering 1 -> 2 -> ... -> 7 -> text -> 1 -> ...), a left
+// swipe steps backward through the same loop (text -> 7 -> 6 -> ... ->
+// 1 -> text -> 7 -> ...). The plain text is one stop on that 8-item
+// loop (index 0)—not a separate "unset" state outside it—so cycling
+// all the way around in either direction always lands back on it. The
+// choice is kept in sessionStorage, so it survives closing/reopening
+// the mobile menu (and any other in-session navigation) but resets on
+// a fresh tab/session, same lifetime as the rest of the site's
+// per-viewer state.
 (function () {
   var brand = document.querySelector('.mobile-bar__brand');
   if (!brand) return;
@@ -70,9 +73,11 @@
     var dy = touch.clientY - startY;
     if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy)) return;
     // A real horizontal swipe, not a tap—don't also let it navigate
-    // home via the <a>'s own click.
+    // home via the <a>'s own click. Right steps forward, left steps
+    // backward, both wrapping through the same 8-item loop.
     e.preventDefault();
-    applyState((currentIndex + 1) % STATE_COUNT);
+    var step = dx > 0 ? 1 : -1;
+    applyState((currentIndex + step + STATE_COUNT) % STATE_COUNT);
     try { sessionStorage.setItem(STORAGE_KEY, String(currentIndex)); } catch (err) { /* ditto */ }
   });
 })();
