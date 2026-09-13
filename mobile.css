@@ -671,7 +671,7 @@
   .mobile-menu {
     display: block;
     position: fixed;
-    bottom: 120px; /* 80px from bottom + 40px bar height */
+    bottom: 160px; /* 80px from bottom + 40px bar height + 40px raised */
     left: var(--page-margin, 16px);
     right: var(--page-margin, 16px);
     height: calc(100vh - 200px);
@@ -779,7 +779,7 @@
     font-weight: 700;
     font-style: normal;
     line-height: 1.4;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.32px; /* 20% tighter than the previous 0.4px */
     color: #171717;
     text-decoration: none;
     padding: 0;
@@ -841,13 +841,14 @@
     padding-bottom: 0;
   }
 
-  /* Photo: full-width square, 8px gap below */
+  /* Photo: full-width square, 6px gap below (2px tighter than the
+     original 8px, to bring Approach closer up underneath it) */
   .about-page .about-photo {
     grid-column: unset;
     width: 100%;
     aspect-ratio: 1 / 1;
     height: auto;
-    margin: 0 0 8px;
+    margin: 0 0 6px;
   }
 
   /* Sections: flex row — label (84px) + content (flex-1) */
