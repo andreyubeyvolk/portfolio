@@ -673,16 +673,11 @@
   .mobile-menu {
     display: block;
     position: fixed;
-    bottom: 120px; /* 80px from bottom + 40px bar height—stays flush against
-                      the bar; raising the panel is done via extra height
-                      below (top edge), not by lifting bottom, or the panel
-                      detaches from the bar with a visible gap under it */
+    bottom: 120px; /* 80px from bottom + 40px bar height */
     left: var(--page-margin, 16px);
     right: var(--page-margin, 16px);
-    height: calc(100vh - 160px); /* 40px taller than the original 200px
-                                     subtrahend—raises the top edge 40px
-                                     while the bottom stays flush with the bar */
-    height: calc(100dvh - 160px);
+    height: calc(100vh - 200px);
+    height: calc(100dvh - 200px);
     background: #fff;
     z-index: 101;
     overflow: hidden;
@@ -768,7 +763,8 @@
   /* ── Menu nav tabs ── */
   .menu-tabs {
     position: absolute;
-    bottom: 16px;
+    bottom: 32px; /* 16px original + 16px raised—only the text moves, the
+                     white panel itself stays its original size/position */
     left: 0;
     right: 0;
     display: flex;
