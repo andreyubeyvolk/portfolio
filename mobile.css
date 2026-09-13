@@ -292,8 +292,9 @@
     font-size: 0.9375rem;
     letter-spacing: -0.5px;
     line-height: 1.2;
-    border-top: 1px solid #171717;
-    border-top-width: 1px;
+    border-top: 2px solid #171717; /* matches About's service-row divider
+                                       (e.g. above Visual Athleticism) */
+    border-top-width: 2px;
   }
 
   /* No top border on first item in each column */
