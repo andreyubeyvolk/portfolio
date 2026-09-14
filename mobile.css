@@ -259,10 +259,11 @@
   /* ── See all projects: full-width tap target, no divider rules ──
      32px margin-bottom keeps it from visually merging into the
      socials grid right below it. Width is 100% (not fit-content) and a
-     ::before bleeds the :active fill up through the 16px residual gap
-     (8px .reel-card margin-bottom + 8px this element's own margin-top)
-     so the highlight reads flush against the cover above, the same
-     bleed-up trick the desktop hover version uses. */
+     ::before bleeds the :active fill up through the 8px residual gap
+     (this element's 8px margin-top collapses against .reel-card's own
+     8px margin-bottom, per adjacent-sibling margin collapsing—not a
+     16px sum) so the highlight reads flush against the cover above,
+     the same bleed-up trick the desktop hover version uses. */
   .home-projects-link {
     display: block;
     width: 100%;
@@ -283,7 +284,9 @@
     left: 0;
     right: 0;
     bottom: 100%;
-    height: 16px;
+    /* Adjacent margins collapse (both 8px), so the real gap is 8px, not
+       their 8+8 sum—measured via getBoundingClientRect, not assumed. */
+    height: 8px;
     background: transparent;
     pointer-events: none;
   }
