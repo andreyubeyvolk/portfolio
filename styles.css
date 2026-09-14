@@ -63,6 +63,22 @@ a {
   text-decoration: none;
 }
 
+/* Visually hidden but still in the accessibility tree and readable by
+   search engines/screen readers—used for the page <h1> on templates
+   whose real, visible heading is a styled non-heading element (the
+   design doesn't have room for a second, visible page title). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Site-wide hover feedback for inline text links (bio copy, project
    Challenge/Solution prose, archive descriptions, the [LINK] reference
    style, etc.)—same black-bg/white-text treatment already used for nav,

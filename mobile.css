@@ -504,7 +504,7 @@
     min-height: calc(33.33vh - 16px);
   }
 
-  .section-intro p.section-page-title {
+  .section-intro .section-page-title {
     display: block;
     grid-column: 1 / 2;
     margin: 0;
