@@ -508,6 +508,11 @@
     display: block;
     grid-column: 1 / 2;
     margin: 0;
+    /* Was a <p>, now an <h1> (for real page-heading semantics)—without
+       this it picks up the browser's own oversized default h1 font-size/
+       weight instead of matching the paragraph beside it, since nothing
+       here ever set those explicitly (the <p> just inherited them). */
+    font: inherit;
   }
 
   .archive-page .section-intro.intro p {
