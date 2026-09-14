@@ -1378,7 +1378,23 @@
     text-decoration: none;
     cursor: pointer;
     width: 100%;
+    position: relative;
     transition: color 150ms ease, background-color 150ms ease;
+  }
+
+  /* Tap/hover fill bleeds up through the 2px flex gap so it reads flush
+     against the divider bar above—same trick as .home-projects-link and
+     .inhouse-title. */
+  .mobile-project__action a::before,
+  .next-project-btn::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 2px;
+    background: transparent;
+    pointer-events: none;
   }
 
   .mobile-project__action a:hover,
@@ -1386,6 +1402,13 @@
   .next-project-btn:hover,
   .next-project-btn:active {
     color: #fff;
+    background-color: #171717;
+  }
+
+  .mobile-project__action a:hover::before,
+  .mobile-project__action a:active::before,
+  .next-project-btn:hover::before,
+  .next-project-btn:active::before {
     background-color: #171717;
   }
 
