@@ -17,6 +17,10 @@ export default defineNuxtConfig({
         { rel: 'stylesheet', href: '/styles.css' },
         { rel: 'stylesheet', href: '/mobile.css' },
         { rel: 'stylesheet', href: '/graffiti.css' },
+        // Lenis smooth-scroll library (third-party, defines window.Lenis
+        // only—doesn't touch the DOM on its own, so unlike the nav scripts
+        // there's no hydration race to worry about). See ScrollPane.vue.
+        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.css' },
         { rel: 'icon', href: '/assets/favicon.svg', type: 'image/svg+xml' },
         { rel: 'icon', href: '/assets/favicon-32.png', sizes: '32x32', type: 'image/png' },
         { rel: 'icon', href: '/assets/favicon-16.png', sizes: '16x16', type: 'image/png' },
@@ -26,6 +30,9 @@ export default defineNuxtConfig({
       // are NOT listed here—loading them as static <script> tags races
       // Vue's hydration (see plugins/legacy-nav-scripts.client.ts for why
       // that matters and where they're actually injected instead).
+      script: [
+        { src: 'https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js' },
+      ],
     },
   },
 })
