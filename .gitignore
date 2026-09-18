@@ -12,3 +12,9 @@ ss_*.png
 node_modules/
 package.json
 package-lock.json
+
+# ...except the Nuxt migration project (nuxt-migration branch), which is a
+# real Node project—its package.json/lockfile must be tracked for reproducible
+# builds in GitHub Actions.
+!nuxt-app/package.json
+!nuxt-app/package-lock.json
