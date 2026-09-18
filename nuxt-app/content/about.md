@@ -1,3 +1,3 @@
-# About Content Version 3
+# About (Stage 2 placeholder)
 
-[Back home](/)
+Real content lands in later stages.
