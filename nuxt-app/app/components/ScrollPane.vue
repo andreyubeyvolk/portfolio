@@ -11,16 +11,30 @@
 // navigation would leave behind an orphaned Lenis instance, wheel
 // listener, and scrollbar track—all still running against a pane that no
 // longer exists.
+interface LenisInstance {
+  destroy: () => void
+  scrollTo: (target: number, opts?: Record<string, unknown>) => void
+}
+
 declare global {
   interface Window {
-    Lenis?: new (opts: Record<string, unknown>) => { destroy: () => void }
+    Lenis?: new (opts: Record<string, unknown>) => LenisInstance
+  }
+  interface HTMLElement {
+    lenisInstance?: LenisInstance
   }
 }
+
+const props = defineProps<{
+  // to-top.js's original query is document.querySelector('.project-scroll')
+  // (project pages only)—About's pane doesn't need this class at all.
+  projectScroll?: boolean
+}>()
 
 const paneRef = useTemplateRef<HTMLElement>('pane')
 let track: HTMLDivElement | null = null
 let thumb: HTMLDivElement | null = null
-let lenis: { destroy: () => void } | null = null
+let lenis: LenisInstance | null = null
 let resizeObserver: ResizeObserver | null = null
 let isDragging = false
 let dragStartY = 0
@@ -153,6 +167,12 @@ onMounted(() => {
   mq = window.matchMedia('(min-width: 981px)')
   if (mq.matches && typeof window.Lenis === 'function') {
     lenis = new window.Lenis({ wrapper: pane, content: pane.firstElementChild, autoRaf: true })
+    // Exposed on the element (not a Vue provide/inject) so KvIcon.vue's
+    // "to top" can pause/resume this exact instance via a plain
+    // closest('.project-scroll') query—matches how scroll.js itself did
+    // it, no extra wiring needed between components that don't otherwise
+    // know about each other.
+    pane.lenisInstance = lenis
   }
   window.addEventListener('wheel', onWheel, { passive: false })
 
@@ -170,7 +190,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="pane" class="content-pane__scroll custom-scroll">
+  <div ref="pane" class="content-pane__scroll custom-scroll" :class="{ 'project-scroll': projectScroll }">
     <slot />
   </div>
 </template>

@@ -4,7 +4,7 @@ export default defineContentConfig({
   collections: {
     content: defineCollection({
       type: 'page',
-      source: { include: '**', exclude: ['about.md'] },
+      source: { include: '**', exclude: ['about.md', 'projects/**'] },
     }),
     // Structured data, not prose—the 'page' type only keeps a fixed set of
     // fields (title/description/body/...) and buries everything else
@@ -39,6 +39,70 @@ export default defineContentConfig({
           href: z.string().optional(),
         })),
         resumeUrl: z.string(),
+      }),
+    }),
+    // One project-page template (see components/ProjectPage.vue) driven
+    // entirely by this data—no per-project template copy-paste, which is
+    // the actual point of the migration for these 12 pages. `gallery` is
+    // the same wide/pair sequence already worked out by hand on the
+    // static site (CLAUDE.md's mechanical wide/pair classification from
+    // each photo's pixel dimensions)--carried over as-is, not re-derived.
+    project: defineCollection({
+      type: 'data',
+      source: 'projects/**/*.md',
+      schema: z.object({
+        slug: z.string(),
+        section: z.enum(['inhouse', 'brands']),
+        title: z.string(),
+        description: z.string(),
+        cover: z.object({
+          type: z.enum(['image', 'video']),
+          src: z.string(),
+          width: z.number(),
+          height: z.number(),
+        }),
+        about: z.string(),
+        gallery: z.array(z.union([
+          z.object({
+            type: z.literal('wide'),
+            item: z.object({
+              type: z.enum(['image', 'video']),
+              src: z.string(),
+              width: z.number(),
+              height: z.number(),
+              alt: z.string().optional(),
+              note: z.string().optional(),
+              player: z.enum(['bare', 'full']).optional(),
+            }),
+          }),
+          z.object({
+            type: z.literal('pair'),
+            items: z.tuple([
+              z.object({
+                type: z.enum(['image', 'video']),
+                src: z.string(),
+                width: z.number(),
+                height: z.number(),
+                alt: z.string().optional(),
+                note: z.string().optional(),
+                player: z.enum(['bare', 'full']).optional(),
+              }),
+              z.object({
+                type: z.enum(['image', 'video']),
+                src: z.string(),
+                width: z.number(),
+                height: z.number(),
+                alt: z.string().optional(),
+                note: z.string().optional(),
+                player: z.enum(['bare', 'full']).optional(),
+              }),
+            ]),
+          }),
+        ])),
+        challenge: z.string(),
+        solution: z.string(),
+        kv: z.string(),
+        zipUrl: z.string().optional(),
       }),
     }),
   },

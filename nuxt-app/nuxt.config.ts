@@ -21,6 +21,12 @@ export default defineNuxtConfig({
         // only—doesn't touch the DOM on its own, so unlike the nav scripts
         // there's no hydration race to worry about). See ScrollPane.vue.
         { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.css' },
+        // Project-page template CSS (cover/gallery/video-player/info-note)
+        // and the scroll-reveal fade+rise—both used only on project pages,
+        // but small enough (and identical across all of them, by design)
+        // that a global include is simpler than per-route loading.
+        { rel: 'stylesheet', href: '/project-page.css' },
+        { rel: 'stylesheet', href: '/scroll-reveal.css' },
         { rel: 'icon', href: '/assets/favicon.svg', type: 'image/svg+xml' },
         { rel: 'icon', href: '/assets/favicon-32.png', sizes: '32x32', type: 'image/png' },
         { rel: 'icon', href: '/assets/favicon-16.png', sizes: '16x16', type: 'image/png' },
