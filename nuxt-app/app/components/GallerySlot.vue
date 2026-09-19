@@ -19,6 +19,7 @@ export interface GalleryMediaItem {
   note?: string
   player?: 'bare' | 'full'
   tall?: boolean
+  tip?: string
 }
 
 const props = defineProps<{
@@ -40,6 +41,40 @@ const tallStyle = computed(() => (props.wrapperClass === 'pv-wide' && props.item
 const el = useTemplateRef<HTMLElement>('el')
 const isRevealed = ref(!!props.skipReveal)
 const isNoteOpen = ref(false)
+
+// Cursor-follow hover caption (valera, CLAUDE.md's vp-tipslot pattern).
+// Shows ~1s after the cursor rests over the slide, positioned just
+// below-right of the cursor and clamped to the viewport.
+const tipLines = computed(() => props.item.tip?.split('|').map(s => s.trim()) ?? [])
+const isTipVisible = ref(false)
+const tipStyle = ref<{ left: string, top: string }>({ left: '0px', top: '0px' })
+let tipTimer: ReturnType<typeof setTimeout> | undefined
+
+function onTipMove(e: MouseEvent) {
+  isTipVisible.value = false
+  clearTimeout(tipTimer)
+  const cx = e.clientX
+  const cy = e.clientY
+  tipTimer = setTimeout(() => {
+    const off = 16
+    // Rough box estimate before layout--good enough to keep the tip on
+    // screen; the browser reflows the actual span widths immediately after.
+    const tw = Math.max(...tipLines.value.map(l => l.length)) * 8 + 10
+    const th = tipLines.value.length * 26
+    let left = cx + off
+    let top = cy + off
+    if (left + tw > window.innerWidth - 8) left = cx - off - tw
+    if (top + th > window.innerHeight - 8) top = cy - off - th
+    if (left < 8) left = 8
+    if (top < 8) top = 8
+    tipStyle.value = { left: `${left}px`, top: `${top}px` }
+    isTipVisible.value = true
+  }, 1000)
+}
+function onTipLeave() {
+  clearTimeout(tipTimer)
+  isTipVisible.value = false
+}
 
 let revealObserver: IntersectionObserver | null = null
 let noteObserver: IntersectionObserver | null = null
@@ -95,6 +130,7 @@ onBeforeUnmount(() => {
   revealObserver?.disconnect()
   noteObserver?.disconnect()
   clearTimeout(closeTimer)
+  clearTimeout(tipTimer)
 })
 </script>
 
@@ -104,6 +140,8 @@ onBeforeUnmount(() => {
     class="gallery-slot"
     :class="[wrapperClass, { reveal: !skipReveal, 'is-revealed': isRevealed, 'info-note': item.note, 'is-note-open': isNoteOpen }]"
     :style="tallStyle"
+    @mousemove="item.tip ? onTipMove($event) : undefined"
+    @mouseleave="item.tip ? onTipLeave() : undefined"
   >
     <img v-if="item.type === 'image'" :width="item.width" :height="item.height" loading="lazy" :src="item.src" :alt="item.alt || ''" />
     <!-- `paired` (cropped, absolutely positioned to fill the box) only
@@ -122,6 +160,12 @@ onBeforeUnmount(() => {
         <span class="info-note__text">{{ item.note }}</span>
       </div>
     </div>
+
+    <Teleport v-if="item.tip" to="body">
+      <div class="vp-tip" :class="{ 'is-visible': isTipVisible }" :style="tipStyle">
+        <span v-for="(line, idx) in tipLines" :key="idx">{{ line }}</span>
+      </div>
+    </Teleport>
   </figure>
 </template>
 

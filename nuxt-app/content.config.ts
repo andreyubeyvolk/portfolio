@@ -60,6 +60,10 @@ export default defineContentConfig({
         // taller than the standard 3:2 box (e.g. apac-17) needs its real
         // aspect ratio instead of being cropped--see GallerySlot.vue.
         tall: z.boolean().optional(),
+        // Cursor-follow hover caption (valera, CLAUDE.md's "vp-tipslot"
+        // pattern)--distinct from `note`'s tap-to-reveal info-note bar.
+        // Lines are '|'-separated, matching the static site's data-tip.
+        tip: z.string().optional(),
       })
       return defineCollection({
         type: 'data',
