@@ -1060,6 +1060,11 @@ window.initGraffiti = function initGraffiti() {
   }
   tick();
 
+  // Exposed so other scripts (e.g. the Archive lightbox) can wipe every
+  // tag on demand--switching or closing an open Archive card is meant to
+  // erase whatever was drawn while it was open, same trigger as Escape.
+  window.clearGraffiti = clearAll;
+
   return function destroy() {
     cancelAnimationFrame(rafId);
     cancelAnimationFrame(scrollWatchRafId);
@@ -1073,6 +1078,7 @@ window.initGraffiti = function initGraffiti() {
     window.removeEventListener('click', onClick, true);
     if (resizeObserver) resizeObserver.disconnect();
     document.body.classList.remove('graffiti-mode');
+    if (window.clearGraffiti === clearAll) delete window.clearGraffiti;
     canvas.remove();
     paneView.remove();
     cursor.remove();

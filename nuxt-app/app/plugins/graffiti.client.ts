@@ -14,6 +14,7 @@ declare global {
   interface Window {
     GRAFFITI_CLEAR_EFFECT?: string
     initGraffiti?: () => () => void
+    clearGraffiti?: () => void
   }
 }
 
