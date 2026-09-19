@@ -18,41 +18,11 @@ const props = defineProps<{
 const tipRef = useTemplateRef<HTMLElement>('tip')
 const tipVisible = ref(false)
 const tipStyle = ref({ left: '0px', top: '0px' })
-let isAnimating = false
-
-function easeOutQuint(t: number) { return 1 - Math.pow(1 - t, 5) }
-
-function animateScrollTo(getPos: () => number, setPos: (v: number) => void, target: number, duration: number, onDone?: () => void) {
-  const start = getPos()
-  const change = target - start
-  if (!change) { onDone?.(); return }
-  let startTime: number | null = null
-  function step(now: number) {
-    if (startTime === null) startTime = now
-    const t = Math.min((now - startTime) / duration, 1)
-    setPos(start + change * easeOutQuint(t))
-    if (t < 1) requestAnimationFrame(step)
-    else onDone?.()
-  }
-  requestAnimationFrame(step)
-}
+const { scrollTo: scrollPaneTo } = useScrollToPane('.project-scroll')
 
 function scrollToTop() {
-  if (isAnimating) return
-  isAnimating = true
   tipVisible.value = false
-
-  const pane = document.querySelector<HTMLElement>('.project-scroll')
-  const desktopQuery = window.matchMedia('(min-width: 981px)')
-
-  if (desktopQuery.matches && pane) {
-    const setPos = pane.lenisInstance
-      ? (v: number) => pane.lenisInstance!.scrollTo(v, { immediate: true })
-      : (v: number) => { pane.scrollTop = v }
-    animateScrollTo(() => pane.scrollTop, setPos, 0, 1400, () => { isAnimating = false })
-  } else {
-    animateScrollTo(() => window.scrollY, (v) => window.scrollTo(0, v), 0, 1400, () => { isAnimating = false })
-  }
+  scrollPaneTo(0)
 }
 
 function onMouseMove(e: MouseEvent) {

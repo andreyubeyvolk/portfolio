@@ -63,6 +63,61 @@ function openCard(card: (typeof cards.value)[number]) {
   }
 }
 
+// For every item in the flat catalog, which `cards` index "owns" it--
+// itself if it has its own grid card, else the nearest preceding
+// isCard:true item (a series' continuation frames all belong to that
+// series' single card). Used below to know how far Load More needs to
+// reveal after the lightbox is stepped deeper than what's shown.
+const cardOwnerIndex = computed(() => {
+  const owners: number[] = []
+  let current = -1
+  allItems.value.forEach((item) => {
+    if (item.isCard) current = cards.value.indexOf(item)
+    owners.push(current)
+  })
+  return owners
+})
+
+const cardEls = ref<(HTMLElement | null)[]>([])
+const { scrollTo: scrollGridTo } = useScrollToPane('.content-pane__scroll')
+
+// Stepping inside the lightbox can reach a card far past what Load More
+// has revealed (both overlays are handed the full `allItems` catalog,
+// not just `visibleCards`). On close, catch the grid up to cover
+// whatever was last viewed--as if Load More had been clicked enough
+// times--and scroll it into view, instead of leaving the grid looking
+// like navigation never happened.
+function revealAndScrollTo(flatIndex: number) {
+  const ownerIdx = cardOwnerIndex.value[flatIndex]
+  if (ownerIdx === undefined || ownerIdx === -1) return
+  // Only the over-navigated case (stepped in the lightbox past what
+  // Load More has revealed) gets the catch-up + scroll treatment--
+  // closing on an already-visible card leaves the grid's scroll
+  // position exactly where it was, same as before.
+  if (ownerIdx < shown.value) return
+  const from = shown.value
+  revealingFrom.value = from
+  shown.value = Math.min(cards.value.length, ownerIdx + 1)
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { revealingFrom.value = Infinity })
+      const el = cardEls.value[ownerIdx]
+      const pane = document.querySelector<HTMLElement>('.content-pane__scroll')
+      if (!el || !pane) return
+      const paneRect = pane.getBoundingClientRect()
+      const cardRect = el.getBoundingClientRect()
+      scrollGridTo(pane.scrollTop + (cardRect.top - paneRect.top), 900)
+    })
+  })
+}
+
+watch(openIndex, (idx, prevIdx) => {
+  if (idx === null && prevIdx !== undefined && prevIdx !== null) revealAndScrollTo(prevIdx)
+})
+watch(mobileOpenIndex, (idx, prevIdx) => {
+  if (idx === null && prevIdx !== undefined && prevIdx !== null) revealAndScrollTo(prevIdx)
+})
+
 function loadMore() {
   const from = shown.value
   revealingFrom.value = from
@@ -104,6 +159,7 @@ useHead({
         <button
           v-for="(card, i) in visibleCards"
           :key="card.src"
+          :ref="(el) => { cardEls[i] = el as HTMLElement | null }"
           type="button"
           class="archive-card"
           :class="{ 'archive-card--revealing': i >= revealingFrom }"
@@ -119,6 +175,7 @@ useHead({
       </article>
 
       <button v-if="hasMore" class="load-more-btn" type="button" @click="loadMore">Load more</button>
+      <button v-else class="load-more-btn" type="button" @click="scrollGridTo(0)">To top</button>
     </ScrollPane>
   </section>
 
