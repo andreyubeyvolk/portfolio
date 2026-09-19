@@ -22,7 +22,7 @@ const props = defineProps<{
   gallery: GalleryRow[]
   challenge: string
   solution: string
-  kv: string
+  kv: { src: string, width: number, height: number }
   zipUrl?: string
 }>()
 
@@ -106,7 +106,7 @@ const flatGallery = computed(() => {
                 <div class="pv-solution">
                   <div class="pv-solution__body">
                     <p>{{ solution }}</p>
-                    <KvIcon variant="desktop" :src="kv" :width="206" :height="206" />
+                    <KvIcon variant="desktop" :src="kv.src" :width="kv.width" :height="kv.height" />
                   </div>
                   <div class="pv-actions">
                     <div class="pv-action">
@@ -172,7 +172,7 @@ const flatGallery = computed(() => {
           <span class="mobile-project__label">Solution</span>
           <div class="mobile-project__solution">
             <p class="mobile-project__text">{{ solution }}</p>
-            <KvIcon variant="mobile" :src="kv" :width="206" :height="206" />
+            <KvIcon variant="mobile" :src="kv.src" :width="kv.width" :height="kv.height" />
           </div>
         </RevealOnScroll>
 

@@ -131,6 +131,9 @@ gallery:
         alt: AI Secures APAC visual 18
 challenge: "Sumsub Multiverse already had its own layered visual language, built to represent the hidden depths of fraud prevention. The dragon was the stakeholder's idea from the start, but the dilemma was making it feel earned, not a tacky cliché. In 2024, AI tools couldn't yet generate complex 3D easily, so it had to be built by hand, from flat sketches through to full 3D. The challenge was reconciling a literal symbol with real specificity, without shortcuts."
 solution: "We took the dragon as the central figure, rebuilding its scales as a tangle of wires forming the tail, with AI data reading as glowing pulses running through them. Surfaces shift between solid and semi-transparent, giving the dragon a half-materialized, digital quality. White fire-like panels break through as accents, sharpening the regional read. The result: a digital dragon standing guard, tradition and AI security fused into one figure."
-kv: /assets/inhouse/dragon/dragon-kv.webp
+kv:
+  src: /assets/inhouse/dragon/dragon-kv.webp
+  width: 206
+  height: 206
 zipUrl: /assets/inhouse/dragon/dragon-project-images.zip
 ---

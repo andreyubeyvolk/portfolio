@@ -80,7 +80,14 @@ export default defineContentConfig({
           ])),
           challenge: z.string(),
           solution: z.string(),
-          kv: z.string(),
+          // Not a fixed 206x206 everywhere--igaming's KV is 246x257. Real
+          // width/height (not just src) so KvIcon renders at its actual
+          // aspect instead of a hardcoded square.
+          kv: z.object({
+            src: z.string(),
+            width: z.number(),
+            height: z.number(),
+          }),
           zipUrl: z.string().optional(),
         }),
       })
