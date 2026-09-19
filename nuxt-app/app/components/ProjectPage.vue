@@ -26,9 +26,7 @@ const props = defineProps<{
   zipUrl?: string
 }>()
 
-const sectionIntroText = computed(() => props.section === 'inhouse'
-  ? 'Leading a design team. Visual systems and brand communications across every medium.'
-  : 'Independent identity projects I build for external clients ready to find a voice of their own.')
+const introText = computed(() => sectionIntroText(props.section))
 
 // Flat running index across the whole gallery (a pair row counts as two),
 // matching the static site's own "skip the first N already-visible items"
@@ -53,7 +51,7 @@ const flatGallery = computed(() => {
        provides those and passes this component's own root nodes into its
        <slot />, same as about.vue. -->
   <section class="section-intro intro" :aria-label="`${section === 'inhouse' ? 'Inhouse' : 'Brands'} section introduction`">
-    <p>{{ sectionIntroText }}</p>
+    <p>{{ introText }}</p>
   </section>
 
     <section class="content-pane project-frame" :aria-label="`${title} project content`">
