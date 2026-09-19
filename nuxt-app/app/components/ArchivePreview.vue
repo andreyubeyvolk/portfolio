@@ -296,6 +296,18 @@ function handleEdgeClick(dir: 1 | -1, event: MouseEvent) {
   stepPreview(dir)
 }
 
+// .preview-nav's click needs the same stopPropagation handleEdgeClick
+// already has--without it, the click bubbles to the overlay's own
+// onOverlayClick, which (in group mode) closes on anything that isn't
+// on its allow-list. That allow-list never included `.preview-nav`
+// (it's hidden in group mode anyway), so a step that LANDS on a
+// group's first/last frame flips isGroupMode mid-click and the same
+// click that just requested the step closes the whole lightbox instead.
+function handleNavClick(dir: 1 | -1, event: MouseEvent) {
+  event.stopPropagation()
+  stepPreview(dir)
+}
+
 // ── Shared prev/next navigation ──────────────────────────────────────
 // Inside an open filmstrip, stepping past its first/last frame keeps
 // going straight into the previous/next item of the whole flat catalog
@@ -303,6 +315,11 @@ function handleEdgeClick(dir: 1 | -1, event: MouseEvent) {
 // the filmstrip" never reads as a dead end. Outside a filmstrip it's a
 // direct catalog-to-catalog jump--no scroll/ease, that's filmstrip-only.
 function stepPreview(dir: 1 | -1) {
+  // Blur whatever's focused (typically a just-clicked .preview-nav
+  // button) on every step, not just the very first open--otherwise a
+  // mouse-clicked nav button keeps its focus ring visible through every
+  // later keyboard-driven step too, since nothing else ever clears it.
+  if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   if (isGroupMode.value) {
     const frameIdx = currentFilmstripIndex()
     const nextFrameIdx = frameIdx + dir
@@ -390,13 +407,10 @@ function onResize() {
 function onKeydown(event: KeyboardEvent) {
   if (!isOpen.value || isMobile()) return
   if (event.key === 'Escape') { close(); return }
-  if (event.key === ' ') {
-    const tag = (event.target as HTMLElement | null)?.tagName
-    if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return
-    event.preventDefault()
-    stepPreview(1)
-    return
-  }
+  // Space is deliberately NOT wired to stepping here--it's the
+  // graffiti feature's global clear-tag key (see graffiti.js), and
+  // having it do both depending on focus was a real conflict. Arrow
+  // keys are the only keyboard way to step through the lightbox now.
   if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
   event.preventDefault()
   stepPreview(event.key === 'ArrowRight' ? 1 : -1)
@@ -431,8 +445,8 @@ onBeforeUnmount(() => {
       </header>
       <div class="preview-media">
         <img ref="previewImg" class="preview-image" :src="currentEntry?.src" :alt="currentEntry?.alt || ''" />
-        <button class="preview-nav preview-nav--prev" type="button" aria-label="Previous photo" @click="stepPreview(-1)"><span class="preview-nav__arrow">&lt;</span></button>
-        <button class="preview-nav preview-nav--next" type="button" aria-label="Next photo" @click="stepPreview(1)"><span class="preview-nav__arrow">&gt;</span></button>
+        <button class="preview-nav preview-nav--prev" type="button" aria-label="Previous photo" @click="handleNavClick(-1, $event)"><span class="preview-nav__arrow">&lt;</span></button>
+        <button class="preview-nav preview-nav--next" type="button" aria-label="Next photo" @click="handleNavClick(1, $event)"><span class="preview-nav__arrow">&gt;</span></button>
       </div>
       <div ref="previewText" class="preview-text">
         <p v-if="descParts">{{ descParts.before }}<a class="archive-num" :href="currentEntry!.link" target="_blank" rel="noreferrer">{{ descParts.linkText }}</a>{{ descParts.after }}</p>
