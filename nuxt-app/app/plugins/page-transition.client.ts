@@ -17,6 +17,23 @@ const PROJECT_ROUTE_NAMES = new Set(['inhouse-slug', 'brands-slug'])
 // curtain (a project page isn't a "section" nav).
 const MORPH_SLUGS = new Set(['igaming'])
 
+// Nuxt's own view-transitions.client.js attaches a .catch() to
+// transition.finished but not to transition.ready--if the browser ever
+// aborts a transition (overlapping navigations from an impatient
+// double-click, or the tab being backgrounded mid-navigation), that
+// rejection surfaces as an unhandled promise rejection in the console.
+// The nav itself still completes fine either way (Nuxt's own
+// page:finish-driven fallback doesn't depend on `ready`), so this just
+// silences that console noise rather than changing any behavior.
+if (typeof document !== 'undefined' && document.startViewTransition) {
+  const nativeStartViewTransition = document.startViewTransition.bind(document)
+  document.startViewTransition = ((callbackOrOptions: unknown) => {
+    const transition = nativeStartViewTransition(callbackOrOptions as never)
+    transition.ready.catch(() => {})
+    return transition
+  }) as typeof document.startViewTransition
+}
+
 export default defineNuxtPlugin((nuxtApp) => {
   const router = useRouter()
 
