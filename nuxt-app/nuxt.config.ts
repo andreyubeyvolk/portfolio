@@ -38,6 +38,12 @@ export default defineNuxtConfig({
       // that matters and where they're actually injected instead).
       script: [
         { src: 'https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js' },
+        // graffiti.js only DEFINES window.initGraffiti here (see the file's
+        // own header)—it doesn't touch the DOM until something calls it, so
+        // unlike the nav scripts there's no hydration race loading it as a
+        // plain tag. plugins/graffiti.client.ts is what actually calls it,
+        // once per navigation.
+        { src: '/graffiti.js' },
       ],
     },
   },
