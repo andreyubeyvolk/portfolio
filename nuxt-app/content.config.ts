@@ -56,6 +56,10 @@ export default defineContentConfig({
         alt: z.string().optional(),
         note: z.string().optional(),
         player: z.enum(['bare', 'full']).optional(),
+        // CLAUDE.md's documented exception: a .pv-wide photo exported
+        // taller than the standard 3:2 box (e.g. apac-17) needs its real
+        // aspect ratio instead of being cropped--see GallerySlot.vue.
+        tall: z.boolean().optional(),
       })
       return defineCollection({
         type: 'data',

@@ -18,6 +18,7 @@ export interface GalleryMediaItem {
   alt?: string
   note?: string
   player?: 'bare' | 'full'
+  tall?: boolean
 }
 
 const props = defineProps<{
@@ -25,6 +26,16 @@ const props = defineProps<{
   wrapperClass: string
   skipReveal?: boolean
 }>()
+
+// CLAUDE.md's own documented exception: a .pv-wide photo exported taller
+// than the standard 3:2 box (e.g. apac-17 at 2160x1780) needs its real
+// aspect ratio instead of being cropped to fit--computed inline rather
+// than a fixed .pv-wide--tall CSS class since the "how much taller" varies
+// per photo. Mobile never has this problem (.mobile-project__photo img is
+// always natural height:auto there), so this only applies to .pv-wide.
+const tallStyle = computed(() => (props.wrapperClass === 'pv-wide' && props.item.tall)
+  ? { aspectRatio: `${props.item.width} / ${props.item.height}` }
+  : undefined)
 
 const el = useTemplateRef<HTMLElement>('el')
 const isRevealed = ref(!!props.skipReveal)
@@ -92,6 +103,7 @@ onBeforeUnmount(() => {
     ref="el"
     class="gallery-slot"
     :class="[wrapperClass, { reveal: !skipReveal, 'is-revealed': isRevealed, 'info-note': item.note, 'is-note-open': isNoteOpen }]"
+    :style="tallStyle"
   >
     <img v-if="item.type === 'image'" :width="item.width" :height="item.height" loading="lazy" :src="item.src" :alt="item.alt || ''" />
     <!-- `paired` (cropped, absolutely positioned to fill the box) only
