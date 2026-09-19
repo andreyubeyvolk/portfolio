@@ -90,10 +90,16 @@ onBeforeUnmount(() => {
 <template>
   <figure
     ref="el"
+    class="gallery-slot"
     :class="[wrapperClass, { reveal: !skipReveal, 'is-revealed': isRevealed, 'info-note': item.note, 'is-note-open': isNoteOpen }]"
   >
     <img v-if="item.type === 'image'" :width="item.width" :height="item.height" loading="lazy" :src="item.src" :alt="item.alt || ''" />
-    <Vp v-else-if="item.player === 'full'" :src="item.src" paired autoplay="scroll" />
+    <!-- `paired` (cropped, absolutely positioned to fill the box) only
+         makes sense when there IS a sized box (a wrapperClass) to fill--a
+         standalone top-level video (empty wrapperClass, see
+         ProjectPage.vue's 'video' row) needs its natural free-flowing
+         height instead, same as it gets outside any pair. -->
+    <Vp v-else-if="item.player === 'full'" :src="item.src" :paired="!!wrapperClass" autoplay="scroll" />
     <VpBare v-else :src="item.src" :width="item.width" :height="item.height" />
 
     <div v-if="item.note" class="info-note__bar">
@@ -106,3 +112,13 @@ onBeforeUnmount(() => {
     </div>
   </figure>
 </template>
+
+<style scoped>
+/* .pv-wide/.pv-pair__photo/.mobile-project__photo all zero this
+   themselves--only matters when wrapperClass is empty (a standalone
+   top-level video, see ProjectPage.vue's 'video' row), where the
+   browser's own default <figure> margin would otherwise leak in. */
+.gallery-slot {
+  margin: 0;
+}
+</style>

@@ -86,11 +86,10 @@ const flatGallery = computed(() => {
             </div>
             <!-- Standalone full-width video: natural aspect, not cropped
                  into a pv-wide box (see content.config.ts's 'video' row
-                 comment)--rendered directly, no GallerySlot wrapper class. -->
-            <RevealOnScroll v-else :skip="row.flatIndex === 0">
-              <Vp v-if="row.item.player !== 'bare'" :src="row.item.src" autoplay="scroll" />
-              <VpBare v-else :src="row.item.src" :width="row.item.width" :height="row.item.height" />
-            </RevealOnScroll>
+                 comment). GallerySlot with an empty wrapper class still
+                 gets it reveal + info-note support for free (e.g.
+                 greenflag-01/26, both standalone AND noted). -->
+            <GallerySlot v-else :item="row.item" wrapper-class="" :skip-reveal="row.flatIndex === 0" />
           </template>
 
           <div class="pv-info">
@@ -152,24 +151,21 @@ const flatGallery = computed(() => {
         :skip-reveal="row.flatIndex! < 2"
       />
       <template v-else-if="row.type === 'pair'">
-        <template v-for="(item, j) in row.items" :key="j">
-          <!-- A full-audio player paired with a photo on desktop (cropped
-               into the 3:4 slot via Vp's `paired` mode) has no mobile
-               equivalent box to crop into--the static site's own mobile
-               markup for this case (see finance-stories.mp4) just drops
-               it in full-width and standalone, same as a top-level
-               'video' row, with its paired photo rendered separately
-               right after. -->
-          <RevealOnScroll v-if="item.type === 'video' && item.player !== 'bare'" :skip="row.flatIndexes![j] < 2">
-            <Vp :src="item.src" autoplay="scroll" />
-          </RevealOnScroll>
-          <GallerySlot v-else :item="item" wrapper-class="mobile-project__photo" :skip-reveal="row.flatIndexes![j] < 2" />
-        </template>
+        <!-- A full-audio player paired with a photo on desktop (cropped
+             into the 3:4 slot via Vp's `paired` mode) has no mobile
+             equivalent box to crop into--the static site's own mobile
+             markup for this case (see finance-stories.mp4) just drops it
+             in full-width and standalone, same as a top-level 'video'
+             row, with its paired photo rendered separately right after. -->
+        <GallerySlot
+          v-for="(item, j) in row.items"
+          :key="j"
+          :item="item"
+          :wrapper-class="item.type === 'video' && item.player !== 'bare' ? '' : 'mobile-project__photo'"
+          :skip-reveal="row.flatIndexes![j] < 2"
+        />
       </template>
-      <RevealOnScroll v-else :skip="row.flatIndex! < 2">
-        <Vp v-if="row.item.player !== 'bare'" :src="row.item.src" autoplay="scroll" />
-        <VpBare v-else :src="row.item.src" :width="row.item.width" :height="row.item.height" />
-      </RevealOnScroll>
+      <GallerySlot v-else :item="row.item" wrapper-class="" :skip-reveal="row.flatIndex! < 2" />
     </template>
 
     <div class="mobile-project__blocks">
