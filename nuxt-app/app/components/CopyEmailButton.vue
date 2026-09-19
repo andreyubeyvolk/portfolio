@@ -37,7 +37,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 </script>
 
 <template>
-  <button class="contact-link" type="button" :class="{ 'is-copied': isCopied }" @click="copy">
+  <button type="button" :class="{ 'is-copied': isCopied }" @click="copy">
     <slot>Mail</slot><span class="copy-label" aria-hidden="true">Copied</span>
   </button>
 </template>

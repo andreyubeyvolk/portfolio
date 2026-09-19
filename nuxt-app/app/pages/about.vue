@@ -98,7 +98,7 @@ useHead({
           <div class="about-section__content">
             <div class="contact-grid">
               <template v-for="contact in page.contacts" :key="contact.label">
-                <CopyEmailButton v-if="contact.type === 'email'" :email="contact.value">{{ contact.label }}</CopyEmailButton>
+                <CopyEmailButton v-if="contact.type === 'email'" class="contact-link" :email="contact.value">{{ contact.label }}</CopyEmailButton>
                 <a v-else class="contact-link" :href="contact.href" target="_blank" rel="noreferrer">{{ contact.label }}</a>
               </template>
             </div>
