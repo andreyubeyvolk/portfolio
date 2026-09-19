@@ -90,6 +90,17 @@ button.archive-card {
         width: 100%;
         height: auto;
         display: block;
+        opacity: 1;
+        transform: scale(1);
+        transition: opacity 200ms ease, transform 200ms ease;
+      }
+
+      /* Brief crossfade while stepping between two single-image cards
+         (arrow keys/nav buttons)--toggled off once the new image has
+         synced its size (see ArchivePreview.vue's isStepping). */
+      .preview-media img.is-stepping {
+        opacity: 0;
+        transform: scale(0.98);
       }
 
       .archive-preview .project-header {

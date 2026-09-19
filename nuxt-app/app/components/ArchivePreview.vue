@@ -340,6 +340,13 @@ function stepPreview(dir: 1 | -1) {
   emit('update:openIndex', nextFlatIdx)
 }
 
+// A step between two single-image cards (not the filmstrip's own scroll
+// physics, which already reads as smooth) gets a brief opacity/scale
+// crossfade on the swapped image--cheap and self-contained, per the
+// user's "смягчить" ask. Only for genuine steps (!wasClosed), never the
+// initial open (that already has its own is-open fade).
+const isStepping = ref(false)
+
 // ── Open/close ───────────────────────────────────────────────────────
 watch(() => props.openIndex, async (idx) => {
   if (idx === null) return
@@ -349,6 +356,7 @@ watch(() => props.openIndex, async (idx) => {
   // (arrow-key stepping) wipes the slate rather than carrying tags
   // across cards or partially layering them.
   if (!wasClosed) window.clearGraffiti?.()
+  if (!wasClosed && !isGroupMode.value) isStepping.value = true
   clearTimeout(closeTimer)
   isOpen.value = true
   document.body.classList.add('is-preview-open')
@@ -364,6 +372,7 @@ watch(() => props.openIndex, async (idx) => {
     await openFilmstrip()
   } else {
     await syncPreviewSize()
+    if (!wasClosed) requestAnimationFrame(() => { isStepping.value = false })
   }
 })
 
@@ -459,7 +468,7 @@ onBeforeUnmount(() => {
         <h1 class="preview-title">{{ titleParts?.base }}<sup v-if="titleParts?.badge" class="archive-num">{{ titleParts.badge }}</sup></h1>
       </header>
       <div class="preview-media">
-        <img ref="previewImg" class="preview-image" :src="currentEntry?.src" :alt="currentEntry?.alt || ''" />
+        <img ref="previewImg" class="preview-image" :class="{ 'is-stepping': isStepping }" :src="currentEntry?.src" :alt="currentEntry?.alt || ''" />
         <button class="preview-nav preview-nav--prev" type="button" aria-label="Previous photo" @click="handleNavClick(-1, $event)"><span class="preview-nav__arrow">&lt;</span></button>
         <button class="preview-nav preview-nav--next" type="button" aria-label="Next photo" @click="handleNavClick(1, $event)"><span class="preview-nav__arrow">&gt;</span></button>
       </div>
