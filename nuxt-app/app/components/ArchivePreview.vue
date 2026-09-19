@@ -344,6 +344,11 @@ function stepPreview(dir: 1 | -1) {
 watch(() => props.openIndex, async (idx) => {
   if (idx === null) return
   const wasClosed = !isOpen.value
+  // Simplified per the user's own model: an open card's graffiti is
+  // scratch space for that card alone--switching to a different one
+  // (arrow-key stepping) wipes the slate rather than carrying tags
+  // across cards or partially layering them.
+  if (!wasClosed) window.clearGraffiti?.()
   clearTimeout(closeTimer)
   isOpen.value = true
   document.body.classList.add('is-preview-open')
@@ -365,6 +370,9 @@ watch(() => props.openIndex, async (idx) => {
 function close() {
   isVisible.value = false
   document.body.classList.remove('is-preview-open')
+  // Closing goes back to the Archive section itself--the graffiti drawn
+  // while this card was open shouldn't linger there.
+  window.clearGraffiti?.()
   filmstripStopEase()
   clearTimeout(closeTimer)
   closeTimer = setTimeout(() => {
@@ -380,6 +388,13 @@ function close() {
 }
 
 function onOverlayClick(event: MouseEvent) {
+  // A graffiti stroke's mouseup fires a click too--the canvas itself has
+  // pointer-events:none (paint is routed by rectangle membership, not
+  // real hit-testing), so that click's target ends up being whatever's
+  // underneath the cursor. Ctrl/Cmd is only ever held for drawing, never
+  // for an intentional close-click, so bail before the target checks
+  // below can mistake a drawn stroke for a click-outside-to-close.
+  if (event.ctrlKey || event.metaKey) return
   const target = event.target as HTMLElement
   if (isGroupMode.value) {
     if (target.closest('.preview-close')) { close(); return }

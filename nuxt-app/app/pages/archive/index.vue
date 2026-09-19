@@ -177,8 +177,9 @@ useHead({
       <button v-if="hasMore" class="load-more-btn" type="button" @click="loadMore">Load more</button>
       <button v-else class="load-more-btn" type="button" @click="scrollGridTo(0)">To top</button>
     </ScrollPane>
+
+    <ArchivePreview :items="allItems" :open-index="openIndex" @update:open-index="openIndex = $event" />
   </section>
 
-  <ArchivePreview :items="allItems" :open-index="openIndex" @update:open-index="openIndex = $event" />
   <ArchiveCardOverlay :items="allItems" :open-index="mobileOpenIndex" @update:open-index="mobileOpenIndex = $event" />
 </template>
