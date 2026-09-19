@@ -57,7 +57,7 @@ const flatGallery = computed(() => {
     <section class="content-pane project-frame" :aria-label="`${title} project content`">
       <header class="content-pane__header project-header">
         <h1>{{ title }}</h1>
-        <NuxtLink class="close-button" :to="`/${section}`" aria-label="Close project"><span>[x]</span></NuxtLink>
+        <NuxtLink class="close-button" :to="`/${section}`" aria-label="Close project"><span>[X]</span></NuxtLink>
       </header>
       <ScrollPane project-scroll>
         <article class="project-content">
@@ -109,6 +109,7 @@ const flatGallery = computed(() => {
                     <div class="pv-action">
                       <div class="pv-action__bar" />
                       <a v-if="zipUrl" class="pv-action__btn" :href="zipUrl" download>Download project images</a>
+                      <span v-else class="pv-action__btn">Download project images</span>
                     </div>
                     <div class="pv-action">
                       <div class="pv-action__bar" />
@@ -186,7 +187,8 @@ const flatGallery = computed(() => {
         <div class="mobile-project__actions">
           <div class="mobile-project__action">
             <div class="mobile-project__action-bar" />
-            <a v-if="zipUrl" :href="zipUrl" download>Download project images</a>
+            <a v-if="zipUrl" class="mobile-project__action-btn" :href="zipUrl" download>Download project images</a>
+            <span v-else class="mobile-project__action-btn">Download project images</span>
           </div>
           <div class="mobile-project__action">
             <div class="mobile-project__action-bar" />

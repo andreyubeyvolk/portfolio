@@ -1367,6 +1367,7 @@
   }
 
   .mobile-project__action a,
+  .mobile-project__action-btn,
   .next-project-btn {
     display: block;
     padding: 0;
@@ -1390,6 +1391,7 @@
      against the divider bar above—same trick as .home-projects-link and
      .inhouse-title. */
   .mobile-project__action a::before,
+  .mobile-project__action-btn::before,
   .next-project-btn::before {
     content: '';
     position: absolute;
@@ -1403,6 +1405,8 @@
 
   .mobile-project__action a:hover,
   .mobile-project__action a:active,
+  .mobile-project__action-btn:hover,
+  .mobile-project__action-btn:active,
   .next-project-btn:hover,
   .next-project-btn:active {
     color: #fff;
@@ -1411,6 +1415,8 @@
 
   .mobile-project__action a:hover::before,
   .mobile-project__action a:active::before,
+  .mobile-project__action-btn:hover::before,
+  .mobile-project__action-btn:active::before,
   .next-project-btn:hover::before,
   .next-project-btn:active::before {
     background-color: #171717;
