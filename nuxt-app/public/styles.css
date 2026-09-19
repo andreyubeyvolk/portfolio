@@ -281,7 +281,11 @@ img {
   font: inherit;
   font-weight: 700;
   letter-spacing: -0.02em;
-  /* line-height inherits body's 20px so the cap-height aligns with section-intro paragraphs */
+  /* Explicit 1.2 (the site's own standard for real copy, see body's own
+     line-height:1 comment)--this used to just inherit body's tight 1,
+     which put it a few px out of line with section-intro's 1.2 paragraph
+     beside it. */
+  line-height: 1.2;
 }
 
 .close-button {
