@@ -54,6 +54,18 @@
   transition: opacity 0.24s ease;
   z-index: 50;
 }
+
+/* Same idea as #graffiti-pane-view, for the Archive lightbox's series
+   filmstrip (see graffiti.js's filmstripCanvas/filmstripView)--sized
+   and positioned via JS to match .archive-preview__filmstrip's own
+   rect, re-blitted from an off-screen store on every horizontal
+   scroll instead of the pane's vertical one. */
+#graffiti-filmstrip-view {
+  position: fixed;
+  pointer-events: none;
+  transition: opacity 0.24s ease;
+  z-index: 50;
+}
 .graffiti-cursor {
   position: fixed;
   top: 0;

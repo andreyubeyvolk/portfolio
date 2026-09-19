@@ -239,6 +239,70 @@ window.initGraffiti = function initGraffiti() {
   document.body.appendChild(paneView);
   var pvctx = paneView.getContext('2d');
 
+  // Archive lightbox filmstrip (see app/components/ArchivePreview.vue):
+  // a third paint surface, same off-screen-store/on-screen-view split as
+  // the pane above, but keyed to the filmstrip's own horizontal
+  // scrollLeft instead of the page's vertical scroll. The filmstrip's
+  // DOM node doesn't exist at init (it only mounts while a series card
+  // is open) and gets torn down/recreated on every open--so unlike
+  // pane/card/article above, it's polled for in scrollWatchTick rather
+  // than looked up once here.
+  var filmstripEl = null;
+  var filmstripRect = null;
+  var lastFilmstripScrollLeft = 0;
+  var filmstripCanvas = document.createElement('canvas');
+  var fctx = filmstripCanvas.getContext('2d');
+  var filmstripView = document.createElement('canvas');
+  filmstripView.id = 'graffiti-filmstrip-view';
+  document.body.appendChild(filmstripView);
+  var fvctx = filmstripView.getContext('2d');
+
+  function updateFilmstripRect() {
+    filmstripRect = filmstripEl ? filmstripEl.getBoundingClientRect() : null;
+  }
+
+  // (Re)sizes the off-screen store to the filmstrip's full scrollable
+  // width and the on-screen view to its visible rect--called whenever
+  // the filmstrip (re)mounts or the window resizes. Always starts blank:
+  // a freshly opened filmstrip has nothing on it yet (ArchivePreview.vue
+  // wipes all graffiti on every card switch/close), and a resize losing
+  // whatever was mid-stroke is an acceptable, rare edge case, same as
+  // the pane canvas above.
+  function setupFilmstripCanvas() {
+    updateFilmstripRect();
+    if (!filmstripEl || !filmstripRect) return;
+    var w = Math.max(1, filmstripEl.scrollWidth);
+    var h = Math.max(1, Math.round(filmstripRect.height));
+    filmstripCanvas.width = Math.round(w * dpr);
+    filmstripCanvas.height = Math.round(h * dpr);
+    fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    filmstripView.width = Math.round(filmstripRect.width * dpr);
+    filmstripView.height = Math.round(filmstripRect.height * dpr);
+    filmstripView.style.width = filmstripRect.width + 'px';
+    filmstripView.style.height = filmstripRect.height + 'px';
+    filmstripView.style.left = filmstripRect.left + 'px';
+    filmstripView.style.top = filmstripRect.top + 'px';
+    fvctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    lastFilmstripScrollLeft = filmstripEl.scrollLeft;
+    blitFilmstrip();
+  }
+
+  // Same idea as blitPane, just horizontal: copies the currently-visible
+  // vertical... horizontal slice of the off-screen store into the small
+  // on-screen view canvas. Raw device pixels both sides, so the identity
+  // transform (see blitPane's own comment for why).
+  function blitFilmstrip() {
+    if (!filmstripEl || !filmstripRect) return;
+    var sx = Math.round(filmstripEl.scrollLeft * dpr);
+    var sw = filmstripView.width, sh = filmstripView.height;
+    if (sw <= 0 || sh <= 0) return;
+    fvctx.save();
+    fvctx.setTransform(1, 0, 0, 1, 0, 0);
+    fvctx.clearRect(0, 0, sw, sh);
+    fvctx.drawImage(filmstripCanvas, sx, 0, sw, sh, 0, 0, sw, sh);
+    fvctx.restore();
+  }
+
   var articleRect = null;
   function updateArticleRect() { articleRect = article ? article.getBoundingClientRect() : null; }
 
@@ -287,11 +351,13 @@ window.initGraffiti = function initGraffiti() {
     if (!desktopQuery.matches) {
       canvas.style.display = 'none';
       paneView.style.display = 'none';
+      filmstripView.style.display = 'none';
       setCtrlMode(false);
       return;
     }
     canvas.style.display = '';
     paneView.style.display = '';
+    filmstripView.style.display = '';
     dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     canvas.width = Math.round(window.innerWidth * dpr);
     canvas.height = Math.round(window.innerHeight * dpr);
@@ -326,6 +392,7 @@ window.initGraffiti = function initGraffiti() {
       pvctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     updateArticleRect();
+    if (filmstripEl) setupFilmstripCanvas();
     // Reassigning a canvas's width/height always wipes its pixels,
     // even to the same value—true here on every real window
     // resize, and also whenever browser zoom changes (Chrome fires
@@ -387,11 +454,23 @@ window.initGraffiti = function initGraffiti() {
   var scrollWatchRafId = null;
   function scrollWatchTick() {
     scrollWatchRafId = requestAnimationFrame(scrollWatchTick);
-    if (!desktopQuery.matches || !pane) return;
-    if (pane.scrollTop !== lastScrollTop) {
+    if (!desktopQuery.matches) return;
+    if (pane && pane.scrollTop !== lastScrollTop) {
       lastScrollTop = pane.scrollTop;
       updateArticleRect();
       blitPane();
+    }
+    // The filmstrip mounts/unmounts with the Archive lightbox itself
+    // (v-if in ArchivePreview.vue)--a plain querySelector poll here,
+    // same cadence as the scrollTop poll above, since there's no mount/
+    // unmount event to hook into from this plain script.
+    var fs = document.querySelector('.archive-preview__filmstrip');
+    if (fs !== filmstripEl) {
+      filmstripEl = fs;
+      if (fs) setupFilmstripCanvas();
+    } else if (fs && fs.scrollLeft !== lastFilmstripScrollLeft) {
+      lastFilmstripScrollLeft = fs.scrollLeft;
+      blitFilmstrip();
     }
   }
   scrollWatchTick();
@@ -493,12 +572,19 @@ window.initGraffiti = function initGraffiti() {
       // triggered above the header or below the current bottom
       // fold is still logically on the pane (see stampDot for
       // why), just not necessarily visible the moment it starts.
-      var inPane = paneRect && x >= paneRect.left && x <= paneRightEdge;
+      var inFilmstrip = filmstripEl && filmstripRect && x >= filmstripRect.left && x <= filmstripRect.right && y >= filmstripRect.top && y <= filmstripRect.bottom;
+      var inPane = !inFilmstrip && paneRect && x >= paneRect.left && x <= paneRightEdge;
       // Captured now, not read live at render time: a drip can still
       // be falling several strokes (and color-modifier changes) later,
       // and should keep the color of the stroke that triggered it.
       var drip = { vel: 0, dist: 0, maxDist: CFG.dripMaxDistMin + Math.random() * CFG.dripMaxDistRange, color: strokeColor };
-      if (inPane) {
+      if (inFilmstrip) {
+        drip.space = 'filmstrip';
+        drip.x = x - filmstripRect.left + filmstripEl.scrollLeft;
+        drip.y = y - filmstripRect.top;
+        drip.tone = 0;
+        drip.alphaMul = 1;
+      } else if (inPane) {
         drip.space = 'pane';
         drip.x = x - (articleRect ? articleRect.left : paneRect.left);
         drip.y = y - (articleRect ? articleRect.top : paneRect.top) + edgeLift(x);
@@ -539,12 +625,14 @@ window.initGraffiti = function initGraffiti() {
     // The on-screen canvases only—paneCanvas is the off-screen store
     // now and was never visible to begin with, so animating that
     // would do nothing.
-    var visible = [canvas, paneView];
+    var visible = [canvas, paneView, filmstripView];
     var finish = function () {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       pctx.clearRect(0, 0, paneCanvas.width, paneCanvas.height);
+      fctx.clearRect(0, 0, filmstripCanvas.width, filmstripCanvas.height);
       resetDripState();
       blitPane();
+      blitFilmstrip();
       clearing = false;
     };
     if (CLEAR_EFFECT === 'wipe') {
@@ -771,6 +859,22 @@ window.initGraffiti = function initGraffiti() {
   }
 
   function stampDot(x, y, alpha) {
+    // Filmstrip membership first: while the Archive lightbox's series
+    // filmstrip is open, it visually covers the same screen rectangle
+    // the pane's own paneRect occupies (ArchivePreview.vue now nests
+    // inside .content-pane, matching the static site)--so without this
+    // check first, a dot landing here would fall into the pane branch
+    // below and get stored relative to the ARCHIVE GRID's scroll
+    // instead of the filmstrip's, decoupled from what's actually on
+    // screen. Content-relative to the filmstrip's own scrollLeft, same
+    // reasoning as the pane's content-relative-to-scrollTop storage.
+    if (filmstripEl && filmstripRect && x >= filmstripRect.left && x <= filmstripRect.right && y >= filmstripRect.top && y <= filmstripRect.bottom) {
+      var flocalX = x - filmstripRect.left + filmstripEl.scrollLeft;
+      var flocalY = y - filmstripRect.top;
+      paintDot(fctx, flocalX, flocalY, 0, alpha);
+      paintDot(fvctx, x - filmstripRect.left, y - filmstripRect.top, 0, alpha);
+      return;
+    }
     // Membership on the pane is horizontal only (left edge, and
     // the right edge stopping short of the scrollbar gutter—see
     // paneRightEdge). Whether a point is ALSO within the
@@ -926,7 +1030,7 @@ window.initGraffiti = function initGraffiti() {
       d.y += fall;
       d.dist += fall;
 
-      var targetCtx = d.space === 'pane' ? pctx : ctx;
+      var targetCtx = d.space === 'pane' ? pctx : (d.space === 'filmstrip' ? fctx : ctx);
       // Same reasoning as stampDot: a pane-space drip's (x, y) are
       // content-relative for persistence, but drawing them AGAIN
       // directly onto the small view canvas whenever they're
@@ -936,6 +1040,7 @@ window.initGraffiti = function initGraffiti() {
       // cost of skipping this.
       var inView = d.space === 'pane' && paneRect && articleRect &&
         (articleRect.top + d.y) >= paneRect.top && (articleRect.top + d.y) <= paneRect.bottom;
+      var inFilmstripView = d.space === 'filmstrip' && filmstripEl && filmstripRect;
       var progress = Math.min(1, d.dist / d.maxDist);
       var radius = 1 + progress * 2.6;
       var n = 3 + Math.round(progress * 3);
@@ -945,6 +1050,7 @@ window.initGraffiti = function initGraffiti() {
         var dotY = d.y + (Math.random() - 0.5) * 1.6;
         paintDot(targetCtx, dotX, dotY, d.tone, a);
         if (inView) paintDot(pvctx, articleRect.left + dotX - paneRect.left, articleRect.top + dotY - paneRect.top, d.tone, a);
+        if (inFilmstripView) paintDot(fvctx, dotX - filmstripEl.scrollLeft, dotY, d.tone, a);
       }
 
       if (d.dist >= d.maxDist) {
@@ -958,6 +1064,7 @@ window.initGraffiti = function initGraffiti() {
           var by = d.y + Math.sin(ang) * r;
           paintDot(targetCtx, bx, by, d.tone, ab);
           if (inView) paintDot(pvctx, articleRect.left + bx - paneRect.left, articleRect.top + by - paneRect.top, d.tone, ab);
+          if (inFilmstripView) paintDot(fvctx, bx - filmstripEl.scrollLeft, by, d.tone, ab);
         }
         drips.splice(i, 1);
       }
@@ -1057,6 +1164,8 @@ window.initGraffiti = function initGraffiti() {
     flushBatch(ctx);
     flushBatch(pctx);
     flushBatch(pvctx);
+    flushBatch(fctx);
+    flushBatch(fvctx);
   }
   tick();
 
@@ -1081,6 +1190,7 @@ window.initGraffiti = function initGraffiti() {
     if (window.clearGraffiti === clearAll) delete window.clearGraffiti;
     canvas.remove();
     paneView.remove();
+    filmstripView.remove();
     cursor.remove();
   };
 };
