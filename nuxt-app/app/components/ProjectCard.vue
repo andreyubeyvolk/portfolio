@@ -72,11 +72,12 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
     <div class="inhouse-card__cover">
       <img width="1080" height="1440" :src="`/assets/${section}/${slug}/${slug}-card.webp`" :alt="title" />
       <img
-        v-if="activePreview"
+        v-if="cardPreview?.length"
         class="inhouse-card__hover-preview"
-        :width="activePreview.width"
-        :height="activePreview.height"
-        :src="activePreview.src"
+        :class="{ 'is-visible': !!activePreview }"
+        :width="activePreview?.width ?? cardPreview[0].width"
+        :height="activePreview?.height ?? cardPreview[0].height"
+        :src="(activePreview ?? cardPreview[0]).src"
         alt=""
         aria-hidden="true"
       />
@@ -98,5 +99,11 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
   transform: translate(-50%, -50%);
   object-fit: cover;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.inhouse-card__hover-preview.is-visible {
+  opacity: 1;
 }
 </style>
