@@ -1,0 +1,65 @@
+/* ── Same-document View Transitions for client-side route changes ──
+   Nuxt's `experimental.viewTransition` wraps every route change in
+   document.startViewTransition() when the browser supports it (no-op,
+   plain instant nav otherwise). Which EFFECT plays is chosen per
+   navigation by plugins/page-transition.client.ts, which sets
+   documentElement.dataset.transition to 'curtain', 'project-open',
+   'project-close', or 'none' in a router.beforeEach guard--BEFORE the
+   old-page snapshot is taken, so by the time both snapshots exist and
+   these rules are evaluated, the attribute already reflects this
+   navigation's classification.
+
+   Two effects:
+   - 'curtain': ported from the static site's Cross-Document
+     view-transitions.css prototype (white wipe, top-to-bottom then
+     bottom-to-top, with a brightness dip)--used for section-to-section
+     nav (Inhouse/Brands/Archive/About).
+   - 'project-open'/'project-close': deliberately NOT overridden here.
+     Opening/closing a project instead relies on a per-element
+     view-transition-name (see ProjectCard.vue/ProjectPage.vue, iGaming
+     only for now--"попробуем на айгейминге" test) so the browser morphs
+     that one shared cover image between its listing-card size/position
+     and its project-page size/position automatically; the rest of the
+     page just gets the browser's own default cross-fade underneath it,
+     which is what we want here instead of a second competing effect. */
+
+html[data-transition='curtain']::view-transition-group(root) {
+  background: #fff;
+  animation-duration: 0.9s;
+}
+
+html[data-transition='curtain']::view-transition-old(root) {
+  z-index: 2;
+  mix-blend-mode: normal;
+  animation: vt-curtain-cover 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+html[data-transition='curtain']::view-transition-new(root) {
+  z-index: 1;
+  mix-blend-mode: normal;
+  animation: vt-curtain-reveal 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@keyframes vt-curtain-cover {
+  0%   { clip-path: inset(0 0 0 0); filter: brightness(1); }
+  50%  { clip-path: inset(100% 0 0 0); filter: brightness(0.9); }
+  100% { clip-path: inset(100% 0 0 0); filter: brightness(0.9); }
+}
+
+@keyframes vt-curtain-reveal {
+  0%   { clip-path: inset(100% 0 0 0); filter: brightness(0.9); }
+  50%  { clip-path: inset(100% 0 0 0); filter: brightness(0.9); }
+  100% { clip-path: inset(0 0 0 0); filter: brightness(1); }
+}
+
+/* A named morph pair (see project-cover-* below) still gets clipped to
+   its own bounds by the UA default--nothing extra needed--but give it a
+   touch longer than the UA's ~0.25s default so the resize actually
+   reads as a morph instead of a blink. */
+::view-transition-group(project-cover-igaming) {
+  animation-duration: 0.5s;
+}
+::view-transition-old(project-cover-igaming),
+::view-transition-new(project-cover-igaming) {
+  animation-duration: 0.5s;
+}

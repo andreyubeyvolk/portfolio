@@ -62,7 +62,14 @@ const flatGallery = computed(() => {
       <ScrollPane project-scroll>
         <article class="project-content">
           <figure class="pv-cover">
-            <img v-if="cover.type === 'image'" :width="cover.width" :height="cover.height" :src="cover.src" :alt="title" />
+            <img
+              v-if="cover.type === 'image'"
+              :width="cover.width"
+              :height="cover.height"
+              :src="cover.src"
+              :alt="title"
+              :style="slug === 'igaming' ? { viewTransitionName: 'project-cover-igaming' } : undefined"
+            />
             <VpBare v-else :src="cover.src" :width="cover.width" :height="cover.height" />
           </figure>
 

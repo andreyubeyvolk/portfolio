@@ -70,7 +70,13 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
     @touchend="cardPreview?.length ? onTouchEnd() : undefined"
   >
     <div class="inhouse-card__cover">
-      <img width="1080" height="1440" :src="`/assets/${section}/${slug}/${slug}-card.webp`" :alt="title" />
+      <img
+        width="1080"
+        height="1440"
+        :src="`/assets/${section}/${slug}/${slug}-card.webp`"
+        :alt="title"
+        :style="slug === 'igaming' ? { viewTransitionName: 'project-cover-igaming' } : undefined"
+      />
       <img
         v-if="cardPreview?.length"
         class="inhouse-card__hover-preview"

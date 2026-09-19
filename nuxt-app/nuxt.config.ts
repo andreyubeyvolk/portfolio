@@ -5,6 +5,14 @@ export default defineNuxtConfig({
   ],
   devtools: { enabled: true },
   compatibilityDate: '2024-04-03',
+  // Native (same-document) View Transitions for client-side route
+  // changes--see plugins/page-transition.client.ts for how the actual
+  // effect (curtain vs. project-cover morph vs. none) is chosen per
+  // navigation, and public/page-transitions.css for the CSS driving it.
+  // No-op in browsers without API support (Nuxt feature-detects).
+  experimental: {
+    viewTransition: true,
+  },
   app: {
     // NOTE: leave this at '/' for now—the real value (either '/portfolio/'
     // or '/' if a custom domain lands first) is a Stage 7 cutover decision,
@@ -31,6 +39,11 @@ export default defineNuxtConfig({
         // ported from that page's own inline <style> block on the static
         // site, same reasoning as project-page.css above.
         { rel: 'stylesheet', href: '/archive-page.css' },
+        // Curtain wipe between section pages + the project-cover morph
+        // test (see plugins/page-transition.client.ts)--ported from the
+        // static site's Cross-Document view-transitions.css prototype,
+        // adapted for same-document (client-side route) transitions.
+        { rel: 'stylesheet', href: '/page-transitions.css' },
         { rel: 'icon', href: '/assets/favicon.svg', type: 'image/svg+xml' },
         { rel: 'icon', href: '/assets/favicon-32.png', sizes: '32x32', type: 'image/png' },
         { rel: 'icon', href: '/assets/favicon-16.png', sizes: '16x16', type: 'image/png' },
