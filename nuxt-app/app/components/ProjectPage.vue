@@ -11,6 +11,7 @@ import type { GalleryMediaItem } from './GallerySlot.vue'
 type GalleryRow =
   | { type: 'wide', item: GalleryMediaItem }
   | { type: 'pair', items: [GalleryMediaItem, GalleryMediaItem] }
+  | { type: 'video', item: GalleryMediaItem }
 
 const props = defineProps<{
   section: 'inhouse' | 'brands'
@@ -35,13 +36,13 @@ const sectionIntroText = computed(() => props.section === 'inhouse'
 const flatGallery = computed(() => {
   let idx = 0
   return props.gallery.map((row) => {
-    if (row.type === 'wide') {
-      const out = { ...row, flatIndex: idx }
-      idx += 1
+    if (row.type === 'pair') {
+      const out = { ...row, flatIndexes: [idx, idx + 1] as [number, number] }
+      idx += 2
       return out
     }
-    const out = { ...row, flatIndexes: [idx, idx + 1] as [number, number] }
-    idx += 2
+    const out = { ...row, flatIndex: idx }
+    idx += 1
     return out
   })
 })
@@ -79,10 +80,17 @@ const flatGallery = computed(() => {
               wrapper-class="pv-wide"
               :skip-reveal="row.flatIndex === 0"
             />
-            <div v-else class="pv-pair">
+            <div v-else-if="row.type === 'pair'" class="pv-pair">
               <GallerySlot :item="row.items[0]" wrapper-class="pv-pair__photo" :skip-reveal="row.flatIndexes![0] === 0" />
               <GallerySlot :item="row.items[1]" wrapper-class="pv-pair__photo" :skip-reveal="row.flatIndexes![1] === 0" />
             </div>
+            <!-- Standalone full-width video: natural aspect, not cropped
+                 into a pv-wide box (see content.config.ts's 'video' row
+                 comment)--rendered directly, no GallerySlot wrapper class. -->
+            <RevealOnScroll v-else :skip="row.flatIndex === 0">
+              <Vp v-if="row.item.player !== 'bare'" :src="row.item.src" autoplay="scroll" />
+              <VpBare v-else :src="row.item.src" :width="row.item.width" :height="row.item.height" />
+            </RevealOnScroll>
           </template>
 
           <div class="pv-info">
@@ -143,10 +151,14 @@ const flatGallery = computed(() => {
         wrapper-class="mobile-project__photo"
         :skip-reveal="row.flatIndex! < 2"
       />
-      <template v-else>
+      <template v-else-if="row.type === 'pair'">
         <GallerySlot :item="row.items[0]" wrapper-class="mobile-project__photo" :skip-reveal="row.flatIndexes![0] < 2" />
         <GallerySlot :item="row.items[1]" wrapper-class="mobile-project__photo" :skip-reveal="row.flatIndexes![1] < 2" />
       </template>
+      <RevealOnScroll v-else :skip="row.flatIndex! < 2">
+        <Vp v-if="row.item.player !== 'bare'" :src="row.item.src" autoplay="scroll" />
+        <VpBare v-else :src="row.item.src" :width="row.item.width" :height="row.item.height" />
+      </RevealOnScroll>
     </template>
 
     <div class="mobile-project__blocks">
