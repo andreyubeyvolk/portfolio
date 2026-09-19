@@ -1,20 +1,10 @@
 <script setup lang="ts">
+import type { ArchiveFlatItem } from '~/utils/archiveTypes'
+
 // Desktop lightbox for the Archive (Stage 2: single-image; Stage 3 adds
 // this file's filmstrip mode for series). Only ever opens on desktop
 // widths (>980px)--the static site's own isMobile() gate; tablet/phone
-// get their own card overlay in Stage 4.
-export interface ArchiveFlatItem {
-  src: string
-  width: number
-  height: number
-  alt: string
-  title: string
-  description: string
-  link?: string
-  tags?: string
-  group?: string
-  frameTitle?: string
-}
+// get their own card overlay (ArchiveCardOverlay.vue, Stage 4).
 
 // Controlled by index into the full flat catalog (not a resolved item
 // object)--stepping needs to know "the next/previous position", and for a

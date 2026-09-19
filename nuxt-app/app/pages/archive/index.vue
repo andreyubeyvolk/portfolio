@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // Stage 1: data + grid + Load more. Stage 2: desktop single-image
 // lightbox. Stage 3: series cards (Transportation, YamiYami Case) open
-// the filmstrip instead, via the same lightbox component.
+// the filmstrip instead, via the same lightbox component. Stage 4:
+// tablet/phone get their own card overlay (ArchiveCardOverlay.vue).
 const { data: archive } = await useAsyncData('archive', () => queryCollection('archive').first())
 
 if (!archive.value) {
@@ -42,15 +43,24 @@ const hasMore = computed(() => shown.value < cards.value.length)
 // frames--reachable via arrow-key stepping, just not their own grid card).
 const allItems = computed(() => archive.value!.items)
 const openIndex = ref<number | null>(null)
+// Stage 4: tablet/phone get their own overlay (ArchiveCardOverlay)
+// instead of the desktop lightbox--a separate index since the two never
+// show at once (gated by breakpoint at click time, same as the static
+// site's own `if (isMobile()) { ... } else { openPreviewFor(...) }`).
+const mobileOpenIndex = ref<number | null>(null)
 
 function isMobile() {
   return window.matchMedia('(max-width: 980px)').matches
 }
 
 function openCard(card: (typeof cards.value)[number]) {
-  if (isMobile()) return
   const idx = allItems.value.indexOf(card)
-  if (idx !== -1) openIndex.value = idx
+  if (idx === -1) return
+  if (isMobile()) {
+    mobileOpenIndex.value = idx
+  } else {
+    openIndex.value = idx
+  }
 }
 
 function loadMore() {
@@ -113,4 +123,5 @@ useHead({
   </section>
 
   <ArchivePreview :items="allItems" :open-index="openIndex" @update:open-index="openIndex = $event" />
+  <ArchiveCardOverlay :items="allItems" :open-index="mobileOpenIndex" @update:open-index="mobileOpenIndex = $event" />
 </template>
