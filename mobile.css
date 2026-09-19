@@ -513,6 +513,10 @@
        weight instead of matching the paragraph beside it, since nothing
        here ever set those explicitly (the <p> just inherited them). */
     font: inherit;
+    /* font:inherit above pulls in the SECTION's own line-height (body's
+       tight 1.0 default), not the 1.2 the paragraph beside it actually
+       uses--set explicitly so both lines of text sit at the same rhythm. */
+    line-height: 1.2;
   }
 
   .archive-page .section-intro.intro p {
