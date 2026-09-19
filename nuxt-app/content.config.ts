@@ -4,7 +4,7 @@ export default defineContentConfig({
   collections: {
     content: defineCollection({
       type: 'page',
-      source: { include: '**', exclude: ['about.md', 'projects/**'] },
+      source: { include: '**', exclude: ['about.md', 'archive.md', 'projects/**'] },
     }),
     // Structured data, not prose—the 'page' type only keeps a fixed set of
     // fields (title/description/body/...) and buries everything else
@@ -100,5 +100,45 @@ export default defineContentConfig({
         }),
       })
     })(),
+    // Archive—single projects and experiments, not full case studies (no
+    // Challenge/Solution). One flat `items` array in DOM order, mirroring
+    // the static site's own flat list (see ../archive/index.html)--a
+    // series (Transportation, YamiYami Case) is several consecutive items
+    // sharing one `group`, exactly like `.archive-series-extra`'s frames
+    // there: only the first (`isCard: true`) gets its own grid card, the
+    // rest are reachable only through the lightbox once Stage 2/3 build it.
+    archive: defineCollection({
+      type: 'data',
+      source: 'archive.md',
+      schema: z.object({
+        title: z.string(),
+        description: z.string(),
+        intro: z.string(),
+        items: z.array(z.object({
+          src: z.string(),
+          width: z.number(),
+          height: z.number(),
+          alt: z.string(),
+          // Exactly what the grid card shows, e.g. "Longread[0001]" or a
+          // series' "[1/8]" fraction badge--already the plain concatenated
+          // text (title + bracket tail), not re-derived at render time.
+          title: z.string(),
+          description: z.string(),
+          link: z.string().optional(),
+          tags: z.string().optional(),
+          group: z.string().optional(),
+          // The lightbox's own per-frame title (data-title on the static
+          // site)--only ever differs from `title` for a series frame (the
+          // main card shows "Transportation[1/8]" in the grid but opens
+          // the lightbox on plain "Transportation"). Falls back to `title`
+          // when absent.
+          frameTitle: z.string().optional(),
+          // false for a series' continuation frames (.archive-series-extra
+          // on the static site)--stored for the lightbox stages, not
+          // rendered as its own grid card.
+          isCard: z.boolean(),
+        })),
+      }),
+    }),
   },
 })
