@@ -31,17 +31,14 @@ const orderedProjects = computed(() => {
   <section class="content-pane" :aria-label="`${title} projects`">
     <ScrollPane>
       <article class="inhouse-grid">
-        <NuxtLink
+        <ProjectCard
           v-for="project in orderedProjects"
           :key="project.slug"
-          class="inhouse-card"
-          :to="`/${section}/${project.slug}`"
-        >
-          <div class="inhouse-card__cover">
-            <img width="1080" height="1440" :src="`/assets/${section}/${project.slug}/${project.slug}-card.webp`" :alt="project.title" />
-          </div>
-          <span class="inhouse-title">{{ project.title }}</span>
-        </NuxtLink>
+          :section="section"
+          :slug="project.slug"
+          :title="project.title"
+          :card-preview="project.cardPreview"
+        />
       </article>
     </ScrollPane>
   </section>

@@ -97,6 +97,16 @@ export default defineContentConfig({
             height: z.number(),
           }),
           zipUrl: z.string().optional(),
+          // Listing-card hover preview (ProjectCard.vue): up to 4 gallery
+          // photos that cycle in as the cursor (or a touch drag) crosses
+          // the card left-to-right. Optional--only iGaming has this for
+          // now, as the initial test case; every other project's card
+          // just shows its own cover with no hover behavior.
+          cardPreview: z.array(z.object({
+            src: z.string(),
+            width: z.number(),
+            height: z.number(),
+          })).optional(),
         }),
       })
     })(),

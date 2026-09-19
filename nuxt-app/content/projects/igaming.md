@@ -229,4 +229,17 @@ kv:
   width: 246
   height: 257
 zipUrl: /assets/inhouse/igaming/igaming-project-images.zip
+cardPreview:
+  - src: /assets/inhouse/igaming/igaming-12.webp
+    width: 1080
+    height: 1440
+  - src: /assets/inhouse/igaming/igaming-02.webp
+    width: 1080
+    height: 1440
+  - src: /assets/inhouse/igaming/igaming-11.webp
+    width: 1080
+    height: 1440
+  - src: /assets/inhouse/igaming/igaming-03.webp
+    width: 1080
+    height: 1440
 ---

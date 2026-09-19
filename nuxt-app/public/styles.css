@@ -480,7 +480,6 @@ body::-webkit-scrollbar-thumb:active {
   grid-column: 1 / -1;
   display: block;
   width: 100%;
-  aspect-ratio: 2.1 / 1;
   padding: 0;
   overflow: hidden;
   border: 0;
@@ -488,10 +487,15 @@ body::-webkit-scrollbar-thumb:active {
   cursor: pointer;
 }
 
+/* No fixed aspect-ratio/object-fit here on purpose (desktop only--see
+   mobile.css for the phone crop, unchanged): the real reel is still an
+   unknown size (not necessarily this placeholder's 16:9-ish shape), so
+   the box sizes from the media's own intrinsic ratio via its width/
+   height attributes instead of guessing a shape and cropping to fit it. */
 .reel-card__poster {
+  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
 }
 
 .reel-card__cta {
@@ -642,6 +646,8 @@ body::-webkit-scrollbar-thumb:active {
 }
 
 .inhouse-card__cover {
+  position: relative; /* anchors the hover-preview overlay (ProjectCard.vue)--
+    harmless with no such child present, same as every other project's card */
   overflow: hidden;
   background: #d9d9d9;
   aspect-ratio: 3 / 4;
