@@ -1,9 +1,11 @@
-// ── Spray-can graffiti (desktop only). Hold Ctrl: cursor swaps to a
-// black spray-can icon. Hold Ctrl + drag with the left mouse button:
-// paints a spray-style stroke. Release Ctrl: painting stops, but the
-// tag itself stays put—nothing fades or clears on its own. To wipe it,
-// press Backspace, Delete, or Space (while not typing in the settings
-// panel), or just reload/leave the page.
+// ── Spray-can graffiti (desktop only). Hold Ctrl (or Cmd on Mac):
+// cursor swaps to a black spray-can icon. Hold it + drag with the left
+// mouse button: paints a spray-style stroke—add Shift for red (#EB1026)
+// or Alt for green (#11E3B0), held for the whole stroke; plain Ctrl+drag
+// stays the default black/gray. Release Ctrl/Cmd: painting stops, but
+// the tag itself stays put—nothing fades or clears on its own. To wipe
+// it, press Backspace, Delete, Space, or Escape (while not typing in a
+// text field), or just reload/leave the page.
 //
 // Shared across every Brands page (originally a nimax-only prototype;
 // see graffiti.css for the matching styles and logo-scrub.js for the
@@ -492,7 +494,10 @@ window.initGraffiti = function initGraffiti() {
       // fold is still logically on the pane (see stampDot for
       // why), just not necessarily visible the moment it starts.
       var inPane = paneRect && x >= paneRect.left && x <= paneRightEdge;
-      var drip = { vel: 0, dist: 0, maxDist: CFG.dripMaxDistMin + Math.random() * CFG.dripMaxDistRange };
+      // Captured now, not read live at render time: a drip can still
+      // be falling several strokes (and color-modifier changes) later,
+      // and should keep the color of the stroke that triggered it.
+      var drip = { vel: 0, dist: 0, maxDist: CFG.dripMaxDistMin + Math.random() * CFG.dripMaxDistRange, color: strokeColor };
       if (inPane) {
         drip.space = 'pane';
         drip.x = x - (articleRect ? articleRect.left : paneRect.left);
@@ -620,8 +625,11 @@ window.initGraffiti = function initGraffiti() {
   }
 
   function onKeyDown(e) {
-    if (e.key === 'Control') { if (desktopQuery.matches) setCtrlMode(true); return; }
-    if (e.key === 'Backspace' || e.key === 'Delete' || e.key === ' ') {
+    // Control on Windows/Linux and physical Mac keyboards; Meta (Cmd) is
+    // Mac's own natural modifier for this kind of gesture, so it's
+    // additive here—Ctrl keeps working everywhere it already did.
+    if (e.key === 'Control' || e.key === 'Meta') { if (desktopQuery.matches) setCtrlMode(true); return; }
+    if (e.key === 'Backspace' || e.key === 'Delete' || e.key === ' ' || e.key === 'Escape') {
       // If focus is in a text input/textarea anywhere on the page,
       // these keys need to keep doing their normal editing job.
       var tag = document.activeElement ? document.activeElement.tagName : '';
@@ -632,7 +640,7 @@ window.initGraffiti = function initGraffiti() {
   }
   window.addEventListener('keydown', onKeyDown);
   function onKeyUp(e) {
-    if (e.key === 'Control') setCtrlMode(false);
+    if (e.key === 'Control' || e.key === 'Meta') setCtrlMode(false);
   }
   window.addEventListener('keyup', onKeyUp);
   // Alt-tabbing away (or anything else) while Ctrl is physically
@@ -647,6 +655,16 @@ window.initGraffiti = function initGraffiti() {
   }
   window.addEventListener('mousemove', onMouseMove);
 
+  // Color modifiers, captured once at stroke-start and held for the
+  // whole stroke (same as "Ctrl held = graffiti mode" already is)—
+  // Ctrl+Shift+drag = red, Ctrl+Alt+drag = green, plain Ctrl+drag =
+  // today's black/gray. null means "use the tone value as a literal
+  // gray" (unchanged default path); a color object means "blend the
+  // tone value as a lightening amount on top of this hue instead."
+  var COLOR_RED = { r: 0xEB, g: 0x10, b: 0x26, key: 'red' };
+  var COLOR_GREEN = { r: 0x11, g: 0xE3, b: 0xB0, key: 'green' };
+  var strokeColor = null;
+
   function onMouseDown(e) {
     if (!ctrlHeld || e.button !== 0) return;
     // Ctrl+click normally opens a link in a new tab—while in
@@ -654,6 +672,7 @@ window.initGraffiti = function initGraffiti() {
     // actions, so it's deliberately suppressed for the duration.
     e.preventDefault();
     isDrawing = true;
+    strokeColor = e.shiftKey ? COLOR_RED : (e.altKey ? COLOR_GREEN : null);
     smooth.x = raw.x;
     smooth.y = raw.y;
     lastStamp = { x: raw.x, y: raw.y };
@@ -697,15 +716,29 @@ window.initGraffiti = function initGraffiti() {
   // visible window, the small on-screen view canvas directly (see
   // stampDot/updateDrips)—and the fixed canvas is a third.
   var batches = new Map();
-  function paintDot(targetCtx, x, y, g, a) {
+  // `tone` is a lightening amount (0 = the stroke's own darkest/purest
+  // value, up to ~30 near the pane's left-edge sheen)—historically
+  // rendered literally as a gray value (rgba(tone,tone,tone,a)). A
+  // colored stroke keeps that same shading character instead of
+  // rendering flat: each channel blends from the hue toward white by
+  // the same tone/255 fraction the grayscale path always used.
+  function paintDot(targetCtx, x, y, tone, a) {
     var qa = Math.round(a * 16) / 16;
     if (qa <= 0) return;
     var sub = batches.get(targetCtx);
     if (!sub) { sub = new Map(); batches.set(targetCtx, sub); }
-    var key = g + '_' + qa;
+    var colorKey = strokeColor ? strokeColor.key : 'k';
+    var key = tone + '_' + qa + '_' + colorKey;
     var bucket = sub.get(key);
     if (!bucket) {
-      bucket = { style: 'rgba(' + g + ',' + g + ',' + g + ',' + qa.toFixed(3) + ')', dots: [] };
+      var r = tone, g = tone, b = tone;
+      if (strokeColor) {
+        var mix = tone / 255;
+        r = Math.round(strokeColor.r + (255 - strokeColor.r) * mix);
+        g = Math.round(strokeColor.g + (255 - strokeColor.g) * mix);
+        b = Math.round(strokeColor.b + (255 - strokeColor.b) * mix);
+      }
+      bucket = { style: 'rgba(' + r + ',' + g + ',' + b + ',' + qa.toFixed(3) + ')', dots: [] };
       sub.set(key, bucket);
     }
     bucket.dots.push(x, y, 0.25 + Math.random() * 0.6);
@@ -878,8 +911,14 @@ window.initGraffiti = function initGraffiti() {
       ctx.clip('evenodd');
       clipped = true;
     }
+    // Drips render through paintDot, which reads the module-level
+    // strokeColor—swap it to each drip's own captured color for the
+    // duration of its paint calls below, restoring afterward so a
+    // live stroke elsewhere in the same frame isn't affected.
+    var savedStrokeColor = strokeColor;
     for (var i = drips.length - 1; i >= 0; i--) {
       var d = drips[i];
+      strokeColor = d.color;
       d.vel += (Math.random() - 0.5) * CFG.dripWobbleAccel;
       d.vel *= CFG.dripWobbleDamp;
       d.x += d.vel;
@@ -923,6 +962,7 @@ window.initGraffiti = function initGraffiti() {
         drips.splice(i, 1);
       }
     }
+    strokeColor = savedStrokeColor;
     // Flush the fixed-canvas bucket now, while the clip above is
     // still active—these dots must land under it, not after it's
     // been restored below. Off-screen-store and view-canvas drip
