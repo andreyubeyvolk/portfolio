@@ -124,9 +124,11 @@ const flatGallery = computed(() => {
     </section>
 
   <!-- ── MOBILE LAYOUT ──
-       Teleported out from under <main> (display:none on mobile)—see the
-       comment on #mobile-page-content in layouts/default.vue. -->
-  <Teleport to="#mobile-page-content">
+       Teleported out from under <main> (display:none on mobile) to Nuxt's
+       own reserved "#teleports" container--see the comment in
+       layouts/default.vue on why a custom target selector here silently
+       loses its content during SSR. -->
+  <Teleport to="#teleports">
   <div class="project-bar" id="project-bar">
     <span class="project-bar__title">{{ title }}</span>
     <NuxtLink class="project-bar__close" :to="`/${section}`" aria-label="Close project">[X]</NuxtLink>
