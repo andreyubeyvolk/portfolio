@@ -27,6 +27,10 @@ export default defineNuxtConfig({
         // that a global include is simpler than per-route loading.
         { rel: 'stylesheet', href: '/project-page.css' },
         { rel: 'stylesheet', href: '/scroll-reveal.css' },
+        // Archive page template CSS (the lightbox preview + filmstrip)--
+        // ported from that page's own inline <style> block on the static
+        // site, same reasoning as project-page.css above.
+        { rel: 'stylesheet', href: '/archive-page.css' },
         { rel: 'icon', href: '/assets/favicon.svg', type: 'image/svg+xml' },
         { rel: 'icon', href: '/assets/favicon-32.png', sizes: '32x32', type: 'image/png' },
         { rel: 'icon', href: '/assets/favicon-16.png', sizes: '16x16', type: 'image/png' },

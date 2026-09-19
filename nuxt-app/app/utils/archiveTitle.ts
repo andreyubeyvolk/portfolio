@@ -8,3 +8,18 @@ export function splitArchiveTitle(title: string): { base: string, badge?: string
   if (!match) return { base: title }
   return { base: match[1]!, badge: match[2] }
 }
+
+// A description can carry one inline "[LINK]" token (see renderDescriptionInto
+// in the static site's archive/index.html)--rendered as a real <a> in the
+// same small gray superscript style as the title's bracket badge. No `link`,
+// or no "[LINK]" token in the text, and this just returns the plain text.
+export function splitArchiveDescription(description: string, link?: string): { before: string, linkText: string, after: string } | null {
+  if (!link) return null
+  const idx = description.indexOf('[LINK]')
+  if (idx === -1) return null
+  return {
+    before: description.slice(0, idx),
+    linkText: '[LINK]',
+    after: description.slice(idx + '[LINK]'.length),
+  }
+}
