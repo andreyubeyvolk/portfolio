@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { ArchiveLightboxItem } from '~/components/ArchivePreview.vue'
-
-// Stage 1 of the Archive migration: data + grid + Load more only. Stage 2
-// adds the desktop single-image lightbox for non-series cards.
+// Stage 1: data + grid + Load more. Stage 2: desktop single-image
+// lightbox. Stage 3: series cards (Transportation, YamiYami Case) open
+// the filmstrip instead, via the same lightbox component.
 const { data: archive } = await useAsyncData('archive', () => queryCollection('archive').first())
 
 if (!archive.value) {
@@ -35,43 +34,23 @@ onMounted(() => {
 const visibleCards = computed(() => cards.value.slice(0, shown.value))
 const hasMore = computed(() => shown.value < cards.value.length)
 
-// Stage 2: single-image lightbox, desktop only--series cards (`group` set)
-// aren't clickable yet, that's Stage 3's filmstrip. The flat catalog
-// prev/next cycles through is every non-series card currently in the DOM
-// (not just the ones already revealed by Load more--stepping forward from
-// the last-loaded card shouldn't dead-end, same reasoning as the static
-// site's own itemsArr covering cards still hidden behind its Load more).
-const steppableCards = computed(() => cards.value.filter(card => !card.group))
+// Lightbox: controlled by index into the FULL flat catalog (all 92 items,
+// including series continuation frames)--ArchivePreview needs that whole
+// list to resolve a series' own frames and to step seamlessly past a
+// group's boundary into the next single item, matching the static site's
+// own itemsArr (which also includes the hidden .archive-series-extra
+// frames--reachable via arrow-key stepping, just not their own grid card).
+const allItems = computed(() => archive.value!.items)
 const openIndex = ref<number | null>(null)
-const currentItem = computed<ArchiveLightboxItem | null>(() => {
-  if (openIndex.value === null) return null
-  const card = steppableCards.value[openIndex.value]
-  if (!card) return null
-  return {
-    src: card.src,
-    width: card.width,
-    height: card.height,
-    alt: card.alt,
-    title: card.frameTitle ?? card.title,
-    description: card.description,
-    link: card.link,
-    tags: card.tags,
-  }
-})
 
 function isMobile() {
   return window.matchMedia('(max-width: 980px)').matches
 }
 
 function openCard(card: (typeof cards.value)[number]) {
-  if (isMobile() || card.group) return
-  const idx = steppableCards.value.indexOf(card)
+  if (isMobile()) return
+  const idx = allItems.value.indexOf(card)
   if (idx !== -1) openIndex.value = idx
-}
-
-function stepPreview(dir: 1 | -1) {
-  if (openIndex.value === null || !steppableCards.value.length) return
-  openIndex.value = (openIndex.value + dir + steppableCards.value.length) % steppableCards.value.length
 }
 
 function loadMore() {
@@ -112,14 +91,13 @@ useHead({
   <section class="content-pane" aria-label="Archive projects">
     <ScrollPane>
       <article class="archive-grid">
-        <component
-          :is="card.group ? 'div' : 'button'"
+        <button
           v-for="(card, i) in visibleCards"
           :key="card.src"
-          :type="card.group ? undefined : 'button'"
+          type="button"
           class="archive-card"
           :class="{ 'archive-card--revealing': i >= revealingFrom }"
-          @click="card.group ? undefined : openCard(card)"
+          @click="openCard(card)"
         >
           <div class="archive-card__cover">
             <img :width="card.width" :height="card.height" loading="lazy" :src="card.src" :alt="card.alt" />
@@ -127,12 +105,12 @@ useHead({
           <span class="archive-title">
             {{ splitArchiveTitle(card.title).base }}<sup v-if="splitArchiveTitle(card.title).badge" class="archive-num">{{ splitArchiveTitle(card.title).badge }}</sup>
           </span>
-        </component>
+        </button>
       </article>
 
       <button v-if="hasMore" class="load-more-btn" type="button" @click="loadMore">Load more</button>
     </ScrollPane>
   </section>
 
-  <ArchivePreview :item="currentItem" @close="openIndex = null" @prev="stepPreview(-1)" @next="stepPreview(1)" />
+  <ArchivePreview :items="allItems" :open-index="openIndex" @update:open-index="openIndex = $event" />
 </template>

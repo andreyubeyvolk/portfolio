@@ -1,10 +1,9 @@
 <script setup lang="ts">
-// Desktop single-image lightbox (Stage 2 of the Archive migration).
-// Series cards (their own filmstrip mode) land in Stage 3; the tablet/
-// phone card overlay lands in Stage 4--this component only ever opens
-// on desktop widths (>980px), matching the static site's own isMobile()
-// gate in archive/index.html.
-export interface ArchiveLightboxItem {
+// Desktop lightbox for the Archive (Stage 2: single-image; Stage 3 adds
+// this file's filmstrip mode for series). Only ever opens on desktop
+// widths (>980px)--the static site's own isMobile() gate; tablet/phone
+// get their own card overlay in Stage 4.
+export interface ArchiveFlatItem {
   src: string
   width: number
   height: number
@@ -13,10 +12,16 @@ export interface ArchiveLightboxItem {
   description: string
   link?: string
   tags?: string
+  group?: string
+  frameTitle?: string
 }
 
-const props = defineProps<{ item: ArchiveLightboxItem | null }>()
-const emit = defineEmits<{ close: [], prev: [], next: [] }>()
+// Controlled by index into the full flat catalog (not a resolved item
+// object)--stepping needs to know "the next/previous position", and for a
+// series, the CURRENT position within its own frame list too, which is
+// simplest to derive from indices rather than juggling item references.
+const props = defineProps<{ items: ArchiveFlatItem[], openIndex: number | null }>()
+const emit = defineEmits<{ 'update:openIndex': [value: number | null] }>()
 
 const overlay = useTemplateRef<HTMLElement>('overlay')
 const previewImg = useTemplateRef<HTMLImageElement>('previewImg')
@@ -24,6 +29,9 @@ const previewHeader = useTemplateRef<HTMLElement>('previewHeader')
 const previewText = useTemplateRef<HTMLElement>('previewText')
 const previewTags = useTemplateRef<HTMLElement>('previewTags')
 const previewInner = useTemplateRef<HTMLElement>('previewInner')
+const filmstripEl = useTemplateRef<HTMLElement>('filmstripEl')
+const frameEls = ref<(HTMLElement | null)[]>([])
+const frameImgEls = ref<(HTMLImageElement | null)[]>([])
 
 // [hidden]-equivalent (mount/unmount) vs the 'is-open' fade class--kept
 // separate so closing can fade out over 260ms before actually unmounting,
@@ -32,14 +40,28 @@ const isOpen = ref(false)
 const isVisible = ref(false)
 let closeTimer: ReturnType<typeof setTimeout> | undefined
 
-const isVertical = computed(() => !!props.item && props.item.height >= props.item.width)
-const titleParts = computed(() => props.item ? splitArchiveTitle(props.item.title) : null)
-const descParts = computed(() => props.item ? splitArchiveDescription(props.item.description, props.item.link) : null)
+const currentEntry = computed(() => props.openIndex !== null ? props.items[props.openIndex] ?? null : null)
+const isGroupMode = computed(() => !!currentEntry.value?.group)
+// A series' frames are always contiguous in `items` (mirrors the static
+// site's own .archive-series-extra placement), so filtering preserves
+// their real order--no separate sort needed.
+const groupFrames = computed(() => isGroupMode.value ? props.items.filter(i => i.group === currentEntry.value!.group) : [])
+const entryIndexInGroup = computed(() => currentEntry.value ? Math.max(0, groupFrames.value.indexOf(currentEntry.value)) : 0)
+const frameDisplays = computed(() => groupFrames.value.map(frame => ({
+  frame,
+  titleParts: splitArchiveTitle(frame.frameTitle ?? frame.title),
+  descParts: splitArchiveDescription(frame.description, frame.link),
+})))
+
+const isVertical = computed(() => !!currentEntry.value && currentEntry.value.height >= currentEntry.value.width)
+const titleParts = computed(() => currentEntry.value ? splitArchiveTitle(currentEntry.value.frameTitle ?? currentEntry.value.title) : null)
+const descParts = computed(() => currentEntry.value ? splitArchiveDescription(currentEntry.value.description, currentEntry.value.link) : null)
 
 function isMobile() {
   return window.matchMedia('(max-width: 980px)').matches
 }
 
+// ── Single-image sizing (Stage 2) ──────────────────────────────────────
 async function syncPreviewSize() {
   const img = previewImg.value
   if (!img) return
@@ -63,7 +85,7 @@ function fitPreviewImage() {
   const text = previewText.value
   const inner = previewInner.value
   if (!img || !ov || !header || !text || !inner) return
-  const tagsH = (previewTags.value && props.item?.tags) ? previewTags.value.offsetHeight : 0
+  const tagsH = (previewTags.value && currentEntry.value?.tags) ? previewTags.value.offsetHeight : 0
 
   if (isMobile()) {
     const availableHeight = ov.clientHeight - header.offsetHeight - text.offsetHeight - tagsH - 40
@@ -92,26 +114,251 @@ function fitPreviewImage() {
   }
 }
 
-watch(() => props.item, async (item) => {
-  if (!item) return
+// ── Filmstrip (Stage 3) ─────────────────────────────────────────────────
+// Per-frame sizing: each frame's own natural size, capped only if it would
+// overflow the filmstrip's available height (after that frame's own
+// title/text/tags) or width--never upscaled. Frames end up uneven in
+// height on purpose (they share a top line, not a common row height).
+function fitFilmstripFrame(i: number) {
+  const frame = frameEls.value[i]
+  const img = frameImgEls.value[i]
+  const strip = filmstripEl.value
+  if (!frame || !img || !strip) return
+  const naturalW = img.naturalWidth
+  const naturalH = img.naturalHeight
+  if (!naturalW || !naturalH) return
+  const titleEl = frame.querySelector<HTMLElement>('.filmstrip-frame__title')
+  const textEl = frame.querySelector<HTMLElement>('.filmstrip-frame__text')
+  const tagsEl = frame.querySelector<HTMLElement>('.filmstrip-frame__tags')
+  let chromeH = (titleEl?.offsetHeight ?? 0) + (textEl?.offsetHeight ?? 0)
+  if (tagsEl) chromeH += tagsEl.offsetHeight
+  const availableHeight = strip.clientHeight - chromeH
+  const availableWidth = strip.clientWidth - 32
+  let h = Math.min(naturalH, availableHeight)
+  let w = h * (naturalW / naturalH)
+  if (w > availableWidth) {
+    w = availableWidth
+    h = w * (naturalH / naturalW)
+  }
+  w = Math.round(w)
+  h = Math.round(h)
+  img.style.width = `${w}px`
+  img.style.height = `${h}px`
+  frame.style.width = `${w}px`
+}
+
+function fitAllFilmstripFrames() {
+  groupFrames.value.forEach((_, i) => fitFilmstripFrame(i))
+}
+
+function onFrameImgLoad(i: number) {
+  fitFilmstripFrame(i)
+}
+
+async function openFilmstrip() {
+  filmstripStepTarget = null
+  frameEls.value = []
+  frameImgEls.value = []
+  await nextTick()
+  const idx = entryIndexInGroup.value
+  if (idx <= 0) {
+    if (filmstripEl.value) filmstripEl.value.scrollLeft = 0
+  } else {
+    requestAnimationFrame(() => {
+      const frame = frameEls.value[idx]
+      if (filmstripEl.value && frame) filmstripEl.value.scrollLeft = frame.offsetLeft
+    })
+  }
+  groupFrames.value.forEach((_, i) => {
+    const img = frameImgEls.value[i]
+    if (img?.complete && img.naturalWidth) fitFilmstripFrame(i)
+  })
+}
+
+// ── Filmstrip drag/wheel/magnet interaction ─────────────────────────────
+// scroll-snap-type would fight every instant scrollLeft write (drag/wheel
+// ticks); easing + a magnet-on-settle replaces it so motion stays smooth
+// under a live gesture and still snaps to a frame at rest.
+let filmstripDragActive = false
+let filmstripDragMoved = false
+let filmstripDragStartX = 0
+let filmstripDragStartScroll = 0
+// Last frame index requested via stepPreview (keyboard/edge-click), so a
+// rapid repeat step chains off the intended target instead of re-reading
+// scrollLeft mid-flight. Invalidated by drag/wheel, which move the strip
+// by a different mechanism and make this tracked value stale.
+let filmstripStepTarget: number | null = null
+let filmstripAnimRaf: number | null = null
+let filmstripAnimTarget = 0
+const FILMSTRIP_MAGNET_RADIUS = 48
+
+function filmstripStopEase() {
+  if (filmstripAnimRaf) {
+    cancelAnimationFrame(filmstripAnimRaf)
+    filmstripAnimRaf = null
+  }
+}
+
+function filmstripEaseTo(target: number) {
+  const strip = filmstripEl.value
+  if (!strip) return
+  const max = Math.max(0, strip.scrollWidth - strip.clientWidth)
+  filmstripAnimTarget = Math.max(0, Math.min(max, target))
+  if (filmstripAnimRaf) return
+  const tick = () => {
+    const s = filmstripEl.value
+    if (!s) { filmstripAnimRaf = null; return }
+    const current = s.scrollLeft
+    const diff = filmstripAnimTarget - current
+    if (Math.abs(diff) < 0.5) {
+      s.scrollLeft = filmstripAnimTarget
+      filmstripAnimRaf = null
+      filmstripMagnetCheck()
+      return
+    }
+    s.scrollLeft = current + diff * 0.22
+    filmstripAnimRaf = requestAnimationFrame(tick)
+  }
+  filmstripAnimRaf = requestAnimationFrame(tick)
+}
+
+function filmstripMagnetCheck() {
+  const strip = filmstripEl.value
+  if (!strip || !groupFrames.value.length || filmstripDragActive) return
+  const scrollLeft = strip.scrollLeft
+  const max = Math.max(0, strip.scrollWidth - strip.clientWidth)
+  let nearest: number | null = null
+  let nearestDist = Infinity
+  frameEls.value.forEach((el) => {
+    if (!el) return
+    const d = Math.abs(el.offsetLeft - scrollLeft)
+    if (d < nearestDist) { nearestDist = d; nearest = el.offsetLeft }
+  })
+  if (Math.abs(max - scrollLeft) < nearestDist) { nearestDist = Math.abs(max - scrollLeft); nearest = max }
+  if (nearest !== null && nearestDist > 1 && nearestDist <= FILMSTRIP_MAGNET_RADIUS) {
+    filmstripEaseTo(nearest)
+  }
+}
+
+function currentFilmstripIndex(): number {
+  const strip = filmstripEl.value
+  if (!strip) return 0
+  const scrollLeft = strip.scrollLeft
+  const max = Math.max(0, strip.scrollWidth - strip.clientWidth)
+  if (scrollLeft >= max - 1) return groupFrames.value.length - 1
+  let idx = 0
+  frameEls.value.forEach((el, i) => {
+    if (el && el.offsetLeft <= scrollLeft + 8) idx = i
+  })
+  return idx
+}
+
+function stepFilmstrip(dir: 1 | -1) {
+  if (!groupFrames.value.length) return
+  filmstripStopEase()
+  const idx = filmstripStepTarget !== null ? filmstripStepTarget : currentFilmstripIndex()
+  const next = Math.max(0, Math.min(groupFrames.value.length - 1, idx + dir))
+  filmstripStepTarget = next
+  const strip = filmstripEl.value
+  const frame = frameEls.value[next]
+  if (strip && frame) strip.scrollTo({ left: frame.offsetLeft, behavior: 'smooth' })
+}
+
+function onFilmstripPointerDown(event: PointerEvent) {
+  filmstripStopEase()
+  filmstripStepTarget = null
+  filmstripDragActive = true
+  filmstripDragMoved = false
+  filmstripDragStartX = event.clientX
+  filmstripDragStartScroll = filmstripEl.value?.scrollLeft ?? 0
+  filmstripEl.value?.classList.add('is-dragging')
+  try { filmstripEl.value?.setPointerCapture(event.pointerId) } catch { /* pointer already released--nothing to capture */ }
+}
+function onFilmstripPointerMove(event: PointerEvent) {
+  if (!filmstripDragActive || !filmstripEl.value) return
+  const dx = event.clientX - filmstripDragStartX
+  if (Math.abs(dx) > 4) filmstripDragMoved = true
+  filmstripEl.value.scrollLeft = filmstripDragStartScroll - dx
+}
+function endFilmstripDrag() {
+  if (!filmstripDragActive) return
+  filmstripDragActive = false
+  filmstripEl.value?.classList.remove('is-dragging')
+  filmstripMagnetCheck()
+  // Clear the "was a drag" flag after this gesture's own click event has
+  // had a chance to consume it (see onOverlayClick's guard)--clearing it
+  // synchronously here would leave it stale for the next, unrelated click.
+  setTimeout(() => { filmstripDragMoved = false }, 0)
+}
+function onFilmstripWheel(event: WheelEvent) {
+  if (event.ctrlKey) return // trackpad pinch-to-zoom--leave that to the browser
+  const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
+  if (!delta) return
+  event.preventDefault()
+  filmstripStepTarget = null
+  const base = filmstripAnimRaf ? filmstripAnimTarget : (filmstripEl.value?.scrollLeft ?? 0)
+  filmstripEaseTo(base + delta)
+}
+
+function handleEdgeClick(dir: 1 | -1, event: MouseEvent) {
+  if (filmstripDragMoved) return // was a drag, not a tap
+  event.stopPropagation()
+  stepPreview(dir)
+}
+
+// ── Shared prev/next navigation ──────────────────────────────────────
+// Inside an open filmstrip, stepping past its first/last frame keeps
+// going straight into the previous/next item of the whole flat catalog
+// (a series' frames are always contiguous in `items`), so "last frame of
+// the filmstrip" never reads as a dead end. Outside a filmstrip it's a
+// direct catalog-to-catalog jump--no scroll/ease, that's filmstrip-only.
+function stepPreview(dir: 1 | -1) {
+  if (isGroupMode.value) {
+    const frameIdx = currentFilmstripIndex()
+    const nextFrameIdx = frameIdx + dir
+    if (nextFrameIdx >= 0 && nextFrameIdx < groupFrames.value.length) {
+      stepFilmstrip(dir)
+      return
+    }
+    const globalIdx = props.items.indexOf(groupFrames.value[frameIdx]!)
+    if (globalIdx === -1) return
+    const nextGlobalIdx = (globalIdx + dir + props.items.length) % props.items.length
+    emit('update:openIndex', nextGlobalIdx)
+    return
+  }
+  if (!currentEntry.value) return
+  const flatIdx = props.items.indexOf(currentEntry.value)
+  if (flatIdx === -1) return
+  const nextFlatIdx = (flatIdx + dir + props.items.length) % props.items.length
+  emit('update:openIndex', nextFlatIdx)
+}
+
+// ── Open/close ───────────────────────────────────────────────────────
+watch(() => props.openIndex, async (idx) => {
+  if (idx === null) return
   const wasClosed = !isOpen.value
   clearTimeout(closeTimer)
   isOpen.value = true
   document.body.classList.add('is-preview-open')
-  // Let Vue actually apply the new src to the DOM <img> before measuring/
-  // decoding it below--reading it in the same synchronous tick would still
-  // see the previous element state.
+  // Let Vue actually apply the new item to the DOM before measuring/
+  // decoding anything below--reading it in the same synchronous tick
+  // would still see the previous element state.
   await nextTick()
   if (wasClosed) {
     requestAnimationFrame(() => { isVisible.value = true })
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   }
-  await syncPreviewSize()
+  if (isGroupMode.value) {
+    await openFilmstrip()
+  } else {
+    await syncPreviewSize()
+  }
 })
 
 function close() {
   isVisible.value = false
   document.body.classList.remove('is-preview-open')
+  filmstripStopEase()
   clearTimeout(closeTimer)
   closeTimer = setTimeout(() => {
     isOpen.value = false
@@ -122,15 +369,28 @@ function close() {
     if (previewText.value) previewText.value.style.width = ''
     if (previewInner.value) previewInner.value.style.alignItems = ''
   }, 260)
-  emit('close')
+  emit('update:openIndex', null)
 }
 
 function onOverlayClick(event: MouseEvent) {
-  if (!previewInner.value?.contains(event.target as Node)) close()
+  const target = event.target as HTMLElement
+  if (isGroupMode.value) {
+    if (target.closest('.preview-close')) { close(); return }
+    if (filmstripDragMoved) return
+    if (target.closest('.filmstrip-frame')) return
+    if (target.closest('.filmstrip-edge')) return
+    close()
+    return
+  }
+  if (!previewInner.value?.contains(target)) close()
 }
 
 function onResize() {
   if (!isOpen.value) return
+  if (isGroupMode.value) {
+    fitAllFilmstripFrames()
+    return
+  }
   fitPreviewImage()
   if (overlay.value && previewImg.value) overlay.value.style.setProperty('--preview-width', `${previewImg.value.getBoundingClientRect().width}px`)
   fitPreviewImage()
@@ -144,12 +404,12 @@ function onKeydown(event: KeyboardEvent) {
     const tag = (event.target as HTMLElement | null)?.tagName
     if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT') return
     event.preventDefault()
-    emit('next')
+    stepPreview(1)
     return
   }
   if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
   event.preventDefault()
-  emit(event.key === 'ArrowRight' ? 'next' : 'prev')
+  stepPreview(event.key === 'ArrowRight' ? 1 : -1)
 }
 
 onMounted(() => {
@@ -160,6 +420,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', onResize)
   document.removeEventListener('keydown', onKeydown)
   document.body.classList.remove('is-preview-open')
+  filmstripStopEase()
   clearTimeout(closeTimer)
 })
 </script>
@@ -169,25 +430,66 @@ onBeforeUnmount(() => {
     v-if="isOpen"
     ref="overlay"
     class="archive-preview"
-    :class="{ 'is-open': isVisible, 'is-vertical': isVertical, 'is-horizontal': !isVertical }"
+    :class="{ 'is-open': isVisible, 'is-filmstrip': isGroupMode, 'is-vertical': !isGroupMode && isVertical, 'is-horizontal': !isGroupMode && !isVertical }"
     @click="onOverlayClick"
   >
     <button class="close-button preview-close" type="button" @click="close"><span>[X]</span></button>
 
-    <div ref="previewInner" class="archive-preview__inner">
+    <div v-if="!isGroupMode" ref="previewInner" class="archive-preview__inner">
       <header ref="previewHeader" class="content-pane__header project-header">
         <h1 class="preview-title">{{ titleParts?.base }}<sup v-if="titleParts?.badge" class="archive-num">{{ titleParts.badge }}</sup></h1>
       </header>
       <div class="preview-media">
-        <img ref="previewImg" class="preview-image" :src="item?.src" :alt="item?.alt || ''" />
-        <button class="preview-nav preview-nav--prev" type="button" aria-label="Previous photo" @click="emit('prev')"><span class="preview-nav__arrow">&lt;</span></button>
-        <button class="preview-nav preview-nav--next" type="button" aria-label="Next photo" @click="emit('next')"><span class="preview-nav__arrow">&gt;</span></button>
+        <img ref="previewImg" class="preview-image" :src="currentEntry?.src" :alt="currentEntry?.alt || ''" />
+        <button class="preview-nav preview-nav--prev" type="button" aria-label="Previous photo" @click="stepPreview(-1)"><span class="preview-nav__arrow">&lt;</span></button>
+        <button class="preview-nav preview-nav--next" type="button" aria-label="Next photo" @click="stepPreview(1)"><span class="preview-nav__arrow">&gt;</span></button>
       </div>
       <div ref="previewText" class="preview-text">
-        <p v-if="descParts">{{ descParts.before }}<a class="archive-num" :href="item!.link" target="_blank" rel="noreferrer">{{ descParts.linkText }}</a>{{ descParts.after }}</p>
-        <p v-else>{{ item?.description }}</p>
+        <p v-if="descParts">{{ descParts.before }}<a class="archive-num" :href="currentEntry!.link" target="_blank" rel="noreferrer">{{ descParts.linkText }}</a>{{ descParts.after }}</p>
+        <p v-else>{{ currentEntry?.description }}</p>
       </div>
-      <span v-if="item?.tags" ref="previewTags" class="preview-tags">{{ item.tags }}</span>
+      <span v-if="currentEntry?.tags" ref="previewTags" class="preview-tags">{{ currentEntry.tags }}</span>
     </div>
+
+    <template v-else>
+      <div
+        ref="filmstripEl"
+        class="archive-preview__filmstrip"
+        @pointerdown="onFilmstripPointerDown"
+        @pointermove="onFilmstripPointerMove"
+        @pointerup="endFilmstripDrag"
+        @pointercancel="endFilmstripDrag"
+        @wheel="onFilmstripWheel"
+      >
+        <div
+          v-for="(display, i) in frameDisplays"
+          :key="display.frame.src"
+          class="filmstrip-frame"
+          :ref="(el) => { frameEls[i] = el as HTMLElement | null }"
+        >
+          <h2 class="filmstrip-frame__title">{{ display.titleParts.base }}<sup v-if="display.titleParts.badge" class="archive-num">{{ display.titleParts.badge }}</sup></h2>
+          <div class="filmstrip-frame__media">
+            <img
+              :ref="(el) => { frameImgEls[i] = el as HTMLImageElement | null }"
+              :src="display.frame.src"
+              :alt="display.frame.alt"
+              :draggable="false"
+              @load="onFrameImgLoad(i)"
+            />
+          </div>
+          <div class="filmstrip-frame__text">
+            <p v-if="display.descParts">{{ display.descParts.before }}<a class="archive-num" :href="display.frame.link" target="_blank" rel="noreferrer">{{ display.descParts.linkText }}</a>{{ display.descParts.after }}</p>
+            <p v-else>{{ display.frame.description }}</p>
+          </div>
+          <span v-if="display.frame.tags" class="filmstrip-frame__tags">{{ display.frame.tags }}</span>
+        </div>
+      </div>
+      <div class="filmstrip-edge filmstrip-edge--left" aria-hidden="true" @click="handleEdgeClick(-1, $event)">
+        <span class="filmstrip-edge__arrow">&lt;</span>
+      </div>
+      <div class="filmstrip-edge filmstrip-edge--right" aria-hidden="true" @click="handleEdgeClick(1, $event)">
+        <span class="filmstrip-edge__arrow">&gt;</span>
+      </div>
+    </template>
   </div>
 </template>
