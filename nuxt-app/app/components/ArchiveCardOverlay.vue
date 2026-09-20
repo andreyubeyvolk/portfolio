@@ -120,6 +120,11 @@ function onSwipeHintAnimationEnd() {
 // ── Open/close ───────────────────────────────────────────────────────
 watch(() => props.openIndex, async (idx) => {
   if (idx === null) return
+  // A graffiti tag drawn on the grid shouldn't linger once a card opens
+  // on top of it--same reasoning as ArchivePreview.vue's own clearGraffiti
+  // calls, just never wired up here since this overlay only exists on
+  // tablet/phone.
+  window.clearGraffiti?.()
   isOpen.value = true
   isPhoneMode.value = isPhone()
   document.body.classList.add('card-is-open')
@@ -139,6 +144,7 @@ watch(() => props.openIndex, async (idx) => {
 function close() {
   isOpen.value = false
   document.body.classList.remove('card-is-open')
+  window.clearGraffiti?.()
   if (cardPanel.value) cardPanel.value.style.width = ''
   emit('update:openIndex', null)
 }

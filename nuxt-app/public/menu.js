@@ -59,6 +59,9 @@
   }
 
   function open() {
+    // Any graffiti tag drawn on the page shouldn't still be sitting there,
+    // half-covered, once the menu slides out on top of it.
+    if (window.clearGraffiti) window.clearGraffiti();
     primeDimLayers();
     document.body.classList.add('menu-is-open');
     if (menu) menu.removeAttribute('inert');

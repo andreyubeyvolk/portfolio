@@ -680,13 +680,26 @@ window.initGraffiti = function initGraffiti() {
       // triggered above the header or below the current bottom
       // fold is still logically on the pane (see stampDot for
       // why), just not necessarily visible the moment it starts.
-      var inFilmstrip = filmstripEl && filmstripRect && x >= filmstripRect.left && x <= filmstripRect.right && y >= filmstripRect.top && y <= filmstripRect.bottom;
-      var inPane = !inFilmstrip && paneRect && x >= paneRect.left && x <= paneRightEdge;
+      var inFilmstrip = !touchArmed && filmstripEl && filmstripRect && x >= filmstripRect.left && x <= filmstripRect.right && y >= filmstripRect.top && y <= filmstripRect.bottom;
+      var inPane = !touchArmed && !inFilmstrip && paneRect && x >= paneRect.left && x <= paneRightEdge;
       // Captured now, not read live at render time: a drip can still
       // be falling several strokes (and color-modifier changes) later,
       // and should keep the color of the stroke that triggered it.
       var drip = { vel: 0, dist: 0, maxDist: CFG.dripMaxDistMin + Math.random() * CFG.dripMaxDistRange, color: strokeColor };
-      if (inFilmstrip) {
+      if (touchArmed) {
+        // Same reasoning as stampDot's own touchArmed branch: mobile has
+        // no fixed/pane split, just content-relative-to-window.scrollY
+        // storage--without this branch, every mobile drip fell through
+        // to the 'fixed' case below and got stored in raw SCREEN
+        // coordinates on the non-scrolling canvas, which read as the
+        // drip staying put on screen while the page (and the tag it fell
+        // from) scrolled out from under it.
+        drip.space = 'mobile';
+        drip.x = x;
+        drip.y = y + window.scrollY;
+        drip.tone = 0;
+        drip.alphaMul = 1;
+      } else if (inFilmstrip) {
         drip.space = 'filmstrip';
         drip.x = x - filmstripRect.left + filmstripEl.scrollLeft;
         drip.y = y - filmstripRect.top;
@@ -1250,7 +1263,7 @@ window.initGraffiti = function initGraffiti() {
       d.y += fall;
       d.dist += fall;
 
-      var targetCtx = d.space === 'pane' ? pctx : (d.space === 'filmstrip' ? fctx : ctx);
+      var targetCtx = d.space === 'pane' ? pctx : (d.space === 'filmstrip' ? fctx : (d.space === 'mobile' ? mpctx : ctx));
       // Same reasoning as stampDot: a pane-space drip's (x, y) are
       // content-relative for persistence, but drawing them AGAIN
       // directly onto the small view canvas whenever they're
@@ -1261,6 +1274,7 @@ window.initGraffiti = function initGraffiti() {
       var inView = d.space === 'pane' && paneRect && articleRect &&
         (articleRect.top + d.y) >= paneRect.top && (articleRect.top + d.y) <= paneRect.bottom;
       var inFilmstripView = d.space === 'filmstrip' && filmstripEl && filmstripRect;
+      var inMobileView = d.space === 'mobile' && (d.y - window.scrollY) >= 0 && (d.y - window.scrollY) <= window.innerHeight;
       var progress = Math.min(1, d.dist / d.maxDist);
       var radius = 1 + progress * 2.6;
       var n = 3 + Math.round(progress * 3);
@@ -1271,6 +1285,7 @@ window.initGraffiti = function initGraffiti() {
         paintDot(targetCtx, dotX, dotY, d.tone, a);
         if (inView) paintDot(pvctx, articleRect.left + dotX - paneRect.left, articleRect.top + dotY - paneRect.top, d.tone, a);
         if (inFilmstripView) paintDot(fvctx, dotX - filmstripEl.scrollLeft, dotY, d.tone, a);
+        if (inMobileView) paintDot(mpvctx, dotX, dotY - window.scrollY, d.tone, a);
       }
 
       if (d.dist >= d.maxDist) {
@@ -1285,6 +1300,7 @@ window.initGraffiti = function initGraffiti() {
           paintDot(targetCtx, bx, by, d.tone, ab);
           if (inView) paintDot(pvctx, articleRect.left + bx - paneRect.left, articleRect.top + by - paneRect.top, d.tone, ab);
           if (inFilmstripView) paintDot(fvctx, bx - filmstripEl.scrollLeft, by, d.tone, ab);
+          if (inMobileView) paintDot(mpvctx, bx, by - window.scrollY, d.tone, ab);
         }
         drips.splice(i, 1);
       }
@@ -1346,6 +1362,8 @@ window.initGraffiti = function initGraffiti() {
     // drawn straight onto pvctx too (see updateDrips).
     flushBatch(pctx);
     flushBatch(pvctx);
+    flushBatch(mpctx);
+    flushBatch(mpvctx);
 
     if (!isDrawing || !lastStamp) return;
 

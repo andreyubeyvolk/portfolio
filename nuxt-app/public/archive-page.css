@@ -102,8 +102,20 @@ button.archive-card {
 
       /* Brief crossfade while stepping between two single-image cards
          (arrow keys/nav buttons)--toggled off once the new image has
-         synced its size (see ArchivePreview.vue's isStepping). */
-      .preview-media img.is-stepping {
+         synced its size (see ArchivePreview.vue's isStepping). Covers the
+         WHOLE card now (photo + title/description/tags plaques), not just
+         the photo: the plaques' width comes from the --preview-width CSS
+         var below, which is only kept in sync while a single-image card
+         is open--stepping in from a filmstrip (which never touches that
+         var) leaves it holding a stale value from whichever single-image
+         card was open longest ago, until syncPreviewSize() recomputes it
+         a tick later. Hiding everything until that recompute finishes is
+         what actually stops that stale width from ever painting--this
+         was the real cause of the "margins on the title/description
+         plaques" report right after a series (the photo-only fade never
+         touched the plaques at all, so they rendered at the wrong width
+         for a frame, in full view). */
+      .archive-preview__inner.is-stepping .preview-media img {
         opacity: 0;
         transform: scale(0.98);
       }
@@ -136,6 +148,13 @@ button.archive-card {
       .archive-preview__inner > .preview-tags {
         width: var(--preview-width, auto);
         max-width: 100%;
+        transition: opacity 200ms ease;
+      }
+
+      .archive-preview__inner.is-stepping > .project-header,
+      .archive-preview__inner.is-stepping > .preview-text,
+      .archive-preview__inner.is-stepping > .preview-tags {
+        opacity: 0;
       }
 
       .archive-preview.is-vertical .preview-media {

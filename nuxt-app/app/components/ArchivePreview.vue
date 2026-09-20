@@ -564,12 +564,12 @@ onBeforeUnmount(() => {
   >
     <button class="close-button preview-close" type="button" @click="close"><span>[X]</span></button>
 
-    <div v-if="!isGroupMode" ref="previewInner" class="archive-preview__inner">
+    <div v-if="!isGroupMode" ref="previewInner" class="archive-preview__inner" :class="{ 'is-stepping': isStepping }">
       <header ref="previewHeader" class="content-pane__header project-header">
         <h1 class="preview-title">{{ titleParts?.base }}<sup v-if="titleParts?.badge" class="archive-num">{{ titleParts.badge }}</sup></h1>
       </header>
       <div class="preview-media">
-        <img ref="previewImg" class="preview-image" :class="{ 'is-stepping': isStepping }" :src="currentEntry?.src" :alt="currentEntry?.alt || ''" />
+        <img ref="previewImg" class="preview-image" :src="currentEntry?.src" :alt="currentEntry?.alt || ''" />
         <button class="preview-nav preview-nav--prev" type="button" aria-label="Previous photo" @click="handleNavClick(-1, $event)"><span class="preview-nav__arrow">&lt;</span></button>
         <button class="preview-nav preview-nav--next" type="button" aria-label="Next photo" @click="handleNavClick(1, $event)"><span class="preview-nav__arrow">&gt;</span></button>
       </div>
