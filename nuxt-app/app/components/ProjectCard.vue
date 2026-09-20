@@ -5,11 +5,12 @@
 // hover-preview mechanic below only has to be written once and applies
 // everywhere per its own design brief.
 //
-// Hover preview: for a project with `cardPreview` set (iGaming only,
-// for now--every other project has none and this is fully inert),
-// moving the cursor left-to-right across the card (or dragging a
-// finger the same way on touch) cycles through up to 4 photos, shown
-// centered over the cover at half the card's own size. No existing
+// Hover preview: for a project with `cardPreview` set (iGaming, Crypto,
+// Finance, Identity, and the four Brands projects so far--every other
+// project has none and this is fully inert), moving the cursor
+// left-to-right across the card (or dragging a finger the same way on
+// touch) cycles through up to 4 photos, shown centered over the cover
+// at half the card's own size. No existing
 // pattern to build on--GallerySlot.vue's cursor-follow tip is an
 // absolute-position tooltip follower, not a position-within-element
 // picker, so this is a fresh implementation.
@@ -114,7 +115,7 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
    to settle back), and the :hover rule's own transition governs
    entering it (1200ms, a longer, more deliberate approach). */
 .inhouse-card__cover-img {
-  transition: transform 800ms cubic-bezier(0.16, 1, 0.3, 1), filter 800ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1), filter 900ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Suppressed while a graffiti stroke is live (body.graffiti-mode, see
@@ -122,8 +123,8 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
    and darken whatever card happens to be under the cursor. */
 body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__cover-img {
   transform: scale(1.02);
-  filter: brightness(0.9);
-  transition: transform 1200ms cubic-bezier(0.16, 1, 0.3, 1), filter 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+  filter: brightness(0.8);
+  transition: transform 1400ms cubic-bezier(0.16, 1, 0.3, 1), filter 1400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Subtle film-grain texture that fades in alongside the darken/scale
@@ -138,11 +139,11 @@ body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__cover-img {
   opacity: 0;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  transition: opacity 800ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__noise {
-  opacity: 0.25;
-  transition: opacity 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.3;
+  transition: opacity 1400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Centered over the cover at half the card's own size--.inhouse-card__cover
