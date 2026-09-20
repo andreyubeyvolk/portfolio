@@ -23,9 +23,8 @@ export default defineNuxtConfig({
     viewTransition: true,
   },
   app: {
-    // NOTE: leave this at '/' for now—the real value (either '/portfolio/'
-    // or '/' if a custom domain lands first) is a Stage 7 cutover decision,
-    // not something to guess at here.
+    // Root custom domain (andreyubeyvolk.com), no subpath--settled at the
+    // Stage 7 cutover.
     head: {
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -70,6 +69,12 @@ export default defineNuxtConfig({
         // plain tag. plugins/graffiti.client.ts is what actually calls it,
         // once per navigation.
         { src: '/graffiti.js' },
+        // Google Analytics (gtag.js)--only DEFINES window.gtag/dataLayer
+        // here. plugins/analytics.client.ts does the actual init (gated to
+        // the real domain) and fires page_view on every route change,
+        // since gtag's own automatic pageview only covers the first
+        // document load, not later client-side navigations.
+        { src: 'https://www.googletagmanager.com/gtag/js?id=G-SXEF693HCE', async: true },
       ],
     },
   },
