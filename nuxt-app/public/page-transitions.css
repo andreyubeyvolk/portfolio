@@ -52,13 +52,13 @@ html[data-transition='curtain']::view-transition-new(root) {
 
 @keyframes vt-curtain-cover {
   0%   { clip-path: inset(0 0 0 0); filter: brightness(1); }
-  50%  { clip-path: inset(100% 0 0 0); filter: brightness(0.9); }
-  100% { clip-path: inset(100% 0 0 0); filter: brightness(0.9); }
+  50%  { clip-path: inset(100% 0 0 0); filter: brightness(0.85); }
+  100% { clip-path: inset(100% 0 0 0); filter: brightness(0.85); }
 }
 
 @keyframes vt-curtain-reveal {
-  0%   { clip-path: inset(100% 0 0 0); filter: brightness(0.9); }
-  50%  { clip-path: inset(100% 0 0 0); filter: brightness(0.9); }
+  0%   { clip-path: inset(100% 0 0 0); filter: brightness(0.85); }
+  50%  { clip-path: inset(100% 0 0 0); filter: brightness(0.85); }
   100% { clip-path: inset(0 0 0 0); filter: brightness(1); }
 }
 

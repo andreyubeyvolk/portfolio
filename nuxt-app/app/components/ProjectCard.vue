@@ -141,7 +141,7 @@ body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__cover-img {
   transition: opacity 800ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__noise {
-  opacity: 0.15;
+  opacity: 0.25;
   transition: opacity 1200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
