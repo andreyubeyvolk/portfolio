@@ -179,4 +179,17 @@ kv:
   src: /assets/brands/stickerburg/stickerburg-kv.webp
   width: 206
   height: 206
+cardPreview:
+  - src: /assets/brands/stickerburg/stickerburg-03.webp
+    width: 1080
+    height: 1440
+  - src: /assets/brands/stickerburg/stickerburg-20.webp
+    width: 1080
+    height: 1440
+  - src: /assets/brands/stickerburg/stickerburg-16.webp
+    width: 1080
+    height: 1440
+  - src: /assets/brands/stickerburg/stickerburg-19.webp
+    width: 1080
+    height: 1440
 ---

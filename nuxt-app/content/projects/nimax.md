@@ -182,4 +182,17 @@ kv:
   width: 206
   height: 206
 zipUrl: /assets/brands/nimax/nimax-project-images.zip
+cardPreview:
+  - src: /assets/brands/nimax/nimax-08.webp
+    width: 1080
+    height: 1440
+  - src: /assets/brands/nimax/nimax-09.webp
+    width: 1080
+    height: 1440
+  - src: /assets/brands/nimax/nimax-15.webp
+    width: 1080
+    height: 1440
+  - src: /assets/brands/nimax/nimax-23.webp
+    width: 1080
+    height: 1440
 ---

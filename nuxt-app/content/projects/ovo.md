@@ -199,4 +199,17 @@ kv:
   src: /assets/brands/ovo/ovo-kv.webp
   width: 206
   height: 206
+cardPreview:
+  - src: /assets/brands/ovo/ovo-01.webp
+    width: 1080
+    height: 1440
+  - src: /assets/brands/ovo/ovo-05.webp
+    width: 1080
+    height: 1440
+  - src: /assets/brands/ovo/ovo-17.webp
+    width: 1080
+    height: 1440
+  - src: /assets/brands/ovo/ovo-09.webp
+    width: 1080
+    height: 1440
 ---
