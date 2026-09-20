@@ -136,4 +136,17 @@ kv:
   width: 206
   height: 206
 zipUrl: /assets/inhouse/apac/apac-project-images.zip
+cardPreview:
+  - src: /assets/inhouse/apac/apac-03.webp
+    width: 1080
+    height: 1440
+  - src: /assets/inhouse/apac/apac-12.webp
+    width: 1080
+    height: 1440
+  - src: /assets/inhouse/apac/apac-07.webp
+    width: 1080
+    height: 1440
+  - src: /assets/inhouse/apac/apac-08.webp
+    width: 1080
+    height: 1440
 ---
