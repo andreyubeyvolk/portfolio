@@ -30,7 +30,25 @@ const isOpen = ref(false)
 const isVisible = ref(false)
 let closeTimer: ReturnType<typeof setTimeout> | undefined
 
-const currentEntry = computed(() => props.openIndex !== null ? props.items[props.openIndex] ?? null : null)
+// close() emits update:openIndex(null) immediately (not after the mask
+// finishes)--so props.openIndex goes null well before the 800ms clip-
+// path retreat has actually hidden anything. Reading it directly here
+// meant currentEntry (and everything derived from it: the image src,
+// title, description, tags, even isGroupMode) went blank/false the
+// INSTANT close() ran, while the mask was still supposed to be
+// gracefully covering a card that, by then, had no content left to
+// show--read live as the card "snapping" empty immediately, then the
+// shell finishing its retreat a beat later. Falling back to the last
+// real index while openIndex is null keeps rendering the card that was
+// actually open throughout the whole retreat; nothing about it changes
+// until isOpen itself goes false (the existing MASK_MS-delayed unmount
+// in close()), which is also when this stale index stops mattering.
+const lastOpenIndex = ref<number | null>(null)
+watch(() => props.openIndex, (idx) => { if (idx !== null) lastOpenIndex.value = idx })
+const currentEntry = computed(() => {
+  const idx = props.openIndex ?? lastOpenIndex.value
+  return idx !== null ? props.items[idx] ?? null : null
+})
 const isGroupMode = computed(() => !!currentEntry.value?.group)
 // A series' frames are always contiguous in `items` (mirrors the static
 // site's own .archive-series-extra placement), so filtering preserves
@@ -611,7 +629,21 @@ function onOverlayClick(event: MouseEvent) {
 function onResize() {
   if (!isOpen.value) return
   if (isGroupMode.value) {
+    // Every frame's own width (and so its offsetLeft) depends on the
+    // filmstrip's current clientWidth--resizing the window changes all
+    // of them, which can shrink the filmstrip's total scrollWidth below
+    // the (still pre-resize) scrollLeft. Left alone, the browser then
+    // clamps scrollLeft down on its own once fitAllFilmstripFrames()
+    // narrows everything, which visibly snapped the view back toward
+    // frame 0 instead of keeping whatever frame was actually being
+    // viewed. Recording which frame that was BEFORE resizing (while
+    // scrollLeft/offsetLeft still reflect the old, correct layout) and
+    // scrolling back to that same frame's new offsetLeft afterward is
+    // what actually keeps the view stable across a resize.
+    const idx = currentFilmstripIndex()
     fitAllFilmstripFrames()
+    const frame = frameEls.value[idx]
+    if (filmstripEl.value && frame) filmstripEl.value.scrollLeft = frame.offsetLeft
     return
   }
   syncPreviewWidth()
