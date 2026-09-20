@@ -89,6 +89,7 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
         :src="`/assets/${section}/${slug}/${slug}-card.webp`"
         :alt="title"
       />
+      <div class="inhouse-card__noise" aria-hidden="true"></div>
       <img
         v-if="cardPreview?.length"
         class="inhouse-card__hover-preview"
@@ -105,18 +106,43 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
 </template>
 
 <style scoped>
+/* Asymmetric easing: a fast start that eases into a soft finish
+   (cubic-bezier(0.16,1,0.3,1), a common "ease-out-expo" curve) reads
+   very differently depending on direction, so enter/exit each need
+   their OWN duration set on the state they transition INTO--the base
+   (non-hover) rule's transition governs leaving :hover (800ms, quicker
+   to settle back), and the :hover rule's own transition governs
+   entering it (1200ms, a longer, more deliberate approach). */
 .inhouse-card__cover-img {
-  /* Long, deliberately slow settle (2s)--reads as a soft, delayed drift
-     into the zoomed-in state rather than a snappy hover response. */
-  transition: transform 2000ms ease, filter 2000ms ease;
+  transition: transform 800ms cubic-bezier(0.16, 1, 0.3, 1), filter 800ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Suppressed while a graffiti stroke is live (body.graffiti-mode, see
    isGraffitiDrawing() above)--drawing over the grid shouldn't also zoom
    and darken whatever card happens to be under the cursor. */
 body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__cover-img {
-  transform: scale(1.04);
+  transform: scale(1.02);
   filter: brightness(0.9);
+  transition: transform 1200ms cubic-bezier(0.16, 1, 0.3, 1), filter 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Subtle film-grain texture that fades in alongside the darken/scale
+   above--a flat feTurbulence noise field (no external asset, generated
+   inline as a data URI) blended over the cover via mix-blend-mode, not
+   a separate visible layer. Same asymmetric-easing/duration split as
+   the cover image itself, so both settle together in each direction. */
+.inhouse-card__noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  transition: opacity 800ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__noise {
+  opacity: 0.15;
+  transition: opacity 1200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Centered over the cover at half the card's own size--.inhouse-card__cover
