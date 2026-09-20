@@ -52,9 +52,54 @@ function isMobile() {
 }
 
 // ── Single-image sizing (Stage 2) ──────────────────────────────────────
-// Two passes, back-to-back: fitPreviewImage's own math depends on
-// previewHeader/previewText's WIDTH, which the first pass itself just
-// set--the second pass re-measures against that now-stable layout.
+// Re-measures the rendered width available to the photo and republishes
+// it as --preview-width (which the title/description/tags plaques size
+// themselves to--see the CSS comment on .archive-preview__inner's
+// children), looping fitPreviewImage() until that measurement stops
+// moving (capped, as a safety net against a pathological case never
+// settling). A fixed two passes (the previous approach) assumes the
+// SECOND pass's resulting width is already final, but that isn't always
+// true: header's own height is fixed (18px) regardless of width, but
+// preview-text's description wraps onto a different number of lines
+// right around certain widths, which changes its offsetHeight, which
+// changes the available height fitPreviewImage() gives the photo, which
+// changes the photo's own width--sometimes still mid-settle after only
+// two rounds.
+//
+// Measures the <img>'s own offsetWidth, NOT getBoundingClientRect()--the
+// real bug behind the plaques reading persistently narrower than the
+// photo after every card-to-card step (not just a one-frame flash):
+// this runs while isStepping is still true, i.e. while the swapped-in
+// <img> still carries the is-stepping CSS class's `transform:
+// scale(0.98)`. A transform never changes an element's own LAYOUT size,
+// but it DOES change what getBoundingClientRect() reports for that
+// element specifically (the post-transform, painted box)--so measuring
+// the <img> that way read a width scaled down by that same 0.98 factor
+// (confirmed live: a 589.47px photo measured as 577.68px, exactly
+// 589.47*0.98), and that wrong, ~2%-too-narrow number got baked into
+// --preview-width for the plaques, staying wrong until the NEXT step
+// re-measured (and re-corrupted) it the same way. offsetWidth is a pure
+// LAYOUT measurement (no transform applied), so it isn't affected.
+//
+// Also deliberately NOT .preview-media's own rect, which would dodge
+// the transform issue too but trades it for a worse one: .preview-media
+// has no width of its own--it flex-stretches to match whichever sibling
+// (header/text/tags, all explicitly `width: var(--preview-width)`) is
+// widest, so its rect is partly a REFLECTION of the very value we're
+// about to overwrite, not independent ground truth. Measuring it after
+// a filmstrip visit (which never touches --preview-width, so it can
+// hold a stale value from a completely different, differently-sized
+// photo the whole time the series was open) just fed that stale number
+// back to itself forever, converging to "whatever it already was"
+// instead of the new photo's real size (confirmed live: header and
+// .preview-media agreed with each other after stepping out of
+// Transportation's filmstrip, but the actual <img> rendered ~2px
+// narrower than both--neither plaque nor container had course-corrected
+// to the new photo at all). The <img>'s own offsetWidth has no such
+// dependency: its width is computed straight from its own natural
+// aspect ratio and the height fitPreviewImage() just gave it, with no
+// path back through --preview-width.
+//
 // Originally double-requestAnimationFrame'd (ported as-is from the
 // static site), which silently broke inside the Archive open/close
 // View Transition added later: that callback's own promise resolved
@@ -62,21 +107,46 @@ function isMobile() {
 // so the transition's "new" snapshot captured the UNSIZED, natural-size
 // image--the mask then revealed that oversized/mispositioned layout
 // before it visibly snapped to the correct one a frame later. Calling
-// fitPreviewImage() synchronously twice works just as well: reading
+// fitPreviewImage() synchronously works just as well: reading
 // offsetHeight/clientHeight/getBoundingClientRect() always forces a
 // synchronous layout recalculation against whatever was just written,
-// no actual paint required--and now `await syncPreviewSize()` really
-// does mean "sizing is done" wherever it's called, transition or not.
+// no actual paint required.
+function syncPreviewWidth() {
+  const img = previewImg.value
+  const ov = overlay.value
+  if (!img || !ov) return
+  let lastWidth = -1
+  for (let i = 0; i < 6; i++) {
+    fitPreviewImage()
+    const width = img.offsetWidth
+    ov.style.setProperty('--preview-width', `${width}px`)
+    if (Math.abs(width - lastWidth) < 0.05) return
+    lastWidth = width
+  }
+}
+
 async function syncPreviewSize() {
   const img = previewImg.value
   if (!img) return
-  if (img.decode) {
-    try { await img.decode() } catch { /* a stale/aborted decode--the next syncPreviewSize call (new src) supersedes it */ }
+  // Was img.decode()--switched after finding it can simply never settle
+  // (neither resolve nor reject, hanging this whole step forever in the
+  // faded is-stepping state) for an <img> whose src is already cached/
+  // decoded elsewhere on the page, which is exactly our situation: the
+  // grid thumbnail and the lightbox's own <img> are two different
+  // elements pointing at the same url, and the lightbox one is freshly
+  // (re)mounted on every filmstrip<->single-image crossing. complete/
+  // load has none of decode()'s edge cases here--naturalWidth/Height
+  // (all the sizing math below actually needs) are guaranteed available
+  // by the time either fires, and isStepping's own opacity fade already
+  // gives the browser a real paint's worth of time to finish decoding
+  // before the image is ever actually revealed.
+  if (!img.complete) {
+    await new Promise<void>((resolve) => {
+      img.addEventListener('load', () => resolve(), { once: true })
+      img.addEventListener('error', () => resolve(), { once: true })
+    })
   }
-  fitPreviewImage()
-  if (overlay.value && previewImg.value) overlay.value.style.setProperty('--preview-width', `${previewImg.value.getBoundingClientRect().width}px`)
-  fitPreviewImage()
-  if (overlay.value && previewImg.value) overlay.value.style.setProperty('--preview-width', `${previewImg.value.getBoundingClientRect().width}px`)
+  syncPreviewWidth()
 }
 
 function fitPreviewImage() {
@@ -87,6 +157,27 @@ function fitPreviewImage() {
   const inner = previewInner.value
   if (!img || !ov || !header || !text || !inner) return
   const tagsH = (previewTags.value && currentEntry.value?.tags) ? previewTags.value.offsetHeight : 0
+
+  // Crossing the mobile/desktop breakpoint WHILE the lightbox stays open
+  // (e.g. docking/undocking Chrome DevTools, which easily pushes the
+  // viewport under 980px and back without the lightbox ever closing)
+  // used to leave stale inline styles behind: the mobile branch below
+  // sets fixed-px inline styles (outranking any stylesheet rule by
+  // specificity), but the desktop branch only ever wrote the
+  // --preview-image-height/--preview-width CSS custom properties--it
+  // never cleared those inline overrides, so once a single mobile-width
+  // pass had run, the photo stayed stuck at that fixed px size forever
+  // after, visibly squished/wrong-proportioned even back at full desktop
+  // width, and stayed that way through every later card (switching
+  // cards re-runs this function, but the desktop branch still never
+  // touched the leftover inline styles--only close() ever cleared them).
+  // Clearing unconditionally here means whichever branch runs below
+  // always starts from a clean slate.
+  img.style.width = ''
+  img.style.height = ''
+  header.style.width = ''
+  text.style.width = ''
+  inner.style.alignItems = ''
 
   if (isMobile()) {
     const availableHeight = ov.clientHeight - header.offsetHeight - text.offsetHeight - tagsH - 40
@@ -523,10 +614,7 @@ function onResize() {
     fitAllFilmstripFrames()
     return
   }
-  fitPreviewImage()
-  if (overlay.value && previewImg.value) overlay.value.style.setProperty('--preview-width', `${previewImg.value.getBoundingClientRect().width}px`)
-  fitPreviewImage()
-  if (overlay.value && previewImg.value) overlay.value.style.setProperty('--preview-width', `${previewImg.value.getBoundingClientRect().width}px`)
+  syncPreviewWidth()
 }
 
 function onKeydown(event: KeyboardEvent) {
