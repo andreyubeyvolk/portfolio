@@ -392,6 +392,17 @@ function stepFilmstrip(dir: 1 | -1) {
 }
 
 function onFilmstripPointerDown(event: PointerEvent) {
+  // Ctrl/Cmd held means this pointerdown is (or is about to become) a
+  // graffiti stroke, not a drag-to-scroll gesture--without this check,
+  // both systems reacted to the same event: the filmstrip started
+  // tracking its own drag-scroll here, while graffiti.js's own
+  // Ctrl-gated mousedown handler started a stroke, fighting over the
+  // same gesture instead of drawing taking priority. The wheel handler
+  // just below already had the equivalent ctrlKey check for wheel
+  // input; drag never did. Releasing Ctrl before the NEXT gesture still
+  // lets it scroll normally--this only matters at the moment a new
+  // gesture starts.
+  if (event.ctrlKey || event.metaKey) return
   filmstripStopEase()
   filmstripStepTarget = null
   filmstripDragActive = true
@@ -579,9 +590,6 @@ watch(() => props.openIndex, async (idx) => {
 function close() {
   const token = ++transitionToken
   document.body.classList.remove('is-preview-open')
-  // Closing goes back to the Archive section itself--the graffiti drawn
-  // while this card was open shouldn't linger there.
-  window.clearGraffiti?.()
   filmstripStopEase()
   clearTimeout(closeTimer)
   // Retreat first (reverse of the open reveal--same clip-path property,
@@ -589,12 +597,22 @@ function close() {
   // clipping back up into the top slot), THEN unmount once it's fully
   // clipped away--no visible pop from the content disappearing, since
   // nothing of it is showing by then. The archive grid underneath
-  // (already there, just dimmed via body.is-preview-open, removed
-  // above) fades back to full opacity on its own 0.3s transition,
-  // visible through the shrinking clip the whole time.
+  // (already there, just dimmed via the page veil, removed above)
+  // fades back to full opacity on its own transition, visible through
+  // the shrinking clip the whole time.
   isVisible.value = false
   closeTimer = setTimeout(() => {
     if (token !== transitionToken) return // a reopen already happened, don't unmount it
+    // Clearing the tag only NOW (once the mask has fully retreated),
+    // not at the moment close() was first called--per the user's own
+    // report, clearing it immediately made the tag's disappearance
+    // read as "hidden by the shutter" rather than "erased," since both
+    // animations ran over almost the same window at the same time,
+    // visually blending into one event instead of two distinct ones.
+    // The mechanism itself (clearAll's wipe/fade) was never broken--
+    // confirmed live it does fully clear the canvas--this is purely
+    // about sequencing so the erase reads as its own visible action.
+    window.clearGraffiti?.()
     isOpen.value = false
     overlay.value?.style.removeProperty('--preview-width')
     overlay.value?.style.removeProperty('--preview-image-height')
