@@ -175,4 +175,17 @@ kv:
   width: 206
   height: 206
 zipUrl: /assets/inhouse/finance/finance-project-images.zip
+cardPreview:
+  - src: /assets/inhouse/finance/finance-10.webp
+    width: 1080
+    height: 1440
+  - src: /assets/inhouse/finance/finance-12.webp
+    width: 1080
+    height: 1440
+  - src: /assets/inhouse/finance/finance-23.webp
+    width: 1080
+    height: 1440
+  - src: /assets/inhouse/finance/finance-22.webp
+    width: 1080
+    height: 1440
 ---

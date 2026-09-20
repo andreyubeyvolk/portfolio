@@ -141,4 +141,17 @@ kv:
   width: 206
   height: 206
 zipUrl: /assets/inhouse/identity/identity-project-images.zip
+cardPreview:
+  - src: /assets/inhouse/identity/identity-04.webp
+    width: 1080
+    height: 1440
+  - src: /assets/inhouse/identity/identity-15.webp
+    width: 1080
+    height: 1440
+  - src: /assets/inhouse/identity/identity-14.webp
+    width: 1080
+    height: 1440
+  - src: /assets/inhouse/identity/identity-09.webp
+    width: 1080
+    height: 1440
 ---
