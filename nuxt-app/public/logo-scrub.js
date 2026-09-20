@@ -79,24 +79,52 @@
     tip.classList.remove('is-visible');
   }
 
-  // Any mouse movement anywhere dismisses the tip (if up) and resets
-  // the idle clock; it only actually shows once a full 5s passes with
-  // no movement at all.
+  // Progressive backoff: the first idle-triggered appearance waits only
+  // 3s, but showing the hint repeatedly at that same short interval gets
+  // annoying fast--each later appearance waits twice as long as the one
+  // before (3s -> 6s -> 12s -> 24s), capping at 24s so it doesn't keep
+  // growing forever.
+  var IDLE_STEPS_MS = [3000, 6000, 12000, 24000];
+  var idleStepIndex = 0;
+
+  // Any real mouse movement anywhere dismisses the tip (if up) and
+  // resets the idle clock; it only actually shows once the current
+  // step's idle window passes with no movement at all.
   var idleTimer = null;
   function armIdleTimer() {
     clearTimeout(idleTimer);
-    idleTimer = setTimeout(function () { showTip(lastMouseX, lastMouseY); }, 5000);
+    var delay = IDLE_STEPS_MS[Math.min(idleStepIndex, IDLE_STEPS_MS.length - 1)];
+    idleTimer = setTimeout(function () {
+      showTip(lastMouseX, lastMouseY);
+      idleStepIndex++; // next re-arm (after the user moves again) waits longer
+    }, delay);
   }
+  // A plain click (mousedown+mouseup with no drag) can still dispatch a
+  // 'mousemove' in some browsers, and even when it doesn't, a real human
+  // hand isn't perfectly still between mousedown and mouseup--a few px
+  // of natural tremor is common. Neither should count as "the user moved
+  // the mouse" and reset the idle clock; only a genuine drag should.
+  // Tracked for any button (left or right--a right-click's contextmenu
+  // is preceded by the same mousedown) via a wider movement threshold
+  // while a button is held, rather than ignoring click-adjacent movement
+  // outright, so real dragging still works as before. The timeout is a
+  // safety net in case mouseup never fires for some OS/browser
+  // combination (e.g. a context menu swallowing it).
+  var mouseButtonDown = false;
+  var mouseButtonDownResetTimer = null;
+  function setMouseButtonDown(down) {
+    mouseButtonDown = down;
+    clearTimeout(mouseButtonDownResetTimer);
+    if (down) mouseButtonDownResetTimer = setTimeout(function () { mouseButtonDown = false; }, 500);
+  }
+  window.addEventListener('mousedown', function () { setMouseButtonDown(true); });
+  window.addEventListener('mouseup', function () { setMouseButtonDown(false); });
   window.addEventListener('mousemove', function (e) {
-    // A plain click (mousedown+mouseup with no drag) still dispatches a
-    // 'mousemove' in some browsers even at zero/near-zero delta--without
-    // this check, repeatedly clicking in place (e.g. dotting with
-    // graffiti rather than dragging) kept re-arming this timer forever,
-    // so the hint never got a real 5s idle window to fire in.
     var dx = e.clientX - lastMouseX, dy = e.clientY - lastMouseY;
     lastMouseX = e.clientX;
     lastMouseY = e.clientY;
-    if (Math.abs(dx) < 2 && Math.abs(dy) < 2) return;
+    var threshold = mouseButtonDown ? 10 : 2;
+    if (Math.abs(dx) < threshold && Math.abs(dy) < threshold) return;
     hideTip();
     armIdleTimer();
   });
