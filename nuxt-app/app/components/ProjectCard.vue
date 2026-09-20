@@ -115,16 +115,22 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
    to settle back), and the :hover rule's own transition governs
    entering it (1200ms, a longer, more deliberate approach). */
 .inhouse-card__cover-img {
-  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1), filter 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1), opacity 900ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Suppressed while a graffiti stroke is live (body.graffiti-mode, see
    isGraffitiDrawing() above)--drawing over the grid shouldn't also zoom
-   and darken whatever card happens to be under the cursor. */
+   and lighten whatever card happens to be under the cursor. Lightens
+   rather than darkens (per the user's own correction away from the
+   earlier brightness(0.8) darken): the image itself fades 20% toward
+   transparent, revealing .inhouse-card__cover's own light gray (#d9d9d9)
+   backdrop underneath--an opacity fade reads as the photo washing out
+   toward that lighter surface, not a brightness filter pushed the other
+   way (which would just blow out highlights instead). */
 body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__cover-img {
   transform: scale(1.02);
-  filter: brightness(0.8);
-  transition: transform 1400ms cubic-bezier(0.16, 1, 0.3, 1), filter 1400ms cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.8;
+  transition: transform 1400ms cubic-bezier(0.16, 1, 0.3, 1), opacity 1400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Subtle film-grain texture that fades in alongside the darken/scale

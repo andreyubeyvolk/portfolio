@@ -175,7 +175,7 @@ useHead({
       </article>
 
       <button v-if="hasMore" class="load-more-btn" type="button" @click="loadMore">Load more</button>
-      <button v-else class="load-more-btn" type="button" @click="scrollGridTo(0)">To top</button>
+      <button v-else class="load-more-btn" type="button" @click="scrollGridTo(0)">To top ↑</button>
     </ScrollPane>
 
     <ArchivePreview :items="allItems" :open-index="openIndex" @update:open-index="openIndex = $event" />
