@@ -25,15 +25,6 @@ const props = defineProps<{
 const cardRef = useTemplateRef('cardRef')
 const activeIndex = ref<number | null>(null)
 
-// Shared with app/plugins/page-transition.client.ts--set right before a
-// project-cover morph navigation (open or close) and cleared otherwise, so
-// this card only carries a view-transition-name during the ONE navigation
-// it's actually meant to morph for. A plain unconditional "slug==='igaming'"
-// check would leak the name into every OTHER transition that happens to
-// render this card too (e.g. the curtain between sections), creating a
-// second, unclipped animated layer floating on top of the curtain.
-const morphTarget = useState<string | null>('morphTargetSlug', () => null)
-
 function cardEl(): HTMLElement | null {
   // NuxtLink is a component, not a plain element--its template ref is
   // the component instance, and $el is the underlying <a> it renders.
@@ -97,7 +88,6 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
         height="1440"
         :src="`/assets/${section}/${slug}/${slug}-card.webp`"
         :alt="title"
-        :style="slug === morphTarget ? { viewTransitionName: `project-cover-${slug}` } : undefined"
       />
       <img
         v-if="cardPreview?.length"
@@ -116,14 +106,16 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
 
 <style scoped>
 .inhouse-card__cover-img {
-  transition: transform 320ms ease, filter 320ms ease;
+  /* Long, deliberately slow settle (2s)--reads as a soft, delayed drift
+     into the zoomed-in state rather than a snappy hover response. */
+  transition: transform 2000ms ease, filter 2000ms ease;
 }
 
 /* Suppressed while a graffiti stroke is live (body.graffiti-mode, see
    isGraffitiDrawing() above)--drawing over the grid shouldn't also zoom
    and darken whatever card happens to be under the cursor. */
 body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__cover-img {
-  transform: scale(1.1);
+  transform: scale(1.04);
   filter: brightness(0.9);
 }
 
