@@ -111,30 +111,27 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
    (cubic-bezier(0.16,1,0.3,1), a common "ease-out-expo" curve) reads
    very differently depending on direction, so enter/exit each need
    their OWN duration set on the state they transition INTO--the base
-   (non-hover) rule's transition governs leaving :hover (800ms, quicker
+   (non-hover) rule's transition governs leaving :hover (900ms, quicker
    to settle back), and the :hover rule's own transition governs
-   entering it (1200ms, a longer, more deliberate approach). */
+   entering it (1400ms, a longer, more deliberate approach). No scale
+   anymore (removed per the user's own request)--darken only, via
+   brightness, back from a brief detour through an opacity-based
+   lighten (0.8) that the user also reverted; brightness(0.9) is the
+   settled value. */
 .inhouse-card__cover-img {
-  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1), opacity 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: filter 900ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Suppressed while a graffiti stroke is live (body.graffiti-mode, see
-   isGraffitiDrawing() above)--drawing over the grid shouldn't also zoom
-   and lighten whatever card happens to be under the cursor. Lightens
-   rather than darkens (per the user's own correction away from the
-   earlier brightness(0.8) darken): the image itself fades 20% toward
-   transparent, revealing .inhouse-card__cover's own light gray (#d9d9d9)
-   backdrop underneath--an opacity fade reads as the photo washing out
-   toward that lighter surface, not a brightness filter pushed the other
-   way (which would just blow out highlights instead). */
+   isGraffitiDrawing() above)--drawing over the grid shouldn't also darken
+   whatever card happens to be under the cursor. */
 body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__cover-img {
-  transform: scale(1.02);
-  opacity: 0.8;
-  transition: transform 1400ms cubic-bezier(0.16, 1, 0.3, 1), opacity 1400ms cubic-bezier(0.16, 1, 0.3, 1);
+  filter: brightness(0.9);
+  transition: filter 1400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Subtle film-grain texture that fades in alongside the darken/scale
-   above--a flat feTurbulence noise field (no external asset, generated
+/* Subtle film-grain texture that fades in alongside the darken above--a
+   flat feTurbulence noise field (no external asset, generated
    inline as a data URI) blended over the cover via mix-blend-mode, not
    a separate visible layer. Same asymmetric-easing/duration split as
    the cover image itself, so both settle together in each direction. */
@@ -165,7 +162,7 @@ body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__noise {
   object-fit: cover;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 220ms ease;
+  transition: opacity 320ms ease;
 }
 
 .inhouse-card__hover-preview.is-visible {
