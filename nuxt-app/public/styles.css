@@ -1,0 +1,1317 @@
+:root {
+  --page-margin: 16px;
+  --grid-gap: 16px;
+  --scrollbar-thumb-width: 8px;
+  --scrollbar-track-padding: 4px;
+  --scrollbar-gutter: calc(var(--scrollbar-thumb-width) + var(--scrollbar-track-padding) * 2);
+  --link-underline-thickness: 1px;
+  --text: #111;
+  --muted: #f2f2f2;
+  --line: #d8d8d8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Applied by video-player.js on a video load error (bad connection, dropped
+   request)—hides that gallery slot entirely rather than leaving a broken
+   player visible. !important since it needs to win over whatever box-model
+   rules the slot's own class (.pv-cover/.pv-wide/.pv-pair__photo, each
+   redeclared per project page) already has. */
+.media-load-error {
+  display: none !important;
+}
+
+html,
+body {
+  height: 100%;
+  scrollbar-color: #000 #fff;
+  scrollbar-width: thin;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  color: var(--text);
+  background: #F5F4F4;
+  font-family: "Inter", Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  /* Tighter than the site's original 1.25/0 default—line-height went
+     1.25 -> 1.125 -> 1 across a couple of rounds of tightening; letter-
+     spacing settled at -0.5px. Components that need more breathing room
+     for actual multi-line copy (most paragraph-level text) set their
+     own looser line-height locally—this is the baseline for anything
+     that doesn't. */
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+::selection {
+  background: #000;
+  color: #fff;
+}
+
+::-moz-selection {
+  background: #000;
+  color: #fff;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Visually hidden but still in the accessibility tree and readable by
+   search engines/screen readers—used for the page <h1> on templates
+   whose real, visible heading is a styled non-heading element (the
+   design doesn't have room for a second, visible page title). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Site-wide hover feedback for inline text links (bio copy, project
+   Challenge/Solution prose, archive descriptions, the [LINK] reference
+   style, etc.)—same black-bg/white-text treatment already used for nav,
+   close buttons and social links, just generalized to any link inside
+   running text. Scoped to "p a" rather than a bare "a:hover" on purpose:
+   an unscoped rule would also catch every image-wrapping card link
+   (.archive-card, .inhouse-card, ...) across the site's project grids,
+   painting a black box behind photo thumbnails on hover—those already
+   have their own, different hover treatment on a child element instead.
+   (hover:hover) keeps this off touch devices, where hover has no
+   real "point and reveal" meaning and can otherwise stick after a tap. */
+@media (hover: hover) {
+  p a:hover {
+    color: #fff;
+    background-color: #000;
+  }
+}
+
+button {
+  color: inherit;
+  font: inherit;
+}
+
+img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.site-shell {
+  display: grid;
+  grid-template-columns: repeat(24, minmax(0, 1fr));
+  gap: var(--grid-gap);
+  height: 100vh;
+  padding: var(--page-margin);
+}
+
+.page-grid {
+  display: grid;
+}
+
+.site-nav {
+  grid-column: 1 / 5;
+  min-width: 0;
+}
+
+.brand {
+  display: block;
+  width: 120px;
+  max-width: min(100%, 120px);
+  margin-bottom: 18px;
+  font-weight: 800;
+  transition: opacity 180ms ease;
+}
+
+.brand:hover {
+  opacity: 0.7;
+}
+
+.brand-mark {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transform: translateY(4px);
+}
+
+.bottom-copy a,
+.project-footer a,
+.project-footer .copy-mail-link,
+.copy-mail-link {
+  display: inline-block;
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-decoration: none;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.bottom-copy a:hover,
+.project-footer a:hover,
+.project-footer .copy-mail-link:hover,
+.copy-mail-link:hover {
+  color: #fff;
+  background-color: #000;
+}
+
+.nav-list a {
+  display: block;
+  width: 100%;
+  padding: 0;
+  color: inherit;
+  line-height: 1.2;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.nav-list a:hover {
+  color: #fff;
+  background-color: #000;
+}
+
+.nav-list a.is-active {
+  font-style: italic;
+}
+
+.nav-list a.is-active:hover {
+  color: inherit;
+  background-color: transparent;
+}
+
+.section-intro {
+  grid-column: 5 / 9;
+  min-width: 0;
+  padding-right: 2px;
+}
+
+.section-intro p {
+  max-width: 100%;
+  margin: 0 0 8px;
+  line-height: 1.2;
+}
+
+.intro-media {
+  display: none;
+  margin: 0;
+  background: var(--muted);
+}
+
+.intro-media--one {
+  display: block;
+  width: calc((100% - var(--grid-gap) * 3) / 4);
+}
+
+.intro-media--two {
+  display: block;
+  width: calc((100% - var(--grid-gap) * 3) / 2 + var(--grid-gap));
+}
+
+.intro-media--three {
+  display: block;
+  width: calc((100% - var(--grid-gap) * 3) * 0.75 + var(--grid-gap) * 2);
+}
+
+.intro-media--four {
+  display: block;
+  width: 100%;
+}
+
+.home-intro p {
+  margin-bottom: 8px;
+}
+
+.home-portrait {
+  width: 44px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  margin: 0;
+  background: var(--muted);
+}
+
+.home-portrait img {
+  height: 100%;
+  object-fit: cover;
+}
+
+.content-pane {
+  position: relative;
+  grid-column: 9 / 25;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  height: calc(100vh - var(--page-margin) * 2);
+  margin-right: calc(var(--page-margin) * -1);
+}
+
+.home-pane {
+  display: block;
+  margin-right: 0;
+}
+
+.content-pane__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: 18px;
+  padding: 0 var(--scrollbar-gutter) 0 0;
+}
+
+.project-header h1 {
+  margin: 0;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  /* Explicit 1.2 (the site's own standard for real copy, see body's own
+     line-height:1 comment)--this used to just inherit body's tight 1,
+     which put it a few px out of line with section-intro's 1.2 paragraph
+     beside it. */
+  line-height: 1.2;
+}
+
+.close-button {
+  display: block;
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  height: 18px;
+  padding: 0 0 0 32px; /* wider hit area to the left */
+  border: 0;
+  background: transparent;
+  text-align: right;
+  cursor: pointer;
+  line-height: 1.125;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Hover only on the visible symbol, not the padding area */
+.close-button span {
+  display: inline-block;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.close-button:hover span {
+  color: #fff;
+  background: #000;
+}
+
+.archive-preview__inner {
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.archive-preview__inner > .project-header,
+.archive-preview__inner > .preview-text {
+  width: 100%;
+  max-width: 100%;
+}
+
+.archive-preview__inner > .media {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.archive-preview__inner > .media img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.archive-preview .content-pane__header {
+  gap: var(--scrollbar-gutter);
+  padding-right: 0;
+}
+
+.project-scroll {
+  min-height: 0;
+}
+
+.content-pane__scroll {
+  padding-right: var(--scrollbar-gutter);
+}
+
+.custom-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+}
+
+.custom-scroll::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background: #fff;
+}
+
+.custom-scroll::-webkit-scrollbar-track,
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.custom-scroll::-webkit-scrollbar-button,
+.custom-scroll::-webkit-scrollbar-button:single-button,
+.custom-scroll::-webkit-scrollbar-button:vertical,
+.custom-scroll::-webkit-scrollbar-button:horizontal,
+.custom-scroll::-webkit-scrollbar-button:start,
+.custom-scroll::-webkit-scrollbar-button:end,
+.custom-scroll::-webkit-scrollbar-button:increment,
+.custom-scroll::-webkit-scrollbar-button:decrement,
+html::-webkit-scrollbar-button,
+html::-webkit-scrollbar-button:single-button,
+html::-webkit-scrollbar-button:vertical,
+html::-webkit-scrollbar-button:horizontal,
+html::-webkit-scrollbar-button:start,
+html::-webkit-scrollbar-button:end,
+html::-webkit-scrollbar-button:increment,
+html::-webkit-scrollbar-button:decrement,
+body::-webkit-scrollbar-button,
+body::-webkit-scrollbar-button:single-button,
+body::-webkit-scrollbar-button:vertical,
+body::-webkit-scrollbar-button:horizontal,
+body::-webkit-scrollbar-button:start,
+body::-webkit-scrollbar-button:end,
+body::-webkit-scrollbar-button:increment,
+body::-webkit-scrollbar-button:decrement {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+  width: 0;
+  height: 0;
+  border: 0;
+  background: transparent;
+}
+
+.custom-scroll::-webkit-scrollbar-corner,
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner {
+  background: #fff;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb,
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 48px;
+  border: var(--scrollbar-track-padding) solid transparent;
+  border-radius: 0;
+  background: #000;
+  background-clip: content-box;
+  box-shadow: none;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover,
+.custom-scroll::-webkit-scrollbar-thumb:active,
+html::-webkit-scrollbar-thumb:hover,
+html::-webkit-scrollbar-thumb:active,
+body::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:active {
+  border-radius: 0;
+  background: #000;
+  background-clip: content-box;
+}
+
+.custom-scrollbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 5;
+  width: var(--scrollbar-gutter);
+  background: #F5F4F4;
+  pointer-events: auto;
+}
+
+.custom-scrollbar[hidden] {
+  display: none;
+}
+
+.custom-scrollbar__thumb {
+  position: absolute;
+  top: 0;
+  left: var(--scrollbar-track-padding);
+  width: var(--scrollbar-thumb-width);
+  min-height: 48px;
+  border-radius: 0;
+  background: #000;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.home-view {
+  display: grid;
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  gap: var(--grid-gap);
+}
+
+.reel-card {
+  position: relative;
+  grid-column: 1 / -1;
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: var(--muted);
+  cursor: pointer;
+}
+
+/* No fixed aspect-ratio/object-fit here on purpose (desktop only--see
+   mobile.css for the phone crop, unchanged): the real reel is still an
+   unknown size (not necessarily this placeholder's 16:9-ish shape), so
+   the box sizes from the media's own intrinsic ratio via its width/
+   height attributes instead of guessing a shape and cropping to fit it. */
+.reel-card__poster {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.reel-card__cta {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.reel-card__icon {
+  width: 21px;
+  height: auto;
+}
+
+.reel-card__text {
+  width: 35px;
+  height: auto;
+}
+
+.home-socials {
+  grid-column: 9 / 17;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-template-rows: repeat(3, auto);
+  gap: 8px var(--grid-gap);
+  margin-top: -10px;
+  font-style: normal;
+}
+
+.home-socials a,
+.home-socials button {
+  display: block;
+  width: 100%;
+  border-top: 2px solid var(--text);
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  padding: 0;
+  margin: 0;
+  background: none;
+  background-image: none;
+  font: inherit;
+  line-height: 1.2;
+  color: inherit;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.home-socials a:hover,
+.home-socials button:hover {
+  color: #fff;
+  background-color: #000;
+}
+
+/* Mail (1st) and YouTube (4th) — first row, no top border */
+.home-socials :nth-child(1),
+.home-socials :nth-child(4) {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+/* "See all projects": sits in the empty column to the left of the socials,
+   same row, flush with the borderless top row (Mail / YouTube). */
+.home-projects-link {
+  grid-column: 1 / 9;
+  align-self: start;
+  display: block;
+  width: 100%;
+  margin-top: -10px;
+  color: inherit;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.home-projects-link:hover {
+  color: #fff;
+  background-color: #000;
+}
+
+/* "See all projects", Mail and YouTube sit directly under the reel-card
+   player—16px grid-gap partially closed by their own -10px margin-top,
+   leaving a 6px residual gap. On hover, bleed the black background up
+   through that residual so the highlight reads flush with the player's
+   bottom edge instead of stopping short of it. A ::before, not a bigger
+   margin/padding, so the link's own box and text position never move.
+   Mail/YouTube only keep this on the desktop grid: below 980px the layout
+   goes to block flow and "See all projects" (which keeps its bleed at
+   every width) lands between them and the player, so they're no longer
+   the row actually touching it. */
+.home-projects-link,
+.home-socials :nth-child(1),
+.home-socials :nth-child(4) {
+  position: relative;
+}
+.home-projects-link::before,
+.home-socials :nth-child(1)::before,
+.home-socials :nth-child(4)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 6px;
+  pointer-events: none;
+  /* Same timing as the element's own background-color transition below—
+     without this the bleed strip (no transition = instant) and the main
+     hover fade (150ms) visibly fell out of sync, reading as two separate
+     hover states landing a beat apart instead of one flush highlight. */
+  transition: background-color 150ms ease;
+}
+.home-projects-link:hover::before,
+.home-socials :nth-child(1):hover::before,
+.home-socials :nth-child(4):hover::before {
+  background: #000;
+}
+
+@media (max-width: 980px) {
+  .home-socials :nth-child(1)::before,
+  .home-socials :nth-child(4)::before {
+    display: none;
+  }
+}
+
+.inhouse-page {
+  background: #F5F4F4;
+}
+
+.inhouse-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px var(--grid-gap);
+  padding-bottom: 58px;
+}
+
+.inhouse-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.inhouse-card__cover {
+  position: relative; /* anchors the hover-preview overlay (ProjectCard.vue)--
+    harmless with no such child present, same as every other project's card */
+  overflow: hidden;
+  background: #d9d9d9;
+  aspect-ratio: 3 / 4;
+}
+
+.inhouse-card__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.inhouse-title {
+  order: -1;
+  display: block;
+  font-size: 1rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.inhouse-card:hover .inhouse-title {
+  color: #fff;
+  background-color: #000;
+}
+
+/* Cards without a built target (href dropped, set by main.js) aren't links —
+   don't present the interactive hover affordance. Compound selector (not
+   just source order) so this keeps winning over .inhouse-card:hover above
+   regardless of how the rules ever get reordered—same fix already applied
+   to .archive-card.archive-card--more for the identical reason. */
+.inhouse-card.inhouse-card--pending:hover .inhouse-title {
+  color: inherit;
+  background-color: transparent;
+}
+
+.load-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 30px; /* 48px, 20% shorter, then another 8px off — desktop/
+    tablet only, mobile.css sets its own height for the phone breakpoint */
+  margin-top: 40px;
+  background: #fff;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+  color: #171717;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+@media (hover: hover) {
+  .load-more-btn:hover {
+    background: #000;
+    color: #fff;
+  }
+}
+
+.brands-page {
+  background: #F5F4F4;
+}
+
+.archive-page {
+  background: #F5F4F4;
+}
+
+.all-projects-page {
+  background: #F5F4F4;
+}
+
+.archive-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 40px;
+  padding-bottom: 58px;
+}
+
+/* All Projects: same card component as Inhouse/Brands (.inhouse-card),
+   laid out on Archive's 4-column grid for a bigger, gallery-like scroll. */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 40px;
+  padding-bottom: 58px;
+}
+
+.archive-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  opacity: 1;
+  transition: opacity 0.7s ease-out;
+}
+
+.archive-card.archive-card--more {
+  display: none; /* compound selector, not source order, since it ties
+    on specificity with .archive-card's own display:flex above */
+}
+
+.archive-card.archive-card--revealing {
+  opacity: 0; /* starting state for a just-unhidden Load more batch—see
+    load-more.js, which flips this off a couple frames later so the
+    opacity:1 above actually has something to transition from */
+}
+
+.archive-card__cover {
+  overflow: hidden;
+  background: #d9d9d9;
+}
+
+.archive-card__cover img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.archive-title {
+  order: -1;
+  display: block;
+  font-size: 1rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.archive-card:hover .archive-title {
+  color: #fff;
+  background-color: #000;
+}
+
+/* Small gray superscript badge—used for the "[0001]"-style numbering tail
+   on archive titles, and reused as-is for an inline "[LINK]" reference in
+   a description (see renderTitleInto/renderDescriptionInto in
+   archive/index.html). #9F9F9F is the site's existing muted/caption gray
+   (already used by .preview-tags), not a new color. */
+.archive-num {
+  color: #9f9f9f;
+  font-size: 0.7em;
+  vertical-align: super;
+  text-decoration: none;
+}
+
+/* ─── One-shot video (vp-once): silent, autoplay once in view, plays a
+   single pass (no loop). On end, a centered replay button appears;
+   clicking it restarts from the beginning. New, additive component—
+   does not touch the existing .vp / .vp-bare players used on project
+   pages. Standalone it flows at natural height, like .vp-bare; nested
+   in a fixed-box slot (.archive-card__cover, .pv-pair__photo) it fills
+   the box via object-fit:cover instead. */
+.vp-once {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+}
+.vp-once__video {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+.archive-card__cover .vp-once,
+.pv-pair__photo .vp-once {
+  position: absolute;
+  inset: 0;
+}
+.archive-card__cover .vp-once .vp-once__video,
+.pv-pair__photo .vp-once .vp-once__video {
+  position: absolute;
+  inset: -1px; /* 1px overscan clipped by overflow:hidden, kills any
+    sub-pixel hairline gap without visibly cropping content */
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  object-fit: cover;
+}
+
+.vp-once__replay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.vp-once__replay svg {
+  width: 18px;
+  height: 22px;
+  display: block;
+  margin-left: 2px; /* optical centering—the triangle's visual weight leans left */
+}
+.vp-once.is-ended .vp-once__replay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.copy-mail-link {
+  justify-self: start;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+/* Перебиваем display: block от .home-socials button */
+.home-socials .copy-mail-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.copy-label {
+  display: none;
+}
+
+.is-copied .copy-label {
+  display: inline;
+}
+
+.project-view {
+  display: grid;
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  gap: var(--grid-gap);
+  padding-bottom: 58px;
+}
+
+.media {
+  margin: 0;
+  min-width: 0;
+  background: var(--muted);
+}
+
+.media img {
+  height: 100%;
+  object-fit: cover;
+}
+
+.media--wide {
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 8.35;
+}
+
+.media--hero {
+  aspect-ratio: 1400 / 779;
+}
+
+.media--tape {
+  aspect-ratio: 1866 / 954;
+}
+
+.split-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  gap: var(--grid-gap);
+}
+
+.split-row .media {
+  grid-column: 1 / 9;
+}
+
+.copy {
+  grid-column: 9 / 17;
+  max-width: 560px;
+}
+
+.copy p,
+.bottom-copy p {
+  margin: 0 0 16px;
+}
+
+.image-grid {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--grid-gap);
+}
+
+.image-grid .media {
+  aspect-ratio: 1 / 1.38;
+}
+
+.bottom-copy {
+  grid-column: 9 / 17;
+  max-width: 560px;
+}
+
+.bottom-copy a {
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.project-footer {
+  grid-column: 9 / 17;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--grid-gap);
+  margin-top: 42px;
+}
+
+.project-footer p {
+  margin: 0;
+}
+
+.social-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-style: normal;
+}
+
+@media (max-width: 980px) {
+  body {
+    overflow-y: auto;
+  }
+
+  .site-shell {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* Sticky horizontal header */
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+    align-items: end;
+    height: 32px;
+    padding: 0 var(--page-margin);
+    background: #F5F4F4; /* home page */
+  }
+
+  /* Inhouse/Archive/Brands/About pages have darker bg */
+  .inhouse-page .site-nav,
+  .brands-page .site-nav,
+  .archive-page .site-nav {
+    background: #F5F4F4;
+  }
+
+  .brand {
+    grid-column: 1 / 3;
+    margin-bottom: 0;
+  }
+
+  .nav-list {
+    grid-column: 3 / 5;
+    flex-direction: row;
+    justify-content: space-between;
+    transform: none;
+  }
+
+  .nav-list a {
+    width: auto;
+  }
+
+  /* Section text flows with content, aligned to col 3 */
+  .section-intro {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+    padding: 24px var(--page-margin) 80px;
+  }
+
+  .section-intro p {
+    grid-column: 3 / 5;
+    grid-row: 1;
+    margin: 0;
+  }
+
+  .home-portrait {
+    grid-column: 3 / 4;
+    grid-row: 2;
+    margin-top: 8px;
+    margin-bottom: 0;
+  }
+
+  /* Content pane: no fixed height, flows with page */
+  .content-pane {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 0 var(--page-margin) 58px;
+    margin: 0;
+    overflow: visible;
+  }
+
+  .content-pane__scroll {
+    overflow: visible;
+    padding-right: 0;
+    scrollbar-gutter: auto;
+  }
+
+  .content-pane__header {
+    padding-right: 0;
+  }
+
+  .custom-scrollbar {
+    display: none;
+  }
+
+  .home-pane {
+    height: auto;
+    min-height: 0;
+  }
+
+  .inhouse-title {
+    font-size: 1rem;
+  }
+
+  /* ── Archive card overlay (tablet) ── */
+
+  /* Transparent full-screen backdrop (click-to-close). The visible panel is
+     .card-panel — sized and positioned by JS, pinned right: 16px top: 16px. */
+  .card-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: transparent;
+  }
+
+  .card-overlay[hidden] {
+    display: none;
+  }
+
+  /* Visible white panel — right-aligned, width set by JS */
+  .card-panel {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .card-panel__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .card-panel__title {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-panel__close {
+    padding: 0;
+    margin: 0;
+    background: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* Image-wrap: shrinks to image size (no stretch) */
+  .card-panel__image-wrap {
+    flex-shrink: 0;
+    overflow: hidden;
+    margin-top: -4px;
+    line-height: 0;
+  }
+
+  /* Width + height set by JS */
+  .card-panel__image {
+    display: block;
+  }
+
+  .card-panel__tags {
+    flex-shrink: 0;
+    display: block;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: #9f9f9f;
+    background: #fff;
+    width: 100%;
+    margin-top: -4px;
+  }
+
+  .card-panel__tags[hidden] {
+    display: none;
+  }
+
+  .card-panel__desc {
+    flex-shrink: 0;
+  }
+
+  .card-panel__desc-text {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+    color: #171717;
+    margin: 0;
+  }
+
+  body.card-is-open {
+    overflow: hidden;
+  }
+
+  /* Opacity fade + grain on top (see archive/index.html)—no blur. The card
+     overlay itself lives outside .site-shell in the DOM, so this never
+     touches it. Base transition is unconditional (see archive/index.html
+     for why: a transition declared only inside the dimmed-state rule never
+     gets to animate the close, since the element stops matching that rule
+     the instant the class is removed). Faster close than open: "fast but
+     smooth". */
+  .site-shell {
+    transition: opacity 0.18s ease;
+  }
+  body.card-is-open .site-shell {
+    opacity: 0.08;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  /* ── Project page (tablet) ── */
+
+  /* No section description — project starts immediately */
+  .project-page .section-intro {
+    display: none;
+  }
+
+  /* Sticky project title + [X] bar — sits just below the 32px nav, 16px breathing room */
+  .project-page .content-pane__header {
+    position: sticky;
+    top: 32px;
+    padding-top: 16px;
+    background: #F5F4F4;
+    z-index: 9;
+  }
+
+  /* Challenge + Solution: full content width (not right-half only) */
+  .project-page .pv-info {
+    width: 100%;
+    margin-left: 0;
+    margin-top: -8px;
+  }
+
+  /* Download + Next: full content width, each 50% */
+  .project-page .pv-actions {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    overflow: auto;
+  }
+
+  .site-shell {
+    display: block;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .site-nav,
+  .section-intro,
+  .content-pane {
+    width: 100%;
+  }
+
+  .site-nav {
+    margin-bottom: 28px;
+  }
+
+  .section-intro {
+    margin-bottom: 28px;
+  }
+
+  .intro-media--two,
+  .intro-media--three {
+    width: 100%;
+  }
+
+  .project-view,
+  .split-row,
+  .home-view {
+    display: block;
+  }
+
+  .project-scroll {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .custom-scrollbar {
+    display: none;
+  }
+
+  .reel-card {
+    margin-bottom: var(--grid-gap);
+  }
+
+  .inhouse-title {
+    font-size: 1rem;
+  }
+
+  .home-socials {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, auto);
+    margin-top: 0;
+  }
+
+  .media,
+  .split-row .media,
+  .copy,
+  .bottom-copy,
+  .project-footer {
+    width: 100%;
+    max-width: none;
+  }
+
+  .media,
+  .copy,
+  .bottom-copy {
+    margin-bottom: var(--grid-gap);
+  }
+
+  .project-footer {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 32px;
+  }
+}

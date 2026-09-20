@@ -1,0 +1,196 @@
+/* ── Spray-can graffiti + logo hover-scrub, shared across the Brands
+   section (desktop only, min-width:981px—see graffiti.js/logo-scrub.js
+   for the full writeup and the gating logic itself). Originally a
+   nimax-only prototype; rolled out to every Brands page (including the
+   Brands listing) once it was dialed in. Link this from any page that
+   also includes logo-scrub.js and/or graffiti.js. */
+
+/* Cursor-following tooltip—used by the Solution icon's "To top" tooltip
+   (built per-project-page, see that page's own inline script) and by
+   logo-scrub.js's "Ctrl+click to tag!" hint. Matches the site's own
+   text-selection look: black rectangle, white text (see ::selection in
+   styles.css). Lives on <body> (position:fixed) so nothing clips it. */
+.pv-icon-tip {
+  position: fixed;
+  z-index: 200;
+  background: #000;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+  padding: 0px 2px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.pv-icon-tip.is-visible {
+  opacity: 1;
+}
+
+/* ── Spray-can graffiti (desktop only). Canvas overlay sits above the
+   whole page; cursor swaps to the spray-can icon while Ctrl is held. */
+#graffiti-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  transition: opacity 0.24s ease;
+}
+/* The real pane paint lives on an off-screen canvas the full height of
+   the gallery (see graffiti.js)—never inserted into the page, so it
+   costs nothing to composite. These two are the only pane-related
+   canvases actually on screen: viewport-sized (not gallery-height),
+   fixed over the visible scroll window, and repainted with just the
+   currently-visible slice of the off-screen store on every frame and
+   every scroll (see blitPane in JS). That's what keeps a gallery with a
+   12000px-tall canvas from costing any more per frame than the
+   sidebar's own small one. */
+#graffiti-pane-view {
+  position: fixed;
+  pointer-events: none;
+  transition: opacity 0.24s ease;
+  z-index: 50;
+}
+
+/* Same idea as #graffiti-pane-view, for the Archive lightbox's series
+   filmstrip (see graffiti.js's filmstripCanvas/filmstripView)--sized
+   and positioned via JS to match .archive-preview__filmstrip's own
+   rect, re-blitted from an off-screen store on every horizontal
+   scroll instead of the pane's vertical one. */
+#graffiti-filmstrip-view {
+  position: fixed;
+  pointer-events: none;
+  transition: opacity 0.24s ease;
+  z-index: 50;
+}
+
+/* Same idea again, for touch strokes on mobile (see graffiti.js's
+   mobilePaneCanvas/mobilePaneView)--covers the full viewport width/
+   height, re-blitted on every window.scrollY change instead of a
+   specific element's scrollTop. */
+#graffiti-mobile-pane-view {
+  position: fixed;
+  pointer-events: none;
+  transition: opacity 0.24s ease;
+  z-index: 50;
+}
+.graffiti-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 46px;
+  height: 46px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  will-change: transform;
+}
+.graffiti-cursor.is-active {
+  opacity: 1;
+}
+/* Position (translate, every frame, no transition) lives on
+   .graffiti-cursor itself; the lean lives on this inner wrapper
+   instead, with its own transition—so the tilt eases in/out smoothly
+   without that easing also dragging at the tracked position. Pivots
+   near the nozzle so the tip stays put while the body leans back, like
+   tilting a can in your hand. */
+.graffiti-cursor__tilt {
+  width: 100%;
+  height: 100%;
+  transform-origin: 10% 15%;
+  transition: transform 0.15s ease;
+}
+.graffiti-cursor svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+body.graffiti-mode,
+body.graffiti-mode * {
+  cursor: none !important;
+}
+/* While actively tagging, card hovers (project listing/archive grids)
+   shouldn't visually react to the cursor passing over them mid-stroke—
+   distracting, and the cards sit right where a lot of tagging happens.
+   Higher specificity than the plain :hover rules below (an extra
+   body.graffiti-mode ancestor class) rather than touching pointer-
+   events: clicking/dragging through a card should still work exactly
+   the same, only its own hover-triggered look is suppressed. */
+body.graffiti-mode .inhouse-card:hover .inhouse-title,
+body.graffiti-mode .archive-card:hover .archive-title {
+  color: inherit;
+  background-color: transparent;
+}
+
+/* ── Logo hover-scrub—hovering the brand mark swaps in one of 7
+   brush-stroke renderings of the same wordmark, advancing to the next
+   one each time the cursor re-enters (not tracking cursor position
+   within the mark). Click still goes home as normal (the <a> itself is
+   untouched). See logo-scrub.js. */
+#brand-scrub {
+  position: relative;
+  /* The site-wide .brand fixes a 120px box sized for the flat logo.svg
+     image. The text mark below sizes itself to its own content instead
+     (the scrub images stack on top of it via position:absolute, so
+     they don't add to that width)—auto/none here let it do that rather
+     than clipping or wrapping the wordmark. A plain block element's
+     width:auto fills its containing block (the whole nav column)
+     rather than shrinking to its content—fit-content is what actually
+     shrink-wraps it to the text's own rendered length, which is also
+     what the hover-scrub math needs: it maps cursor X against this
+     element's own width to pick a brush zone, so the zones must span
+     just the letters, not the empty column space after them. */
+  width: fit-content;
+  max-width: 100%;
+}
+/* Base mark, text version (Brands only)—same type as the nav links
+   below it. Deliberately doesn't redeclare font-family/size/letter-
+   spacing: .nav-list a doesn't either, both just inherit straight from
+   body, and a couple of project pages tweak body's own letter-spacing
+   for that page—inheriting keeps this matching whichever value that
+   page uses instead of locking in one page's numbers. Only overrides
+   .brand's own font-weight:800 (sized for the old bold image-derived
+   look, not real text) back down to the nav's 700, plus the layout
+   bits real text needs that an <img> didn't. Swaps to one of the 7
+   brush strokes below on hover, exactly like the old flat-logo image
+   did. */
+#brand-scrub .brand-mark--text {
+  display: block;
+  width: auto;
+  white-space: nowrap;
+  font-weight: 700;
+}
+/* The site-wide .brand:hover rule dims the whole mark to 0.7 opacity—
+   fine for a static logo, but it washed out every brush variant while
+   scrubbing through them. This ID selector outranks that class rule, so
+   whichever mark is showing here stays solid black the whole time the
+   cursor is over it. */
+#brand-scrub:hover {
+  opacity: 1;
+}
+#brand-scrub .brand-mark--brush {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+}
+#brand-scrub.is-scrubbing .brand-mark:not(.brand-mark--brush) {
+  opacity: 0;
+}
+#brand-scrub .brand-mark--brush.is-active {
+  opacity: 1;
+}
+/* Every swap eases now (text->lettering on hover-enter, lettering->text
+   on hover-leave)—logo-scrub.js adds this class once at setup and never
+   removes it, since a single hover only ever shows one lettering
+   (nothing to scrub between while the cursor stays over it). */
+#brand-scrub.is-transitioning .brand-mark--brush,
+#brand-scrub.is-transitioning .brand-mark:not(.brand-mark--brush) {
+  transition: opacity 0.18s ease;
+}

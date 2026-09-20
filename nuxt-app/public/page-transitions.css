@@ -1,0 +1,93 @@
+/* ── Same-document View Transitions for client-side route changes ──
+   Nuxt's `experimental.viewTransition` wraps every route change in
+   document.startViewTransition() when the browser supports it (no-op,
+   plain instant nav otherwise). Which EFFECT plays is chosen per
+   navigation by plugins/page-transition.client.ts, which sets
+   documentElement.dataset.transition to one of the values below in a
+   router.beforeEach guard--BEFORE the old-page snapshot is taken, so by
+   the time both snapshots exist and these rules are evaluated, the
+   attribute already reflects this navigation's classification.
+
+   Three effects (desktop only--see page-transition.client.ts, mobile
+   always classifies as 'none', the plain browser default cross-fade):
+   - 'curtain': ported from the static site's Cross-Document
+     view-transitions.css prototype (white wipe, top-to-bottom then
+     bottom-to-top, with a brightness dip)--used for section<->section
+     nav (Inhouse/Brands/Archive/About/Home).
+   - 'project-open-panel'/'project-close-panel': entering/leaving ANY
+     project. Both the listing's .content-pane and the project page's
+     .content-pane carry the same 'content-pane' view-transition-name
+     for this one navigation (see usePanelTransitionStyle.ts), so the
+     browser pairs them into one group--same box in both states, so the
+     curtain keyframes below just wipe within it instead of resizing
+     anything. (An earlier version morphed iGaming's cover photo
+     specifically via its own per-element name instead--removed per the
+     user's own follow-up: "убери морфинг переход... шторкой переход на
+     проект", the resize-then-reposition of a differently-sized/-cropped
+     cover read as a jump, not a clean effect.)
+
+   The content-pane name is bound CONDITIONALLY (only during the one
+   navigation it applies to, via shared useState read/write by
+   plugins/page-transition.client.ts)--an always-on name would leak into
+   every OTHER transition that happens to render the same element (e.g.
+   during a section curtain), creating a second, unclipped animated
+   layer floating on top of whatever else is happening. */
+
+html[data-transition='curtain']::view-transition-group(root) {
+  background: #fff;
+  animation-duration: 1s;
+}
+
+html[data-transition='curtain']::view-transition-old(root) {
+  z-index: 2;
+  mix-blend-mode: normal;
+  animation: vt-curtain-cover 1s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+html[data-transition='curtain']::view-transition-new(root) {
+  z-index: 1;
+  mix-blend-mode: normal;
+  animation: vt-curtain-reveal 1s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@keyframes vt-curtain-cover {
+  0%   { clip-path: inset(0 0 0 0); filter: brightness(1); }
+  50%  { clip-path: inset(100% 0 0 0); filter: brightness(0.85); }
+  100% { clip-path: inset(100% 0 0 0); filter: brightness(0.85); }
+}
+
+@keyframes vt-curtain-reveal {
+  0%   { clip-path: inset(100% 0 0 0); filter: brightness(0.85); }
+  50%  { clip-path: inset(100% 0 0 0); filter: brightness(0.85); }
+  100% { clip-path: inset(0 0 0 0); filter: brightness(1); }
+}
+
+/* Content-pane curtain for entering/leaving any project. Same wipe
+   keyframes as the root curtain, just a shorter box (the .content-pane
+   itself, not the full page). Slowed several times per the user's own
+   feedback ("чуть плавнее, медленнее"), 0.6s -> 0.85s -> 0.9s -> 1s. */
+html[data-transition='project-open-panel']::view-transition-group(content-pane),
+html[data-transition='project-close-panel']::view-transition-group(content-pane) {
+  animation-duration: 1s;
+}
+html[data-transition='project-open-panel']::view-transition-old(content-pane),
+html[data-transition='project-close-panel']::view-transition-old(content-pane) {
+  z-index: 2;
+  mix-blend-mode: normal;
+  animation: vt-curtain-cover 1s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+html[data-transition='project-open-panel']::view-transition-new(content-pane),
+html[data-transition='project-close-panel']::view-transition-new(content-pane) {
+  z-index: 1;
+  mix-blend-mode: normal;
+  animation: vt-curtain-reveal 1s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+/* Archive lightbox open/close used to be driven by a manual
+   document.startViewTransition() call, styled here via
+   ::view-transition-old/new(archive-lightbox)--replaced with a plain
+   clip-path transition directly on .archive-preview (archive-page.css)
+   after the View Transition's snapshot timing didn't reliably wait for
+   Archive's own async sizing (syncPreviewSize/openFilmstrip), revealing
+   content before it was correctly sized/positioned. See
+   ArchivePreview.vue's own comment for the full reasoning. */

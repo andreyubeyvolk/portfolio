@@ -1,0 +1,543 @@
+/* Non-series cards render as a real <button> (Stage 2's lightbox needs a
+   focusable, keyboard-activatable element--Enter/Space open it, matching
+   .pv-icon and every other interactive control on the site). Series cards
+   stay a plain <div> until Stage 3 wires up the filmstrip. Reset the
+   browser's own button chrome so it's visually identical to a div here. */
+button.archive-card {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* ── Preview overlay ── */
+      .archive-preview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        /* Above .archive-page-veil's own z-index:11--that veil needed to
+           clear .site-nav's z-index:10 (styles.css, tablet breakpoint),
+           which put it above THIS element's old z-index:10 too, letting
+           the veil visually wash out the card/header/description above
+           it instead of just dimming the page behind it. The card must
+           always win over the veil; the veil only ever needs to beat the
+           page's own normal content. */
+        z-index: 12;
+        /* Mask, not a fade: opening clips this element's own content to a
+           zero-height sliver anchored at the TOP (bottom-inset 100%), then
+           grows it downward as the bottom-inset shrinks--reads as the
+           whole card sliding down out of a slot at the top. Closing plays
+           the exact same property backward (retreating back up into that
+           slot). The page behind it dims in lockstep too, via the
+           separate .archive-page-veil (teleported to page level, see
+           ArchivePreview.vue's own template comment)--same clip-path
+           values/timing, just scoped to cover the whole page (nav sidebar
+           + section intro included) rather than only what fits inside
+           this element's own content-pane-scoped box.
+           Deliberately no transform/translate on the content itself (a
+           translateY was tried and reverted per the user's own
+           correction)--the CARD stays perfectly still the whole time;
+           only this clip window moves. Content sliding under a static
+           mask reads as the card itself flying around; a static card
+           under a moving mask reads as a shutter. */
+        clip-path: inset(0 0 100% 0);
+        transition: clip-path 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+      }
+      .archive-preview.is-open {
+        clip-path: inset(0 0 0 0);
+      }
+
+      .archive-preview[hidden] {
+        display: none;
+      }
+
+      /* Page-level dimming veil (see ArchivePreview.vue's own template
+         comment for why this is teleported out rather than living inside
+         .archive-preview). Same page-background color as body's own
+         #F5F4F4, at the same 92% opacity the grid itself used to fade to
+         under the old body.is-preview-open rule (see that rule's own
+         removal note further down)--the math is identical either way (8%
+         of whatever's underneath still shows through, blended with 92%
+         background). Purely decorative--pointer-events:none, so it never
+         intercepts clicks meant for the page (closing-by-clicking-
+         outside still only works within .archive-preview's own bounds,
+         same as before this veil existed at all). z-index 11 clears
+         .site-nav's own z-index:10 at the tablet breakpoint (styles.css),
+         where .site-nav is position:sticky and would otherwise compete
+         for the same stacking level. */
+      .archive-page-veil {
+        position: fixed;
+        inset: 0;
+        z-index: 11;
+        background: rgba(245, 244, 244, 0.92);
+        pointer-events: none;
+        clip-path: inset(0 0 100% 0);
+        transition: clip-path 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+      }
+      .archive-page-veil.is-open {
+        clip-path: inset(0 0 0 0);
+      }
+
+      .archive-preview__inner {
+        /* position:relative (not just for its own sake--see below) is
+           what actually keeps this above .archive-preview__scrim.
+           Positioned elements always paint above non-positioned ones in
+           the same stacking context regardless of DOM order--the scrim
+           (position:absolute) was winning against this element's default
+           position:static even though it comes LATER in the markup,
+           which is what let it visibly cover the description/tags
+           underneath. .archive-preview__filmstrip never had this problem
+           since it was already position:absolute. */
+        position: relative;
+        width: fit-content;
+        max-width: calc(100% - 16px);
+        max-height: 100%;
+        margin-left: auto;
+        margin-right: 16px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .preview-text {
+        background: #fff;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding: 0;
+        display: block;
+        height: auto;
+        box-sizing: border-box;
+        overflow-wrap: anywhere;
+      }
+
+
+      .preview-text p {
+        margin: 0;
+      }
+
+      .preview-tags {
+        display: block;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        color: #9f9f9f;
+        background: #fff;
+        padding-top: 4px;
+      }
+
+      .preview-tags[hidden] {
+        display: none;
+      }
+
+      .preview-media {
+        position: relative;
+        margin: 0 0 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .preview-media img {
+        width: 100%;
+        height: auto;
+        display: block;
+        opacity: 1;
+        transition: opacity 400ms ease;
+      }
+
+      /* Brief crossfade while stepping between two single-image cards
+         (arrow keys, filmstrip edges, or the preview-nav prev/next
+         buttons--all funnel through the same stepPreview()/isStepping
+         state, so this applies uniformly no matter which one triggered
+         the step)--toggled off once the new image has synced its size
+         (see ArchivePreview.vue's isStepping). Covers the WHOLE card now
+         (photo + title/description/tags plaques), not just the photo:
+         the plaques' width comes from the --preview-width CSS var below,
+         which is only kept in sync while a single-image card is open--
+         stepping in from a filmstrip (which never touches that var)
+         leaves it holding a stale value from whichever single-image card
+         was open longest ago, until syncPreviewSize() recomputes it a
+         tick later. Hiding everything until that recompute finishes is
+         what actually stops that stale width from ever painting--this
+         was the real cause of the "margins on the title/description
+         plaques" report right after a series (the photo-only fade never
+         touched the plaques at all, so they rendered at the wrong width
+         for a frame, in full view).
+         Opacity only now--no scale. The user's own original ask was a
+         morph "через опасити" (via opacity); a scale on top of that read
+         as a distracting pop rather than a soft cross-dissolve, and had
+         no bearing on the actual reported "not smooth" complaint. Slowed
+         200ms -> 400ms for the same reason--fast enough not to feel
+         laggy, slow enough to actually register as a cross-dissolve
+         rather than a blink. */
+      .archive-preview__inner.is-stepping .preview-media img {
+        opacity: 0;
+      }
+
+      .archive-preview .project-header {
+        position: relative; /* lifts it above .preview-media in paint order
+          (see z-index below)—.preview-media's own -2px margin-top, meant
+          to close a sub-pixel hairline gap, was instead letting the image
+          (later in DOM, so painted on top by default) clip a couple mm
+          off the bottom of the title text wherever they overlapped */
+        z-index: 2;
+        height: 18px; /* matches .close-button's own height so the two
+          white plaques line up. A title carrying a [0000]/[1/8] <sup>
+          badge naturally runs a bit taller than plain text—rather than
+          clip it to fit, let it overflow past this box's edge (no
+          overflow:hidden here); it stays fully visible either way since
+          the whole header already paints above the photo via z-index. */
+        background: #fff;
+        box-sizing: border-box;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 0;
+        padding-right: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .archive-preview__inner > .project-header,
+      .archive-preview__inner > .preview-text,
+      .archive-preview__inner > .preview-tags {
+        width: var(--preview-width, auto);
+        max-width: 100%;
+        transition: opacity 400ms ease;
+      }
+
+      .archive-preview__inner.is-stepping > .project-header,
+      .archive-preview__inner.is-stepping > .preview-text,
+      .archive-preview__inner.is-stepping > .preview-tags {
+        opacity: 0;
+      }
+
+      .archive-preview.is-vertical .preview-media {
+        flex: 0 1 auto;
+        min-height: 0;
+        margin-top: -2px;
+      }
+
+      .archive-preview.is-vertical .preview-media img {
+        width: auto;
+        max-width: 100%;
+        height: var(--preview-image-height, auto);
+      }
+
+      .archive-preview.is-horizontal .preview-media {
+        flex: 0 1 auto;
+        min-height: 0;
+        margin-top: -2px;
+      }
+
+      .archive-preview.is-horizontal .preview-media img {
+        width: auto;
+        max-width: 100%;
+        height: var(--preview-image-height, auto);
+      }
+
+      .archive-preview.is-horizontal .project-header,
+      .archive-preview.is-horizontal .preview-text,
+      .archive-preview.is-horizontal .preview-tags,
+      .archive-preview.is-horizontal .preview-media {
+        margin-left: auto;
+      }
+
+      .archive-preview.is-vertical .project-header,
+      .archive-preview.is-vertical .preview-text,
+      .archive-preview.is-vertical .preview-tags,
+      .archive-preview.is-vertical .preview-media {
+        margin-left: auto;
+      }
+
+      /* Close button lives outside .archive-preview__inner now (a plain
+         .archive-preview child) so it stays visible in both single-image
+         and filmstrip mode. Wider white backing (not just a thin sliver)
+         so it reads as its own deliberate chip, inset from the edge to
+         match the filmstrip's own right mask. */
+      .archive-preview > .preview-close {
+        position: absolute;
+        top: 0;
+        right: var(--page-margin, 16px);
+        z-index: 6;
+        background: #fff;
+        padding-left: 16px;
+      }
+
+      /* ── Series filmstrip ──────────────────────────────────────────
+         Horizontal-scrolling row of every frame in an opened series (see
+         data-group on the source [data-preview] images). Each frame keeps
+         its own natural size—capped only if it would overflow the
+         available height or width, never scaled up—so the row is
+         intentionally uneven; frames share a common top line, not a
+         common height. Three ways to move: drag, wheel, or the invisible
+         edge zones (click steps one frame). No CSS scroll-snap—it fought
+         every programmatic scroll (wheel, drag, even native trackpad
+         panning got snapped back mid-gesture and chained onto the page
+         behind it). Magnetism, easing and settling are hand-rolled in JS
+         instead (see the filmstrip interaction block), so they can be
+         gentle and never fight a live gesture. */
+      .archive-preview__filmstrip {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: var(--page-margin, 16px); /* incoming frames emerge from behind
+          this inset "mask" edge, not the raw viewport edge—left stays flush
+          since frame 1 is meant to sit right at the container's own edge */
+        bottom: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-x: contain; /* don't chain onto the page behind
+          once a native (e.g. trackpad) scroll hits either end */
+        scrollbar-width: none;
+        cursor: grab;
+        align-items: flex-start;
+      }
+      .archive-preview__filmstrip::-webkit-scrollbar {
+        display: none;
+      }
+      .archive-preview__filmstrip.is-dragging {
+        cursor: grabbing;
+        user-select: none;
+      }
+      .archive-preview.is-filmstrip .archive-preview__filmstrip {
+        display: flex;
+      }
+      .archive-preview.is-filmstrip .archive-preview__inner {
+        display: none;
+      }
+
+      .filmstrip-frame {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        margin-right: var(--page-margin, 16px);
+      }
+      .filmstrip-frame:last-child {
+        margin-right: 0; /* last frame ends flush against the mask edge—the
+          edge zone is a fixed overlay on top of the content, not part of
+          the scrollable width, so it needs no room reserved for it here */
+      }
+
+      .filmstrip-frame__title {
+        position: relative; /* same fix as .project-header: lifts the title
+          above .filmstrip-frame__media in paint order, since that media's
+          own -2px margin-top (hairline-gap trick) otherwise lets the image
+          (later in DOM, painted on top by default) clip the bottom of the
+          title text wherever they overlap */
+        z-index: 2;
+        height: 18px; /* matches .close-button/.preview-close, same reason
+          as .project-header: a [0000] <sup> badge can run a bit taller
+          than plain text—let it overflow past this box instead of
+          stretching every frame's title plaque to a different height
+          than the close button's, which read as a visible "step" between
+          the two white plaques */
+        background: #fff;
+        margin: 0;
+        font: inherit;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        box-sizing: border-box;
+        overflow-wrap: anywhere;
+        white-space: nowrap;
+      }
+
+      .filmstrip-frame__media {
+        margin-top: -2px;
+      }
+      .filmstrip-frame__media img {
+        display: block;
+        width: auto;
+        height: auto;
+        -webkit-user-drag: none;
+        user-select: none;
+      }
+
+      .filmstrip-frame__text {
+        background: #fff;
+        margin: 0;
+        padding: 0;
+        overflow-wrap: anywhere;
+      }
+      .filmstrip-frame__text p {
+        margin: 0;
+      }
+
+      .filmstrip-frame__tags {
+        display: block;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        color: #9f9f9f;
+        background: #fff;
+        padding-top: 4px;
+      }
+      .filmstrip-frame__tags[hidden] {
+        display: none;
+      }
+
+      .filmstrip-edge {
+        display: none;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 72px;
+        z-index: 4;
+        cursor: pointer;
+        align-items: center;
+      }
+      .filmstrip-edge--left {
+        left: 0;
+        justify-content: flex-start;
+      }
+      .filmstrip-edge--right {
+        right: var(--page-margin, 16px);
+        justify-content: flex-end;
+      }
+      .archive-preview.is-filmstrip .filmstrip-edge {
+        display: flex;
+      }
+
+      /* Hint glyph: hidden until the zone is hovered a moment, then eases
+         in. Plain text "<"/">"—no circle, no icon—same house gray as the
+         [0000] number badges (#9f9f9f) with a little transparency on top,
+         so it reads consistently on both light and dark photos without
+         needing a scrim behind it. Fades back out immediately on
+         mouseleave (no delay on the way out, only on the way in). */
+      .filmstrip-edge__arrow,
+      .preview-nav__arrow {
+        margin: 0 6px;
+        font-family: inherit;
+        font-weight: 500;
+        font-size: 1.25rem;
+        line-height: 1;
+        color: rgba(159, 159, 159, 0.85);
+        opacity: 0;
+        transition: opacity 0.25s ease;
+        pointer-events: none;
+      }
+      .filmstrip-edge:hover .filmstrip-edge__arrow,
+      .preview-nav:hover .preview-nav__arrow {
+        opacity: 1;
+        transition: opacity 0.25s ease 0.35s;
+      }
+
+      /* Per-photo prev/next hover arrows—the single-image counterpart to
+         the filmstrip edge zones above (same glyph, same gray, same hover
+         reveal), but pinned to the rendered photo's own left/right edges
+         (via .preview-media's position:relative + overflow:hidden) rather
+         than the wider content-pane area, and switching is instant—no
+         scroll/ease, that's a filmstrip-only concept. */
+      .preview-nav {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 64px;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        z-index: 3;
+      }
+      .preview-nav--prev {
+        left: 0;
+        justify-content: flex-start;
+      }
+      .preview-nav--next {
+        right: 0;
+        justify-content: flex-end;
+      }
+
+      body.is-preview-open .content-pane__scroll.custom-scroll::-webkit-scrollbar {
+        display: none;
+      }
+
+      body.is-preview-open .content-pane__scroll.custom-scroll {
+        scrollbar-width: none;
+      }
+
+      body.is-preview-open .custom-scrollbar {
+        display: none;
+      }
+
+      /* Nav sidebar/section intro/grid all just need to stop being
+         interactive while the lightbox sits on top--dimming itself is
+         handled entirely by .archive-page-veil now (see that rule
+         above), which covers the whole page in one pass instead of
+         these three independently fading their own opacity. Keeping a
+         SEPARATE opacity fade here too would double-dim them (the
+         veil's own overlay plus their own reduced opacity stacking
+         together), which is exactly what the user's own "вуаль чтобы
+         закрывала всю страницу" ask replaced. */
+      body.is-preview-open .site-nav,
+      body.is-preview-open .section-intro,
+      body.is-preview-open .content-pane__scroll {
+        pointer-events: none;
+      }
+
+      @media (max-width: 980px) {
+        .archive-preview {
+          position: fixed;
+          top: 32px;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 15;
+          display: flex;
+          flex-direction: column;
+          padding: 24px var(--page-margin) var(--page-margin);
+          background: transparent;
+        }
+
+        .archive-preview__inner {
+          width: 100%;
+          max-width: 100%;
+          margin-left: 0;
+          margin-right: 0;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .archive-preview .project-header {
+          flex: 0 0 auto;
+          width: 100%;
+          padding-right: 0;
+          background: #fff;
+        }
+
+        .archive-preview__inner > .project-header,
+        .archive-preview__inner > .preview-text {
+          width: 100%;
+        }
+
+        .archive-preview.is-horizontal .preview-media,
+        .archive-preview.is-vertical .preview-media {
+          flex: 0 0 auto;
+          margin-top: 0;
+          margin-left: 0;
+        }
+
+        .archive-preview .preview-text {
+          flex: 0 0 auto;
+          background: #fff;
+          padding-top: 0;
+          margin-top: 0;
+        }
+
+        body.is-preview-open {
+          overflow: hidden;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .archive-preview {
+          display: none !important;
+        }
+      }
+    

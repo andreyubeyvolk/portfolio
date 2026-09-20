@@ -1,0 +1,1425 @@
+/* ─────────────────────────────────────────────
+   MOBILE-ONLY DEFAULTS — hidden on desktop
+   ───────────────────────────────────────────── */
+.mobile-bar,
+.home-headline,
+.reel-card__overlay-left,
+.reel-card__overlay-right,
+.menu-overlay,
+.mobile-menu,
+.open-to-portrait,
+.about-download-mobile,
+.project-bar,
+.mobile-project,
+.section-page-title {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────
+   MOBILE LAYOUT  ≤ 640px
+   ───────────────────────────────────────────── */
+@media (max-width: 640px) {
+
+  /* ── Global rule: intro paragraph spacing ──
+     All section-intro blocks on every page use 2 paragraphs.
+     Gap between them = 8px (less than side padding, more than line-height). */
+  .section-intro p {
+    margin: 0 0 8px;
+  }
+
+  .section-intro p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ── Shell ── */
+  body {
+    overflow: auto;
+  }
+
+  .site-shell {
+    display: block;
+    height: auto;
+    min-height: 100vh;
+    padding: 16px 16px 200px;
+  }
+
+  /* ── Hide desktop nav ── */
+  .site-nav {
+    display: none;
+  }
+
+  /* ── Mobile nav bar ── */
+  /* left/right insets (not a fixed width + centering transform) so the
+     gap to the screen edge is always the same var(--page-margin) on any
+     phone width—the old width:326px + translateX(-50%) instead gave a
+     margin that grew with viewport width, and on anything narrower than
+     ~326px + 2*page-margin the bar would actually overflow past the
+     edges. Logo/Menu inside just sit at their own ends via
+     justify-content:space-between, so they naturally track the bar's
+     now-fluid width. */
+  .mobile-bar {
+    display: flex;
+    position: fixed;
+    bottom: 80px;
+    left: var(--page-margin, 16px);
+    right: var(--page-margin, 16px);
+    height: 40px;
+    background: #171717;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 100;
+  }
+
+  .mobile-bar__brand {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    text-decoration: none;
+    margin-left: -2px; /* nudge 2px closer to the left edge */
+  }
+
+  /* Text wordmark—same type as .mobile-bar__menu opposite it (same
+     font-size/line-height/letter-spacing), just left-aligned instead
+     of right. Swaps out for one of the 7 brush-stroke letterings (see
+     mobile-logo-swipe.js) on a horizontal swipe across it. */
+  .mobile-bar__brand .brand-mark--text {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .mobile-bar__brand .mobile-brand-lettering {
+    display: none;
+    height: 22px;
+    width: auto;
+    /* Same white-on-dark treatment the old flat logo.svg image had on
+       this bar—these SVGs are plain black ink, this just recolors
+       them for the #171717 background. */
+    filter: brightness(0) invert(1);
+  }
+  .mobile-bar__brand.is-lettering .brand-mark--text {
+    display: none;
+  }
+  .mobile-bar__brand.is-lettering .mobile-brand-lettering {
+    display: block;
+  }
+
+  .mobile-bar__menu {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #fff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    /* touch target: full bar height × 80px wide, flush to right edge */
+    height: 40px;
+    width: 80px;
+    margin-right: -16px;
+    padding: 0 14px 0 0; /* 2px less than the 16px hit-box inset—nudges the
+                            visible text 2px closer to the right edge */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  /* ── About section ── */
+  .home-headline {
+    display: block;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+    margin: 0 0 16px;
+  }
+
+  /* Same 4-column title/content split as the other section intros (see
+     the archive/inhouse/about rules)—here the "label" column is the
+     portrait photo instead of a text title. Homepage has no .about-page
+     ancestor, so this base rule is what it actually uses; the About page
+     (which reuses .home-intro for its own text-only intro) overrides
+     display/columns again under .about-page further down, so the two
+     never fight over the same properties. */
+  .section-intro.home-intro {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 16px; /* matches --page-margin so the photo-to-text gap
+      reads the same as the edge-to-photo gap */
+    align-items: start;
+    padding: 0;
+    margin-bottom: 28px; /* was on .home-portrait itself—moved to the
+      container so the gap before the next section is consistent
+      regardless of which grid item (photo or text) ends up taller */
+    min-height: calc(33.33vh - 16px);
+  }
+
+  .section-intro.home-intro p {
+    grid-column: 2 / -1;
+    grid-row: 1; /* the paragraph comes before .home-portrait in the HTML,
+      but needs to sit in the *later* column—without an explicit row,
+      default sparse grid packing places this first (row 1, cols 2-4) and
+      then can't backtrack to fit the portrait into row 1's now-passed
+      column 1, pushing it down to row 2 instead */
+    font-size: 0.9375rem;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+    margin: 0 0 8px;
+  }
+
+  .home-portrait {
+    grid-column: 1 / 2;
+    grid-row: 1;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    margin: 0;
+  }
+
+  .home-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  /* ── Content pane ── */
+  .content-pane {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .home-view {
+    display: block;
+  }
+
+  /* ── Showreel ── */
+  .reel-card {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .reel-card__poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* Hide "reel" text SVG, keep play icon */
+  .reel-card__text {
+    display: none;
+  }
+
+  .reel-card__icon {
+    width: 18px;
+  }
+
+  /* Text overlays on the reel */
+  .reel-card__overlay-left,
+  .reel-card__overlay-right {
+    display: block;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #fff;
+    pointer-events: none;
+  }
+
+  .reel-card__overlay-left {
+    left: 16px;
+    width: 101px;
+  }
+
+  .reel-card__overlay-right {
+    right: 16px;
+    width: 79px;
+    text-align: right;
+  }
+
+  /* ── See all projects: full-width tap target, no divider rules ──
+     32px margin-bottom keeps it from visually merging into the
+     socials grid right below it. Width is 100% (not fit-content) and a
+     ::before bleeds the :active fill up through the 8px residual gap
+     (this element's 8px margin-top collapses against .reel-card's own
+     8px margin-bottom, per adjacent-sibling margin collapsing—not a
+     16px sum) so the highlight reads flush against the cover above,
+     the same bleed-up trick the desktop hover version uses. */
+  .home-projects-link {
+    display: block;
+    width: 100%;
+    margin: 8px 0 32px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: inherit;
+    text-decoration: none;
+    text-align: left;
+    position: relative;
+  }
+
+  .home-projects-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    /* Adjacent margins collapse (both 8px), so the real gap is 8px, not
+       their 8+8 sum—measured via getBoundingClientRect, not assumed. */
+    height: 8px;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .home-projects-link:active {
+    color: #fff;
+    background-color: #171717;
+  }
+
+  .home-projects-link:active::before {
+    background-color: #171717;
+  }
+
+  /* ── Social links ── */
+  .home-socials {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, auto);
+    grid-auto-flow: column;
+    gap: 16px 8px;
+    margin-top: 0;
+  }
+
+  .home-socials a,
+  .home-socials button {
+    font-size: 0.9375rem;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    border-top: 2px solid #171717; /* matches About's service-row divider
+                                       (e.g. above Visual Athleticism) */
+    border-top-width: 2px;
+  }
+
+  /* No top border on first item in each column */
+  .home-socials :nth-child(1),
+  .home-socials :nth-child(4) {
+    border-top: none;
+  }
+
+  /* Neutralize sticky hover on touch; rely on :active + is-copied only */
+  .home-socials a:hover,
+  .home-socials button:hover {
+    color: inherit;
+    background-color: transparent;
+  }
+
+  .home-socials a:active,
+  .home-socials button:active,
+  .home-socials .copy-mail-link.is-copied {
+    color: #fff;
+    background-color: #000;
+  }
+
+  /* ── Archive card overlay — phones get the swipe carousel ──
+     Single-card tablet styles live in styles.css @media (max-width: 980px);
+     these phone-only rules override them into a horizontal swipe ribbon. */
+  .card-overlay {
+    z-index: 50;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .card-panel {
+    position: relative;
+    right: auto;
+    top: auto;
+    left: auto;
+    width: auto;
+    max-width: none;
+    margin: 16px;
+    background: transparent;
+    gap: 0;
+  }
+
+  .card-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0);
+    pointer-events: none;
+    transition: background 0.3s ease;
+    z-index: 10;
+  }
+
+  body.menu-is-open .card-panel::after {
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  .card-panel__header {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 8px;
+    align-items: start;
+    background: #fff;
+  }
+
+  .card-panel__close {
+    width: 100%;
+    padding: 0;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* Horizontal swipe ribbon — magnetic snap, 16px gaps between cards.
+     No -webkit-overflow-scrolling:touch here on purpose: iOS momentum
+     scrolling let a fast flick glide well past scroll-snap-stop's own
+     per-slide braking, covering 2+ cards in one swipe. Without it, the
+     strip only moves as far as the finger actually drags—slower, more
+     "viscous", and combined with mandatory snap + stop:always it can't
+     overshoot past the very next slide. */
+  .card-track {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .card-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* One-time hint that the deck swipes sideways (see openMobileCard in
+     the inline script—gated behind a localStorage flag so it only ever
+     plays once per browser). A pure CSS transform, not a real scroll: it
+     never touches scrollLeft, so it can't fight scroll-snap or leave the
+     track mid-scroll. */
+  @keyframes card-track-swipe-hint {
+    0%, 100% { transform: translateX(0); }
+    30% { transform: translateX(-28px); }
+    62% { transform: translateX(10px); }
+  }
+  .card-track.is-swipe-hint {
+    animation: card-track-swipe-hint 0.9s ease-in-out;
+  }
+
+  .card-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always; /* forces the swipe to stop at every slide,
+      even on a fast/hard fling—without this, a strong swipe's momentum
+      could sail straight past several slides to wherever it naturally
+      decelerated, skipping photos instead of landing on the very next one */
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+  }
+
+  .card-panel__image-wrap {
+    flex-shrink: 0;
+    overflow: hidden;
+    line-height: 0;
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .card-panel__image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .card-panel__desc {
+    flex-shrink: 0;
+    margin-top: 4px;
+    background: transparent;
+    width: auto;
+  }
+
+  .card-panel__tags {
+    margin-top: 2px;
+    background: transparent;
+    width: auto;
+  }
+
+
+
+  body.card-is-open {
+    overflow: hidden;
+  }
+
+  /* Opacity fade + grain on top (see archive/index.html)—no blur. The card
+     overlay itself lives outside .site-shell in the DOM, so this never
+     touches it. Base transition is unconditional (see archive/index.html
+     for why: a transition declared only inside the dimmed-state rule never
+     gets to animate the close, since the element stops matching that rule
+     the instant the class is removed). Faster close than open: "fast but
+     smooth". */
+  .site-shell {
+    transition: opacity 0.18s ease;
+  }
+  body.card-is-open .site-shell {
+    opacity: 0.06; /* phone only—deliberately lower than tablet's 0.08
+      (styles.css), per feedback specific to this breakpoint */
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  /* ── Archive page ── */
+  /* Intro as a 4-column row, matching the label+content split used in the
+     section's own body (e.g. .about-section__label / __content): title in
+     column 1, description spanning the remaining 3. */
+  .archive-page .section-intro.intro {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 8px;
+    align-items: start;
+    padding: 0;
+    margin-bottom: 0;
+    min-height: calc(33.33vh - 16px);
+  }
+
+  .section-intro .section-page-title {
+    display: block;
+    grid-column: 1 / 2;
+    margin: 0;
+    /* Was a <p>, now an <h1> (for real page-heading semantics)—without
+       this it picks up the browser's own oversized default h1 font-size/
+       weight instead of matching the paragraph beside it, since nothing
+       here ever set those explicitly (the <p> just inherited them). */
+    font: inherit;
+    /* font:inherit above pulls in the SECTION's own line-height (body's
+       tight 1.0 default), not the 1.2 the paragraph beside it actually
+       uses--set explicitly so both lines of text sit at the same rhythm. */
+    line-height: 1.2;
+  }
+
+  .archive-page .section-intro.intro p {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+  }
+
+  .archive-page .section-intro.intro p:not(.section-page-title) {
+    grid-column: 2 / -1;
+  }
+
+  .archive-page .archive-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 8px;
+    padding-bottom: 0;
+  }
+
+  .archive-card {
+    gap: 3px;
+  }
+
+  .archive-card__cover {
+    height: auto;
+  }
+
+  .archive-title {
+    order: 0;
+    font-size: 0.9375rem;
+    letter-spacing: -0.5px;
+  }
+
+
+  /* ── Inhouse page ── */
+  /* Same 4-column title/description split as the archive intro above. */
+  .inhouse-page .section-intro.intro,
+  .brands-page .section-intro.intro {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 8px;
+    align-items: start;
+    padding: 0;
+    margin-bottom: 0;
+    min-height: calc(33.33vh - 16px);
+  }
+
+  .inhouse-page .section-intro.intro p,
+  .brands-page .section-intro.intro p {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+    margin: 0 0 8px;
+  }
+
+  .inhouse-page .section-intro.intro p:last-child,
+  .brands-page .section-intro.intro p:last-child {
+    margin-bottom: 0;
+  }
+
+  .inhouse-page .section-intro.intro p:not(.section-page-title),
+  .brands-page .section-intro.intro p:not(.section-page-title) {
+    grid-column: 2 / -1;
+  }
+
+  .inhouse-page .inhouse-grid,
+  .brands-page .inhouse-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 8px;
+    padding-bottom: 0;
+  }
+
+  .all-projects-page .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 8px;
+    padding-bottom: 0;
+  }
+
+  .inhouse-card {
+    gap: 3px;
+  }
+
+  .inhouse-card__cover {
+    aspect-ratio: 3 / 4; /* keep the 1080×1440 proportion at any width—a
+      fixed height cropped the portrait card on wider phones/tablets */
+  }
+
+  .inhouse-title {
+    order: 0;
+    font-size: 0.9375rem;
+    letter-spacing: -0.5px;
+    position: relative;
+  }
+
+  /* Tap highlight (mobile has no :hover)—same black fill as the desktop
+     .inhouse-card:hover treatment, plus a ::before that bleeds it up
+     through the 3px flex `gap` above so it reads flush against the
+     cover, same bleed-up trick as .home-projects-link. Shared by
+     Inhouse, Brands, and All Projects—they all use this one card
+     component (see the .projects-grid comment in styles.css). */
+  .inhouse-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 3px;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .inhouse-card:active .inhouse-title {
+    color: #fff;
+    background-color: #171717;
+  }
+
+  .inhouse-card:active .inhouse-title::before {
+    background-color: #171717;
+  }
+
+  /* Cards without a built target aren't links—don't show the tap
+     affordance (mirrors .inhouse-card--pending:hover on desktop). */
+  .inhouse-card.inhouse-card--pending:active .inhouse-title {
+    color: inherit;
+    background-color: transparent;
+  }
+
+  .inhouse-card.inhouse-card--pending:active .inhouse-title::before {
+    background-color: transparent;
+  }
+
+  .load-more-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 40px;
+    margin-top: 40px;
+    background: #fff;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+    cursor: pointer;
+  }
+
+  /* ── Site shell dims when menu is open ── */
+  /* Project pages hide .site-shell on mobile and render their own layout
+     (.project-bar + .mobile-project), so those must dim too. */
+  .site-shell,
+  .project-bar,
+  .mobile-project {
+    transition: opacity 0.3s ease;
+  }
+
+  /* .site-shell's own pointer-events:none (below) stops taps on the dimmed
+     page, but a touch-scroll swipe doesn't need a tap target—body itself
+     is the scrollable element (overflow:auto, above), so it kept scrolling
+     right through the menu overlay. Locking body's overflow while the menu
+     is open is what actually stops that; the page stays visually frozen
+     at its current scroll position, not reset to the top. */
+  body.menu-is-open {
+    overflow: hidden;
+  }
+
+  body.menu-is-open .site-shell {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  /* Project pages dim as ONE merged layer via the menu overlay veil (see
+     .menu-overlay below). The fixed header + content are NOT faded
+     individually — doing that makes the translucent fixed bar reveal the
+     content scrolled beneath it (double-exposed, not a single dim layer). */
+  body.menu-is-open .project-bar,
+  body.menu-is-open .mobile-project {
+    pointer-events: none;
+  }
+
+  /* Card already dims the grid to 0.06; opening the menu on top must not
+     pull it back up to 0.4. The card itself dims via .card-panel::after. */
+  body.card-is-open.menu-is-open .site-shell {
+    opacity: 0.06;
+  }
+
+  body.menu-is-open .card-overlay {
+    pointer-events: none;
+  }
+
+  /* ── Overlay (catches outside clicks, transparent) ── */
+  .menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    background: transparent;
+    display: none;
+  }
+
+  body.menu-is-open .menu-overlay {
+    display: block;
+  }
+
+  /* Project pages: the overlay doubles as a single translucent dim layer
+     over the header + content — one unified veil instead of per-element
+     opacity (matches the Archive card's .card-panel::after veil). */
+  body.project-page.menu-is-open .menu-overlay {
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  /* ── Full mobile menu ── */
+  /* Same left/right insets as .mobile-bar above (not a fixed width +
+     centering transform)—this panel is meant to visually grow straight
+     up out of the bar via the clip-path mask below, so it has to share
+     the exact same edges on every phone width, not just whichever width
+     happens to make 326px land near var(--page-margin) either side. */
+  .mobile-menu {
+    display: block;
+    position: fixed;
+    bottom: 120px; /* 80px from bottom + 40px bar height */
+    left: var(--page-margin, 16px);
+    right: var(--page-margin, 16px);
+    height: calc(100vh - 200px);
+    height: calc(100dvh - 200px);
+    background: #fff;
+    z-index: 101;
+    overflow: hidden;
+
+    /* Mask: clips upward from the bar. (A transform:translateY() version
+       was tried here instead, to sidestep clip-path's per-frame repaint
+       cost—but a position:fixed element animating via transform, combined
+       with body's overflow:hidden toggle for the scroll lock below, is a
+       known problem spot on real mobile Safari: the fixed element can
+       render off/blank instead of tracking the viewport. Reverted—a
+       working menu that isn't perfectly smooth beats an invisible one.) */
+    clip-path: inset(100% 0 0 0);
+    pointer-events: none;
+    transition: clip-path 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  body.menu-is-open .mobile-menu {
+    clip-path: inset(0 0 0 0);
+    pointer-events: auto;
+  }
+
+  /* ── Menu banner (disabled by default) ── */
+  .menu-banner {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 219px;
+    height: 135px;
+    background: #171717;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .menu-banner[hidden] {
+    display: none;
+  }
+
+  .menu-banner__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .menu-banner__title {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-family: 'Impact', Impact, sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: -0.4px;
+    color: #fff;
+  }
+
+  .menu-banner__title p {
+    margin: 0;
+    line-height: 1;
+  }
+
+  .menu-banner__cta {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1;
+    letter-spacing: -0.4px;
+    color: #fff;
+  }
+
+  .menu-banner__arrow {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 12px;
+    height: 12px;
+    color: #fff;
+  }
+
+  /* ── Menu nav tabs ── */
+  .menu-tabs {
+    position: absolute;
+    bottom: 32px; /* 16px original + 16px raised—only the text moves, the
+                     white panel itself stays its original size/position */
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px;
+  }
+
+  .menu-tabs a {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 48px;
+    font-family: 'Inter', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    font-style: normal;
+    line-height: 1.4;
+    letter-spacing: 0.32px; /* 20% tighter than the previous 0.4px */
+    color: #171717;
+    text-decoration: none;
+    padding: 0;
+    touch-action: manipulation;
+    transition: color 120ms ease, background-color 120ms ease;
+  }
+
+  /* Current page — Bold Italic */
+  .menu-tabs a[aria-current="page"] {
+    font-style: italic;
+  }
+
+  .menu-tabs a:hover {
+    color: #fff;
+    background: #171717;
+    padding: 0 4px;
+  }
+
+  /* Tap state — full black rect, white text, instant */
+  .menu-tabs a:active,
+  .menu-tabs a.is-tapped {
+    color: #fff;
+    background: #171717;
+    padding: 0 4px;
+    transition: none;
+  }
+
+  /* ── About page ── */
+
+  /* Intro text: no extra top padding (site-shell already has 16px), then
+     96px gap before content. Same 4-column title/description split as the
+     other section intros above—title in column 1, description spanning
+     the remaining 3. */
+  .about-page .section-intro.home-intro {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 8px;
+    align-items: start;
+    padding-top: 0;
+    margin-bottom: 0;
+  }
+
+  .about-page .section-intro.home-intro p {
+    margin: 0 0 8px;
+  }
+
+  .about-page .section-intro.home-intro p:last-child {
+    margin-bottom: 0;
+  }
+
+  .about-page .section-intro.home-intro p:not(.section-page-title) {
+    grid-column: 2 / -1;
+  }
+
+  /* Reset desktop article grid → plain column */
+  .about-page .about-view {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
+  }
+
+  /* Photo: full-width square, 6px gap below (2px tighter than the
+     original 8px, to bring Approach closer up underneath it) */
+  .about-page .about-photo {
+    grid-column: unset;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    margin: 0 0 6px;
+  }
+
+  /* Sections: flex row — label (84px) + content (flex-1) */
+  .about-page .about-section {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: flex-start;
+    grid-column: unset;
+    border-top: 4px solid #171717;
+    margin-top: 96px;
+    margin-bottom: 0;
+    padding-top: 0;
+  }
+
+  /* Focus — no top line, no top margin (immediately after photo) */
+  .about-page .about-section:first-of-type {
+    border-top: none;
+    margin-top: 0;
+  }
+
+  .about-page .about-section__label {
+    grid-column: unset;
+    width: 84px;
+    min-width: 84px;
+    flex-shrink: 0;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin: 0;
+  }
+
+  .about-page .about-section__content {
+    grid-column: unset;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .about-page .about-section__content > p {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin: 0;
+  }
+
+  /* Contact section — same layout as others */
+  .about-page .about-section--contact .about-section__content {
+    grid-column: unset;
+    flex: 1;
+  }
+
+  /* Service rows (Focus) → stacked title + desc, dividers between rows */
+  .about-page .service-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 32px;
+    border-top: 2px solid #171717;
+    padding-top: 0;
+    grid-template-columns: unset;
+    column-gap: unset;
+    align-items: unset;
+  }
+
+  .about-page .service-row:first-child {
+    border-top: none;
+  }
+
+  .about-page .service-row__title,
+  .about-page .service-row__desc {
+    grid-column: unset;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+    margin: 0;
+  }
+
+  /* Experience rows → стaircase (лесенка):
+     container = flex-col + align-items: flex-end
+     company = full width → appears left edge
+     role    = 175px → indented (266-175=91px from left)
+     years   = 83px  → most indented (266-83=183px from left) */
+  .about-page .exp-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end;
+    margin-bottom: 21px;
+    border-top: 2px solid #171717;
+    padding-top: 0;
+    grid-template-columns: unset;
+    column-gap: unset;
+  }
+
+  .about-page .exp-row:first-child {
+    border-top: none;
+  }
+
+  .about-page .exp-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .about-page .exp-row__company,
+  .about-page .exp-row__role,
+  .about-page .exp-row__years {
+    grid-column: unset;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+    text-align: left;
+  }
+
+  /* Staircase widths */
+  .about-page .exp-row__company {
+    width: 100%;
+  }
+
+  .about-page .exp-row__role {
+    width: 175px;
+  }
+
+  .about-page .exp-row__years {
+    width: 83px;
+  }
+
+  /* Open to portrait — 83×83, shown on mobile */
+  .about-page .open-to-portrait {
+    display: block;
+    width: 83px;
+    height: 83px;
+    object-fit: cover;
+    object-position: top;
+    margin-top: 14px;
+  }
+
+  /* Contact grid — 2 columns */
+  .about-page .contact-grid {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 8px;
+    row-gap: 0;
+  }
+
+  .about-page .contact-link {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    padding: 0 0 20px; /* 2px border + 0 + ~18px text + 20px = 40px tap target */
+    border-top-width: 2px;
+    position: relative;
+    z-index: 0;
+  }
+
+  .about-page .contact-grid .contact-link:nth-child(-n+2) {
+    border-top: none;
+    padding-top: 0;
+    padding-bottom: 22px; /* no border → 18px text + 22px = 40px tap target */
+  }
+
+  /* Hover bar: full-width, covers border + text only (not the full tap area) */
+  .about-page .contact-link::before {
+    content: '';
+    position: absolute;
+    top: -2px; /* extends up to cover the 2px border */
+    left: 0;
+    right: 0;
+    height: 20px; /* 2px border + 18px line-height */
+    background: #171717;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 150ms ease;
+  }
+
+  .about-page .contact-grid .contact-link:nth-child(-n+2)::before {
+    top: 0;
+    height: 18px; /* no border, just line-height */
+  }
+
+  /* Neutralize sticky hover on touch */
+  .about-page .contact-link:hover {
+    color: inherit;
+    background: none;
+  }
+
+  .about-page .contact-link:hover::before {
+    opacity: 0;
+  }
+
+  /* Touch feedback + Copied state */
+  .about-page .contact-link:active,
+  .about-page .contact-link.is-copied {
+    color: #fff;
+    background: none;
+  }
+
+  .about-page .contact-link:active::before,
+  .about-page .contact-link.is-copied::before {
+    opacity: 1;
+  }
+
+  /* Hide desktop download link on mobile */
+  .about-page .about-download {
+    display: none;
+  }
+
+  /* Mobile download PDF section — right-aligned, aligned to the 2nd contact column */
+  .about-page .about-download-mobile {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 96px;
+  }
+
+  /* Match the 2nd contact column: full row minus label(84)+gap(8)+grid-gap(8)=100, halved */
+  .about-page .about-download-mobile .download-pdf-btn {
+    width: calc((100% - 100px) / 2);
+  }
+
+  .about-page .download-pdf-btn {
+    display: block;
+    width: 100%;
+    border-top: 4px solid #171717;
+    padding-top: 2px;
+    padding-bottom: 0;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 150ms ease, background-color 150ms ease;
+  }
+
+  .about-page .download-pdf-btn.is-downloading {
+    color: #fff;
+    background-color: #171717;
+  }
+
+  /* ── Project page (mobile) ── */
+
+  /* Hide desktop shell and section intro */
+  .project-page .site-shell {
+    display: none;
+  }
+
+  /* Fixed top bar: project title + [X] */
+  .project-page .project-bar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: #f5f4f4;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 98; /* below .menu-overlay (99) so the menu veil dims it too */
+  }
+
+  .project-bar__title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+  }
+
+  .project-bar__close {
+    display: flex;
+    align-items: center;
+    height: 40px; /* full bar height = full tap area */
+    padding-left: 32px; /* wider tap zone to the left */
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 150ms ease, background-color 150ms ease;
+  }
+
+  .project-bar__close:active {
+    color: #fff;
+    background-color: #171717;
+  }
+
+  /* Scrollable project content */
+  .project-page .mobile-project {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 56px 16px 200px; /* 40px bar + 16px gap top; 200px clears bottom bar */
+    background: #f5f4f4;
+    min-height: 100vh;
+  }
+
+  .mobile-project__intro {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+    margin: 0;
+    min-height: calc(33.33vh - 56px); /* 56px = 40px project bar + 16px gap */
+  }
+
+  /* Photos: full width, auto height, no margin (gap handles spacing) */
+  .mobile-project__photo {
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .mobile-project__photo img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Short landscape photo (e.g. wide mockup) */
+  .mobile-project__photo--short img {
+    max-height: 184px;
+    object-fit: cover;
+  }
+
+  /* Challenge / Solution text blocks */
+  .mobile-project__blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    /* No extra margin-top: the 8px gap from .mobile-project (the parent
+       flex column) already matches the spacing between photos. */
+  }
+
+  .mobile-project__block {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  /* 2px divider above Solution */
+  .mobile-project__block--divider {
+    border-top: 2px solid #171717;
+  }
+
+  .mobile-project__label {
+    width: 84px;
+    min-width: 84px;
+    flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+  }
+
+  .mobile-project__text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Solution column: text + icon */
+  .mobile-project__solution {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* icon has width:auto, don't stretch it to full width */
+    gap: 16px;
+  }
+
+  /* Small square icon/logo */
+  .mobile-project__icon {
+    width: auto;
+    height: 83px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  /*
+   * Solution outer group: wraps [Solution block] + [Download/Next buttons].
+   * gap-40px between them, right-aligned (items-end).
+   */
+  .mobile-solution-group {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: flex-end;
+  }
+
+  /* Inner solution block stretches full width */
+  .mobile-solution-group > .mobile-project__block {
+    width: 100%;
+  }
+
+  /* Download/Next buttons row — aligned with text column (right of 84px label) */
+  .mobile-project__actions {
+    display: flex;
+    gap: 8px;
+    width: calc(100% - 84px - 8px);
+  }
+
+  .mobile-project__action {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mobile-project__action-bar {
+    height: 4px;
+    background: #171717;
+    flex-shrink: 0;
+  }
+
+  .mobile-project__action a,
+  .mobile-project__action-btn,
+  .next-project-btn {
+    display: block;
+    padding: 0;
+    background: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    color: #171717;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    width: 100%;
+    position: relative;
+    transition: color 150ms ease, background-color 150ms ease;
+  }
+
+  /* Tap/hover fill bleeds up through the 2px flex gap so it reads flush
+     against the divider bar above—same trick as .home-projects-link and
+     .inhouse-title. */
+  .mobile-project__action a::before,
+  .mobile-project__action-btn::before,
+  .next-project-btn::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 2px;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .mobile-project__action a:hover,
+  .mobile-project__action a:active,
+  .mobile-project__action-btn:hover,
+  .mobile-project__action-btn:active,
+  .next-project-btn:hover,
+  .next-project-btn:active {
+    color: #fff;
+    background-color: #171717;
+  }
+
+  .mobile-project__action a:hover::before,
+  .mobile-project__action a:active::before,
+  .mobile-project__action-btn:hover::before,
+  .mobile-project__action-btn:active::before,
+  .next-project-btn:hover::before,
+  .next-project-btn:active::before {
+    background-color: #171717;
+  }
+
+}
