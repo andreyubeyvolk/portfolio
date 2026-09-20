@@ -17,7 +17,11 @@
   // a "Ctrl+click to tag!" hint for a desktop-only Ctrl+drag feature,
   // permanently stuck on screen on mobile. Bailing out entirely here
   // is simpler and more robust than gating just the idle-timer piece.
-  var desktopQuery = window.matchMedia('(min-width: 981px)');
+  // (pointer: fine) on top of the width check--a wide-viewport touch
+  // device (tablet in landscape, a phone with desktop-site requested)
+  // still has no real Ctrl key, so the hint would otherwise get created
+  // and then just sit there forever with nothing able to dismiss it.
+  var desktopQuery = window.matchMedia('(min-width: 981px) and (pointer: fine)');
   if (!desktopQuery.matches) return;
 
   var brand = document.getElementById('brand-scrub');

@@ -95,7 +95,10 @@
 // plugins/graffiti.client.ts for the actual init/destroy-on-navigate
 // wiring.
 window.initGraffiti = function initGraffiti() {
-  var desktopQuery = window.matchMedia('(min-width: 981px)');
+  // (pointer: fine) alongside the width check--Ctrl+drag needs a real
+  // keyboard+mouse, so a wide-viewport touch device (tablet landscape,
+  // "desktop site" on a phone) should never arm this either.
+  var desktopQuery = window.matchMedia('(min-width: 981px) and (pointer: fine)');
   if (!desktopQuery.matches) return function () {};
 
   // Values below are andrey's own tuned pass from the settings
@@ -622,6 +625,11 @@ window.initGraffiti = function initGraffiti() {
   function clearAll() {
     if (clearing) return;
     clearing = true;
+    // Whatever nav link/button happened to end up focused during the
+    // stroke that triggered this (mousedown/mouseup landing on it while
+    // the canvas's own pointer-events:none lets clicks fall through)
+    // shouldn't keep showing its focus ring once the tag is gone.
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     // The on-screen canvases only—paneCanvas is the off-screen store
     // now and was never visible to begin with, so animating that
     // would do nothing.

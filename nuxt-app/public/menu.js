@@ -29,11 +29,16 @@
     });
   }
 
-  // Persist tap highlight while the page is loading
+  // Persist tap highlight while the page is loading. On the static site a
+  // link click was always a full page reload, which closed the menu for
+  // free--Nuxt's client-side routing swaps the page without one, so the
+  // menu has to be told to close explicitly here or it just stays open
+  // over the new page.
   menuLinks.forEach(function (link) {
     link.addEventListener('click', function () {
       menuLinks.forEach(function (l) { l.classList.remove('is-tapped'); });
       link.classList.add('is-tapped');
+      close();
     });
   });
 
