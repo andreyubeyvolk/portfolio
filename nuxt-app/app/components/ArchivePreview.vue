@@ -682,6 +682,16 @@ onBeforeUnmount(() => {
     :class="{ 'is-open': isVisible, 'is-filmstrip': isGroupMode, 'is-vertical': !isGroupMode && isVertical, 'is-horizontal': !isGroupMode && !isVertical }"
     @click="onOverlayClick"
   >
+    <!-- Dims the real archive grid behind this overlay--deliberately a
+         plain child here rather than a separate opacity fade on the grid
+         itself (see archive-page.css's own comment on this): being a
+         child of .archive-preview means it's clipped by the SAME
+         clip-path as the rest of this element, so the dimming and the
+         card reveal are literally the same moving mask, not two
+         independently-timed effects. Per the user's own framing: "как
+         наезд вуали которая одновременно осветляет фон и показывает нам
+         открытую карточку." -->
+    <div class="archive-preview__scrim" aria-hidden="true"></div>
     <button class="close-button preview-close" type="button" @click="close"><span>[X]</span></button>
 
     <div v-if="!isGroupMode" ref="previewInner" class="archive-preview__inner" :class="{ 'is-stepping': isStepping }">

@@ -28,12 +28,14 @@ button.archive-card {
            grows it downward as the bottom-inset shrinks--reads as the
            whole card sliding down out of a slot at the top. Closing plays
            the exact same property backward (retreating back up into that
-           slot), unclipping the real archive grid underneath as it goes
-           (already there, just dimmed via body.is-preview-open--see that
-           rule elsewhere in this file) at whatever opacity IT'S
-           transitioning to, not a separate opaque panel covering it. See
-           ArchivePreview.vue's own comment on why this replaced the
-           earlier View-Transition-based mask.
+           slot). The dimmed real archive grid underneath is revealed as
+           it goes too--not a separate opacity fade running on its own
+           timer, but literally the same clip-path: .archive-preview__scrim
+           (a child of this element, see below) sits between the grid and
+           the card, so wherever this mask has opened, both the scrim AND
+           the card become visible together, one moving veil doing both
+           jobs at once. See ArchivePreview.vue's own comment on why this
+           replaced the earlier View-Transition-based mask.
            Deliberately no transform/translate on the content itself (a
            translateY was tried and reverted per the user's own
            correction)--the CARD stays perfectly still the whole time;
@@ -49,6 +51,22 @@ button.archive-card {
 
       .archive-preview[hidden] {
         display: none;
+      }
+
+      /* Fills the whole clipped box behind the card/filmstrip content--
+         same page-background color as body's own #F5F4F4, at the same
+         92% opacity the grid itself used to fade to under the old
+         body.is-preview-open rule (see that rule's own removal note
+         elsewhere in this file). The math is identical either way
+         (8% of the grid's own color still shows through, blended with
+         92% background)--the difference is WHERE that blending happens:
+         here it's confined to whatever region this element's own
+         clip-path has already revealed, instead of applying to the grid
+         uniformly regardless of the mask's position. */
+      .archive-preview__scrim {
+        position: absolute;
+        inset: 0;
+        background: rgba(245, 244, 244, 0.92);
       }
 
       .archive-preview__inner {
@@ -102,28 +120,36 @@ button.archive-card {
         height: auto;
         display: block;
         opacity: 1;
-        transform: scale(1);
-        transition: opacity 200ms ease, transform 200ms ease;
+        transition: opacity 400ms ease;
       }
 
       /* Brief crossfade while stepping between two single-image cards
-         (arrow keys/nav buttons)--toggled off once the new image has
-         synced its size (see ArchivePreview.vue's isStepping). Covers the
-         WHOLE card now (photo + title/description/tags plaques), not just
-         the photo: the plaques' width comes from the --preview-width CSS
-         var below, which is only kept in sync while a single-image card
-         is open--stepping in from a filmstrip (which never touches that
-         var) leaves it holding a stale value from whichever single-image
-         card was open longest ago, until syncPreviewSize() recomputes it
-         a tick later. Hiding everything until that recompute finishes is
+         (arrow keys, filmstrip edges, or the preview-nav prev/next
+         buttons--all funnel through the same stepPreview()/isStepping
+         state, so this applies uniformly no matter which one triggered
+         the step)--toggled off once the new image has synced its size
+         (see ArchivePreview.vue's isStepping). Covers the WHOLE card now
+         (photo + title/description/tags plaques), not just the photo:
+         the plaques' width comes from the --preview-width CSS var below,
+         which is only kept in sync while a single-image card is open--
+         stepping in from a filmstrip (which never touches that var)
+         leaves it holding a stale value from whichever single-image card
+         was open longest ago, until syncPreviewSize() recomputes it a
+         tick later. Hiding everything until that recompute finishes is
          what actually stops that stale width from ever painting--this
          was the real cause of the "margins on the title/description
          plaques" report right after a series (the photo-only fade never
          touched the plaques at all, so they rendered at the wrong width
-         for a frame, in full view). */
+         for a frame, in full view).
+         Opacity only now--no scale. The user's own original ask was a
+         morph "через опасити" (via opacity); a scale on top of that read
+         as a distracting pop rather than a soft cross-dissolve, and had
+         no bearing on the actual reported "not smooth" complaint. Slowed
+         200ms -> 400ms for the same reason--fast enough not to feel
+         laggy, slow enough to actually register as a cross-dissolve
+         rather than a blink. */
       .archive-preview__inner.is-stepping .preview-media img {
         opacity: 0;
-        transform: scale(0.98);
       }
 
       .archive-preview .project-header {
@@ -154,7 +180,7 @@ button.archive-card {
       .archive-preview__inner > .preview-tags {
         width: var(--preview-width, auto);
         max-width: 100%;
-        transition: opacity 200ms ease;
+        transition: opacity 400ms ease;
       }
 
       .archive-preview__inner.is-stepping > .project-header,
@@ -414,25 +440,33 @@ button.archive-card {
         display: none;
       }
 
-      /* Background treatment behind the preview: plain opacity fade, no
-         blur. The transition lives here, unconditionally, not just in the
-         dimmed state below—when the class is removed on close, the element
-         stops matching that rule at the very same instant the opacity
-         reverts, so a transition declared only there never gets to animate
-         the close. Still a bit quicker than the open (0.24s vs 0.3s—was
-         0.18s, nudged up for a softer close), matching the preview panel's
-         own fade above. */
+      /* Background treatment for the nav sidebar/section intro: plain
+         opacity fade, no blur. Neither sits behind .archive-preview's own
+         clip-path (they're outside .content-pane entirely), so there's no
+         mask to tie them to--the grid itself USED to be dimmed the same
+         way here too, but that's now handled by .archive-preview__scrim
+         above instead, since the grid genuinely does sit behind that
+         mask and can be synced to it. The transition lives here,
+         unconditionally, not just in the dimmed state below--when the
+         class is removed on close, the element stops matching that rule
+         at the very same instant the opacity reverts, so a transition
+         declared only there never gets to animate the close. Still a bit
+         quicker than the open (0.24s vs 0.3s—was 0.18s, nudged up for a
+         softer close), matching the preview panel's own fade above. */
       .site-nav,
-      .section-intro,
-      .content-pane__scroll {
+      .section-intro {
         transition: opacity 0.24s ease;
       }
       body.is-preview-open .site-nav,
-      body.is-preview-open .section-intro,
-      body.is-preview-open .content-pane__scroll {
+      body.is-preview-open .section-intro {
         opacity: 0.08;
         pointer-events: none;
         transition: opacity 0.3s ease;
+      }
+      /* Still needs to stop being interactive while the lightbox sits on
+         top of it--just no opacity fade of its own anymore (see above). */
+      body.is-preview-open .content-pane__scroll {
+        pointer-events: none;
       }
 
       @media (max-width: 980px) {
