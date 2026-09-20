@@ -4,22 +4,13 @@
 // resolves the new route/swaps components--so by the time Nuxt's own
 // viewTransition wiring calls document.startViewTransition() a moment
 // later, both documentElement.dataset.transition AND the shared
-// pageTransitionType/morphTargetSlug state below already reflect this
-// navigation's target.
+// pageTransitionType state below already reflect this navigation's
+// target.
 //
-// 'home' now joins the section set--logo-to-home and home-to-section
-// nav both get the curtain, per the user's own ask, not just
-// section<->section.
+// 'home' joins the section set--logo-to-home and home-to-section nav
+// both get the curtain, not just section<->section.
 const SECTION_ROUTE_NAMES = new Set(['index', 'inhouse', 'brands', 'archive', 'about'])
 const PROJECT_ROUTE_NAMES = new Set(['inhouse-slug', 'brands-slug'])
-
-// Cover-morph test scope--"попробуем морфинг, например айгейминге
-// сначала": only these slugs carry a matching view-transition-name
-// (ProjectCard.vue/ProjectPage.vue), so only their own open/close gets
-// the full-cover morph. Every other project gets the plain content-pane
-// curtain instead (project-open-panel/project-close-panel)--see
-// page-transitions.css.
-const MORPH_SLUGS = new Set(['igaming'])
 
 // Nuxt's own view-transitions.client.js attaches a .catch() to
 // transition.finished but not to transition.ready--if the browser ever
@@ -38,18 +29,20 @@ if (typeof document !== 'undefined' && document.startViewTransition) {
   }) as typeof document.startViewTransition
 }
 
+function isDesktop() {
+  return window.matchMedia('(min-width: 981px)').matches
+}
+
 export default defineNuxtPlugin((nuxtApp) => {
   const router = useRouter()
-  // Shared with ProjectCard.vue/ProjectPage.vue (cover morph, keyed by
-  // exact slug) and usePanelTransitionStyle.ts (content-pane curtain,
-  // keyed by transition type)--see those files for why a plain
-  // unconditional "is this the iGaming component" check isn't enough:
-  // a view-transition-name left on an element during an UNRELATED
-  // transition (e.g. iGaming's listing card during a section curtain)
-  // creates its own extra, unclipped animated layer floating on top of
-  // whatever else is happening. These two only carry a real value for
-  // the ONE navigation they actually apply to.
-  const morphTargetSlug = useState<string | null>('morphTargetSlug', () => null)
+  // Shared with usePanelTransitionStyle.ts (content-pane curtain, keyed
+  // by transition type)--see that file for why a plain unconditional
+  // "is this a project page" check isn't enough: a view-transition-name
+  // left on an element during an UNRELATED transition (e.g. a project's
+  // listing card during a section curtain) creates its own extra,
+  // unclipped animated layer floating on top of whatever else is
+  // happening. This only carries a real value for the ONE navigation it
+  // actually applies to.
   const pageTransitionType = useState<string>('pageTransitionType', () => 'none')
 
   router.beforeEach(async (to, from) => {
@@ -64,39 +57,51 @@ export default defineNuxtPlugin((nuxtApp) => {
     // actually distinguishes it: a real navigation always changes the
     // URL, this pseudo-one doesn't (to and from are the same page).
     // Skipping it matters: classifying it as a real transition set
-    // pageTransitionType/morphTargetSlug to something the
-    // server-rendered HTML never had--a real hydration mismatch on the
-    // very first paint (caught live: .content-pane got a stray
-    // view-transition-name style server never rendered).
+    // pageTransitionType to something the server-rendered HTML never
+    // had--a real hydration mismatch on the very first paint (caught
+    // live: .content-pane got a stray view-transition-name style server
+    // never rendered).
     if (to.fullPath === from.fullPath) return
     const html = document.documentElement
+
+    // Mobile/tablet: curtains stay desktop-only for now ("шторки
+    // убираем, делаем переходы между страницами просто плавным
+    // опасити")--plain 'none' here means no CSS override matches, so
+    // the browser's own default cross-fade plays instead. The mobile
+    // hamburger menu's own open/close animation (menu.js/mobile.css) is
+    // untouched--that's a separate, non-routed overlay, not a page
+    // transition at all.
+    if (!isDesktop()) {
+      pageTransitionType.value = 'none'
+      await nextTick()
+      html.dataset.transition = 'none'
+      return
+    }
+
     const toName = String(to.name ?? '')
     const fromName = String(from.name ?? '')
-    const toSlug = typeof to.params.slug === 'string' ? to.params.slug : undefined
-    const fromSlug = typeof from.params.slug === 'string' ? from.params.slug : undefined
 
     let type = 'none'
-    if (PROJECT_ROUTE_NAMES.has(toName) && !PROJECT_ROUTE_NAMES.has(fromName) && toSlug) {
-      type = MORPH_SLUGS.has(toSlug) ? 'project-open-morph' : 'project-open-panel'
-    } else if (PROJECT_ROUTE_NAMES.has(fromName) && !PROJECT_ROUTE_NAMES.has(toName) && fromSlug) {
-      type = MORPH_SLUGS.has(fromSlug) ? 'project-close-morph' : 'project-close-panel'
+    if (PROJECT_ROUTE_NAMES.has(toName) && !PROJECT_ROUTE_NAMES.has(fromName)) {
+      type = 'project-open-panel'
+    } else if (PROJECT_ROUTE_NAMES.has(fromName) && !PROJECT_ROUTE_NAMES.has(toName)) {
+      type = 'project-close-panel'
     } else if (SECTION_ROUTE_NAMES.has(toName) && SECTION_ROUTE_NAMES.has(fromName) && toName !== fromName) {
       type = 'curtain'
     }
 
-    morphTargetSlug.value = type === 'project-open-morph' ? toSlug! : type === 'project-close-morph' ? fromSlug! : null
     pageTransitionType.value = type
-    // Both refs above drive :style bindings on already-MOUNTED elements
-    // (the currently-visible listing card, or the currently-visible
-    // project page's cover/content-pane) for the transition's "old"
-    // side. Vue's reactivity normally flushes that DOM patch on a
-    // microtask, not synchronously--awaiting nextTick() here guarantees
-    // it's actually landed before we return control to Nuxt's own
-    // beforeResolve guard (registered separately, always runs AFTER
-    // every beforeEach guard per Vue Router's own ordering), which is
-    // what calls document.startViewTransition() and takes the "old"
-    // snapshot. The "new" side needs no such wait--it's a fresh mount
-    // that simply reads whatever these refs hold at that later point.
+    // Drives the :style binding on the already-MOUNTED .content-pane
+    // (the currently-visible listing's or project page's) for the
+    // transition's "old" side. Vue's reactivity normally flushes that
+    // DOM patch on a microtask, not synchronously--awaiting nextTick()
+    // here guarantees it's actually landed before we return control to
+    // Nuxt's own beforeResolve guard (registered separately, always
+    // runs AFTER every beforeEach guard per Vue Router's own ordering),
+    // which is what calls document.startViewTransition() and takes the
+    // "old" snapshot. The "new" side needs no such wait--it's a fresh
+    // mount that simply reads whatever this ref holds at that later
+    // point.
     await nextTick()
     html.dataset.transition = type
   })

@@ -28,7 +28,6 @@ const props = defineProps<{
 
 const introText = computed(() => sectionIntroText(props.section))
 
-const morphTarget = useState<string | null>('morphTargetSlug', () => null)
 const panelTransitionStyle = usePanelTransitionStyle()
 
 // Flat running index across the whole gallery (a pair row counts as two),
@@ -71,7 +70,6 @@ const flatGallery = computed(() => {
               :height="cover.height"
               :src="cover.src"
               :alt="title"
-              :style="slug === morphTarget ? { viewTransitionName: `project-cover-${slug}` } : undefined"
             />
             <VpBare v-else :src="cover.src" :width="cover.width" :height="cover.height" />
           </figure>
