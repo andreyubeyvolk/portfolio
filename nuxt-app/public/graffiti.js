@@ -1,11 +1,18 @@
-// ── Spray-can graffiti (desktop only). Hold Ctrl (or Cmd on Mac):
-// cursor swaps to a black spray-can icon. Hold it + drag with the left
-// mouse button: paints a spray-style stroke—add Shift for red (#EB1026)
-// or Alt for green (#11E3B0), held for the whole stroke; plain Ctrl+drag
-// stays the default black/gray. Release Ctrl/Cmd: painting stops, but
-// the tag itself stays put—nothing fades or clears on its own. To wipe
-// it, press Backspace, Delete, Space, or Escape (while not typing in a
-// text field), or just reload/leave the page.
+// ── Spray-can graffiti. Desktop: hold Ctrl (or Cmd on Mac)—cursor swaps
+// to a black spray-can icon. Hold it + drag with the left mouse button:
+// paints a spray-style stroke—add Shift for red (#EB1026) or Alt for
+// green (#11E3B0), held for the whole stroke; plain Ctrl+drag stays the
+// default black/gray. Release Ctrl/Cmd: painting stops, but the tag
+// itself stays put—nothing fades or clears on its own. To wipe it,
+// press Backspace, Delete, Space, or Escape (while not typing in a text
+// field), or just reload/leave the page.
+//
+// Touch (phone/tablet): hold a finger still for 3s to arm a stroke (the
+// same spray-can cursor appears at that point)—drag while held, lift to
+// end it. Two fingers tapped together quickly (no long-press) erases
+// everything, same as Escape. Touch strokes only ever land on the fixed
+// canvas (see "Rendering" below)—mobile pages don't have the desktop's
+// custom-scrolled pane to route content-relative paint through.
 //
 // Shared across every Brands page (originally a nimax-only prototype;
 // see graffiti.css for the matching styles and logo-scrub.js for the
@@ -99,7 +106,15 @@ window.initGraffiti = function initGraffiti() {
   // keyboard+mouse, so a wide-viewport touch device (tablet landscape,
   // "desktop site" on a phone) should never arm this either.
   var desktopQuery = window.matchMedia('(min-width: 981px) and (pointer: fine)');
-  if (!desktopQuery.matches) return function () {};
+  // Touch tagging (long-press to arm, see the bottom of this file) is a
+  // separate, additive input path--gated on touch capability, not on
+  // desktopQuery, so it works on phones/tablets even where the Ctrl+drag
+  // path above is inert. A hybrid device (touchscreen laptop) can
+  // legitimately have both true at once; that's fine, they don't
+  // conflict (one needs a held Ctrl key, the other a 3s hold with no
+  // modifier).
+  var touchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  if (!desktopQuery.matches && !touchCapable) return function () {};
 
   // Values below are andrey's own tuned pass from the settings
   // panel (2026-09-12)—dialed in by eye, not derived from
@@ -351,7 +366,7 @@ window.initGraffiti = function initGraffiti() {
   // resize instead: below the breakpoint, every overlay hides and
   // Ctrl-mode is force-released; above it, everything comes back.
   function resize() {
-    if (!desktopQuery.matches) {
+    if (!desktopQuery.matches && !touchCapable) {
       canvas.style.display = 'none';
       paneView.style.display = 'none';
       filmstripView.style.display = 'none';
@@ -359,14 +374,31 @@ window.initGraffiti = function initGraffiti() {
       return;
     }
     canvas.style.display = '';
-    paneView.style.display = '';
-    filmstripView.style.display = '';
     dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     canvas.width = Math.round(window.innerWidth * dpr);
     canvas.height = Math.round(window.innerHeight * dpr);
     canvas.style.width = window.innerWidth + 'px';
     canvas.style.height = window.innerHeight + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    if (!desktopQuery.matches) {
+      // Touch-only (no fine pointer/desktop width): no pane/card/
+      // filmstrip concept in play here--mobile pages don't have the
+      // desktop's custom-scrolled .content-pane__scroll (Lenis is
+      // desktop-gated in ScrollPane.vue; mobile.css lets .content-pane
+      // flow with the natively-scrolling body instead), so there's
+      // nothing meaningful to route pane-relative paint through. Touch
+      // strokes land on the fixed canvas only--paneRect/cardRect simply
+      // stay null (never assigned below), which is exactly what already
+      // makes stampDot's routing fall through to the fixed-canvas
+      // branch on its own, no extra check needed there.
+      paneView.style.display = 'none';
+      filmstripView.style.display = 'none';
+      resetDripState();
+      return;
+    }
+    paneView.style.display = '';
+    filmstripView.style.display = '';
 
     updatePaneRect();
     updateCardRect();
@@ -782,6 +814,101 @@ window.initGraffiti = function initGraffiti() {
   function onClick(e) { if (ctrlHeld) e.preventDefault(); }
   window.addEventListener('click', onClick, true);
 
+  // ── Touch tagging: long-press to arm, draw while held, lift to end ──
+  // "После долгого зажатия пальцем... появляется курсор-балончик и ты
+  // начинаешь тегать? как только убираешь палец - линия заканчивается."
+  // Reuses the exact same smoothing/stamping pipeline as the mouse path
+  // (isDrawing/lastStamp/smooth/raw, tick()'s stamp loop)--arming just
+  // seeds those the same way onMouseDown does, so nothing downstream
+  // needs to know or care whether the stroke came from a mouse or a
+  // finger. Erasing is a two-finger tap (quick, both fingers together,
+  // never triggered a long-press draw)--no OS permission prompt, no
+  // conflict with an ordinary one-finger scroll/tap, unlike e.g.
+  // shake-to-undo (needs a DeviceMotion permission dialog on iOS).
+  var LONG_PRESS_MS = 3000;
+  var MOVE_CANCEL_PX = 10;
+  var TWO_FINGER_TAP_MS = 400;
+  var touchArmed = false;
+  var longPressTimer = null;
+  var touchStartX = 0, touchStartY = 0;
+  var twoFingerStart = null; // { time } while exactly 2 fingers are down
+
+  function armTouchDrawing(x, y) {
+    touchArmed = true;
+    isDrawing = true;
+    strokeColor = null;
+    raw.x = smooth.x = x;
+    raw.y = smooth.y = y;
+    lastStamp = { x: x, y: y };
+    cursor.classList.add('is-active');
+    cursor.style.transform = 'translate(' + (x - HOTSPOT_X) + 'px,' + (y - HOTSPOT_Y) + 'px)';
+    // Same class the desktop Ctrl-hold path toggles--ProjectCard.vue's
+    // hover-preview/darken-scale logic already checks this to suppress
+    // itself while a stroke is live, and that applies just as much to a
+    // touch-drag preview interaction.
+    document.body.classList.add('graffiti-mode');
+    if (navigator.vibrate) navigator.vibrate(20); // no-op where unsupported (iOS Safari)
+  }
+  function disarmTouchDrawing() {
+    touchArmed = false;
+    isDrawing = false;
+    lastStamp = null;
+    cursor.classList.remove('is-active');
+    document.body.classList.remove('graffiti-mode');
+  }
+
+  function onTouchStart(e) {
+    if (e.touches.length === 2) {
+      clearTimeout(longPressTimer);
+      twoFingerStart = { time: performance.now() };
+      return;
+    }
+    twoFingerStart = null;
+    if (e.touches.length !== 1 || touchArmed) return;
+    var t = e.touches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    clearTimeout(longPressTimer);
+    longPressTimer = setTimeout(function () { armTouchDrawing(touchStartX, touchStartY); }, LONG_PRESS_MS);
+  }
+  function onTouchMove(e) {
+    var t = e.touches[0];
+    if (!t) return;
+    if (touchArmed) {
+      e.preventDefault(); // stop the page scrolling once a stroke is actually live
+      raw.x = t.clientX;
+      raw.y = t.clientY;
+      return;
+    }
+    // Still waiting out the long-press: real movement means this is a
+    // scroll/swipe, not a hold--cancel arming rather than fight it.
+    if (Math.hypot(t.clientX - touchStartX, t.clientY - touchStartY) > MOVE_CANCEL_PX) {
+      clearTimeout(longPressTimer);
+    }
+  }
+  function onTouchEnd(e) {
+    clearTimeout(longPressTimer);
+    if (touchArmed) { disarmTouchDrawing(); return; }
+    if (twoFingerStart && e.touches.length === 0 && performance.now() - twoFingerStart.time < TWO_FINGER_TAP_MS) {
+      clearAll();
+    }
+    twoFingerStart = null;
+  }
+  function onTouchCancel() {
+    clearTimeout(longPressTimer);
+    twoFingerStart = null;
+    disarmTouchDrawing();
+  }
+  if (touchCapable) {
+    // touchmove is deliberately NOT passive--onTouchMove needs to call
+    // preventDefault() once a stroke is armed, to stop the page
+    // scrolling out from under a live drawing gesture.
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', onTouchCancel, { passive: true });
+  }
+
   // Routes each dot to whichever layer actually represents where
   // it landed: inside .content-pane, it goes on the pane's own
   // (scrolling) canvas in content-relative coordinates, with the
@@ -1089,7 +1216,7 @@ window.initGraffiti = function initGraffiti() {
 
   function tick() {
     rafId = requestAnimationFrame(tick);
-    if (!ctrlHeld) return;
+    if (!ctrlHeld && !touchArmed) return;
 
     // Falling behind 30fps (33ms/frame) backs qualityScale off
     // fast; comfortably ahead of it recovers slowly—asymmetric on
@@ -1193,6 +1320,13 @@ window.initGraffiti = function initGraffiti() {
     window.removeEventListener('mousedown', onMouseDown);
     window.removeEventListener('mouseup', onMouseUp);
     window.removeEventListener('click', onClick, true);
+    if (touchCapable) {
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchCancel);
+    }
+    clearTimeout(longPressTimer);
     if (resizeObserver) resizeObserver.disconnect();
     document.body.classList.remove('graffiti-mode');
     if (window.clearGraffiti === clearAll) delete window.clearGraffiti;
