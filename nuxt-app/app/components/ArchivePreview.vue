@@ -375,28 +375,35 @@ function stepPreview(dir: 1 | -1) {
 // initial open (that already has its own is-open fade).
 const isStepping = ref(false)
 
-// Mount/unmount (not the step-to-step crossfade above) gets a mask
-// that wipes down from the top to reveal the lightbox, and the reverse
-// to hide it on close--"шторкой сверху, как маской" per the user's own
-// description. Deliberately a PLAIN CSS clip-path transition on its own
-// overlay element (.archive-preview__shutter), not the native View
-// Transitions API: that approach (tried first) ties the mask's timing
+// Mount/unmount (not the step-to-step crossfade above) gets a mask:
+// the lightbox's OWN content clips away upward into a slot at the top,
+// unclipping the ACTUAL archive grid underneath (already there the
+// whole time, just dimmed via body.is-preview-open) instead of a
+// separate opaque panel covering it. Per the user's own correction:
+// a separate white shutter read as "an unwanted white curtain"; what
+// they wanted is the card itself sliding up into a mask, revealing the
+// real section at full opacity as it goes--so this clips
+// .archive-preview directly (clip-path, not the native View
+// Transitions API--that approach, tried first, ties the mask's timing
 // to a browser-captured snapshot, and Archive's own sizing
 // (syncPreviewSize/openFilmstrip) has async steps whose completion the
-// browser's transition callback doesn't reliably wait for--the mask
-// ended up revealing content before it was correctly sized. A shutter
-// element sidesteps that entirely: content gets mounted and sized on
-// whatever schedule it needs to, in full, BEFORE the shutter is ever
-// told to retract--so there's nothing for it to reveal but the already-
-// correct layout. Pattern matches the user's own reference
-// (House of Walk's shutter/curtain), same clip-path direction.
-const shutterCovering = ref(true)
+// transition callback doesn't reliably wait for, revealing content
+// before it was correctly sized).
+//
+// isVisible drives the clip: default (mounted, not yet revealed) is
+// clipped to a zero-height sliver anchored at the TOP (bottom-inset
+// 100%)--as it opens, the bottom-inset shrinks toward 0, so the
+// visible box grows DOWNWARD from that top anchor (content "slides
+// down out of a slot at the top"). Closing reverses the exact same
+// property back to the sliver, which reads as the content retreating
+// back UP into that same slot--exactly the reverse motion, no separate
+// keyframes needed for either direction.
 // Invalidates a pending close's delayed unmount if the user reopens
 // before that unmount actually runs--without this, a fast
 // close-then-reopen could have the stale close still unmount the
 // freshly-reopened lightbox out from under it.
 let transitionToken = 0
-const SHUTTER_MS = 600
+const MASK_MS = 600
 
 // ── Open/close ───────────────────────────────────────────────────────
 watch(() => props.openIndex, async (idx) => {
@@ -405,24 +412,26 @@ watch(() => props.openIndex, async (idx) => {
   const token = ++transitionToken
 
   if (wasClosed) {
-    shutterCovering.value = true
     isOpen.value = true
-    isVisible.value = true
+    // isVisible stays false here--the freshly-mounted element starts
+    // clipped to the top sliver, revealed only once sizing below
+    // finishes (see the double-rAF further down for why the reveal
+    // itself is deferred, not just the mount).
     document.body.classList.add('is-preview-open')
     await nextTick()
     if (isGroupMode.value) await openFilmstrip()
     else await syncPreviewSize()
     if (token !== transitionToken) return // superseded mid-transition (rapid open/close)
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
-    // Content is now fully sized--safe to retract the shutter. Double
-    // rAF (not one): the "covering" state needs to actually paint
-    // before flipping the class, or the browser can coalesce both
-    // style changes into a single frame and skip the transition
-    // entirely, same reasoning as loadMore()'s own "two frames, not
-    // one" reveal elsewhere in this file.
+    // Content is now fully sized--safe to reveal. Double rAF (not
+    // one): the clipped/hidden state needs to actually paint before
+    // flipping the class, or the browser can coalesce both style
+    // changes into a single frame and skip the transition entirely,
+    // same reasoning as loadMore()'s own "two frames, not one" reveal
+    // elsewhere in this file.
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        if (token === transitionToken) shutterCovering.value = false
+        if (token === transitionToken) isVisible.value = true
       })
     })
     return
@@ -442,7 +451,19 @@ watch(() => props.openIndex, async (idx) => {
     await openFilmstrip()
   } else {
     await syncPreviewSize()
-    requestAnimationFrame(() => { isStepping.value = false })
+    // Force a synchronous style/layout flush of the current
+    // (is-stepping) state before clearing it--reading a layout
+    // property does this immediately, guaranteed. The previous
+    // requestAnimationFrame() here could be delayed by an arbitrary
+    // amount of other work (this same tick's own decode/measure work
+    // included), during which the image was stuck showing its faded/
+    // shrunk starting state--read live as the plaques and photo
+    // randomly drifting right after stepping out of a filmstrip
+    // series into the next single-image card, since THAT crossing
+    // does the most work (a fresh .archive-preview__inner mount) and
+    // so was the likeliest to push the rAF back far enough to notice.
+    previewImg.value?.offsetHeight
+    isStepping.value = false
   }
 })
 
@@ -454,14 +475,17 @@ function close() {
   window.clearGraffiti?.()
   filmstripStopEase()
   clearTimeout(closeTimer)
-  // Cover first (reverse of the open reveal--same clip-path property,
-  // so the browser just plays the transition backward), THEN unmount
-  // once it's fully hidden behind the shutter--no visible pop from the
-  // content disappearing, since nothing of it is showing by then.
-  shutterCovering.value = true
+  // Retreat first (reverse of the open reveal--same clip-path property,
+  // so the browser just plays the transition backward, the content
+  // clipping back up into the top slot), THEN unmount once it's fully
+  // clipped away--no visible pop from the content disappearing, since
+  // nothing of it is showing by then. The archive grid underneath
+  // (already there, just dimmed via body.is-preview-open, removed
+  // above) fades back to full opacity on its own 0.3s transition,
+  // visible through the shrinking clip the whole time.
+  isVisible.value = false
   closeTimer = setTimeout(() => {
     if (token !== transitionToken) return // a reopen already happened, don't unmount it
-    isVisible.value = false
     isOpen.value = false
     overlay.value?.style.removeProperty('--preview-width')
     overlay.value?.style.removeProperty('--preview-image-height')
@@ -469,7 +493,7 @@ function close() {
     if (previewHeader.value) previewHeader.value.style.width = ''
     if (previewText.value) previewText.value.style.width = ''
     if (previewInner.value) previewInner.value.style.alignItems = ''
-  }, SHUTTER_MS)
+  }, MASK_MS)
   emit('update:openIndex', null)
 }
 
@@ -539,7 +563,6 @@ onBeforeUnmount(() => {
     @click="onOverlayClick"
   >
     <button class="close-button preview-close" type="button" @click="close"><span>[X]</span></button>
-    <div class="archive-preview__shutter" :class="{ 'is-covering': shutterCovering }" aria-hidden="true"></div>
 
     <div v-if="!isGroupMode" ref="previewInner" class="archive-preview__inner">
       <header ref="previewHeader" class="content-pane__header project-header">
