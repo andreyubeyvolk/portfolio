@@ -88,8 +88,15 @@
     idleTimer = setTimeout(function () { showTip(lastMouseX, lastMouseY); }, 5000);
   }
   window.addEventListener('mousemove', function (e) {
+    // A plain click (mousedown+mouseup with no drag) still dispatches a
+    // 'mousemove' in some browsers even at zero/near-zero delta--without
+    // this check, repeatedly clicking in place (e.g. dotting with
+    // graffiti rather than dragging) kept re-arming this timer forever,
+    // so the hint never got a real 5s idle window to fire in.
+    var dx = e.clientX - lastMouseX, dy = e.clientY - lastMouseY;
     lastMouseX = e.clientX;
     lastMouseY = e.clientY;
+    if (Math.abs(dx) < 2 && Math.abs(dy) < 2) return;
     hideTip();
     armIdleTimer();
   });
