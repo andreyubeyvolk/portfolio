@@ -22,7 +22,14 @@ button.archive-card {
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 10;
+        /* Above .archive-page-veil's own z-index:11--that veil needed to
+           clear .site-nav's z-index:10 (styles.css, tablet breakpoint),
+           which put it above THIS element's old z-index:10 too, letting
+           the veil visually wash out the card/header/description above
+           it instead of just dimming the page behind it. The card must
+           always win over the veil; the veil only ever needs to beat the
+           page's own normal content. */
+        z-index: 12;
         /* Mask, not a fade: opening clips this element's own content to a
            zero-height sliver anchored at the TOP (bottom-inset 100%), then
            grows it downward as the bottom-inset shrinks--reads as the
