@@ -16,8 +16,8 @@ useHead({
       '@type': 'Person',
       name: 'Andrey Ubeyvolk',
       jobTitle: 'Conceptual Art Director',
-      url: 'https://andreyubeyvolk.github.io/portfolio/',
-      image: 'https://andreyubeyvolk.github.io/portfolio/assets/portrait.webp',
+      url: 'https://andreyubeyvolk.com/',
+      image: 'https://andreyubeyvolk.com/assets/portrait.webp',
       sameAs: [
         'https://t.me/andreyubeyvolk',
         'https://www.linkedin.com/in/andrei-ubeyvolk-b318a817b',

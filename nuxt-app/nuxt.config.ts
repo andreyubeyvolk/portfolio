@@ -5,6 +5,15 @@ export default defineNuxtConfig({
   ],
   devtools: { enabled: true },
   compatibilityDate: '2024-04-03',
+  // /sitemap.xml is a server route (server/routes/sitemap.xml.ts), not a
+  // page--`nuxt generate`'s crawler only follows <a>/NuxtLink hrefs it
+  // finds in prerendered pages, so a route nothing links to needs listing
+  // here explicitly to end up as a static file in the output.
+  nitro: {
+    prerender: {
+      routes: ['/sitemap.xml'],
+    },
+  },
   // Native (same-document) View Transitions for client-side route
   // changes--see plugins/page-transition.client.ts for how the actual
   // effect (curtain vs. project-cover morph vs. none) is chosen per
