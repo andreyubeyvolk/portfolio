@@ -28,14 +28,12 @@ button.archive-card {
            grows it downward as the bottom-inset shrinks--reads as the
            whole card sliding down out of a slot at the top. Closing plays
            the exact same property backward (retreating back up into that
-           slot). The dimmed real archive grid underneath is revealed as
-           it goes too--not a separate opacity fade running on its own
-           timer, but literally the same clip-path: .archive-preview__scrim
-           (a child of this element, see below) sits between the grid and
-           the card, so wherever this mask has opened, both the scrim AND
-           the card become visible together, one moving veil doing both
-           jobs at once. See ArchivePreview.vue's own comment on why this
-           replaced the earlier View-Transition-based mask.
+           slot). The page behind it dims in lockstep too, via the
+           separate .archive-page-veil (teleported to page level, see
+           ArchivePreview.vue's own template comment)--same clip-path
+           values/timing, just scoped to cover the whole page (nav sidebar
+           + section intro included) rather than only what fits inside
+           this element's own content-pane-scoped box.
            Deliberately no transform/translate on the content itself (a
            translateY was tried and reverted per the user's own
            correction)--the CARD stays perfectly still the whole time;
@@ -53,23 +51,44 @@ button.archive-card {
         display: none;
       }
 
-      /* Fills the whole clipped box behind the card/filmstrip content--
-         same page-background color as body's own #F5F4F4, at the same
-         92% opacity the grid itself used to fade to under the old
-         body.is-preview-open rule (see that rule's own removal note
-         elsewhere in this file). The math is identical either way
-         (8% of the grid's own color still shows through, blended with
-         92% background)--the difference is WHERE that blending happens:
-         here it's confined to whatever region this element's own
-         clip-path has already revealed, instead of applying to the grid
-         uniformly regardless of the mask's position. */
-      .archive-preview__scrim {
-        position: absolute;
+      /* Page-level dimming veil (see ArchivePreview.vue's own template
+         comment for why this is teleported out rather than living inside
+         .archive-preview). Same page-background color as body's own
+         #F5F4F4, at the same 92% opacity the grid itself used to fade to
+         under the old body.is-preview-open rule (see that rule's own
+         removal note further down)--the math is identical either way (8%
+         of whatever's underneath still shows through, blended with 92%
+         background). Purely decorative--pointer-events:none, so it never
+         intercepts clicks meant for the page (closing-by-clicking-
+         outside still only works within .archive-preview's own bounds,
+         same as before this veil existed at all). z-index 11 clears
+         .site-nav's own z-index:10 at the tablet breakpoint (styles.css),
+         where .site-nav is position:sticky and would otherwise compete
+         for the same stacking level. */
+      .archive-page-veil {
+        position: fixed;
         inset: 0;
+        z-index: 11;
         background: rgba(245, 244, 244, 0.92);
+        pointer-events: none;
+        clip-path: inset(0 0 100% 0);
+        transition: clip-path 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+      }
+      .archive-page-veil.is-open {
+        clip-path: inset(0 0 0 0);
       }
 
       .archive-preview__inner {
+        /* position:relative (not just for its own sake--see below) is
+           what actually keeps this above .archive-preview__scrim.
+           Positioned elements always paint above non-positioned ones in
+           the same stacking context regardless of DOM order--the scrim
+           (position:absolute) was winning against this element's default
+           position:static even though it comes LATER in the markup,
+           which is what let it visibly cover the description/tags
+           underneath. .archive-preview__filmstrip never had this problem
+           since it was already position:absolute. */
+        position: relative;
         width: fit-content;
         max-width: calc(100% - 16px);
         max-height: 100%;
@@ -440,31 +459,17 @@ button.archive-card {
         display: none;
       }
 
-      /* Background treatment for the nav sidebar/section intro: plain
-         opacity fade, no blur. Neither sits behind .archive-preview's own
-         clip-path (they're outside .content-pane entirely), so there's no
-         mask to tie them to--the grid itself USED to be dimmed the same
-         way here too, but that's now handled by .archive-preview__scrim
-         above instead, since the grid genuinely does sit behind that
-         mask and can be synced to it. The transition lives here,
-         unconditionally, not just in the dimmed state below--when the
-         class is removed on close, the element stops matching that rule
-         at the very same instant the opacity reverts, so a transition
-         declared only there never gets to animate the close. Still a bit
-         quicker than the open (0.24s vs 0.3s—was 0.18s, nudged up for a
-         softer close), matching the preview panel's own fade above. */
-      .site-nav,
-      .section-intro {
-        transition: opacity 0.24s ease;
-      }
+      /* Nav sidebar/section intro/grid all just need to stop being
+         interactive while the lightbox sits on top--dimming itself is
+         handled entirely by .archive-page-veil now (see that rule
+         above), which covers the whole page in one pass instead of
+         these three independently fading their own opacity. Keeping a
+         SEPARATE opacity fade here too would double-dim them (the
+         veil's own overlay plus their own reduced opacity stacking
+         together), which is exactly what the user's own "вуаль чтобы
+         закрывала всю страницу" ask replaced. */
       body.is-preview-open .site-nav,
-      body.is-preview-open .section-intro {
-        opacity: 0.08;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-      }
-      /* Still needs to stop being interactive while the lightbox sits on
-         top of it--just no opacity fade of its own anymore (see above). */
+      body.is-preview-open .section-intro,
       body.is-preview-open .content-pane__scroll {
         pointer-events: none;
       }

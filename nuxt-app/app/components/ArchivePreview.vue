@@ -675,6 +675,19 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <!-- Dims the WHOLE page (nav sidebar + section intro + the archive
+       grid) behind the lightbox, not just the content-pane area--
+       teleported to a page-level anchor since .archive-preview itself is
+       scoped to .content-pane's own box (its width-fitting math depends
+       on that), so it can't stretch to cover the sidebar too. Driven by
+       the same isOpen/isVisible this component already tracks, so it's
+       exactly in sync with the card's own clip-path--one veil, sized for
+       the page, doing both jobs at once. Per the user's own ask: "можно
+       сделать вуаль чтобы закрывала всю страницу (учитывая меню и блок
+       инфо)?" -->
+  <Teleport to="#teleports">
+    <div v-if="isOpen" class="archive-page-veil" :class="{ 'is-open': isVisible }" aria-hidden="true"></div>
+  </Teleport>
   <div
     v-if="isOpen"
     ref="overlay"
@@ -682,16 +695,6 @@ onBeforeUnmount(() => {
     :class="{ 'is-open': isVisible, 'is-filmstrip': isGroupMode, 'is-vertical': !isGroupMode && isVertical, 'is-horizontal': !isGroupMode && !isVertical }"
     @click="onOverlayClick"
   >
-    <!-- Dims the real archive grid behind this overlay--deliberately a
-         plain child here rather than a separate opacity fade on the grid
-         itself (see archive-page.css's own comment on this): being a
-         child of .archive-preview means it's clipped by the SAME
-         clip-path as the rest of this element, so the dimming and the
-         card reveal are literally the same moving mask, not two
-         independently-timed effects. Per the user's own framing: "как
-         наезд вуали которая одновременно осветляет фон и показывает нам
-         открытую карточку." -->
-    <div class="archive-preview__scrim" aria-hidden="true"></div>
     <button class="close-button preview-close" type="button" @click="close"><span>[X]</span></button>
 
     <div v-if="!isGroupMode" ref="previewInner" class="archive-preview__inner" :class="{ 'is-stepping': isStepping }">
