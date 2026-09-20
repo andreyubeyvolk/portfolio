@@ -185,6 +185,26 @@ button.archive-card {
         padding-left: 16px;
       }
 
+      /* Mask that wipes down from the top to reveal the lightbox on open,
+         and reverses to hide it on close--see ArchivePreview.vue's own
+         comment for why this is a plain CSS overlay rather than the
+         native View Transitions API. Sits above .archive-preview__inner/
+         .archive-preview__filmstrip (both un-positioned, z-index:auto)
+         but below .preview-close (z-index:6), so [X] stays visible and
+         clickable through the whole animation. */
+      .archive-preview__shutter {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        background: #fff;
+        clip-path: inset(100% 0 0 0);
+        transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+        pointer-events: none;
+      }
+      .archive-preview__shutter.is-covering {
+        clip-path: inset(0 0 0 0);
+      }
+
       /* ── Series filmstrip ──────────────────────────────────────────
          Horizontal-scrolling row of every frame in an opened series (see
          data-group on the source [data-preview] images). Each frame keeps

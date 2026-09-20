@@ -52,20 +52,31 @@ function isMobile() {
 }
 
 // ── Single-image sizing (Stage 2) ──────────────────────────────────────
+// Two passes, back-to-back: fitPreviewImage's own math depends on
+// previewHeader/previewText's WIDTH, which the first pass itself just
+// set--the second pass re-measures against that now-stable layout.
+// Originally double-requestAnimationFrame'd (ported as-is from the
+// static site), which silently broke inside the Archive open/close
+// View Transition added later: that callback's own promise resolved
+// right after img.decode(), well before either rAF had actually run,
+// so the transition's "new" snapshot captured the UNSIZED, natural-size
+// image--the mask then revealed that oversized/mispositioned layout
+// before it visibly snapped to the correct one a frame later. Calling
+// fitPreviewImage() synchronously twice works just as well: reading
+// offsetHeight/clientHeight/getBoundingClientRect() always forces a
+// synchronous layout recalculation against whatever was just written,
+// no actual paint required--and now `await syncPreviewSize()` really
+// does mean "sizing is done" wherever it's called, transition or not.
 async function syncPreviewSize() {
   const img = previewImg.value
   if (!img) return
   if (img.decode) {
     try { await img.decode() } catch { /* a stale/aborted decode--the next syncPreviewSize call (new src) supersedes it */ }
   }
-  requestAnimationFrame(() => {
-    fitPreviewImage()
-    if (overlay.value && previewImg.value) overlay.value.style.setProperty('--preview-width', `${previewImg.value.getBoundingClientRect().width}px`)
-    requestAnimationFrame(() => {
-      fitPreviewImage()
-      if (overlay.value && previewImg.value) overlay.value.style.setProperty('--preview-width', `${previewImg.value.getBoundingClientRect().width}px`)
-    })
-  })
+  fitPreviewImage()
+  if (overlay.value && previewImg.value) overlay.value.style.setProperty('--preview-width', `${previewImg.value.getBoundingClientRect().width}px`)
+  fitPreviewImage()
+  if (overlay.value && previewImg.value) overlay.value.style.setProperty('--preview-width', `${previewImg.value.getBoundingClientRect().width}px`)
 }
 
 function fitPreviewImage() {
@@ -150,19 +161,24 @@ async function openFilmstrip() {
   frameEls.value = []
   frameImgEls.value = []
   await nextTick()
-  const idx = entryIndexInGroup.value
-  if (idx <= 0) {
-    if (filmstripEl.value) filmstripEl.value.scrollLeft = 0
-  } else {
-    requestAnimationFrame(() => {
-      const frame = frameEls.value[idx]
-      if (filmstripEl.value && frame) filmstripEl.value.scrollLeft = frame.offsetLeft
-    })
-  }
+  // Size already-cached/complete frames BEFORE reading offsetLeft below--
+  // same reasoning as syncPreviewSize's rAF removal: this used to run one
+  // frame AFTER the scroll-set (via requestAnimationFrame), which broke
+  // inside the Archive open View Transition (its own callback resolves
+  // before that rAF ever fires, so the transition's "new" snapshot saw
+  // the wrong scroll position). Reordered so both happen synchronously,
+  // sizing first.
   groupFrames.value.forEach((_, i) => {
     const img = frameImgEls.value[i]
     if (img?.complete && img.naturalWidth) fitFilmstripFrame(i)
   })
+  const idx = entryIndexInGroup.value
+  if (idx <= 0) {
+    if (filmstripEl.value) filmstripEl.value.scrollLeft = 0
+  } else {
+    const frame = frameEls.value[idx]
+    if (filmstripEl.value && frame) filmstripEl.value.scrollLeft = frame.offsetLeft
+  }
 }
 
 // ── Filmstrip drag/wheel/magnet interaction ─────────────────────────────
@@ -347,40 +363,28 @@ function stepPreview(dir: 1 | -1) {
 // initial open (that already has its own is-open fade).
 const isStepping = ref(false)
 
-// Mount/unmount (not the step-to-step crossfade above) gets a real
-// View Transition instead: a mask that wipes down from the top to
-// reveal the lightbox, and the reverse to hide it on close--"шторкой
-// сверху, как маской" per the user's own description. Not a route
-// change, so there's no router hook to key off; this component starts
-// its own transition directly around the isOpen/isVisible flip. Only
-// this one flag needs to carry the name--conditional, not always-on,
-// same reasoning as the page-transition names elsewhere: an always-on
-// name would leak into any UNRELATED transition that happens to run
-// while a card is open (e.g. clicking a nav link mid-browse).
-const lightboxTransitionActive = ref(false)
+// Mount/unmount (not the step-to-step crossfade above) gets a mask
+// that wipes down from the top to reveal the lightbox, and the reverse
+// to hide it on close--"шторкой сверху, как маской" per the user's own
+// description. Deliberately a PLAIN CSS clip-path transition on its own
+// overlay element (.archive-preview__shutter), not the native View
+// Transitions API: that approach (tried first) ties the mask's timing
+// to a browser-captured snapshot, and Archive's own sizing
+// (syncPreviewSize/openFilmstrip) has async steps whose completion the
+// browser's transition callback doesn't reliably wait for--the mask
+// ended up revealing content before it was correctly sized. A shutter
+// element sidesteps that entirely: content gets mounted and sized on
+// whatever schedule it needs to, in full, BEFORE the shutter is ever
+// told to retract--so there's nothing for it to reveal but the already-
+// correct layout. Pattern matches the user's own reference
+// (House of Walk's shutter/curtain), same clip-path direction.
+const shutterCovering = ref(true)
 // Invalidates a pending close's delayed unmount if the user reopens
-// (or steps to another card) before that unmount actually runs--without
-// this, a fast close-then-reopen could have the stale close still
-// unmount the freshly-reopened lightbox out from under it.
+// before that unmount actually runs--without this, a fast
+// close-then-reopen could have the stale close still unmount the
+// freshly-reopened lightbox out from under it.
 let transitionToken = 0
-
-async function withLightboxTransition(mutate: () => void | Promise<void>) {
-  if (!document.startViewTransition) {
-    // No API support (Firefox, older browsers): just apply the change
-    // instantly--an acceptable plain fallback, same as anywhere else
-    // this codebase feature-detects the API.
-    await mutate()
-    return
-  }
-  lightboxTransitionActive.value = true
-  await nextTick()
-  const transition = document.startViewTransition(async () => {
-    await mutate()
-    await nextTick()
-  })
-  try { await transition.finished } catch { /* aborted--the mutation above already applied regardless */ }
-  lightboxTransitionActive.value = false
-}
+const SHUTTER_MS = 600
 
 // ── Open/close ───────────────────────────────────────────────────────
 watch(() => props.openIndex, async (idx) => {
@@ -389,23 +393,26 @@ watch(() => props.openIndex, async (idx) => {
   const token = ++transitionToken
 
   if (wasClosed) {
-    // Fresh open: mounting AND sizing (openFilmstrip/syncPreviewSize)
-    // both happen inside the transition's own callback, so the "new"
-    // state the mask reveals is already in its FINAL layout. Doing the
-    // sizing afterward (outside the transition) was a visible jump: the
-    // mask would reveal the lightbox at its raw, not-yet-sized layout,
-    // then an instant later everything would resize into its real
-    // position once syncPreviewSize()/openFilmstrip() ran.
-    await withLightboxTransition(async () => {
-      isOpen.value = true
-      isVisible.value = true
-      document.body.classList.add('is-preview-open')
-      await nextTick()
-      if (isGroupMode.value) await openFilmstrip()
-      else await syncPreviewSize()
-    })
+    shutterCovering.value = true
+    isOpen.value = true
+    isVisible.value = true
+    document.body.classList.add('is-preview-open')
+    await nextTick()
+    if (isGroupMode.value) await openFilmstrip()
+    else await syncPreviewSize()
     if (token !== transitionToken) return // superseded mid-transition (rapid open/close)
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+    // Content is now fully sized--safe to retract the shutter. Double
+    // rAF (not one): the "covering" state needs to actually paint
+    // before flipping the class, or the browser can coalesce both
+    // style changes into a single frame and skip the transition
+    // entirely, same reasoning as loadMore()'s own "two frames, not
+    // one" reveal elsewhere in this file.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (token === transitionToken) shutterCovering.value = false
+      })
+    })
     return
   }
 
@@ -435,21 +442,22 @@ function close() {
   window.clearGraffiti?.()
   filmstripStopEase()
   clearTimeout(closeTimer)
-  overlay.value?.style.removeProperty('--preview-width')
-  overlay.value?.style.removeProperty('--preview-image-height')
-  if (previewImg.value) { previewImg.value.style.width = ''; previewImg.value.style.height = '' }
-  if (previewHeader.value) previewHeader.value.style.width = ''
-  if (previewText.value) previewText.value.style.width = ''
-  if (previewInner.value) previewInner.value.style.alignItems = ''
-  // Both flip together, inside the transition--the "old" snapshot
-  // (captured just before this callback runs) is what actually plays
-  // the cover-mask animation, regardless of how instantly the real DOM
-  // changes underneath it, so there's no need to stagger a fade before
-  // the unmount the way the old rAF/setTimeout choreography did.
-  withLightboxTransition(() => {
+  // Cover first (reverse of the open reveal--same clip-path property,
+  // so the browser just plays the transition backward), THEN unmount
+  // once it's fully hidden behind the shutter--no visible pop from the
+  // content disappearing, since nothing of it is showing by then.
+  shutterCovering.value = true
+  closeTimer = setTimeout(() => {
+    if (token !== transitionToken) return // a reopen already happened, don't unmount it
     isVisible.value = false
-    if (token === transitionToken) isOpen.value = false // a reopen already happened, don't unmount it
-  })
+    isOpen.value = false
+    overlay.value?.style.removeProperty('--preview-width')
+    overlay.value?.style.removeProperty('--preview-image-height')
+    if (previewImg.value) { previewImg.value.style.width = ''; previewImg.value.style.height = '' }
+    if (previewHeader.value) previewHeader.value.style.width = ''
+    if (previewText.value) previewText.value.style.width = ''
+    if (previewInner.value) previewInner.value.style.alignItems = ''
+  }, SHUTTER_MS)
   emit('update:openIndex', null)
 }
 
@@ -516,10 +524,10 @@ onBeforeUnmount(() => {
     ref="overlay"
     class="archive-preview"
     :class="{ 'is-open': isVisible, 'is-filmstrip': isGroupMode, 'is-vertical': !isGroupMode && isVertical, 'is-horizontal': !isGroupMode && !isVertical }"
-    :style="lightboxTransitionActive ? { viewTransitionName: 'archive-lightbox' } : undefined"
     @click="onOverlayClick"
   >
     <button class="close-button preview-close" type="button" @click="close"><span>[X]</span></button>
+    <div class="archive-preview__shutter" :class="{ 'is-covering': shutterCovering }" aria-hidden="true"></div>
 
     <div v-if="!isGroupMode" ref="previewInner" class="archive-preview__inner">
       <header ref="previewHeader" class="content-pane__header project-header">

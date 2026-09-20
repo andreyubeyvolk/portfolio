@@ -64,43 +64,30 @@ html[data-transition='curtain']::view-transition-new(root) {
 
 /* Content-pane curtain for entering/leaving any project. Same wipe
    keyframes as the root curtain, just a shorter box (the .content-pane
-   itself, not the full page). Slightly slower than the original 0.6s
-   pass per the user's own "чуть плавнее, медленнее" ask. */
+   itself, not the full page). Slowed twice per the user's own feedback
+   ("чуть плавнее, медленнее"), 0.6s -> 0.85s -> 0.9s. */
 html[data-transition='project-open-panel']::view-transition-group(content-pane),
 html[data-transition='project-close-panel']::view-transition-group(content-pane) {
-  animation-duration: 0.85s;
+  animation-duration: 0.9s;
 }
 html[data-transition='project-open-panel']::view-transition-old(content-pane),
 html[data-transition='project-close-panel']::view-transition-old(content-pane) {
   z-index: 2;
   mix-blend-mode: normal;
-  animation: vt-curtain-cover 0.85s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation: vt-curtain-cover 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 html[data-transition='project-open-panel']::view-transition-new(content-pane),
 html[data-transition='project-close-panel']::view-transition-new(content-pane) {
   z-index: 1;
   mix-blend-mode: normal;
-  animation: vt-curtain-reveal 0.85s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation: vt-curtain-reveal 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
-/* Archive lightbox open/close (ArchivePreview.vue)--not a route change,
-   so it's driven by a manual document.startViewTransition() call in
-   that component itself rather than this being keyed off
-   data-transition. Opening only ever has a "new" side (nothing to pair
-   with--the overlay didn't exist a moment ago) and closing only ever
-   has an "old" side, so each rule below is the one-sided half of the
-   same curtain-from-top mask. */
-@keyframes vt-mask-reveal-top {
-  0%   { clip-path: inset(0 0 100% 0); }
-  100% { clip-path: inset(0 0 0 0); }
-}
-@keyframes vt-mask-cover-top {
-  0%   { clip-path: inset(0 0 0 0); }
-  100% { clip-path: inset(0 0 100% 0); }
-}
-::view-transition-new(archive-lightbox) {
-  animation: vt-mask-reveal-top 0.5s cubic-bezier(0.65, 0, 0.35, 1) both;
-}
-::view-transition-old(archive-lightbox) {
-  animation: vt-mask-cover-top 0.5s cubic-bezier(0.65, 0, 0.35, 1) both;
-}
+/* Archive lightbox open/close used to be driven by a manual
+   document.startViewTransition() call, styled here via
+   ::view-transition-old/new(archive-lightbox)--replaced with a plain
+   CSS shutter overlay (.archive-preview__shutter in archive-page.css)
+   after the View Transition's snapshot timing didn't reliably wait for
+   Archive's own async sizing (syncPreviewSize/openFilmstrip), revealing
+   content before it was correctly sized/positioned. See
+   ArchivePreview.vue's own comment for the full reasoning. */
