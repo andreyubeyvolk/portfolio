@@ -35,19 +35,19 @@
 
 html[data-transition='curtain']::view-transition-group(root) {
   background: #fff;
-  animation-duration: 0.9s;
+  animation-duration: 1s;
 }
 
 html[data-transition='curtain']::view-transition-old(root) {
   z-index: 2;
   mix-blend-mode: normal;
-  animation: vt-curtain-cover 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation: vt-curtain-cover 1s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
 html[data-transition='curtain']::view-transition-new(root) {
   z-index: 1;
   mix-blend-mode: normal;
-  animation: vt-curtain-reveal 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation: vt-curtain-reveal 1s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
 @keyframes vt-curtain-cover {
@@ -64,23 +64,23 @@ html[data-transition='curtain']::view-transition-new(root) {
 
 /* Content-pane curtain for entering/leaving any project. Same wipe
    keyframes as the root curtain, just a shorter box (the .content-pane
-   itself, not the full page). Slowed twice per the user's own feedback
-   ("чуть плавнее, медленнее"), 0.6s -> 0.85s -> 0.9s. */
+   itself, not the full page). Slowed several times per the user's own
+   feedback ("чуть плавнее, медленнее"), 0.6s -> 0.85s -> 0.9s -> 1s. */
 html[data-transition='project-open-panel']::view-transition-group(content-pane),
 html[data-transition='project-close-panel']::view-transition-group(content-pane) {
-  animation-duration: 0.9s;
+  animation-duration: 1s;
 }
 html[data-transition='project-open-panel']::view-transition-old(content-pane),
 html[data-transition='project-close-panel']::view-transition-old(content-pane) {
   z-index: 2;
   mix-blend-mode: normal;
-  animation: vt-curtain-cover 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation: vt-curtain-cover 1s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 html[data-transition='project-open-panel']::view-transition-new(content-pane),
 html[data-transition='project-close-panel']::view-transition-new(content-pane) {
   z-index: 1;
   mix-blend-mode: normal;
-  animation: vt-curtain-reveal 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation: vt-curtain-reveal 1s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
 /* Archive lightbox open/close used to be driven by a manual

@@ -11,6 +11,16 @@
 // both get the curtain, not just section<->section.
 const SECTION_ROUTE_NAMES = new Set(['index', 'inhouse', 'brands', 'archive', 'about'])
 const PROJECT_ROUTE_NAMES = new Set(['inhouse-slug', 'brands-slug'])
+// Which listing a project's own panel transition is allowed to pair
+// with--its own section's listing, or all-projects (which lists every
+// project and has always legitimately gotten the panel treatment too).
+// Anything else--another section entirely (About, Archive, Home, the
+// OTHER section)--isn't a panel relationship at all, even though one
+// side happens to be a project route.
+const PROJECT_OWN_SECTION: Record<string, string> = { 'inhouse-slug': 'inhouse', 'brands-slug': 'brands' }
+function isProjectPanelPeer(projectName: string, otherName: string) {
+  return otherName === 'all-projects' || PROJECT_OWN_SECTION[projectName] === otherName
+}
 
 // Nuxt's own view-transitions.client.js attaches a .catch() to
 // transition.finished but not to transition.ready--if the browser ever
@@ -80,13 +90,29 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     const toName = String(to.name ?? '')
     const fromName = String(from.name ?? '')
+    const toIsProject = PROJECT_ROUTE_NAMES.has(toName)
+    const fromIsProject = PROJECT_ROUTE_NAMES.has(fromName)
 
+    // Hierarchy: a project's panel transition (open/close within
+    // .content-pane) only makes sense against a listing that actually
+    // shares that panel--its own section, or all-projects. Anything else
+    // is really a menu-level jump to a DIFFERENT section, even when one
+    // side happens to be a project page (e.g. leaving a project via the
+    // nav menu straight to About, or to Archive)--per the user's own
+    // framing, "это по факту переход в другой раздел меню", so it gets
+    // the same full curtain a section<->section nav gets, not the
+    // smaller content-pane panel effect. Checked BEFORE the panel cases
+    // below so a project<->its-own-listing pair (which IS also
+    // "SECTION_ROUTE_NAMES has one side") still correctly falls through
+    // to panel treatment instead.
     let type = 'none'
-    if (PROJECT_ROUTE_NAMES.has(toName) && !PROJECT_ROUTE_NAMES.has(fromName)) {
+    if (toIsProject && !fromIsProject && isProjectPanelPeer(toName, fromName)) {
       type = 'project-open-panel'
-    } else if (PROJECT_ROUTE_NAMES.has(fromName) && !PROJECT_ROUTE_NAMES.has(toName)) {
+    } else if (fromIsProject && !toIsProject && isProjectPanelPeer(fromName, toName)) {
       type = 'project-close-panel'
     } else if (SECTION_ROUTE_NAMES.has(toName) && SECTION_ROUTE_NAMES.has(fromName) && toName !== fromName) {
+      type = 'curtain'
+    } else if (toIsProject !== fromIsProject && (SECTION_ROUTE_NAMES.has(toName) || SECTION_ROUTE_NAMES.has(fromName))) {
       type = 'curtain'
     }
 
