@@ -86,7 +86,7 @@ html[data-transition='project-close-panel']::view-transition-new(content-pane) {
 /* Archive lightbox open/close used to be driven by a manual
    document.startViewTransition() call, styled here via
    ::view-transition-old/new(archive-lightbox)--replaced with a plain
-   CSS shutter overlay (.archive-preview__shutter in archive-page.css)
+   clip-path transition directly on .archive-preview (archive-page.css)
    after the View Transition's snapshot timing didn't reliably wait for
    Archive's own async sizing (syncPreviewSize/openFilmstrip), revealing
    content before it was correctly sized/positioned. See

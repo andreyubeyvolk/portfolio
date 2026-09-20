@@ -23,17 +23,22 @@ button.archive-card {
         right: 0;
         bottom: 0;
         z-index: 10;
-        /* Fades in/out with the dimmed background below (see body.is-
-           preview-open)—[hidden] still applies display:none, but only
-           after this transition has actually finished (see
-           openPreviewFor/closePreview), so there's something to
-           animate through rather than a hard cut. */
-        opacity: 0;
-        transition: opacity 0.24s ease;
+        /* Mask, not a fade: opening clips this element's own content to a
+           zero-height sliver anchored at the TOP (bottom-inset 100%), then
+           grows it downward as the bottom-inset shrinks--reads as the
+           whole card sliding down out of a slot at the top. Closing plays
+           the exact same property backward (retreating back up into that
+           slot), unclipping the real archive grid underneath as it goes
+           (already there, just dimmed via body.is-preview-open--see that
+           rule elsewhere in this file) at whatever opacity IT'S
+           transitioning to, not a separate opaque panel covering it. See
+           ArchivePreview.vue's own comment on why this replaced the
+           earlier View-Transition-based mask. */
+        clip-path: inset(0 0 100% 0);
+        transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.35, 1);
       }
       .archive-preview.is-open {
-        opacity: 1;
-        transition: opacity 0.3s ease;
+        clip-path: inset(0 0 0 0);
       }
 
       .archive-preview[hidden] {
@@ -183,26 +188,6 @@ button.archive-card {
         z-index: 6;
         background: #fff;
         padding-left: 16px;
-      }
-
-      /* Mask that wipes down from the top to reveal the lightbox on open,
-         and reverses to hide it on close--see ArchivePreview.vue's own
-         comment for why this is a plain CSS overlay rather than the
-         native View Transitions API. Sits above .archive-preview__inner/
-         .archive-preview__filmstrip (both un-positioned, z-index:auto)
-         but below .preview-close (z-index:6), so [X] stays visible and
-         clickable through the whole animation. */
-      .archive-preview__shutter {
-        position: absolute;
-        inset: 0;
-        z-index: 5;
-        background: #fff;
-        clip-path: inset(100% 0 0 0);
-        transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.35, 1);
-        pointer-events: none;
-      }
-      .archive-preview__shutter.is-covering {
-        clip-path: inset(0 0 0 0);
       }
 
       /* ── Series filmstrip ──────────────────────────────────────────
