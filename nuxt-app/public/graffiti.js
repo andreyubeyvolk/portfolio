@@ -774,6 +774,25 @@ window.initGraffiti = function initGraffiti() {
     }
   }
 
+  // No wipe, no fade--just gone, this frame. For contexts where some
+  // OTHER animation is already the thing hiding the tag from view (the
+  // Archive lightbox's own closing shutter, see ArchivePreview.vue) and
+  // playing the wipe/fade ON TOP of that read as two competing
+  // animations instead of "the shutter took the tag with it." Skips the
+  // `clearing` guard too--this is meant to run instantly regardless of
+  // whether an unrelated animated clear happens to be mid-flight.
+  function clearAllInstant() {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pctx.clearRect(0, 0, paneCanvas.width, paneCanvas.height);
+    fctx.clearRect(0, 0, filmstripCanvas.width, filmstripCanvas.height);
+    mpctx.clearRect(0, 0, mobilePaneCanvas.width, mobilePaneCanvas.height);
+    resetDripState();
+    blitPane();
+    blitFilmstrip();
+    blitMobilePane();
+  }
+
   // Board-eraser sweep: a soft diagonal band races from the top-left
   // corner to the bottom-right, masking away everything it's already
   // passed—reads as one broad, fast stroke wiping the tag left-to-
@@ -1410,9 +1429,12 @@ window.initGraffiti = function initGraffiti() {
   tick();
 
   // Exposed so other scripts (e.g. the Archive lightbox) can wipe every
-  // tag on demand--switching or closing an open Archive card is meant to
-  // erase whatever was drawn while it was open, same trigger as Escape.
+  // tag on demand--switching cards is meant to erase whatever was drawn
+  // while the previous one was open, same trigger as Escape.
   window.clearGraffiti = clearAll;
+  // Instant variant--see clearAllInstant's own comment for when this is
+  // the right one to reach for instead.
+  window.clearGraffitiInstant = clearAllInstant;
 
   return function destroy() {
     cancelAnimationFrame(rafId);
@@ -1436,6 +1458,7 @@ window.initGraffiti = function initGraffiti() {
     if (mobileResizeObserver) mobileResizeObserver.disconnect();
     document.body.classList.remove('graffiti-mode');
     if (window.clearGraffiti === clearAll) delete window.clearGraffiti;
+    if (window.clearGraffitiInstant === clearAllInstant) delete window.clearGraffitiInstant;
     canvas.remove();
     paneView.remove();
     filmstripView.remove();

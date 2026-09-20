@@ -592,8 +592,19 @@ function close() {
   document.body.classList.remove('is-preview-open')
   filmstripStopEase()
   clearTimeout(closeTimer)
-  // Retreat first (reverse of the open reveal--same clip-path property,
-  // so the browser just plays the transition backward, the content
+  // Instant, not the normal animated clearGraffiti()--per the user's
+  // own correction, the shutter closing is what should visibly take the
+  // tag away, not a separate wipe/fade playing alongside it (that read
+  // as two competing animations instead of one). Right here, at the
+  // same instant the mask starts its own retreat, is deliberate too: the
+  // tag needs to already be gone by the time anything is visible again,
+  // not linger until some later point in the close. Pressing the normal
+  // erase keys (Del/Backspace/Space/Escape) while the card is still open
+  // is untouched--that still goes through clearGraffiti()'s own
+  // wipe/fade, unrelated to this.
+  window.clearGraffitiInstant?.()
+  // Retreat (reverse of the open reveal--same clip-path property, so
+  // the browser just plays the transition backward, the content
   // clipping back up into the top slot), THEN unmount once it's fully
   // clipped away--no visible pop from the content disappearing, since
   // nothing of it is showing by then. The archive grid underneath
@@ -603,16 +614,6 @@ function close() {
   isVisible.value = false
   closeTimer = setTimeout(() => {
     if (token !== transitionToken) return // a reopen already happened, don't unmount it
-    // Clearing the tag only NOW (once the mask has fully retreated),
-    // not at the moment close() was first called--per the user's own
-    // report, clearing it immediately made the tag's disappearance
-    // read as "hidden by the shutter" rather than "erased," since both
-    // animations ran over almost the same window at the same time,
-    // visually blending into one event instead of two distinct ones.
-    // The mechanism itself (clearAll's wipe/fade) was never broken--
-    // confirmed live it does fully clear the canvas--this is purely
-    // about sequencing so the erase reads as its own visible action.
-    window.clearGraffiti?.()
     isOpen.value = false
     overlay.value?.style.removeProperty('--preview-width')
     overlay.value?.style.removeProperty('--preview-image-height')
