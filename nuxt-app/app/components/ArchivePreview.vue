@@ -131,21 +131,33 @@ function fitFilmstripFrame(i: number) {
   const titleEl = frame.querySelector<HTMLElement>('.filmstrip-frame__title')
   const textEl = frame.querySelector<HTMLElement>('.filmstrip-frame__text')
   const tagsEl = frame.querySelector<HTMLElement>('.filmstrip-frame__tags')
-  let chromeH = (titleEl?.offsetHeight ?? 0) + (textEl?.offsetHeight ?? 0)
-  if (tagsEl) chromeH += tagsEl.offsetHeight
-  const availableHeight = strip.clientHeight - chromeH
   const availableWidth = strip.clientWidth - 32
-  let h = Math.min(naturalH, availableHeight)
-  let w = h * (naturalW / naturalH)
-  if (w > availableWidth) {
-    w = availableWidth
-    h = w * (naturalH / naturalW)
+  // Two passes: chromeH depends on titleEl/textEl's CURRENT offsetHeight,
+  // which itself depends on the frame's CURRENT width (text wraps
+  // differently at different widths)--this function is about to CHANGE
+  // that width, so a single pass measures chromeH against a width that's
+  // about to be stale. Computing once, applying it, then re-measuring
+  // against the now-current layout is what actually converges--same
+  // reasoning as syncPreviewSize's own two-pass fix, and the likely
+  // cause of the reported "plaques randomly drift/overlap the photo by
+  // a couple px" bug (whichever pass happened to run first landed on a
+  // width that didn't match the text's real wrapped height).
+  for (let pass = 0; pass < 2; pass++) {
+    let chromeH = (titleEl?.offsetHeight ?? 0) + (textEl?.offsetHeight ?? 0)
+    if (tagsEl) chromeH += tagsEl.offsetHeight
+    const availableHeight = strip.clientHeight - chromeH
+    let h = Math.min(naturalH, availableHeight)
+    let w = h * (naturalW / naturalH)
+    if (w > availableWidth) {
+      w = availableWidth
+      h = w * (naturalH / naturalW)
+    }
+    w = Math.round(w)
+    h = Math.round(h)
+    img.style.width = `${w}px`
+    img.style.height = `${h}px`
+    frame.style.width = `${w}px`
   }
-  w = Math.round(w)
-  h = Math.round(h)
-  img.style.width = `${w}px`
-  img.style.height = `${h}px`
-  frame.style.width = `${w}px`
 }
 
 function fitAllFilmstripFrames() {
@@ -565,6 +577,8 @@ onBeforeUnmount(() => {
           <div class="filmstrip-frame__media">
             <img
               :ref="(el) => { frameImgEls[i] = el as HTMLImageElement | null }"
+              :width="display.frame.width"
+              :height="display.frame.height"
               :src="display.frame.src"
               :alt="display.frame.alt"
               :draggable="false"
