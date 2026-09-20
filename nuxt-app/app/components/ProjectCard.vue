@@ -25,6 +25,15 @@ const props = defineProps<{
 const cardRef = useTemplateRef('cardRef')
 const activeIndex = ref<number | null>(null)
 
+// Shared with app/plugins/page-transition.client.ts--set right before a
+// project-cover morph navigation (open or close) and cleared otherwise, so
+// this card only carries a view-transition-name during the ONE navigation
+// it's actually meant to morph for. A plain unconditional "slug==='igaming'"
+// check would leak the name into every OTHER transition that happens to
+// render this card too (e.g. the curtain between sections), creating a
+// second, unclipped animated layer floating on top of the curtain.
+const morphTarget = useState<string | null>('morphTargetSlug', () => null)
+
 function cardEl(): HTMLElement | null {
   // NuxtLink is a component, not a plain element--its template ref is
   // the component instance, and $el is the underlying <a> it renders.
@@ -33,10 +42,22 @@ function cardEl(): HTMLElement | null {
   return '$el' in instance ? (instance.$el ?? null) : instance
 }
 
+// Ctrl/Cmd held means an in-progress (or about to start) graffiti stroke--
+// the hover-preview cycling and the darken/scale below would otherwise
+// fire right along with it, since the canvas has pointer-events:none and
+// this card's own mousemove keeps receiving events underneath it. Keyed
+// off graffiti.js's own 'graffiti-mode' body class rather than re-reading
+// event.ctrlKey here, since that's the one already source-of-truth for
+// "is a stroke live right now" (only set once the key's actually held on
+// a desktop-with-a-real-keyboard viewport, see graffiti.js's own gating).
+function isGraffitiDrawing() {
+  return document.body.classList.contains('graffiti-mode')
+}
+
 function updateFromClientX(clientX: number) {
   const preview = props.cardPreview
   const el = cardEl()
-  if (!preview?.length || !el) return
+  if (!preview?.length || !el || isGraffitiDrawing()) return
   const rect = el.getBoundingClientRect()
   const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
   activeIndex.value = Math.min(preview.length - 1, Math.floor(ratio * preview.length))
@@ -71,11 +92,12 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
   >
     <div class="inhouse-card__cover">
       <img
+        class="inhouse-card__cover-img"
         width="1080"
         height="1440"
         :src="`/assets/${section}/${slug}/${slug}-card.webp`"
         :alt="title"
-        :style="slug === 'igaming' ? { viewTransitionName: 'project-cover-igaming' } : undefined"
+        :style="slug === morphTarget ? { viewTransitionName: `project-cover-${slug}` } : undefined"
       />
       <img
         v-if="cardPreview?.length"
@@ -93,6 +115,18 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
 </template>
 
 <style scoped>
+.inhouse-card__cover-img {
+  transition: transform 320ms ease, filter 320ms ease;
+}
+
+/* Suppressed while a graffiti stroke is live (body.graffiti-mode, see
+   isGraffitiDrawing() above)--drawing over the grid shouldn't also zoom
+   and darken whatever card happens to be under the cursor. */
+body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__cover-img {
+  transform: scale(1.1);
+  filter: brightness(0.9);
+}
+
 /* Centered over the cover at half the card's own size--.inhouse-card__cover
    already has overflow:hidden (styles.css), so no extra clipping needed
    here even though this sits well within its bounds anyway. */
