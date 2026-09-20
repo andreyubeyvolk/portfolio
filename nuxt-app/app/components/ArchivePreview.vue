@@ -592,17 +592,12 @@ function close() {
   document.body.classList.remove('is-preview-open')
   filmstripStopEase()
   clearTimeout(closeTimer)
-  // Instant, not the normal animated clearGraffiti()--per the user's
-  // own correction, the shutter closing is what should visibly take the
-  // tag away, not a separate wipe/fade playing alongside it (that read
-  // as two competing animations instead of one). Right here, at the
-  // same instant the mask starts its own retreat, is deliberate too: the
-  // tag needs to already be gone by the time anything is visible again,
-  // not linger until some later point in the close. Pressing the normal
-  // erase keys (Del/Backspace/Space/Escape) while the card is still open
-  // is untouched--that still goes through clearGraffiti()'s own
-  // wipe/fade, unrelated to this.
-  window.clearGraffitiInstant?.()
+  // Plain default clearGraffiti()--same wipe/sponge animation as
+  // Del/Backspace/Space/Escape, just triggered here too, at the moment
+  // the shutter starts its own retreat--per the user's own settling on
+  // "просто по дефолту... как обычно как губкой" after trying both a
+  // delayed clear and an instant one.
+  window.clearGraffiti?.()
   // Retreat (reverse of the open reveal--same clip-path property, so
   // the browser just plays the transition backward, the content
   // clipping back up into the top slot), THEN unmount once it's fully

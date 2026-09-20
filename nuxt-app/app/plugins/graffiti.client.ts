@@ -15,7 +15,6 @@ declare global {
     GRAFFITI_CLEAR_EFFECT?: string
     initGraffiti?: () => () => void
     clearGraffiti?: () => void
-    clearGraffitiInstant?: () => void
   }
 }
 
