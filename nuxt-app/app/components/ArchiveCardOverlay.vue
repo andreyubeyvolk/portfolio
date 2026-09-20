@@ -172,6 +172,17 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <!-- Teleported out of .site-shell (Nuxt only ever splices "body" and its
+       own reserved "#teleports" container into SSR output--see
+       layouts/default.vue's own comment on this, and the identical reason
+       ProjectPage.vue's mobile content teleports there too). The static
+       site's own #card-overlay is a sibling of <main>, outside .site-shell
+       entirely; without this, body.card-is-open's ".site-shell { opacity:
+       0.08 }" dim rule (meant to fade the BACKGROUND behind the card)
+       caught the card overlay too, since it was rendering as a descendant
+       of .site-shell instead--the whole page, card included, read as one
+       uniformly washed-out ghost. -->
+  <Teleport to="#teleports">
   <div v-if="isOpen" class="card-overlay" @click="onOverlayClick">
     <div ref="cardPanel" class="card-panel">
       <div ref="cardHeader" class="card-panel__header">
@@ -215,4 +226,5 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </div>
+  </Teleport>
 </template>
