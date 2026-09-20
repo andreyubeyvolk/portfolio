@@ -27,6 +27,8 @@ useSeoMeta({
 useHead({
   bodyAttrs: { class: 'all-projects-page' },
 })
+
+const panelTransitionStyle = usePanelTransitionStyle()
 </script>
 
 <template>
@@ -39,7 +41,7 @@ useHead({
     </figure>
   </section>
 
-  <section class="content-pane" aria-label="All projects">
+  <section class="content-pane" aria-label="All projects" :style="panelTransitionStyle">
     <ScrollPane>
       <article class="projects-grid">
         <ProjectCard

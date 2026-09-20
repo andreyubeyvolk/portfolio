@@ -28,6 +28,9 @@ const props = defineProps<{
 
 const introText = computed(() => sectionIntroText(props.section))
 
+const morphTarget = useState<string | null>('morphTargetSlug', () => null)
+const panelTransitionStyle = usePanelTransitionStyle()
+
 // Flat running index across the whole gallery (a pair row counts as two),
 // matching the static site's own "skip the first N already-visible items"
 // scroll-reveal rule—see RevealOnScroll.vue/GallerySlot.vue.
@@ -54,7 +57,7 @@ const flatGallery = computed(() => {
     <p>{{ introText }}</p>
   </section>
 
-    <section class="content-pane project-frame" :aria-label="`${title} project content`">
+    <section class="content-pane project-frame" :aria-label="`${title} project content`" :style="panelTransitionStyle">
       <header class="content-pane__header project-header">
         <h1>{{ title }}</h1>
         <NuxtLink class="close-button" :to="`/${section}`" aria-label="Close project"><span>[X]</span></NuxtLink>
@@ -68,7 +71,7 @@ const flatGallery = computed(() => {
               :height="cover.height"
               :src="cover.src"
               :alt="title"
-              :style="slug === 'igaming' ? { viewTransitionName: 'project-cover-igaming' } : undefined"
+              :style="slug === morphTarget ? { viewTransitionName: `project-cover-${slug}` } : undefined"
             />
             <VpBare v-else :src="cover.src" :width="cover.width" :height="cover.height" />
           </figure>

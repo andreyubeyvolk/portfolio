@@ -20,6 +20,8 @@ const orderedProjects = computed(() => {
   const bySlug = new Map((projects.value ?? []).map(p => [p.slug, p]))
   return order.map(slug => bySlug.get(slug)).filter((p): p is NonNullable<typeof p> => !!p)
 })
+
+const panelTransitionStyle = usePanelTransitionStyle()
 </script>
 
 <template>
@@ -28,7 +30,7 @@ const orderedProjects = computed(() => {
     <p>{{ sectionIntroText(section) }}</p>
   </section>
 
-  <section class="content-pane" :aria-label="`${title} projects`">
+  <section class="content-pane" :aria-label="`${title} projects`" :style="panelTransitionStyle">
     <ScrollPane>
       <article class="inhouse-grid">
         <ProjectCard

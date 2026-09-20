@@ -347,10 +347,46 @@ function stepPreview(dir: 1 | -1) {
 // initial open (that already has its own is-open fade).
 const isStepping = ref(false)
 
+// Mount/unmount (not the step-to-step crossfade above) gets a real
+// View Transition instead: a mask that wipes down from the top to
+// reveal the lightbox, and the reverse to hide it on close--"шторкой
+// сверху, как маской" per the user's own description. Not a route
+// change, so there's no router hook to key off; this component starts
+// its own transition directly around the isOpen/isVisible flip. Only
+// this one flag needs to carry the name--conditional, not always-on,
+// same reasoning as the page-transition names elsewhere: an always-on
+// name would leak into any UNRELATED transition that happens to run
+// while a card is open (e.g. clicking a nav link mid-browse).
+const lightboxTransitionActive = ref(false)
+// Invalidates a pending close's delayed unmount if the user reopens
+// (or steps to another card) before that unmount actually runs--without
+// this, a fast close-then-reopen could have the stale close still
+// unmount the freshly-reopened lightbox out from under it.
+let transitionToken = 0
+
+async function withLightboxTransition(mutate: () => void) {
+  if (!document.startViewTransition) {
+    // No API support (Firefox, older browsers): just apply the change
+    // instantly--an acceptable plain fallback, same as anywhere else
+    // this codebase feature-detects the API.
+    mutate()
+    return
+  }
+  lightboxTransitionActive.value = true
+  await nextTick()
+  const transition = document.startViewTransition(() => {
+    mutate()
+    return nextTick()
+  })
+  try { await transition.finished } catch { /* aborted--the mutation above already applied regardless */ }
+  lightboxTransitionActive.value = false
+}
+
 // ── Open/close ───────────────────────────────────────────────────────
 watch(() => props.openIndex, async (idx) => {
   if (idx === null) return
   const wasClosed = !isOpen.value
+  const token = ++transitionToken
   // Simplified per the user's own model: an open card's graffiti is
   // scratch space for that card alone--switching to a different one
   // (arrow-key stepping) wipes the slate rather than carrying tags
@@ -358,16 +394,23 @@ watch(() => props.openIndex, async (idx) => {
   if (!wasClosed) window.clearGraffiti?.()
   if (!wasClosed && !isGroupMode.value) isStepping.value = true
   clearTimeout(closeTimer)
-  isOpen.value = true
-  document.body.classList.add('is-preview-open')
+
+  if (wasClosed) {
+    await withLightboxTransition(() => {
+      isOpen.value = true
+      isVisible.value = true
+      document.body.classList.add('is-preview-open')
+    })
+    if (token !== transitionToken) return // superseded mid-transition (rapid open/close)
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+  } else {
+    isOpen.value = true
+    document.body.classList.add('is-preview-open')
+  }
   // Let Vue actually apply the new item to the DOM before measuring/
   // decoding anything below--reading it in the same synchronous tick
   // would still see the previous element state.
   await nextTick()
-  if (wasClosed) {
-    requestAnimationFrame(() => { isVisible.value = true })
-    if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
-  }
   if (isGroupMode.value) {
     await openFilmstrip()
   } else {
@@ -377,22 +420,28 @@ watch(() => props.openIndex, async (idx) => {
 })
 
 function close() {
-  isVisible.value = false
+  const token = ++transitionToken
   document.body.classList.remove('is-preview-open')
   // Closing goes back to the Archive section itself--the graffiti drawn
   // while this card was open shouldn't linger there.
   window.clearGraffiti?.()
   filmstripStopEase()
   clearTimeout(closeTimer)
-  closeTimer = setTimeout(() => {
-    isOpen.value = false
-    overlay.value?.style.removeProperty('--preview-width')
-    overlay.value?.style.removeProperty('--preview-image-height')
-    if (previewImg.value) { previewImg.value.style.width = ''; previewImg.value.style.height = '' }
-    if (previewHeader.value) previewHeader.value.style.width = ''
-    if (previewText.value) previewText.value.style.width = ''
-    if (previewInner.value) previewInner.value.style.alignItems = ''
-  }, 260)
+  overlay.value?.style.removeProperty('--preview-width')
+  overlay.value?.style.removeProperty('--preview-image-height')
+  if (previewImg.value) { previewImg.value.style.width = ''; previewImg.value.style.height = '' }
+  if (previewHeader.value) previewHeader.value.style.width = ''
+  if (previewText.value) previewText.value.style.width = ''
+  if (previewInner.value) previewInner.value.style.alignItems = ''
+  // Both flip together, inside the transition--the "old" snapshot
+  // (captured just before this callback runs) is what actually plays
+  // the cover-mask animation, regardless of how instantly the real DOM
+  // changes underneath it, so there's no need to stagger a fade before
+  // the unmount the way the old rAF/setTimeout choreography did.
+  withLightboxTransition(() => {
+    isVisible.value = false
+    if (token === transitionToken) isOpen.value = false // a reopen already happened, don't unmount it
+  })
   emit('update:openIndex', null)
 }
 
@@ -459,6 +508,7 @@ onBeforeUnmount(() => {
     ref="overlay"
     class="archive-preview"
     :class="{ 'is-open': isVisible, 'is-filmstrip': isGroupMode, 'is-vertical': !isGroupMode && isVertical, 'is-horizontal': !isGroupMode && !isVertical }"
+    :style="lightboxTransitionActive ? { viewTransitionName: 'archive-lightbox' } : undefined"
     @click="onOverlayClick"
   >
     <button class="close-button preview-close" type="button" @click="close"><span>[X]</span></button>

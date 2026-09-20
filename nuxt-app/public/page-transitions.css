@@ -3,25 +3,39 @@
    document.startViewTransition() when the browser supports it (no-op,
    plain instant nav otherwise). Which EFFECT plays is chosen per
    navigation by plugins/page-transition.client.ts, which sets
-   documentElement.dataset.transition to 'curtain', 'project-open',
-   'project-close', or 'none' in a router.beforeEach guard--BEFORE the
-   old-page snapshot is taken, so by the time both snapshots exist and
-   these rules are evaluated, the attribute already reflects this
-   navigation's classification.
+   documentElement.dataset.transition to one of the values below in a
+   router.beforeEach guard--BEFORE the old-page snapshot is taken, so by
+   the time both snapshots exist and these rules are evaluated, the
+   attribute already reflects this navigation's classification.
 
-   Two effects:
+   Four effects:
    - 'curtain': ported from the static site's Cross-Document
      view-transitions.css prototype (white wipe, top-to-bottom then
-     bottom-to-top, with a brightness dip)--used for section-to-section
-     nav (Inhouse/Brands/Archive/About).
-   - 'project-open'/'project-close': deliberately NOT overridden here.
-     Opening/closing a project instead relies on a per-element
-     view-transition-name (see ProjectCard.vue/ProjectPage.vue, iGaming
-     only for now--"попробуем на айгейминге" test) so the browser morphs
-     that one shared cover image between its listing-card size/position
-     and its project-page size/position automatically; the rest of the
-     page just gets the browser's own default cross-fade underneath it,
-     which is what we want here instead of a second competing effect. */
+     bottom-to-top, with a brightness dip)--used for section<->section
+     nav (Inhouse/Brands/Archive/About/Home).
+   - 'project-open-morph'/'project-close-morph': deliberately NOT
+     overridden here. Opening/closing one of MORPH_SLUGS' projects
+     (iGaming only, for now--"попробуем на айгейминге" test) instead
+     relies on a per-element view-transition-name (see
+     ProjectCard.vue/ProjectPage.vue) so the browser morphs that one
+     shared cover image between its listing-card size/position and its
+     project-page size/position automatically; the rest of the page
+     just gets the browser's own default cross-fade underneath it.
+   - 'project-open-panel'/'project-close-panel': every OTHER project.
+     Both the listing's .content-pane and the project page's
+     .content-pane carry the same 'content-pane' view-transition-name
+     for this one navigation (see usePanelTransitionStyle.ts), so the
+     browser pairs them into one group--same box in both states, so the
+     curtain keyframes below just wipe within it instead of resizing
+     anything.
+
+   The cover-morph and content-pane names are both bound CONDITIONALLY
+   (only during the one navigation they apply to, via shared useState
+   read/write by plugins/page-transition.client.ts)--an always-on name
+   would leak into every OTHER transition that happens to render the
+   same element (e.g. iGaming's listing card during a section curtain),
+   creating a second, unclipped animated layer floating on top of
+   whatever else is happening. */
 
 html[data-transition='curtain']::view-transition-group(root) {
   background: #fff;
@@ -52,14 +66,60 @@ html[data-transition='curtain']::view-transition-new(root) {
   100% { clip-path: inset(0 0 0 0); filter: brightness(1); }
 }
 
-/* A named morph pair (see project-cover-* below) still gets clipped to
-   its own bounds by the UA default--nothing extra needed--but give it a
-   touch longer than the UA's ~0.25s default so the resize actually
-   reads as a morph instead of a blink. */
+/* A named morph pair still gets clipped to its own bounds by the UA
+   default--nothing extra needed--but give it a touch longer than the
+   UA's ~0.25s default so the resize actually reads as a morph instead
+   of a blink. Not scoped to a data-transition value: the
+   view-transition-name itself is already conditional (see header), so
+   this only ever matches during the one navigation it's meant for. */
 ::view-transition-group(project-cover-igaming) {
   animation-duration: 0.5s;
 }
 ::view-transition-old(project-cover-igaming),
 ::view-transition-new(project-cover-igaming) {
   animation-duration: 0.5s;
+}
+
+/* Content-pane curtain for entering/leaving every non-morph project.
+   Same wipe keyframes as the root curtain, just a shorter box (the
+   .content-pane itself, not the full page) and a snappier duration--
+   this fires far more often (every project open/close) than a section
+   nav, so it should read as quick, not grand. */
+html[data-transition='project-open-panel']::view-transition-group(content-pane),
+html[data-transition='project-close-panel']::view-transition-group(content-pane) {
+  animation-duration: 0.6s;
+}
+html[data-transition='project-open-panel']::view-transition-old(content-pane),
+html[data-transition='project-close-panel']::view-transition-old(content-pane) {
+  z-index: 2;
+  mix-blend-mode: normal;
+  animation: vt-curtain-cover 0.6s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+html[data-transition='project-open-panel']::view-transition-new(content-pane),
+html[data-transition='project-close-panel']::view-transition-new(content-pane) {
+  z-index: 1;
+  mix-blend-mode: normal;
+  animation: vt-curtain-reveal 0.6s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+/* Archive lightbox open/close (ArchivePreview.vue)--not a route change,
+   so it's driven by a manual document.startViewTransition() call in
+   that component itself rather than this being keyed off
+   data-transition. Opening only ever has a "new" side (nothing to pair
+   with--the overlay didn't exist a moment ago) and closing only ever
+   has an "old" side, so each rule below is the one-sided half of the
+   same curtain-from-top mask. */
+@keyframes vt-mask-reveal-top {
+  0%   { clip-path: inset(0 0 100% 0); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+@keyframes vt-mask-cover-top {
+  0%   { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(0 0 100% 0); }
+}
+::view-transition-new(archive-lightbox) {
+  animation: vt-mask-reveal-top 0.5s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+::view-transition-old(archive-lightbox) {
+  animation: vt-mask-cover-top 0.5s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
