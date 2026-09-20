@@ -494,7 +494,7 @@ const isStepping = ref(false)
 // close-then-reopen could have the stale close still unmount the
 // freshly-reopened lightbox out from under it.
 let transitionToken = 0
-const MASK_MS = 600
+const MASK_MS = 800
 
 // ── Open/close ───────────────────────────────────────────────────────
 watch(() => props.openIndex, async (idx) => {

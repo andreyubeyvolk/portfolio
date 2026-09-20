@@ -35,7 +35,7 @@ button.archive-card {
            ArchivePreview.vue's own comment on why this replaced the
            earlier View-Transition-based mask. */
         clip-path: inset(0 0 100% 0);
-        transition: clip-path 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+        transition: clip-path 0.8s cubic-bezier(0.65, 0, 0.35, 1);
       }
       .archive-preview.is-open {
         clip-path: inset(0 0 0 0);
@@ -43,6 +43,24 @@ button.archive-card {
 
       .archive-preview[hidden] {
         display: none;
+      }
+
+      /* The clip-path above hides/reveals a fixed-in-place box--on its
+         own that reads as a wipe uncovering a static image, not
+         something physically retreating. A small upward translate on
+         the CONTENT itself, synced to the same is-open state and
+         duration, adds real motion underneath the mask so closing
+         genuinely reads as the card riding up into that top slot (per
+         the user's own "все заезжало обратно наверх"), not just a plain
+         reveal/hide. */
+      .archive-preview__inner,
+      .archive-preview__filmstrip {
+        transform: translateY(0);
+        transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+      }
+      .archive-preview:not(.is-open) .archive-preview__inner,
+      .archive-preview:not(.is-open) .archive-preview__filmstrip {
+        transform: translateY(-48px);
       }
 
       .archive-preview__inner {
