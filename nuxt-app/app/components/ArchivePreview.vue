@@ -364,19 +364,19 @@ const lightboxTransitionActive = ref(false)
 // unmount the freshly-reopened lightbox out from under it.
 let transitionToken = 0
 
-async function withLightboxTransition(mutate: () => void) {
+async function withLightboxTransition(mutate: () => void | Promise<void>) {
   if (!document.startViewTransition) {
     // No API support (Firefox, older browsers): just apply the change
     // instantly--an acceptable plain fallback, same as anywhere else
     // this codebase feature-detects the API.
-    mutate()
+    await mutate()
     return
   }
   lightboxTransitionActive.value = true
   await nextTick()
-  const transition = document.startViewTransition(() => {
-    mutate()
-    return nextTick()
+  const transition = document.startViewTransition(async () => {
+    await mutate()
+    await nextTick()
   })
   try { await transition.finished } catch { /* aborted--the mutation above already applied regardless */ }
   lightboxTransitionActive.value = false
@@ -387,26 +387,34 @@ watch(() => props.openIndex, async (idx) => {
   if (idx === null) return
   const wasClosed = !isOpen.value
   const token = ++transitionToken
-  // Simplified per the user's own model: an open card's graffiti is
-  // scratch space for that card alone--switching to a different one
-  // (arrow-key stepping) wipes the slate rather than carrying tags
-  // across cards or partially layering them.
-  if (!wasClosed) window.clearGraffiti?.()
-  if (!wasClosed && !isGroupMode.value) isStepping.value = true
-  clearTimeout(closeTimer)
 
   if (wasClosed) {
-    await withLightboxTransition(() => {
+    // Fresh open: mounting AND sizing (openFilmstrip/syncPreviewSize)
+    // both happen inside the transition's own callback, so the "new"
+    // state the mask reveals is already in its FINAL layout. Doing the
+    // sizing afterward (outside the transition) was a visible jump: the
+    // mask would reveal the lightbox at its raw, not-yet-sized layout,
+    // then an instant later everything would resize into its real
+    // position once syncPreviewSize()/openFilmstrip() ran.
+    await withLightboxTransition(async () => {
       isOpen.value = true
       isVisible.value = true
       document.body.classList.add('is-preview-open')
+      await nextTick()
+      if (isGroupMode.value) await openFilmstrip()
+      else await syncPreviewSize()
     })
     if (token !== transitionToken) return // superseded mid-transition (rapid open/close)
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
-  } else {
-    isOpen.value = true
-    document.body.classList.add('is-preview-open')
+    return
   }
+
+  // Switching to a different already-open card: no mount transition,
+  // just the existing crossfade (single image) or scroll (filmstrip).
+  window.clearGraffiti?.()
+  if (!isGroupMode.value) isStepping.value = true
+  isOpen.value = true
+  document.body.classList.add('is-preview-open')
   // Let Vue actually apply the new item to the DOM before measuring/
   // decoding anything below--reading it in the same synchronous tick
   // would still see the previous element state.
@@ -415,7 +423,7 @@ watch(() => props.openIndex, async (idx) => {
     await openFilmstrip()
   } else {
     await syncPreviewSize()
-    if (!wasClosed) requestAnimationFrame(() => { isStepping.value = false })
+    requestAnimationFrame(() => { isStepping.value = false })
   }
 })
 
