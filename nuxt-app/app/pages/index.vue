@@ -2,10 +2,10 @@
 useSeoMeta({
   title: 'Andrey Ubeyvolk—Conceptual Art Director',
   description: 'Conceptual art director at the intersection of tech and culture—startups, AI, crypto, fashion. Concept-driven brand work by Andrey Ubeyvolk.',
-  ogTitle: 'Andrey Ubeyvolk—Art Director',
-  ogDescription: 'Conceptual art director at the intersection of tech and culture—startups, AI, crypto, fashion. Concept-driven brand work by Andrey Ubeyvolk.',
-  twitterTitle: 'Andrey Ubeyvolk—Art Director',
-  twitterDescription: 'Conceptual art director at the intersection of tech and culture—startups, AI, crypto, fashion. Concept-driven brand work by Andrey Ubeyvolk.',
+  ogTitle: 'Andrey Ubeyvolk',
+  ogDescription: 'Conceptual art direction with depth and vision. For startups, AI, crypto, and creative brands.',
+  twitterTitle: 'Andrey Ubeyvolk',
+  twitterDescription: 'Conceptual art direction with depth and vision. For startups, AI, crypto, and creative brands.',
 })
 
 useHead({
