@@ -66,6 +66,17 @@
   transition: opacity 0.24s ease;
   z-index: 50;
 }
+
+/* Same idea again, for touch strokes on mobile (see graffiti.js's
+   mobilePaneCanvas/mobilePaneView)--covers the full viewport width/
+   height, re-blitted on every window.scrollY change instead of a
+   specific element's scrollTop. */
+#graffiti-mobile-pane-view {
+  position: fixed;
+  pointer-events: none;
+  transition: opacity 0.24s ease;
+  z-index: 50;
+}
 .graffiti-cursor {
   position: fixed;
   top: 0;

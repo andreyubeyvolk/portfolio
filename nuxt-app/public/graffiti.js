@@ -10,9 +10,13 @@
 // Touch (phone/tablet): hold a finger still for 3s to arm a stroke (the
 // same spray-can cursor appears at that point)—drag while held, lift to
 // end it. Two fingers tapped together quickly (no long-press) erases
-// everything, same as Escape. Touch strokes only ever land on the fixed
-// canvas (see "Rendering" below)—mobile pages don't have the desktop's
-// custom-scrolled pane to route content-relative paint through.
+// everything, same as Escape. Touch strokes are content-relative to the
+// PAGE's own scroll (mobile has no desktop-style custom-scrolled pane—
+// the whole page scrolls natively, see mobile.css/ScrollPane.vue's
+// Lenis being desktop-gated), so a tag stays on whatever it was drawn
+// over as the page scrolls, same principle as the desktop pane canvas
+// just keyed to window.scrollY instead of a specific element's
+// scrollTop.
 //
 // Shared across every Brands page (originally a nimax-only prototype;
 // see graffiti.css for the matching styles and logo-scrub.js for the
@@ -321,6 +325,58 @@ window.initGraffiti = function initGraffiti() {
     fvctx.restore();
   }
 
+  // Mobile touch strokes: same off-screen-store/on-screen-view split as
+  // the desktop pane above, but keyed to window.scrollY (the whole page
+  // scrolls natively on mobile--no .content-pane__scroll to speak of)
+  // instead of a specific element's scrollTop, and covering the FULL
+  // page width/height rather than a narrower content column (mobile has
+  // no sidebar to carve out). Only ever used for touch-armed strokes
+  // (see stampDot)--desktop mouse strokes never touch this.
+  var mobilePaneCanvas = document.createElement('canvas');
+  var mpctx = mobilePaneCanvas.getContext('2d');
+  var mobilePaneView = document.createElement('canvas');
+  mobilePaneView.id = 'graffiti-mobile-pane-view';
+  document.body.appendChild(mobilePaneView);
+  var mpvctx = mobilePaneView.getContext('2d');
+  var lastPageScrollY = 0;
+
+  // (Re)sizes the off-screen store to the page's own full scrollable
+  // height--called on resize and whenever that height changes (a
+  // ResizeObserver on <body>, since mobile pages load/reflow images
+  // asynchronously same as the desktop pane's gallery does). Always
+  // starts blank on a real resize (rare mid-stroke edge case, same
+  // acceptable tradeoff as the desktop pane/filmstrip canvases).
+  function setupMobilePaneCanvas() {
+    if (!touchCapable) return;
+    var w = window.innerWidth;
+    var h = Math.max(document.documentElement.scrollHeight, window.innerHeight);
+    mobilePaneCanvas.width = Math.round(w * dpr);
+    mobilePaneCanvas.height = Math.round(h * dpr);
+    mpctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    mobilePaneView.width = Math.round(w * dpr);
+    mobilePaneView.height = Math.round(window.innerHeight * dpr);
+    mobilePaneView.style.width = w + 'px';
+    mobilePaneView.style.height = window.innerHeight + 'px';
+    mobilePaneView.style.left = '0px';
+    mobilePaneView.style.top = '0px';
+    mpvctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    lastPageScrollY = window.scrollY;
+    blitMobilePane();
+  }
+
+  // Same idea as blitPane, just against window.scrollY instead of an
+  // element's scrollTop.
+  function blitMobilePane() {
+    var sy = Math.round(window.scrollY * dpr);
+    var sw = mobilePaneView.width, sh = mobilePaneView.height;
+    if (sw <= 0 || sh <= 0) return;
+    mpvctx.save();
+    mpvctx.setTransform(1, 0, 0, 1, 0, 0);
+    mpvctx.clearRect(0, 0, sw, sh);
+    mpvctx.drawImage(mobilePaneCanvas, 0, sy, sw, sh, 0, 0, sw, sh);
+    mpvctx.restore();
+  }
+
   var articleRect = null;
   function updateArticleRect() { articleRect = article ? article.getBoundingClientRect() : null; }
 
@@ -370,6 +426,7 @@ window.initGraffiti = function initGraffiti() {
       canvas.style.display = 'none';
       paneView.style.display = 'none';
       filmstripView.style.display = 'none';
+      mobilePaneView.style.display = 'none';
       setCtrlMode(false);
       return;
     }
@@ -382,23 +439,25 @@ window.initGraffiti = function initGraffiti() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     if (!desktopQuery.matches) {
-      // Touch-only (no fine pointer/desktop width): no pane/card/
-      // filmstrip concept in play here--mobile pages don't have the
-      // desktop's custom-scrolled .content-pane__scroll (Lenis is
-      // desktop-gated in ScrollPane.vue; mobile.css lets .content-pane
-      // flow with the natively-scrolling body instead), so there's
-      // nothing meaningful to route pane-relative paint through. Touch
-      // strokes land on the fixed canvas only--paneRect/cardRect simply
-      // stay null (never assigned below), which is exactly what already
-      // makes stampDot's routing fall through to the fixed-canvas
-      // branch on its own, no extra check needed there.
+      // Touch-only (no fine pointer/desktop width): no desktop pane/
+      // card/filmstrip concept in play here (mobile.css lets
+      // .content-pane flow with the natively-scrolling body instead of
+      // the desktop's Lenis-driven .content-pane__scroll)--paneRect/
+      // cardRect simply stay null (never assigned below), which is
+      // exactly what already makes stampDot's routing fall through past
+      // those branches on its own. Touch strokes instead get their own
+      // mobile pane, keyed to the page's own scroll (see
+      // setupMobilePaneCanvas/stampDot).
       paneView.style.display = 'none';
       filmstripView.style.display = 'none';
+      mobilePaneView.style.display = touchCapable ? '' : 'none';
+      if (touchCapable) setupMobilePaneCanvas();
       resetDripState();
       return;
     }
     paneView.style.display = '';
     filmstripView.style.display = '';
+    mobilePaneView.style.display = 'none';
 
     updatePaneRect();
     updateCardRect();
@@ -450,6 +509,14 @@ window.initGraffiti = function initGraffiti() {
     resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(article);
   }
+  // Same idea for the mobile pane's own off-screen store: the page's
+  // total scroll height changes as lazy images load in, same reasoning
+  // as the desktop pane's own observer above.
+  var mobileResizeObserver = null;
+  if (touchCapable && 'ResizeObserver' in window) {
+    mobileResizeObserver = new ResizeObserver(resize);
+    mobileResizeObserver.observe(document.body);
+  }
 
   // Copies just the visible slice of the off-screen pane store
   // into the small on-screen view canvas—the step that actually
@@ -489,7 +556,13 @@ window.initGraffiti = function initGraffiti() {
   var scrollWatchRafId = null;
   function scrollWatchTick() {
     scrollWatchRafId = requestAnimationFrame(scrollWatchTick);
-    if (!desktopQuery.matches) return;
+    if (!desktopQuery.matches) {
+      if (touchCapable && window.scrollY !== lastPageScrollY) {
+        lastPageScrollY = window.scrollY;
+        blitMobilePane();
+      }
+      return;
+    }
     if (pane && pane.scrollTop !== lastScrollTop) {
       lastScrollTop = pane.scrollTop;
       updateArticleRect();
@@ -665,14 +738,16 @@ window.initGraffiti = function initGraffiti() {
     // The on-screen canvases only—paneCanvas is the off-screen store
     // now and was never visible to begin with, so animating that
     // would do nothing.
-    var visible = [canvas, paneView, filmstripView];
+    var visible = [canvas, paneView, filmstripView, mobilePaneView];
     var finish = function () {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       pctx.clearRect(0, 0, paneCanvas.width, paneCanvas.height);
       fctx.clearRect(0, 0, filmstripCanvas.width, filmstripCanvas.height);
+      mpctx.clearRect(0, 0, mobilePaneCanvas.width, mobilePaneCanvas.height);
       resetDripState();
       blitPane();
       blitFilmstrip();
+      blitMobilePane();
       clearing = false;
     };
     if (CLEAR_EFFECT === 'wipe') {
@@ -994,6 +1069,16 @@ window.initGraffiti = function initGraffiti() {
   }
 
   function stampDot(x, y, alpha) {
+    // Touch strokes route to the mobile pane unconditionally--there's no
+    // fixed/pane split to reason about on mobile (no sidebar, the whole
+    // page scrolls as one), just content-relative-to-window.scrollY
+    // storage plus a direct mirror onto the visible slice, same
+    // principle as the desktop pane below.
+    if (touchArmed) {
+      paintDot(mpctx, x, y + window.scrollY, 0, alpha);
+      paintDot(mpvctx, x, y, 0, alpha);
+      return;
+    }
     // Filmstrip membership first: while the Archive lightbox's series
     // filmstrip is open, it visually covers the same screen rectangle
     // the pane's own paneRect occupies (ArchivePreview.vue now nests
@@ -1301,6 +1386,8 @@ window.initGraffiti = function initGraffiti() {
     flushBatch(pvctx);
     flushBatch(fctx);
     flushBatch(fvctx);
+    flushBatch(mpctx);
+    flushBatch(mpvctx);
   }
   tick();
 
@@ -1328,11 +1415,13 @@ window.initGraffiti = function initGraffiti() {
     }
     clearTimeout(longPressTimer);
     if (resizeObserver) resizeObserver.disconnect();
+    if (mobileResizeObserver) mobileResizeObserver.disconnect();
     document.body.classList.remove('graffiti-mode');
     if (window.clearGraffiti === clearAll) delete window.clearGraffiti;
     canvas.remove();
     paneView.remove();
     filmstripView.remove();
+    mobilePaneView.remove();
     cursor.remove();
   };
 };
