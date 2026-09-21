@@ -137,16 +137,16 @@ kv:
   height: 206
 zipUrl: /assets/inhouse/dragon/dragon-project-images.zip
 cardPreview:
-  - src: /assets/inhouse/dragon/dragon-02.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/dragon/dragon-17.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/dragon/dragon-18.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/dragon/dragon-10.webp
-    width: 1080
-    height: 1440
+  - src: /assets/inhouse/dragon/dragon-02-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/dragon/dragon-17-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/dragon/dragon-18-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/dragon/dragon-10-preview.webp
+    width: 480
+    height: 640
 ---

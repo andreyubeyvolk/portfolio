@@ -191,16 +191,16 @@ kv:
   height: 206
 zipUrl: /assets/inhouse/greenflag/greenflag-project-images.zip
 cardPreview:
-  - src: /assets/inhouse/greenflag/greenflag-25.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/greenflag/greenflag-04.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/greenflag/greenflag-05.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/greenflag/greenflag-15.webp
-    width: 1080
-    height: 1440
+  - src: /assets/inhouse/greenflag/greenflag-25-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/greenflag/greenflag-04-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/greenflag/greenflag-05-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/greenflag/greenflag-15-preview.webp
+    width: 480
+    height: 640
 ---

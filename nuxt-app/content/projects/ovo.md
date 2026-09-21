@@ -200,16 +200,16 @@ kv:
   width: 206
   height: 206
 cardPreview:
-  - src: /assets/brands/ovo/ovo-01.webp
-    width: 1080
-    height: 1440
-  - src: /assets/brands/ovo/ovo-05.webp
-    width: 1080
-    height: 1440
-  - src: /assets/brands/ovo/ovo-17.webp
-    width: 1080
-    height: 1440
-  - src: /assets/brands/ovo/ovo-09.webp
-    width: 1080
-    height: 1440
+  - src: /assets/brands/ovo/ovo-01-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/brands/ovo/ovo-05-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/brands/ovo/ovo-17-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/brands/ovo/ovo-09-preview.webp
+    width: 480
+    height: 640
 ---
