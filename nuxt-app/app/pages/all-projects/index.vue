@@ -29,6 +29,12 @@ useHead({
 })
 
 const panelTransitionStyle = usePanelTransitionStyle()
+
+// Same portrait click demo as the home page (this is the same portrait,
+// just repeated in this page's own copy of the intro)--see index.vue's
+// own comment and useSprayReveal for the shared mechanic.
+const paintImg = useTemplateRef<HTMLImageElement>('paintImg')
+const { isActive, show } = useSprayReveal(paintImg)
 </script>
 
 <template>
@@ -36,8 +42,14 @@ const panelTransitionStyle = usePanelTransitionStyle()
     <h1 class="sr-only">All Projects—Andrey Ubeyvolk</h1>
     <p>Conceptual art direction with depth and vision. For startups, AI, crypto, and creative brands.</p>
 
-    <figure class="home-portrait">
-      <img width="176" height="176" src="/assets/portrait.webp" alt="Portrait of Andrey Ubeyvolk" />
+    <figure class="home-portrait" @click="show">
+      <div class="home-portrait__frame">
+        <img width="176" height="176" src="/assets/portrait.webp" alt="Portrait of Andrey Ubeyvolk" />
+      </div>
+      <picture v-show="isActive">
+        <source media="(min-width: 981px)" srcset="/assets/facepaint.svg" />
+        <img ref="paintImg" class="home-portrait__paint" src="/assets/facepaint-mobile.svg" alt="" aria-hidden="true" />
+      </picture>
     </figure>
   </section>
 
