@@ -212,13 +212,15 @@
 
   /* facepaint-mobile.svg's own portrait-oriented art (216:274, splash
      only--no text, since there's no keyboard modifier to name on
-     touch)--roughly centered over the portrait's face with drips
-     running down past it. */
+     touch)--centered over the portrait's face (left:50%+translateX
+     (-50%), same as the desktop block in styles.css) with drips running
+     down past it. */
   .home-portrait .home-portrait__paint {
-    left: -16px;
+    left: 50%;
     top: -26px;
     width: 130px;
     aspect-ratio: 216 / 274;
+    transform: translateX(-50%);
   }
 
   .home-portrait img {
@@ -1119,16 +1121,18 @@
 
   /* Same facepaint-splash.svg art as the home portrait's mobile mark
      (textless--see about.vue), scaled to this 83px box using the same
-     size/portrait-width ratio as .home-portrait's own mobile block. */
+     size/portrait-width ratio as .home-portrait's own mobile block, and
+     centered on it the same way (left:50%+translateX(-50%)). */
   .about-page .about-pane .open-to-splash {
     position: absolute;
     z-index: 1;
-    left: -18px;
+    left: 50%;
     top: -29px;
     width: 146px;
     height: auto;
     aspect-ratio: 216 / 274;
     object-fit: contain;
+    transform: translateX(-50%);
     pointer-events: none;
   }
 
