@@ -98,18 +98,12 @@ function onTouchEnd() {
 }
 
 const activePreview = computed(() => (props.cardPreview && activeIndex.value !== null) ? props.cardPreview[activeIndex.value] : null)
-// Drives the mobile "hover" look (title plaque turns black, flush against
-// the cover) for the same duration the horizontal drag is live--real
-// :active can't be relied on for this: iOS Safari suppresses it during a
-// touchmove it interprets as a scroll/drag gesture.
-const isTouchActive = computed(() => activeIndex.value !== null)
 </script>
 
 <template>
   <NuxtLink
     ref="cardRef"
     class="inhouse-card"
-    :class="{ 'is-touch-active': isTouchActive }"
     :to="`/${section}/${slug}`"
     @mousemove="cardPreview?.length ? onMouseMove($event) : undefined"
     @mouseleave="cardPreview?.length ? onMouseLeave() : undefined"

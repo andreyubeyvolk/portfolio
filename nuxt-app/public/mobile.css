@@ -612,9 +612,9 @@
   }
 
   .inhouse-title {
-    /* -1 to match desktop (styles.css): title sits ABOVE the cover, not
-       below--this was reset to 0 here, silently undoing that. */
-    order: -1;
+    /* Below the cover on mobile, per the user's own call--desktop keeps
+       its own order:-1 (title above) in styles.css, unaffected. */
+    order: 0;
     font-size: 0.9375rem;
     letter-spacing: -0.5px;
     position: relative;
@@ -637,14 +637,12 @@
     pointer-events: none;
   }
 
-  .inhouse-card:active .inhouse-title,
-  .inhouse-card.is-touch-active .inhouse-title {
+  .inhouse-card:active .inhouse-title {
     color: #fff;
     background-color: #171717;
   }
 
-  .inhouse-card:active .inhouse-title::before,
-  .inhouse-card.is-touch-active .inhouse-title::before {
+  .inhouse-card:active .inhouse-title::before {
     background-color: #171717;
   }
 
