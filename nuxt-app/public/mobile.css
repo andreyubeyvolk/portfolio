@@ -7,7 +7,7 @@
 .reel-card__overlay-right,
 .menu-overlay,
 .mobile-menu,
-.open-to-portrait,
+.open-to-photo,
 .about-download-mobile,
 .project-bar,
 .mobile-project,
@@ -210,13 +210,14 @@
     overflow: hidden;
   }
 
-  /* facepaint-mobile.svg's own portrait-oriented art (216:274) with its
-     "Psh" text baked in--roughly centered over the portrait's face with
-     drips running down past it. */
+  /* facepaint-mobile.svg's own portrait-oriented art (216:274, splash
+     only--no text, since there's no keyboard modifier to name on
+     touch)--roughly centered over the portrait's face with drips
+     running down past it. */
   .home-portrait .home-portrait__paint {
-    left: -12px;
-    top: -20px;
-    width: 100px;
+    left: -16px;
+    top: -26px;
+    width: 130px;
     aspect-ratio: 216 / 274;
   }
 
@@ -1096,14 +1097,39 @@
     width: 83px;
   }
 
-  /* Open to portrait — 83×83, shown on mobile */
-  .about-page .about-pane .open-to-portrait {
+  /* Open to portrait — 83×83, shown on mobile. position:relative (not
+     overflow:hidden) so the click-to-demo paint mark, bigger than the
+     portrait's own square, can extend past it--same idea as
+     .home-portrait on the home page. */
+  .about-page .about-pane .open-to-photo {
     display: block;
+    position: relative;
     width: 83px;
     height: 83px;
+    margin-top: 14px;
+    cursor: pointer;
+  }
+
+  .about-page .about-pane .open-to-portrait {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     object-position: top;
-    margin-top: 14px;
+  }
+
+  /* Same facepaint-splash.svg art as the home portrait's mobile mark
+     (textless--see about.vue), scaled to this 83px box using the same
+     size/portrait-width ratio as .home-portrait's own mobile block. */
+  .about-page .about-pane .open-to-splash {
+    position: absolute;
+    z-index: 1;
+    left: -18px;
+    top: -29px;
+    width: 146px;
+    height: auto;
+    aspect-ratio: 216 / 274;
+    object-fit: contain;
+    pointer-events: none;
   }
 
   /* Contact grid — 2 columns (≈3-of-8 + 3-of-8, since the section's

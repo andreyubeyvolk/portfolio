@@ -286,9 +286,9 @@ img {
 .home-portrait .home-portrait__paint {
   position: absolute;
   z-index: 3;
-  left: -7px;
-  top: -12px;
-  width: 60px;
+  left: -9px;
+  top: -16px;
+  width: 78px;
   height: auto;
   aspect-ratio: 216 / 274;
   object-fit: contain;
