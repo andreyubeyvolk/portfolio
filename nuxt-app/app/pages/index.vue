@@ -30,25 +30,40 @@ useHead({
 })
 
 // Portrait click demo: a paint-splash mark (facepaint.svg desktop /
-// facepaint-mobile.svg mobile--real design assets, the desktop one with
-// the instructional text baked in as vector shapes, no separate plaque
-// element needed) appears over the portrait for 3s, nudging toward the
-// hidden Ctrl+drag graffiti feature, then clears. Both appear AND
-// disappear via the same sponge/board-eraser sweep graffiti.js's own tag
-// clear uses--one animation, two directions, not a different reveal
-// mechanic for each end.
+// facepaint-mobile.svg mobile--real design assets, splash art only, no
+// baked-in text--see .home-portrait__label below for why) appears over
+// the portrait for 3s, nudging toward the hidden Ctrl+drag graffiti
+// feature, then clears. Both appear AND disappear via the same sponge/
+// board-eraser sweep graffiti.js's own tag clear uses--one animation, two
+// directions/orderings, not a different mechanic for each end.
 const SHOW_MS = 3000
 const paintImg = useTemplateRef<HTMLImageElement>('paintImg')
+const paintLabel = useTemplateRef<HTMLElement>('paintLabel')
 const isActive = ref(false)
 let dismissTimer: ReturnType<typeof setTimeout> | undefined
 
-// Same "board eraser" diagonal sweep as the Archive lightbox's graffiti
-// tag clear (graffiti.js's own wipeAway)--duplicated here rather than
-// reached into from that vanilla script, since this <img> is a completely
-// separate, Vue-owned surface with its own lifecycle. `reverse` runs the
-// identical sweep backwards--covered-to-visible for the appear, visible-
-// to-covered for the disappear--rather than two different mechanics.
-function sponge(el: HTMLElement, reverse: boolean, onDone: () => void) {
+// The instructional text used to be baked into facepaint.svg as vector
+// shapes--simpler to composite, but meant "Ctrl" could never read
+// correctly on a Mac (no physical Ctrl key most people reach for; the
+// site's own graffiti.js already treats Meta/Cmd identically to Control,
+// so only the LABEL was ever wrong, not the feature). Real HTML text
+// can just say the right thing per platform. UA sniffing is normally
+// worth avoiding, but a keyboard-shortcut label is exactly the
+// exception--there's no feature-detectable way to ask "what does this
+// user call their own modifier key."
+const modifierLabel = computed(() => (
+  typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent) ? 'Cmd' : 'Ctrl'
+))
+
+// Board-eraser diagonal sweep, same technique as the Archive lightbox's
+// graffiti tag clear (graffiti.js's own wipeAway). `mode: 'hide'` erases
+// top-left-to-bottom-right, matching that existing clear. `mode:
+// 'reveal'` sweeps the same direction but grows the VISIBLE region from
+// top-left instead of the hidden one--spraying on left-to-right, the way
+// the mark would actually get drawn, rather than assembling backwards
+// from the opposite corner (which is what running the same gradient
+// stops in reverse-time would do).
+function sponge(el: HTMLElement, mode: 'reveal' | 'hide', onDone: () => void) {
   const DURATION = 700
   const BAND = 4
   let start: number | null = null
@@ -56,8 +71,10 @@ function sponge(el: HTMLElement, reverse: boolean, onDone: () => void) {
     if (start === null) start = now
     const t = Math.min(1, (now - start) / DURATION)
     const eased = 1 - (1 - t) ** 2
-    const pos = (reverse ? 1 - eased : eased) * (100 + BAND) - BAND
-    const mask = `linear-gradient(to bottom right, transparent ${pos}%, #000 ${pos + BAND}%)`
+    const pos = eased * (100 + BAND) - BAND
+    const mask = mode === 'hide'
+      ? `linear-gradient(to bottom right, transparent ${pos}%, #000 ${pos + BAND}%)`
+      : `linear-gradient(to bottom right, #000 ${pos}%, transparent ${pos + BAND}%)`
     el.style.webkitMaskImage = mask
     el.style.maskImage = mask
     if (t < 1) {
@@ -71,12 +88,15 @@ function sponge(el: HTMLElement, reverse: boolean, onDone: () => void) {
 
 function dismiss() {
   clearTimeout(dismissTimer)
-  const img = paintImg.value
-  if (img) {
-    sponge(img, false, () => {
-      isActive.value = false
-      img.style.webkitMaskImage = ''
-      img.style.maskImage = ''
+  const els = [paintImg.value, paintLabel.value].filter((el): el is HTMLElement => !!el)
+  if (els.length) {
+    let remaining = els.length
+    els.forEach((el) => {
+      sponge(el, 'hide', () => {
+        el.style.webkitMaskImage = ''
+        el.style.maskImage = ''
+        if (--remaining === 0) isActive.value = false
+      })
     })
   } else {
     isActive.value = false
@@ -86,21 +106,22 @@ function dismiss() {
 function show() {
   if (isActive.value) return
   isActive.value = true
-  const img = paintImg.value
-  if (img) {
+  const els = [paintImg.value, paintLabel.value].filter((el): el is HTMLElement => !!el)
+  if (els.length) {
     // Starts fully masked (nothing shown) so the very first frame of the
     // reveal sweep is the actual start state, not a flash of the whole
     // mark before the mask engages--matches sponge()'s own t=0 output
-    // for reverse:true (pos=100), not dismiss's t=0 (pos=-4, fully
-    // visible)--those are opposite starting points, mixing them up here
-    // showed the mark at full opacity for a frame before the reveal
-    // "caught up" and hid it again.
-    img.style.webkitMaskImage = 'linear-gradient(to bottom right, transparent 100%, #000 104%)'
-    img.style.maskImage = img.style.webkitMaskImage
+    // for mode:'reveal' (pos=-4, everything past it extends transparent).
+    els.forEach((el) => {
+      el.style.webkitMaskImage = 'linear-gradient(to bottom right, #000 -4%, transparent 0%)'
+      el.style.maskImage = el.style.webkitMaskImage
+    })
     requestAnimationFrame(() => {
-      sponge(img, true, () => {
-        img.style.webkitMaskImage = ''
-        img.style.maskImage = ''
+      els.forEach((el) => {
+        sponge(el, 'reveal', () => {
+          el.style.webkitMaskImage = ''
+          el.style.maskImage = ''
+        })
       })
     })
   }
@@ -123,6 +144,9 @@ onBeforeUnmount(() => clearTimeout(dismissTimer))
         <source media="(min-width: 981px)" srcset="/assets/facepaint.svg" />
         <img ref="paintImg" class="home-portrait__paint" src="/assets/facepaint-mobile.svg" alt="" aria-hidden="true" />
       </picture>
+      <div v-show="isActive" ref="paintLabel" class="home-portrait__label" aria-hidden="true">
+        Press {{ modifierLabel }}+Click<br />Pshh Pshh…
+      </div>
     </figure>
   </section>
 

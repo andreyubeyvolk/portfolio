@@ -273,8 +273,8 @@ img {
   }
 }
 
-/* Paint-splash demo mark (facepaint.svg--a real design asset, text baked
-   in as vector shapes, see index.vue's show()/dismiss()). NOT clipped to
+/* Paint-splash demo mark (facepaint.svg--a real design asset, splash art
+   only, no text--see .home-portrait__label below). NOT clipped to
    __frame--sized well past the portrait's own 44px square, positioned so
    the dense part of the splash sits above/over the portrait with its
    drips running down past it, matching the reference composition.
@@ -290,6 +290,28 @@ img {
   height: auto;
   aspect-ratio: 347 / 187;
   object-fit: contain;
+  pointer-events: none;
+}
+
+/* Real text instead of vector shapes baked into the SVG (see index.vue's
+   modifierLabel)--positioned to land where the original art's own
+   lettering sat, found by rendering just its text paths to a canvas and
+   scanning for the opaque bounding box (21.9-84.1% of facepaint.svg's
+   own width, 27.8-49.7% of its height), then mapping that box onto
+   .home-portrait__paint's own position/size above. Desktop only--the
+   mobile reference has no text at all, hidden outright in mobile.css. */
+.home-portrait .home-portrait__label {
+  position: absolute;
+  z-index: 4;
+  left: 31px;
+  top: -13px;
+  width: 174px;
+  height: 33px;
+  color: #171717;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.3px;
   pointer-events: none;
 }
 

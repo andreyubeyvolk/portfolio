@@ -220,6 +220,11 @@
     aspect-ratio: 221 / 274;
   }
 
+  /* No text on mobile at all, per the reference art. */
+  .home-portrait__label {
+    display: none;
+  }
+
   .home-portrait img {
     width: 100%;
     height: 100%;
