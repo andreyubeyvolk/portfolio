@@ -26,6 +26,13 @@ useSeoMeta({
 useHead({
   bodyAttrs: { class: 'about-page' },
 })
+
+// Same click-to-reveal paint-splash demo as the home portrait, on the
+// "Open to" portrait (mobile-only--this element is display:none on
+// desktop already)--no instructional text here, just the splash itself,
+// since the Ctrl+drag hint already lives on the home page.
+const openToPaintImg = useTemplateRef<HTMLImageElement>('openToPaintImg')
+const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayReveal(openToPaintImg)
 </script>
 
 <template>
@@ -88,7 +95,10 @@ useHead({
           <h2 class="about-section__label">Open to</h2>
           <div class="about-section__content">
             <p>{{ page.openTo }}</p>
-            <img width="176" height="176" loading="lazy" class="open-to-portrait" :src="page.portrait" alt="" aria-hidden="true" />
+            <figure class="open-to-photo" @click="showOpenToSplash">
+              <img width="176" height="176" loading="lazy" class="open-to-portrait" :src="page.portrait" alt="" aria-hidden="true" />
+              <img v-show="isOpenToSplashActive" ref="openToPaintImg" class="open-to-splash" src="/assets/facepaint-splash.svg" alt="" aria-hidden="true" />
+            </figure>
           </div>
         </section>
 

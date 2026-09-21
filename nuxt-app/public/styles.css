@@ -240,17 +240,60 @@ img {
   margin-bottom: 8px;
 }
 
+/* position:relative (not overflow:hidden--that's on __frame below) so the
+   click-to-demo paint mark, much bigger than the portrait's own small
+   square, can extend past it instead of being clipped to it. */
 .home-portrait {
+  position: relative;
   width: 44px;
   aspect-ratio: 1 / 1;
-  overflow: hidden;
   margin: 0;
+  cursor: pointer;
+}
+
+.home-portrait__frame {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   background: var(--muted);
 }
 
 .home-portrait img {
   height: 100%;
   object-fit: cover;
+}
+
+/* Signals the portrait is clickable, same idea as the project-card hover
+   treatment elsewhere. Targets the photo specifically, not the spray
+   mark on top of it. (hover: hover) keeps this off touch devices--mobile
+   gets no hover cue at all, just the spray animation itself (per spec). */
+@media (hover: hover) and (pointer: fine) {
+  .home-portrait:hover .home-portrait__frame > img {
+    opacity: 0.8;
+  }
+}
+
+/* Paint-splash demo mark (facepaint.svg--a real design asset, splash art
+   with its own "Ctrl" text baked in as vector shapes). NOT clipped to
+   __frame--sized well past the portrait's own 44px square, positioned so
+   the dense part of the splash covers the portrait's face with its
+   drips running down past it, matching the reference composition.
+   z-index above .section-intro's own text, which it's meant to overlap
+   briefly. left:50%+translateX(-50%) centers it on the portrait's own
+   horizontal center regardless of width, rather than a hand-tuned left
+   offset that only lines up at one specific size. */
+.home-portrait .home-portrait__paint {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: -21px;
+  width: 101px;
+  height: auto;
+  aspect-ratio: 216 / 274;
+  object-fit: contain;
+  object-position: top;
+  transform: translateX(-50%);
+  pointer-events: none;
 }
 
 .content-pane {
@@ -565,7 +608,7 @@ body::-webkit-scrollbar-thumb:active {
   margin-top: 0;
 }
 
-/* "See all projects": sits in the empty column to the left of the socials,
+/* "All projects": sits in the empty column to the left of the socials,
    same row, flush with the borderless top row (Mail / YouTube). */
 .home-projects-link {
   grid-column: 1 / 9;
@@ -584,14 +627,14 @@ body::-webkit-scrollbar-thumb:active {
   background-color: #000;
 }
 
-/* "See all projects", Mail and YouTube sit directly under the reel-card
+/* "All projects", Mail and YouTube sit directly under the reel-card
    player—16px grid-gap partially closed by their own -10px margin-top,
    leaving a 6px residual gap. On hover, bleed the black background up
    through that residual so the highlight reads flush with the player's
    bottom edge instead of stopping short of it. A ::before, not a bigger
    margin/padding, so the link's own box and text position never move.
    Mail/YouTube only keep this on the desktop grid: below 980px the layout
-   goes to block flow and "See all projects" (which keeps its bleed at
+   goes to block flow and "All projects" (which keeps its bleed at
    every width) lands between them and the player, so they're no longer
    the row actually touching it. */
 .home-projects-link,

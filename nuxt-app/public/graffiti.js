@@ -877,8 +877,8 @@ window.initGraffiti = function initGraffiti() {
   // today's black/gray. null means "use the tone value as a literal
   // gray" (unchanged default path); a color object means "blend the
   // tone value as a lightening amount on top of this hue instead."
-  var COLOR_RED = { r: 0xEB, g: 0x10, b: 0x26, key: 'red' };
-  var COLOR_GREEN = { r: 0x11, g: 0xE3, b: 0xB0, key: 'green' };
+  var COLOR_PINK = { r: 0xFF, g: 0x16, b: 0xA2, key: 'pink' };
+  var COLOR_SILVER = { r: 0xC9, g: 0xC9, b: 0xC9, key: 'silver' };
   var strokeColor = null;
 
   function onMouseDown(e) {
@@ -888,7 +888,7 @@ window.initGraffiti = function initGraffiti() {
     // actions, so it's deliberately suppressed for the duration.
     e.preventDefault();
     isDrawing = true;
-    strokeColor = e.shiftKey ? COLOR_RED : (e.altKey ? COLOR_GREEN : null);
+    strokeColor = e.shiftKey ? COLOR_PINK : (e.altKey ? COLOR_SILVER : null);
     smooth.x = raw.x;
     smooth.y = raw.y;
     lastStamp = { x: raw.x, y: raw.y };

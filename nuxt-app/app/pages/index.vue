@@ -28,6 +28,16 @@ useHead({
     }),
   }],
 })
+
+// Portrait click demo: a paint-splash mark (facepaint.svg desktop /
+// facepaint-mobile.svg mobile--real design assets, splash art WITH its
+// instructional text baked in as vector shapes--"Ctrl" on desktop, no
+// text on mobile/touch since there's no keyboard modifier to name
+// there) appears over the portrait for 3s, then clears--see
+// useSprayReveal for the shared reveal/hide mechanic (also used by
+// About's "Open to" portrait).
+const paintImg = useTemplateRef<HTMLImageElement>('paintImg')
+const { isActive, show } = useSprayReveal(paintImg)
 </script>
 
 <template>
@@ -35,8 +45,14 @@ useHead({
     <h1 class="sr-only">Andrey Ubeyvolk—Conceptual Art Director</h1>
     <p>Conceptual art direction with depth and vision. For startups, AI, crypto, and creative brands.</p>
 
-    <figure class="home-portrait">
-      <img width="176" height="176" src="/assets/portrait.webp" alt="Portrait of Andrey Ubeyvolk" />
+    <figure class="home-portrait" @click="show">
+      <div class="home-portrait__frame">
+        <img width="176" height="176" src="/assets/portrait.webp" alt="Portrait of Andrey Ubeyvolk" />
+      </div>
+      <picture v-show="isActive">
+        <source media="(min-width: 981px)" srcset="/assets/facepaint.svg" />
+        <img ref="paintImg" class="home-portrait__paint" src="/assets/facepaint-mobile.svg" alt="" aria-hidden="true" />
+      </picture>
     </figure>
   </section>
 
@@ -55,7 +71,7 @@ useHead({
         <span class="reel-card__overlay-right" aria-hidden="true">and digital companies</span>
       </button>
 
-      <NuxtLink class="home-projects-link" to="/all-projects">See all projects</NuxtLink>
+      <NuxtLink class="home-projects-link" to="/all-projects">All projects</NuxtLink>
 
       <address class="home-socials">
         <CopyEmailButton class="copy-mail-link" email="6169393@gmail.com">Mail</CopyEmailButton>

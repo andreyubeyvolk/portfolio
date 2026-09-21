@@ -7,7 +7,7 @@
 .reel-card__overlay-right,
 .menu-overlay,
 .mobile-menu,
-.open-to-portrait,
+.open-to-photo,
 .about-download-mobile,
 .project-bar,
 .mobile-project,
@@ -201,8 +201,26 @@
     grid-row: 1;
     width: 100%;
     aspect-ratio: 1 / 1;
-    overflow: hidden;
     margin: 0;
+  }
+
+  .home-portrait__frame {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* facepaint-mobile.svg's own portrait-oriented art (216:274, splash
+     only--no text, since there's no keyboard modifier to name on
+     touch)--centered over the portrait's face (left:50%+translateX
+     (-50%), same as the desktop block in styles.css) with drips running
+     down past it. */
+  .home-portrait .home-portrait__paint {
+    left: 50%;
+    top: -26px;
+    width: 130px;
+    aspect-ratio: 216 / 274;
+    transform: translateX(-50%);
   }
 
   .home-portrait img {
@@ -277,7 +295,7 @@
     text-align: right;
   }
 
-  /* ── See all projects: full-width tap target, no divider rules ──
+  /* ── All projects: full-width tap target, no divider rules ──
      32px margin-bottom keeps it from visually merging into the
      socials grid right below it. Width is 100% (not fit-content) and a
      ::before bleeds the :active fill up through the 8px residual gap
@@ -1081,14 +1099,43 @@
     width: 83px;
   }
 
-  /* Open to portrait — 83×83, shown on mobile */
-  .about-page .about-pane .open-to-portrait {
+  /* Open to portrait — 83×83, shown on mobile. position:relative (not
+     overflow:hidden) so the click-to-demo paint mark, bigger than the
+     portrait's own square, can extend past it--same idea as
+     .home-portrait on the home page. margin:0 overrides the browser's
+     own default <figure> margin (1em 40px)--was pushing this 40px to
+     the right of the paragraph above it, off the shared left edge. */
+  .about-page .about-pane .open-to-photo {
     display: block;
+    position: relative;
     width: 83px;
     height: 83px;
+    margin: 14px 0 0;
+    cursor: pointer;
+  }
+
+  .about-page .about-pane .open-to-portrait {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     object-position: top;
-    margin-top: 14px;
+  }
+
+  /* Same facepaint-splash.svg art as the home portrait's mobile mark
+     (textless--see about.vue), scaled to this 83px box using the same
+     size/portrait-width ratio as .home-portrait's own mobile block, and
+     centered on it the same way (left:50%+translateX(-50%)). */
+  .about-page .about-pane .open-to-splash {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: -29px;
+    width: 146px;
+    height: auto;
+    aspect-ratio: 216 / 274;
+    object-fit: contain;
+    transform: translateX(-50%);
+    pointer-events: none;
   }
 
   /* Contact grid — 2 columns (≈3-of-8 + 3-of-8, since the section's
