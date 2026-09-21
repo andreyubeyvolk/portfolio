@@ -26,6 +26,26 @@ const props = defineProps<{
 const cardRef = useTemplateRef('cardRef')
 const activeIndex = ref<number | null>(null)
 
+// Only cardPreview[0] loads for free (it's the <img>'s default src below,
+// whenever nothing's active)--indices 1-3 previously only started
+// fetching the first time a hover/drag actually reached that segment, a
+// real network wait on a first pass across the card. Warming all of them
+// as plain Image() fetches (not <link rel=preload>--on a listing page
+// with several of these cards, that many preload hints competing for
+// priority with the cards' own visible cover images is worse than just
+// letting the browser schedule ordinary background requests) means
+// they're already in the HTTP cache by the time the user's cursor/finger
+// gets there--the <img src> swap then resolves instantly. Deferred to
+// idle time so this doesn't compete with the page's own critical initial
+// paint; requestIdleCallback isn't in Safari, hence the timeout fallback.
+onMounted(() => {
+  const rest = props.cardPreview?.slice(1)
+  if (!rest?.length) return
+  const warm = () => { rest.forEach((item) => { new Image().src = item.src }) }
+  if ('requestIdleCallback' in window) window.requestIdleCallback(warm, { timeout: 2000 })
+  else setTimeout(warm, 200)
+})
+
 function cardEl(): HTMLElement | null {
   // NuxtLink is a component, not a plain element--its template ref is
   // the component instance, and $el is the underlying <a> it renders.
