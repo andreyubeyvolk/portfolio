@@ -34,6 +34,27 @@
   /* ── Shell ── */
   body {
     overflow: auto;
+    /* A long-press ANYWHERE selectable races the browser's own native
+       text-selection callout, which fires independent of graffiti.js's
+       own long-press-to-draw timer--JS can skip arming a stroke near
+       text, but it can't suppress the browser's own selection UI once
+       something in the touched area is selectable at all (confirmed:
+       it was still triggering on background near text, not just text
+       itself). Making the whole page unselectable by default and
+       opting real body-copy paragraphs back in below is what actually
+       stops it, not a JS check alone. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Opt real body copy back in--About/Challenge/Solution text and
+     similar are all plain <p> elements; nothing else on mobile needs
+     to be selectable (titles, labels, nav are UI chrome, not prose). */
+  p {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
   }
 
   .site-shell {
