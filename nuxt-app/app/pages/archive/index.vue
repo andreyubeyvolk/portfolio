@@ -81,6 +81,18 @@ const cardOwnerIndex = computed(() => {
 const cardEls = ref<(HTMLElement | null)[]>([])
 const { scrollTo: scrollGridTo } = useScrollToPane('.content-pane__scroll')
 
+// Mobile Load More reveal was visibly two-step: the fresh cards' text/
+// background faded in first (.archive-card--revealing above), then each
+// cover image popped in abruptly a beat later once its own network
+// fetch finished--nothing marked "still loading" in between. A light
+// gray placeholder (mobile.css) fills .archive-card__cover until its
+// own <img> fires load/error, keyed by src since visibleCards only
+// grows (Load More never removes cards, so existing keys stay valid).
+const loadedCovers = reactive(new Set<string>())
+function onCoverLoad(src: string) {
+  loadedCovers.add(src)
+}
+
 // Stepping inside the lightbox can reach a card far past what Load More
 // has revealed (both overlays are handed the full `allItems` catalog,
 // not just `visibleCards`). On close, catch the grid up to cover
@@ -165,8 +177,16 @@ useHead({
           :class="{ 'archive-card--revealing': i >= revealingFrom }"
           @click="openCard(card)"
         >
-          <div class="archive-card__cover">
-            <img :width="card.width" :height="card.height" loading="lazy" :src="card.src" :alt="card.alt" />
+          <div class="archive-card__cover" :class="{ 'is-loaded': loadedCovers.has(card.src) }">
+            <img
+              :width="card.width"
+              :height="card.height"
+              loading="lazy"
+              :src="card.src"
+              :alt="card.alt"
+              @load="onCoverLoad(card.src)"
+              @error="onCoverLoad(card.src)"
+            />
           </div>
           <span class="archive-title">
             {{ splitArchiveTitle(card.title).base }}<sup v-if="splitArchiveTitle(card.title).badge" class="archive-num">{{ splitArchiveTitle(card.title).badge }}</sup>

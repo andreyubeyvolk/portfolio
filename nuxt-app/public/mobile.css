@@ -567,9 +567,27 @@
     height: auto;
   }
 
+  /* Load More's freshly-revealed cards faded their text/background in
+     immediately (.archive-card--revealing, above) while each cover's own
+     <img> was still mid-fetch--nothing marked that gap, so the image
+     just popped in on top a beat later once loaded. .archive-card__cover
+     already sits on the site's own #d9d9d9 placeholder gray (styles.css,
+     shared with every other image box)--fading the <img> itself in on
+     its own load/error event is what actually smooths the pop, since an
+     <img> doesn't animate its own paint by default. */
+  .archive-card__cover img {
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  .archive-card__cover.is-loaded img {
+    opacity: 1;
+  }
+
   .archive-title {
-    /* -1 to match desktop (styles.css): title above the cover, not below. */
-    order: -1;
+    /* Below the cover on mobile, same rule as .inhouse-title--desktop
+       keeps its own order:-1 in styles.css, unaffected. */
+    order: 0;
     font-size: 0.9375rem;
     letter-spacing: -0.5px;
   }
@@ -638,45 +656,17 @@
     order: 0;
     font-size: 0.9375rem;
     letter-spacing: -0.5px;
-    position: relative;
   }
 
-  /* Tap highlight (mobile has no :hover)—same black fill as the desktop
-     .inhouse-card:hover treatment, plus a ::before that bleeds it up
-     through the 3px flex `gap` above so it reads flush against the
-     cover, same bleed-up trick as .home-projects-link. Shared by
-     Inhouse, Brands, and All Projects—they all use this one card
-     component (see the .projects-grid comment in styles.css). */
-  .inhouse-title::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 100%;
-    height: 3px;
-    background: transparent;
-    pointer-events: none;
-  }
-
-  .inhouse-card:active .inhouse-title {
-    color: #fff;
-    background-color: #171717;
-  }
-
-  .inhouse-card:active .inhouse-title::before {
-    background-color: #171717;
-  }
-
-  /* Cards without a built target aren't links—don't show the tap
-     affordance (mirrors .inhouse-card--pending:hover on desktop). */
-  .inhouse-card.inhouse-card--pending:active .inhouse-title {
-    color: inherit;
-    background-color: transparent;
-  }
-
-  .inhouse-card.inhouse-card--pending:active .inhouse-title::before {
-    background-color: transparent;
-  }
+  /* No :active tap-highlight here on purpose (removed per the user's own
+     call): CSS :active fires the instant a finger touches down, before
+     the browser knows whether it's a tap, a scroll-past, or the start of
+     the horizontal swipe-to-cycle gesture--scrolling the grid flashed the
+     title black on every card the finger happened to start on. The card
+     only does two things (tap to open, horizontal drag to cycle
+     thumbnails, see ProjectCard.vue)--neither needs a highlight to read
+     as working, and a highlight that also falsely fires on a scroll-past
+     is worse than none. */
 
   .load-more-btn {
     display: flex;
