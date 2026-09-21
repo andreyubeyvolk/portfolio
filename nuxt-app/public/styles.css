@@ -711,19 +711,27 @@ body::-webkit-scrollbar-thumb:active {
   transition: color 150ms ease, background-color 150ms ease;
 }
 
-.inhouse-card:hover .inhouse-title {
-  color: #fff;
-  background-color: #000;
-}
+/* (hover: hover) and (pointer: fine) keeps this off touchscreens--without
+   it, mobile browsers apply :hover as a "sticky" state on tap (there's no
+   real hover concept on touch), so swiping a finger across the card to
+   cycle its preview thumbnails could leave the title stuck inverted
+   black/white until the user tapped elsewhere. Same guard already used
+   for .home-portrait's own hover cue. */
+@media (hover: hover) and (pointer: fine) {
+  .inhouse-card:hover .inhouse-title {
+    color: #fff;
+    background-color: #000;
+  }
 
-/* Cards without a built target (href dropped, set by main.js) aren't links —
-   don't present the interactive hover affordance. Compound selector (not
-   just source order) so this keeps winning over .inhouse-card:hover above
-   regardless of how the rules ever get reordered—same fix already applied
-   to .archive-card.archive-card--more for the identical reason. */
-.inhouse-card.inhouse-card--pending:hover .inhouse-title {
-  color: inherit;
-  background-color: transparent;
+  /* Cards without a built target (href dropped, set by main.js) aren't links —
+     don't present the interactive hover affordance. Compound selector (not
+     just source order) so this keeps winning over .inhouse-card:hover above
+     regardless of how the rules ever get reordered—same fix already applied
+     to .archive-card.archive-card--more for the identical reason. */
+  .inhouse-card.inhouse-card--pending:hover .inhouse-title {
+    color: inherit;
+    background-color: transparent;
+  }
 }
 
 .load-more-btn {
