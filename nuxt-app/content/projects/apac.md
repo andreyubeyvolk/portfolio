@@ -137,16 +137,16 @@ kv:
   height: 206
 zipUrl: /assets/inhouse/apac/apac-project-images.zip
 cardPreview:
-  - src: /assets/inhouse/apac/apac-03.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/apac/apac-12.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/apac/apac-07.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/apac/apac-08.webp
-    width: 1080
-    height: 1440
+  - src: /assets/inhouse/apac/apac-03-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/apac/apac-12-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/apac/apac-07-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/apac/apac-08-preview.webp
+    width: 480
+    height: 640
 ---

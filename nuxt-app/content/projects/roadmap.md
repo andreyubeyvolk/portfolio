@@ -128,16 +128,16 @@ kv:
   height: 206
 zipUrl: /assets/inhouse/roadmap/roadmap-project-images.zip
 cardPreview:
-  - src: /assets/inhouse/roadmap/roadmap-04.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/roadmap/roadmap-12.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/roadmap/roadmap-15.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/roadmap/roadmap-16.webp
-    width: 1080
-    height: 1440
+  - src: /assets/inhouse/roadmap/roadmap-04-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/roadmap/roadmap-12-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/roadmap/roadmap-15-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/roadmap/roadmap-16-preview.webp
+    width: 480
+    height: 640
 ---

@@ -176,16 +176,16 @@ kv:
   height: 206
 zipUrl: /assets/inhouse/finance/finance-project-images.zip
 cardPreview:
-  - src: /assets/inhouse/finance/finance-10.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/finance/finance-12.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/finance/finance-23.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/finance/finance-22.webp
-    width: 1080
-    height: 1440
+  - src: /assets/inhouse/finance/finance-10-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/finance/finance-12-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/finance/finance-23-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/finance/finance-22-preview.webp
+    width: 480
+    height: 640
 ---

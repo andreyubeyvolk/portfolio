@@ -157,16 +157,16 @@ kv:
   height: 206
 zipUrl: /assets/brands/valera/valera-project-images.zip
 cardPreview:
-  - src: /assets/brands/valera/valera-13.webp
-    width: 1080
-    height: 1440
-  - src: /assets/brands/valera/valera-07.webp
-    width: 1080
-    height: 1440
-  - src: /assets/brands/valera/valera-17.webp
-    width: 1080
-    height: 1440
-  - src: /assets/brands/valera/valera-18.webp
-    width: 1080
-    height: 1440
+  - src: /assets/brands/valera/valera-13-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/brands/valera/valera-07-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/brands/valera/valera-17-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/brands/valera/valera-18-preview.webp
+    width: 480
+    height: 640
 ---

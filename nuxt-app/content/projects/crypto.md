@@ -263,16 +263,16 @@ kv:
   height: 206
 zipUrl: /assets/inhouse/crypto/crypto-project-images.zip
 cardPreview:
-  - src: /assets/inhouse/crypto/crypto-02.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/crypto/crypto-31.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/crypto/crypto-20.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/crypto/crypto-29.webp
-    width: 1080
-    height: 1440
+  - src: /assets/inhouse/crypto/crypto-02-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/crypto/crypto-31-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/crypto/crypto-20-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/crypto/crypto-29-preview.webp
+    width: 480
+    height: 640
 ---

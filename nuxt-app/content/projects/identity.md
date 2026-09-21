@@ -142,16 +142,16 @@ kv:
   height: 206
 zipUrl: /assets/inhouse/identity/identity-project-images.zip
 cardPreview:
-  - src: /assets/inhouse/identity/identity-04.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/identity/identity-15.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/identity/identity-14.webp
-    width: 1080
-    height: 1440
-  - src: /assets/inhouse/identity/identity-09.webp
-    width: 1080
-    height: 1440
+  - src: /assets/inhouse/identity/identity-04-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/identity/identity-15-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/identity/identity-14-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/identity/identity-09-preview.webp
+    width: 480
+    height: 640
 ---
