@@ -36,14 +36,36 @@ useHead({
 // mark itself.
 const HINT_MS = 5000
 const sprayImg = useTemplateRef<HTMLImageElement>('sprayImg')
+const portraitFigure = useTemplateRef<HTMLElement>('portraitFigure')
+const introSection = useTemplateRef<HTMLElement>('introSection')
 const isActive = ref(false)
 const isRevealed = ref(false)
 const isHintOpen = ref(false)
+const hintWidth = ref(0)
 let dismissTimer: ReturnType<typeof setTimeout> | undefined
 
 function isDesktop() {
   return window.matchMedia('(min-width: 981px) and (pointer: fine)').matches
 }
+
+// The plaque's own width can't be expressed in plain CSS relative to the
+// portrait alone (a 44px figure)--the spec is "reaches the right edge of
+// .section-intro.home-intro", a DIFFERENT, wider ancestor the figure
+// doesn't share a percentage basis with. Measuring both rects directly
+// is simpler than restructuring the DOM to make that ancestor the
+// plaque's own positioning context.
+function updateHintWidth() {
+  const figure = portraitFigure.value
+  const section = introSection.value
+  if (!figure || !section) return
+  hintWidth.value = section.getBoundingClientRect().right - figure.getBoundingClientRect().left
+}
+
+onMounted(() => {
+  updateHintWidth()
+  window.addEventListener('resize', updateHintWidth)
+})
+onBeforeUnmount(() => window.removeEventListener('resize', updateHintWidth))
 
 // Same "board eraser" diagonal sweep as the Archive lightbox's graffiti
 // tag clear (graffiti.js's own wipeAway)--duplicated here rather than
@@ -76,15 +98,32 @@ function dismiss() {
   clearTimeout(dismissTimer)
   isHintOpen.value = false
   const img = sprayImg.value
-  if (img) wipeAway(img, () => { isRevealed.value = false })
-  else isRevealed.value = false
+  if (img) {
+    wipeAway(img, async () => {
+      // Dropping isRevealed after the wipe finishes would normally also
+      // re-trigger the reveal's own clip-path transition, playing a
+      // second (reversed, right-to-left) animation right after the wipe
+      // already erased everything--reads as two conflicting disappear
+      // animations back to back. Suppressing the transition for this one
+      // state change keeps the wipe as the only thing the user sees.
+      img.style.transition = 'none'
+      isRevealed.value = false
+      await nextTick()
+      img.style.transition = ''
+    })
+  } else {
+    isRevealed.value = false
+  }
   isActive.value = false
 }
 
 function show() {
   isActive.value = true
   isRevealed.value = true
-  if (isDesktop()) isHintOpen.value = true
+  if (isDesktop()) {
+    updateHintWidth()
+    isHintOpen.value = true
+  }
   dismissTimer = setTimeout(dismiss, HINT_MS)
 }
 
@@ -100,11 +139,11 @@ onBeforeUnmount(() => clearTimeout(dismissTimer))
 </script>
 
 <template>
-  <section class="section-intro home-intro" aria-label="Andrey Ubeyvolk introduction">
+  <section ref="introSection" class="section-intro home-intro" aria-label="Andrey Ubeyvolk introduction">
     <h1 class="sr-only">Andrey Ubeyvolk—Conceptual Art Director</h1>
     <p>Conceptual art direction with depth and vision. For startups, AI, crypto, and creative brands.</p>
 
-    <figure class="home-portrait" @click="onPortraitClick">
+    <figure ref="portraitFigure" class="home-portrait" @click="onPortraitClick">
       <div class="home-portrait__frame">
         <img width="176" height="176" src="/assets/portrait.webp" alt="Portrait of Andrey Ubeyvolk" />
         <img
@@ -116,7 +155,12 @@ onBeforeUnmount(() => clearTimeout(dismissTimer))
           aria-hidden="true"
         />
       </div>
-      <div class="home-portrait__hint" :class="{ 'is-open': isHintOpen }" aria-hidden="true">
+      <div
+        class="home-portrait__hint"
+        :class="{ 'is-open': isHintOpen }"
+        :style="{ width: hintWidth + 'px' }"
+        aria-hidden="true"
+      >
         Press CTRL + Click<br />to spray paint! Pshh Pshh…
       </div>
     </figure>

@@ -1,8 +1,8 @@
 <svg width="462" height="265" viewBox="0 0 462 265" fill="none" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <linearGradient id="facetagGrad" gradientUnits="userSpaceOnUse" x1="456.84" y1="273.62" x2="5.16" y2="-8.62">
-<stop offset="25.86%" stop-color="#FFFFFF"/>
-<stop offset="72.8%" stop-color="#ADADAD"/>
+<stop offset="25.86%" stop-color="#000000"/>
+<stop offset="72.8%" stop-color="#3F3F3F"/>
 </linearGradient>
 </defs>
 
