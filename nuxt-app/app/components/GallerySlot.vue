@@ -40,6 +40,13 @@ const tallStyle = computed(() => (props.wrapperClass === 'pv-wide' && props.item
 
 const el = useTemplateRef<HTMLElement>('el')
 const isRevealed = ref(!!props.skipReveal)
+// Skipped items (already on/near screen at load, per the comment above)
+// never got any load treatment at all--fine on desktop/fast connections,
+// but on mobile these first couple of photos can sit blank-white for a
+// beat then pop in fully loaded. Mobile-only CSS (mobile.css) fades the
+// <img> in on its own load event instead, gated by this class--separate
+// from isRevealed/.reveal above, which stays a no-op for skipped items.
+const isImgLoaded = ref(false)
 const isNoteOpen = ref(false)
 
 // Cursor-follow hover caption (valera, CLAUDE.md's vp-tipslot pattern).
@@ -98,6 +105,17 @@ function toggleNote(e: MouseEvent) {
 }
 
 onMounted(() => {
+  if (props.skipReveal) {
+    const img = el.value?.querySelector('img')
+    if (img && !(img as HTMLImageElement).complete) {
+      const onLoaded = () => { isImgLoaded.value = true }
+      img.addEventListener('load', onLoaded, { once: true })
+      img.addEventListener('error', onLoaded, { once: true })
+    } else {
+      isImgLoaded.value = true
+    }
+  }
+
   if (!props.skipReveal && el.value) {
     revealObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
@@ -138,7 +156,7 @@ onBeforeUnmount(() => {
   <figure
     ref="el"
     class="gallery-slot"
-    :class="[wrapperClass, { reveal: !skipReveal, 'is-revealed': isRevealed, 'info-note': item.note, 'is-note-open': isNoteOpen }]"
+    :class="[wrapperClass, { reveal: !skipReveal, 'is-revealed': isRevealed, 'skip-reveal-fade': skipReveal, 'is-img-loaded': isImgLoaded, 'info-note': item.note, 'is-note-open': isNoteOpen }]"
     :style="tallStyle"
     @mousemove="item.tip ? onTipMove($event) : undefined"
     @mouseleave="item.tip ? onTipLeave() : undefined"

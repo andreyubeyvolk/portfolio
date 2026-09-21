@@ -61,24 +61,59 @@ function onMouseMove(event: MouseEvent) {
 function onMouseLeave() {
   activeIndex.value = null
 }
+
+// A touch drag starts ambiguous--could be a vertical page scroll or a
+// horizontal "hover" swipe across the card. Wait for enough movement to
+// tell them apart (a plain tap never moves far enough to trigger either),
+// then commit to one for the rest of the gesture: horizontal drives the
+// preview cycling below, vertical does nothing here and leaves the
+// browser's own scroll alone--previously every touchmove cycled the
+// preview regardless of direction, so scrolling down over a card also
+// flashed through its preview images.
+const touchStart = ref<{ x: number, y: number } | null>(null)
+const touchIntent = ref<'pending' | 'horizontal' | 'vertical'>('pending')
+const DIRECTION_THRESHOLD = 6 // px of movement before committing a direction
+
+function onTouchStart(event: TouchEvent) {
+  const touch = event.touches[0]
+  if (!touch) return
+  touchStart.value = { x: touch.clientX, y: touch.clientY }
+  touchIntent.value = 'pending'
+}
 function onTouchMove(event: TouchEvent) {
   const touch = event.touches[0]
-  if (touch) updateFromClientX(touch.clientX)
+  if (!touch || !touchStart.value) return
+  if (touchIntent.value === 'pending') {
+    const dx = touch.clientX - touchStart.value.x
+    const dy = touch.clientY - touchStart.value.y
+    if (Math.abs(dx) < DIRECTION_THRESHOLD && Math.abs(dy) < DIRECTION_THRESHOLD) return
+    touchIntent.value = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical'
+  }
+  if (touchIntent.value === 'horizontal') updateFromClientX(touch.clientX)
 }
 function onTouchEnd() {
   activeIndex.value = null
+  touchStart.value = null
+  touchIntent.value = 'pending'
 }
 
 const activePreview = computed(() => (props.cardPreview && activeIndex.value !== null) ? props.cardPreview[activeIndex.value] : null)
+// Drives the mobile "hover" look (title plaque turns black, flush against
+// the cover) for the same duration the horizontal drag is live--real
+// :active can't be relied on for this: iOS Safari suppresses it during a
+// touchmove it interprets as a scroll/drag gesture.
+const isTouchActive = computed(() => activeIndex.value !== null)
 </script>
 
 <template>
   <NuxtLink
     ref="cardRef"
     class="inhouse-card"
+    :class="{ 'is-touch-active': isTouchActive }"
     :to="`/${section}/${slug}`"
     @mousemove="cardPreview?.length ? onMouseMove($event) : undefined"
     @mouseleave="cardPreview?.length ? onMouseLeave() : undefined"
+    @touchstart="cardPreview?.length ? onTouchStart($event) : undefined"
     @touchmove="cardPreview?.length ? onTouchMove($event) : undefined"
     @touchend="cardPreview?.length ? onTouchEnd() : undefined"
   >
