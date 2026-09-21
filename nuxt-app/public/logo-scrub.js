@@ -79,25 +79,19 @@
     tip.classList.remove('is-visible');
   }
 
-  // Progressive backoff: the first idle-triggered appearance waits only
-  // 3s, but showing the hint repeatedly at that same short interval gets
-  // annoying fast--each later appearance waits twice as long as the one
-  // before (3s -> 6s -> 12s -> 24s), capping at 24s so it doesn't keep
-  // growing forever.
-  var IDLE_STEPS_MS = [3000, 6000, 12000, 24000];
-  var idleStepIndex = 0;
+  // 30s of no mouse movement at all before the hint shows--same wait
+  // every time it re-arms, not a progressive backoff.
+  var IDLE_MS = 30000;
 
   // Any real mouse movement anywhere dismisses the tip (if up) and
-  // resets the idle clock; it only actually shows once the current
-  // step's idle window passes with no movement at all.
+  // resets the idle clock; it only actually shows once the idle window
+  // passes with no movement at all.
   var idleTimer = null;
   function armIdleTimer() {
     clearTimeout(idleTimer);
-    var delay = IDLE_STEPS_MS[Math.min(idleStepIndex, IDLE_STEPS_MS.length - 1)];
     idleTimer = setTimeout(function () {
       showTip(lastMouseX, lastMouseY);
-      idleStepIndex++; // next re-arm (after the user moves again) waits longer
-    }, delay);
+    }, IDLE_MS);
   }
   // A plain click (mousedown+mouseup with no drag) can still dispatch a
   // 'mousemove' in some browsers, and even when it doesn't, a real human
