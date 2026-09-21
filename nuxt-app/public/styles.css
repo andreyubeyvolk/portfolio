@@ -264,35 +264,57 @@ img {
   object-fit: cover;
 }
 
-/* Spray-can demo canvas (HomePortraitSpray logic in index.vue)--sits
-   inside __frame so it's clipped to the portrait's own square exactly
-   like the photo underneath it. */
-.home-portrait__spray {
+/* Darken-on-hover (actually a lighten--see below) signals the portrait is
+   clickable, same idea as the project-card hover treatment elsewhere.
+   Targets the photo specifically, not the spray mark on top of it. */
+.home-portrait:hover .home-portrait__frame > img {
+  opacity: 0.8;
+}
+
+/* Spray-can demo mark (portrait-spray.svg, a real design asset--see
+   index.vue's onPortraitClick). Sits inside __frame so it's clipped to
+   the portrait's own square exactly like the photo underneath it.
+   Positioned at roughly eye height, bleeding slightly past both side
+   edges (the source art's own margins otherwise read as too tucked-in
+   at this small a size). Reveals left-to-right via clip-path (the art's
+   own ragged/spattered edge already reads as "uneven," no custom mask
+   shape needed)--wipeAway (index.vue) takes over for the disappear,
+   same diagonal sweep as the graffiti tag's own clear. */
+.home-portrait .home-portrait__spray {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  left: -8%;
+  top: 3%;
+  width: 116%;
+  height: auto;
+  aspect-ratio: 462 / 265;
+  object-fit: contain;
   pointer-events: none;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.home-portrait__spray.is-revealed {
+  clip-path: inset(0 0 0 0);
 }
 
 /* Hint plaque: grows from the portrait's bottom-right corner via a
    clip-path shutter (top-down reveal, bottom-up hide)--same mechanism
    as the Archive lightbox's own mask, just a much smaller surface. Gray
    (not black, unlike the graffiti tag's own black spray) since this is
-   an instructional callout, not paint. */
+   an instructional callout, not paint. Flush against the portrait's own
+   corner (no gap) and flush text (no padding) per spec. */
 .home-portrait__hint {
   position: absolute;
   left: 100%;
   bottom: 0;
-  margin-left: 8px;
   width: max-content;
   max-width: 200px;
-  padding: 8px 10px;
+  padding: 0;
   background: #d9d9d9;
   color: #171717;
   font-size: 0.8125rem;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1;
   letter-spacing: -0.3px;
   pointer-events: none;
   z-index: 5;
