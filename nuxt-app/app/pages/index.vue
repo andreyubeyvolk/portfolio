@@ -29,57 +29,34 @@ useHead({
   }],
 })
 
-// Portrait click demo: a spray-can mark (portrait-spray.svg--a real design
-// asset, not procedurally drawn) reveals left-to-right across the eyes,
-// nudging toward the hidden Ctrl+drag graffiti feature. Desktop also gets
-// an instructional plaque; mobile (no Ctrl key to speak of) just gets the
-// mark itself.
-const HINT_MS = 5000
-const sprayImg = useTemplateRef<HTMLImageElement>('sprayImg')
-const portraitFigure = useTemplateRef<HTMLElement>('portraitFigure')
-const introSection = useTemplateRef<HTMLElement>('introSection')
+// Portrait click demo: a paint-splash mark (facepaint.svg desktop /
+// facepaint-mobile.svg mobile--real design assets, the desktop one with
+// the instructional text baked in as vector shapes, no separate plaque
+// element needed) appears over the portrait for 3s, nudging toward the
+// hidden Ctrl+drag graffiti feature, then clears. Both appear AND
+// disappear via the same sponge/board-eraser sweep graffiti.js's own tag
+// clear uses--one animation, two directions, not a different reveal
+// mechanic for each end.
+const SHOW_MS = 3000
+const paintImg = useTemplateRef<HTMLImageElement>('paintImg')
 const isActive = ref(false)
-const isRevealed = ref(false)
-const isHintOpen = ref(false)
-const hintWidth = ref(0)
 let dismissTimer: ReturnType<typeof setTimeout> | undefined
-
-function isDesktop() {
-  return window.matchMedia('(min-width: 981px) and (pointer: fine)').matches
-}
-
-// The plaque's own width can't be expressed in plain CSS relative to the
-// portrait alone (a 44px figure)--the spec is "reaches the right edge of
-// .section-intro.home-intro", a DIFFERENT, wider ancestor the figure
-// doesn't share a percentage basis with. Measuring both rects directly
-// is simpler than restructuring the DOM to make that ancestor the
-// plaque's own positioning context.
-function updateHintWidth() {
-  const figure = portraitFigure.value
-  const section = introSection.value
-  if (!figure || !section) return
-  hintWidth.value = section.getBoundingClientRect().right - figure.getBoundingClientRect().left
-}
-
-onMounted(() => {
-  updateHintWidth()
-  window.addEventListener('resize', updateHintWidth)
-})
-onBeforeUnmount(() => window.removeEventListener('resize', updateHintWidth))
 
 // Same "board eraser" diagonal sweep as the Archive lightbox's graffiti
 // tag clear (graffiti.js's own wipeAway)--duplicated here rather than
 // reached into from that vanilla script, since this <img> is a completely
-// separate, Vue-owned surface with its own lifecycle.
-function wipeAway(el: HTMLElement, onDone: () => void) {
-  const DURATION = 850
+// separate, Vue-owned surface with its own lifecycle. `reverse` runs the
+// identical sweep backwards--covered-to-visible for the appear, visible-
+// to-covered for the disappear--rather than two different mechanics.
+function sponge(el: HTMLElement, reverse: boolean, onDone: () => void) {
+  const DURATION = 700
   const BAND = 4
   let start: number | null = null
   function frame(now: number) {
     if (start === null) start = now
     const t = Math.min(1, (now - start) / DURATION)
     const eased = 1 - (1 - t) ** 2
-    const pos = eased * (100 + BAND) - BAND
+    const pos = (reverse ? 1 - eased : eased) * (100 + BAND) - BAND
     const mask = `linear-gradient(to bottom right, transparent ${pos}%, #000 ${pos + BAND}%)`
     el.style.webkitMaskImage = mask
     el.style.maskImage = mask
@@ -87,8 +64,6 @@ function wipeAway(el: HTMLElement, onDone: () => void) {
       requestAnimationFrame(frame)
     } else {
       onDone()
-      el.style.webkitMaskImage = ''
-      el.style.maskImage = ''
     }
   }
   requestAnimationFrame(frame)
@@ -96,73 +71,58 @@ function wipeAway(el: HTMLElement, onDone: () => void) {
 
 function dismiss() {
   clearTimeout(dismissTimer)
-  isHintOpen.value = false
-  const img = sprayImg.value
+  const img = paintImg.value
   if (img) {
-    wipeAway(img, async () => {
-      // Dropping isRevealed after the wipe finishes would normally also
-      // re-trigger the reveal's own clip-path transition, playing a
-      // second (reversed, right-to-left) animation right after the wipe
-      // already erased everything--reads as two conflicting disappear
-      // animations back to back. Suppressing the transition for this one
-      // state change keeps the wipe as the only thing the user sees.
-      img.style.transition = 'none'
-      isRevealed.value = false
-      await nextTick()
-      img.style.transition = ''
+    sponge(img, false, () => {
+      isActive.value = false
+      img.style.webkitMaskImage = ''
+      img.style.maskImage = ''
     })
   } else {
-    isRevealed.value = false
+    isActive.value = false
   }
-  isActive.value = false
 }
 
 function show() {
+  if (isActive.value) return
   isActive.value = true
-  isRevealed.value = true
-  if (isDesktop()) {
-    updateHintWidth()
-    isHintOpen.value = true
+  const img = paintImg.value
+  if (img) {
+    // Starts fully masked (nothing shown) so the very first frame of the
+    // reveal sweep is the actual start state, not a flash of the whole
+    // mark before the mask engages--matches sponge()'s own t=0 output
+    // for reverse:true (pos=100), not dismiss's t=0 (pos=-4, fully
+    // visible)--those are opposite starting points, mixing them up here
+    // showed the mark at full opacity for a frame before the reveal
+    // "caught up" and hid it again.
+    img.style.webkitMaskImage = 'linear-gradient(to bottom right, transparent 100%, #000 104%)'
+    img.style.maskImage = img.style.webkitMaskImage
+    requestAnimationFrame(() => {
+      sponge(img, true, () => {
+        img.style.webkitMaskImage = ''
+        img.style.maskImage = ''
+      })
+    })
   }
-  dismissTimer = setTimeout(dismiss, HINT_MS)
-}
-
-function onPortraitClick() {
-  if (isActive.value) {
-    if (isDesktop()) dismiss() // early dismiss on a second click--desktop only, per spec
-    return
-  }
-  show()
+  dismissTimer = setTimeout(dismiss, SHOW_MS)
 }
 
 onBeforeUnmount(() => clearTimeout(dismissTimer))
 </script>
 
 <template>
-  <section ref="introSection" class="section-intro home-intro" aria-label="Andrey Ubeyvolk introduction">
+  <section class="section-intro home-intro" aria-label="Andrey Ubeyvolk introduction">
     <h1 class="sr-only">Andrey Ubeyvolk—Conceptual Art Director</h1>
     <p>Conceptual art direction with depth and vision. For startups, AI, crypto, and creative brands.</p>
 
-    <figure ref="portraitFigure" class="home-portrait" @click="onPortraitClick">
+    <figure class="home-portrait" @click="show">
       <div class="home-portrait__frame">
         <img width="176" height="176" src="/assets/portrait.webp" alt="Portrait of Andrey Ubeyvolk" />
-        <img
-          ref="sprayImg"
-          class="home-portrait__spray"
-          :class="{ 'is-revealed': isRevealed }"
-          src="/assets/portrait-spray.svg"
-          alt=""
-          aria-hidden="true"
-        />
       </div>
-      <div
-        class="home-portrait__hint"
-        :class="{ 'is-open': isHintOpen }"
-        :style="{ width: hintWidth + 'px' }"
-        aria-hidden="true"
-      >
-        Press CTRL + Click<br />to spray paint! Pshh Pshh…
-      </div>
+      <picture v-show="isActive">
+        <source media="(min-width: 981px)" srcset="/assets/facepaint.svg" />
+        <img ref="paintImg" class="home-portrait__paint" src="/assets/facepaint-mobile.svg" alt="" aria-hidden="true" />
+      </picture>
     </figure>
   </section>
 

@@ -210,12 +210,14 @@
     overflow: hidden;
   }
 
-  /* No Ctrl key on mobile--just the spray-line demo, no instructional
-     plaque (see index.vue's isDesktop() gate, which already keeps this
-     from ever opening here; hiding it outright too is simpler than
-     trusting that alone). */
-  .home-portrait__hint {
-    display: none;
+  /* facepaint-mobile.svg's own portrait-oriented art (221:274, vs.
+     desktop's wide 347:187)--roughly centered over the portrait with
+     drips running down past it. */
+  .home-portrait .home-portrait__paint {
+    left: -12px;
+    top: -20px;
+    width: 100px;
+    aspect-ratio: 221 / 274;
   }
 
   .home-portrait img {

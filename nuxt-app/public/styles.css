@@ -240,10 +240,9 @@ img {
   margin-bottom: 8px;
 }
 
-/* position:relative (not overflow:hidden--that moved to __frame below) so
-   the click-to-demo hint plaque, anchored off the bottom-right corner,
-   can extend past the portrait's own small square instead of being
-   clipped by it. */
+/* position:relative (not overflow:hidden--that's on __frame below) so the
+   click-to-demo paint mark, much bigger than the portrait's own small
+   square, can extend past it instead of being clipped to it. */
 .home-portrait {
   position: relative;
   width: 44px;
@@ -274,62 +273,24 @@ img {
   }
 }
 
-/* Spray-can demo mark (portrait-spray.svg, a real design asset--see
-   index.vue's onPortraitClick). Sits inside __frame so it's clipped to
-   the portrait's own square exactly like the photo underneath it.
-   Positioned at roughly eye height, bleeding slightly past both side
-   edges (the source art's own margins otherwise read as too tucked-in
-   at this small a size). Reveals left-to-right via clip-path (the art's
-   own ragged/spattered edge already reads as "uneven," no custom mask
-   shape needed)--wipeAway (index.vue) takes over for the disappear,
-   same diagonal sweep as the graffiti tag's own clear. */
-.home-portrait .home-portrait__spray {
+/* Paint-splash demo mark (facepaint.svg--a real design asset, text baked
+   in as vector shapes, see index.vue's show()/dismiss()). NOT clipped to
+   __frame--sized well past the portrait's own 44px square, positioned so
+   the dense part of the splash sits above/over the portrait with its
+   drips running down past it, matching the reference composition.
+   z-index above .section-intro's own text, which it's meant to overlap
+   briefly. Desktop-specific size/position; mobile.css overrides both for
+   facepaint-mobile.svg's own portrait-oriented art. */
+.home-portrait .home-portrait__paint {
   position: absolute;
-  left: -8%;
-  top: -1.5%;
-  width: 116%;
+  z-index: 3;
+  left: -30px;
+  top: -55px;
+  width: 280px;
   height: auto;
-  aspect-ratio: 462 / 265;
+  aspect-ratio: 347 / 187;
   object-fit: contain;
   pointer-events: none;
-  clip-path: inset(0 100% 0 0);
-  transition: clip-path 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.home-portrait__spray.is-revealed {
-  clip-path: inset(0 0 0 0);
-}
-
-/* Hint plaque: starts flush at the portrait's own bottom edge and
-   stretches right to .section-intro.home-intro's own right edge (that
-   ancestor is wider than the 44px portrait figure and isn't a percentage
-   basis either shares--index.vue's updateHintWidth() measures both rects
-   directly and sets this as an inline width). Grows via a clip-path
-   shutter (top-down reveal)--same mechanism as the Archive lightbox's
-   own mask, just a much smaller surface. Gray (not black, unlike the
-   graffiti tag's own spray) since this is an instructional callout, not
-   paint. Flush text (no padding, line-height 1) per spec; font matches
-   .section-intro p's own (weight/size/tracking), just single-line-tight
-   instead of that rule's 1.2. */
-.home-portrait__hint {
-  position: absolute;
-  left: 0;
-  top: 100%;
-  padding: 0;
-  background: #d9d9d9;
-  color: #171717;
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.5px;
-  pointer-events: none;
-  z-index: 5;
-  clip-path: inset(0 0 100% 0);
-  transition: clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.home-portrait__hint.is-open {
-  clip-path: inset(0 0 0 0);
 }
 
 .content-pane {
