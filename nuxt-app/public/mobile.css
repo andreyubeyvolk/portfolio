@@ -1102,13 +1102,15 @@
   /* Open to portrait — 83×83, shown on mobile. position:relative (not
      overflow:hidden) so the click-to-demo paint mark, bigger than the
      portrait's own square, can extend past it--same idea as
-     .home-portrait on the home page. */
+     .home-portrait on the home page. margin:0 overrides the browser's
+     own default <figure> margin (1em 40px)--was pushing this 40px to
+     the right of the paragraph above it, off the shared left edge. */
   .about-page .about-pane .open-to-photo {
     display: block;
     position: relative;
     width: 83px;
     height: 83px;
-    margin-top: 14px;
+    margin: 14px 0 0;
     cursor: pointer;
   }
 
