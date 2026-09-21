@@ -240,17 +240,68 @@ img {
   margin-bottom: 8px;
 }
 
+/* position:relative (not overflow:hidden--that moved to __frame below) so
+   the click-to-demo hint plaque, anchored off the bottom-right corner,
+   can extend past the portrait's own small square instead of being
+   clipped by it. */
 .home-portrait {
+  position: relative;
   width: 44px;
   aspect-ratio: 1 / 1;
-  overflow: hidden;
   margin: 0;
+  cursor: pointer;
+}
+
+.home-portrait__frame {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   background: var(--muted);
 }
 
 .home-portrait img {
   height: 100%;
   object-fit: cover;
+}
+
+/* Spray-can demo canvas (HomePortraitSpray logic in index.vue)--sits
+   inside __frame so it's clipped to the portrait's own square exactly
+   like the photo underneath it. */
+.home-portrait__spray {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Hint plaque: grows from the portrait's bottom-right corner via a
+   clip-path shutter (top-down reveal, bottom-up hide)--same mechanism
+   as the Archive lightbox's own mask, just a much smaller surface. Gray
+   (not black, unlike the graffiti tag's own black spray) since this is
+   an instructional callout, not paint. */
+.home-portrait__hint {
+  position: absolute;
+  left: 100%;
+  bottom: 0;
+  margin-left: 8px;
+  width: max-content;
+  max-width: 200px;
+  padding: 8px 10px;
+  background: #d9d9d9;
+  color: #171717;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.3px;
+  pointer-events: none;
+  z-index: 5;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.home-portrait__hint.is-open {
+  clip-path: inset(0 0 0 0);
 }
 
 .content-pane {
@@ -565,7 +616,7 @@ body::-webkit-scrollbar-thumb:active {
   margin-top: 0;
 }
 
-/* "See all projects": sits in the empty column to the left of the socials,
+/* "All projects": sits in the empty column to the left of the socials,
    same row, flush with the borderless top row (Mail / YouTube). */
 .home-projects-link {
   grid-column: 1 / 9;
@@ -584,14 +635,14 @@ body::-webkit-scrollbar-thumb:active {
   background-color: #000;
 }
 
-/* "See all projects", Mail and YouTube sit directly under the reel-card
+/* "All projects", Mail and YouTube sit directly under the reel-card
    player—16px grid-gap partially closed by their own -10px margin-top,
    leaving a 6px residual gap. On hover, bleed the black background up
    through that residual so the highlight reads flush with the player's
    bottom edge instead of stopping short of it. A ::before, not a bigger
    margin/padding, so the link's own box and text position never move.
    Mail/YouTube only keep this on the desktop grid: below 980px the layout
-   goes to block flow and "See all projects" (which keeps its bleed at
+   goes to block flow and "All projects" (which keeps its bleed at
    every width) lands between them and the player, so they're no longer
    the row actually touching it. */
 .home-projects-link,

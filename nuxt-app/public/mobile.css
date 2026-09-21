@@ -201,8 +201,21 @@
     grid-row: 1;
     width: 100%;
     aspect-ratio: 1 / 1;
-    overflow: hidden;
     margin: 0;
+  }
+
+  .home-portrait__frame {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* No Ctrl key on mobile--just the spray-line demo, no instructional
+     plaque (see index.vue's isDesktop() gate, which already keeps this
+     from ever opening here; hiding it outright too is simpler than
+     trusting that alone). */
+  .home-portrait__hint {
+    display: none;
   }
 
   .home-portrait img {
@@ -277,7 +290,7 @@
     text-align: right;
   }
 
-  /* ── See all projects: full-width tap target, no divider rules ──
+  /* ── All projects: full-width tap target, no divider rules ──
      32px margin-bottom keeps it from visually merging into the
      socials grid right below it. Width is 100% (not fit-content) and a
      ::before bleeds the :active fill up through the 8px residual gap
