@@ -945,6 +945,33 @@ window.initGraffiti = function initGraffiti() {
     document.body.classList.remove('graffiti-mode');
   }
 
+  // A long-press directly on a rendered character races the browser's own
+  // native text-selection hold (which fires well under our 3s)--whichever
+  // wins, the loser reads as broken (either the tag never arms, or normal
+  // text selection gets hijacked). Skipping arming entirely when the touch
+  // actually lands on a glyph sidesteps the race instead of trying to win
+  // it, and leaves text selection completely untouched. caretRangeFromPoint
+  // always returns the NEAREST text node even from empty space nearby, so
+  // this also checks the touch point actually falls inside that
+  // character's own rendered box--not just "some text is somewhere around
+  // here"--which is what "путает зону текста и зону фона" was about.
+  function isOverGlyph(x, y) {
+    if (!document.caretRangeFromPoint) return false;
+    var range = document.caretRangeFromPoint(x, y);
+    if (!range || range.startContainer.nodeType !== Node.TEXT_NODE) return false;
+    var textNode = range.startContainer;
+    var offset = range.startOffset;
+    var glyphRange = document.createRange();
+    glyphRange.setStart(textNode, Math.max(0, offset - 1));
+    glyphRange.setEnd(textNode, Math.min(textNode.textContent.length, offset + 1));
+    var rects = glyphRange.getClientRects();
+    for (var i = 0; i < rects.length; i++) {
+      var r = rects[i];
+      if (x >= r.left - 2 && x <= r.right + 2 && y >= r.top - 2 && y <= r.bottom + 2) return true;
+    }
+    return false;
+  }
+
   function onTouchStart(e) {
     if (e.touches.length === 2) {
       clearTimeout(longPressTimer);
@@ -954,6 +981,7 @@ window.initGraffiti = function initGraffiti() {
     twoFingerStart = null;
     if (e.touches.length !== 1 || touchArmed) return;
     var t = e.touches[0];
+    if (isOverGlyph(t.clientX, t.clientY)) return; // let native text selection have it, untouched
     touchStartX = t.clientX;
     touchStartY = t.clientY;
     clearTimeout(longPressTimer);

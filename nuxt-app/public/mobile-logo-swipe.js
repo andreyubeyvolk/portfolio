@@ -46,14 +46,29 @@
     }
   }
 
-  var stored = null;
-  try { stored = sessionStorage.getItem(STORAGE_KEY); } catch (err) { /* private-mode storage access can throw */ }
-  if (stored !== null) {
-    var restored = parseInt(stored, 10);
-    if (restored >= 0 && restored < STATE_COUNT) applyState(restored);
+  function restoreFromStorage() {
+    var stored = null;
+    try { stored = sessionStorage.getItem(STORAGE_KEY); } catch (err) { /* private-mode storage access can throw */ }
+    if (stored !== null) {
+      var restored = parseInt(stored, 10);
+      if (restored >= 0 && restored < STATE_COUNT) applyState(restored);
+    }
+    // No stored value: stays at index 0 (plain text), already the
+    // markup's own starting state—nothing to apply.
   }
-  // No stored value: stays at index 0 (plain text), already the
-  // markup's own starting state—nothing to apply.
+  restoreFromStorage();
+
+  // .mobile-bar__brand is a NuxtLink--Vue re-patches its `class` attribute
+  // from scratch on every route change (to toggle its own router-link-
+  // active/exact-active classes), wiping is-lettering right back off since
+  // Vue has no idea this script added it outside its own reactivity. The
+  // element itself survives navigation (MobileNav.vue lives in the
+  // persistent layout, not remounted per page)--only its class list gets
+  // clobbered--so re-applying from sessionStorage after each navigation
+  // fixes it without needing to re-run this whole script. Exposed for
+  // legacy-nav-scripts.client.ts's page:finish hook to call, same pattern
+  // as graffiti.js's window.initGraffiti/clearGraffiti.
+  window.reapplyMobileBrandLettering = restoreFromStorage;
 
   var startX = 0, startY = 0, tracking = false;
   var SWIPE_THRESHOLD = 32; // px—short flicks shouldn't accidentally trigger this over a tap

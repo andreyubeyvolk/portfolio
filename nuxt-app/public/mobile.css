@@ -34,6 +34,27 @@
   /* ── Shell ── */
   body {
     overflow: auto;
+    /* A long-press ANYWHERE selectable races the browser's own native
+       text-selection callout, which fires independent of graffiti.js's
+       own long-press-to-draw timer--JS can skip arming a stroke near
+       text, but it can't suppress the browser's own selection UI once
+       something in the touched area is selectable at all (confirmed:
+       it was still triggering on background near text, not just text
+       itself). Making the whole page unselectable by default and
+       opting real body-copy paragraphs back in below is what actually
+       stops it, not a JS check alone. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Opt real body copy back in--About/Challenge/Solution text and
+     similar are all plain <p> elements; nothing else on mobile needs
+     to be selectable (titles, labels, nav are UI chrome, not prose). */
+  p {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
   }
 
   .site-shell {
@@ -547,7 +568,8 @@
   }
 
   .archive-title {
-    order: 0;
+    /* -1 to match desktop (styles.css): title above the cover, not below. */
+    order: -1;
     font-size: 0.9375rem;
     letter-spacing: -0.5px;
   }
@@ -611,6 +633,8 @@
   }
 
   .inhouse-title {
+    /* Below the cover on mobile, per the user's own call--desktop keeps
+       its own order:-1 (title above) in styles.css, unaffected. */
     order: 0;
     font-size: 0.9375rem;
     letter-spacing: -0.5px;
@@ -753,20 +777,20 @@
     z-index: 101;
     overflow: hidden;
 
-    /* Mask: clips upward from the bar. (A transform:translateY() version
-       was tried here instead, to sidestep clip-path's per-frame repaint
-       cost—but a position:fixed element animating via transform, combined
-       with body's overflow:hidden toggle for the scroll lock below, is a
-       known problem spot on real mobile Safari: the fixed element can
-       render off/blank instead of tracking the viewport. Reverted—a
-       working menu that isn't perfectly smooth beats an invisible one.) */
-    clip-path: inset(100% 0 0 0);
+    /* Plain opacity fade, per the user's own request ("просто появление
+       через опасити")—a clip-path grow-from-the-bar mask was tried first,
+       then a transform:translateY() one (reverted: transform on a
+       position:fixed element, combined with body's overflow:hidden scroll
+       lock below, is a known real-mobile-Safari problem spot—the fixed
+       element can render off/blank instead of tracking the viewport).
+       Opacity doesn't share that failure mode, so it's safe here. */
+    opacity: 0;
     pointer-events: none;
-    transition: clip-path 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.3s ease;
   }
 
   body.menu-is-open .mobile-menu {
-    clip-path: inset(0 0 0 0);
+    opacity: 1;
     pointer-events: auto;
   }
 
@@ -908,8 +932,20 @@
     grid-column: 2 / -1;
   }
 
-  /* Reset desktop article grid → plain column */
-  .about-page .about-view {
+  /* Reset desktop article grid → plain column.
+     Every selector below is prefixed .about-page .about-pane (not just
+     .about-page) on purpose: about.vue's OWN scoped <style> redeclares
+     these same classes for desktop (grid-based), compiled to
+     .foo[data-v-hash]--equal specificity to a plain .about-page .foo, so
+     which one wins was coming down to injection order (Vite injects the
+     scoped chunk as a JS side effect, which in practice landed AFTER this
+     linked stylesheet--desktop was winning on mobile, live-confirmed via
+     computed styles: .service-row stuck at display:grid, .about-view's
+     16-col track crushing .about-download-mobile to ~6px). The extra real
+     ancestor class (.about-pane, the <section> wrapping .about-view)
+     bumps specificity above the scoped rule's, unconditionally--verified
+     live that this wins regardless of where it's injected in <head>. */
+  .about-page .about-pane .about-view {
     display: flex;
     flex-direction: column;
     padding-bottom: 0;
@@ -917,7 +953,7 @@
 
   /* Photo: full-width square, 6px gap below (2px tighter than the
      original 8px, to bring Approach closer up underneath it) */
-  .about-page .about-photo {
+  .about-page .about-pane .about-photo {
     grid-column: unset;
     width: 100%;
     aspect-ratio: 1 / 1;
@@ -925,8 +961,9 @@
     margin: 0 0 6px;
   }
 
-  /* Sections: flex row — label (84px) + content (flex-1) */
-  .about-page .about-section {
+  /* Sections: flex row — label (84px, ≈2 of 8 columns at this width) +
+     content (flex-1, the remaining ≈6 of 8) */
+  .about-page .about-pane .about-section {
     display: flex;
     flex-direction: row;
     gap: 8px;
@@ -939,12 +976,12 @@
   }
 
   /* Focus — no top line, no top margin (immediately after photo) */
-  .about-page .about-section:first-of-type {
+  .about-page .about-pane .about-section:first-of-type {
     border-top: none;
     margin-top: 0;
   }
 
-  .about-page .about-section__label {
+  .about-page .about-pane .about-section__label {
     grid-column: unset;
     width: 84px;
     min-width: 84px;
@@ -956,13 +993,13 @@
     margin: 0;
   }
 
-  .about-page .about-section__content {
+  .about-page .about-pane .about-section__content {
     grid-column: unset;
     flex: 1;
     min-width: 0;
   }
 
-  .about-page .about-section__content > p {
+  .about-page .about-pane .about-section__content > p {
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
@@ -971,13 +1008,13 @@
   }
 
   /* Contact section — same layout as others */
-  .about-page .about-section--contact .about-section__content {
+  .about-page .about-pane .about-section--contact .about-section__content {
     grid-column: unset;
     flex: 1;
   }
 
   /* Service rows (Focus) → stacked title + desc, dividers between rows */
-  .about-page .service-row {
+  .about-page .about-pane .service-row {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -989,12 +1026,12 @@
     align-items: unset;
   }
 
-  .about-page .service-row:first-child {
+  .about-page .about-pane .service-row:first-child {
     border-top: none;
   }
 
-  .about-page .service-row__title,
-  .about-page .service-row__desc {
+  .about-page .about-pane .service-row__title,
+  .about-page .about-pane .service-row__desc {
     grid-column: unset;
     font-size: 0.9375rem;
     font-weight: 700;
@@ -1009,7 +1046,7 @@
      company = full width → appears left edge
      role    = 175px → indented (266-175=91px from left)
      years   = 83px  → most indented (266-83=183px from left) */
-  .about-page .exp-row {
+  .about-page .about-pane .exp-row {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -1021,17 +1058,17 @@
     column-gap: unset;
   }
 
-  .about-page .exp-row:first-child {
+  .about-page .about-pane .exp-row:first-child {
     border-top: none;
   }
 
-  .about-page .exp-row:last-child {
+  .about-page .about-pane .exp-row:last-child {
     margin-bottom: 0;
   }
 
-  .about-page .exp-row__company,
-  .about-page .exp-row__role,
-  .about-page .exp-row__years {
+  .about-page .about-pane .exp-row__company,
+  .about-page .about-pane .exp-row__role,
+  .about-page .about-pane .exp-row__years {
     grid-column: unset;
     font-size: 0.9375rem;
     font-weight: 700;
@@ -1042,20 +1079,20 @@
   }
 
   /* Staircase widths */
-  .about-page .exp-row__company {
+  .about-page .about-pane .exp-row__company {
     width: 100%;
   }
 
-  .about-page .exp-row__role {
+  .about-page .about-pane .exp-row__role {
     width: 175px;
   }
 
-  .about-page .exp-row__years {
+  .about-page .about-pane .exp-row__years {
     width: 83px;
   }
 
   /* Open to portrait — 83×83, shown on mobile */
-  .about-page .open-to-portrait {
+  .about-page .about-pane .open-to-portrait {
     display: block;
     width: 83px;
     height: 83px;
@@ -1064,14 +1101,15 @@
     margin-top: 14px;
   }
 
-  /* Contact grid — 2 columns */
-  .about-page .contact-grid {
+  /* Contact grid — 2 columns (≈3-of-8 + 3-of-8, since the section's
+     content already gets ≈6-of-8 above) */
+  .about-page .about-pane .contact-grid {
     grid-template-columns: 1fr 1fr;
     column-gap: 8px;
     row-gap: 0;
   }
 
-  .about-page .contact-link {
+  .about-page .about-pane .contact-link {
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
@@ -1082,14 +1120,14 @@
     z-index: 0;
   }
 
-  .about-page .contact-grid .contact-link:nth-child(-n+2) {
+  .about-page .about-pane .contact-grid .contact-link:nth-child(-n+2) {
     border-top: none;
     padding-top: 0;
     padding-bottom: 22px; /* no border → 18px text + 22px = 40px tap target */
   }
 
   /* Hover bar: full-width, covers border + text only (not the full tap area) */
-  .about-page .contact-link::before {
+  .about-page .about-pane .contact-link::before {
     content: '';
     position: absolute;
     top: -2px; /* extends up to cover the 2px border */
@@ -1102,51 +1140,52 @@
     transition: opacity 150ms ease;
   }
 
-  .about-page .contact-grid .contact-link:nth-child(-n+2)::before {
+  .about-page .about-pane .contact-grid .contact-link:nth-child(-n+2)::before {
     top: 0;
     height: 18px; /* no border, just line-height */
   }
 
   /* Neutralize sticky hover on touch */
-  .about-page .contact-link:hover {
+  .about-page .about-pane .contact-link:hover {
     color: inherit;
     background: none;
   }
 
-  .about-page .contact-link:hover::before {
+  .about-page .about-pane .contact-link:hover::before {
     opacity: 0;
   }
 
   /* Touch feedback + Copied state */
-  .about-page .contact-link:active,
-  .about-page .contact-link.is-copied {
+  .about-page .about-pane .contact-link:active,
+  .about-page .about-pane .contact-link.is-copied {
     color: #fff;
     background: none;
   }
 
-  .about-page .contact-link:active::before,
-  .about-page .contact-link.is-copied::before {
+  .about-page .about-pane .contact-link:active::before,
+  .about-page .about-pane .contact-link.is-copied::before {
     opacity: 1;
   }
 
   /* Hide desktop download link on mobile */
-  .about-page .about-download {
+  .about-page .about-pane .about-download {
     display: none;
   }
 
-  /* Mobile download PDF section — right-aligned, aligned to the 2nd contact column */
-  .about-page .about-download-mobile {
+  /* Mobile download PDF section — right-aligned, aligned to the 2nd
+     contact column (≈columns 6-8 of 8) */
+  .about-page .about-pane .about-download-mobile {
     display: flex;
     justify-content: flex-end;
     margin-top: 96px;
   }
 
   /* Match the 2nd contact column: full row minus label(84)+gap(8)+grid-gap(8)=100, halved */
-  .about-page .about-download-mobile .download-pdf-btn {
+  .about-page .about-pane .about-download-mobile .download-pdf-btn {
     width: calc((100% - 100px) / 2);
   }
 
-  .about-page .download-pdf-btn {
+  .about-page .about-pane .download-pdf-btn {
     display: block;
     width: 100%;
     border-top: 4px solid #171717;
@@ -1168,7 +1207,7 @@
     transition: color 150ms ease, background-color 150ms ease;
   }
 
-  .about-page .download-pdf-btn.is-downloading {
+  .about-page .about-pane .download-pdf-btn.is-downloading {
     color: #fff;
     background-color: #171717;
   }
@@ -1178,6 +1217,22 @@
   /* Hide desktop shell and section intro */
   .project-page .site-shell {
     display: none;
+  }
+
+  /* The first two gallery photos skip the scroll-reveal fade entirely
+     (GallerySlot.vue's skipReveal--they're already on/near screen at
+     load, nothing to "reveal" on scroll). Fine on a fast connection, but
+     on mobile they can sit blank-white for a beat and then pop in fully
+     loaded. This fades the <img> in on its own load event instead
+     (isImgLoaded, set in GallerySlot.vue even when skipReveal is true)--
+     desktop is untouched, this class only ever matters here. */
+  .gallery-slot.skip-reveal-fade img {
+    opacity: 0;
+    transition: opacity 400ms ease;
+  }
+
+  .gallery-slot.skip-reveal-fade.is-img-loaded img {
+    opacity: 1;
   }
 
   /* Fixed top bar: project title + [X] */

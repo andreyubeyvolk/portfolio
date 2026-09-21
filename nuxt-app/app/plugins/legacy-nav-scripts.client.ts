@@ -7,6 +7,12 @@
 // classes on elements it's about to hydrate and logs a mismatch warning
 // (harmless in practice, but a real symptom of a real race). Deferring to
 // app:mounted sidesteps the race entirely instead of trying to win it.
+declare global {
+  interface Window {
+    reapplyMobileBrandLettering?: () => void
+  }
+}
+
 export default defineNuxtPlugin((nuxtApp) => {
   let injected = false
 
@@ -24,5 +30,18 @@ export default defineNuxtPlugin((nuxtApp) => {
       script.src = src
       document.body.appendChild(script)
     })
+  })
+
+  // mobile-logo-swipe.js's chosen lettering survives in sessionStorage
+  // across navigations, but the DOM class showing it doesn't: .mobile-
+  // bar__brand is a NuxtLink, and Vue re-patches its whole `class`
+  // attribute on every route change (to toggle its own router-link-
+  // active state), silently dropping the is-lettering class this script
+  // added outside Vue's own reactivity. Re-applying from storage after
+  // each navigation fixes the visible reset without re-running the
+  // script itself--same page:finish pattern graffiti.client.ts uses for
+  // its own per-navigation re-init.
+  nuxtApp.hook('page:finish', () => {
+    window.reapplyMobileBrandLettering?.()
   })
 })
