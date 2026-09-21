@@ -210,19 +210,14 @@
     overflow: hidden;
   }
 
-  /* facepaint-mobile.svg's own portrait-oriented art (221:274, vs.
-     desktop's wide 347:187)--roughly centered over the portrait with
+  /* facepaint-mobile.svg's own portrait-oriented art (216:274) with its
+     "Psh" text baked in--roughly centered over the portrait's face with
      drips running down past it. */
   .home-portrait .home-portrait__paint {
     left: -12px;
     top: -20px;
     width: 100px;
-    aspect-ratio: 221 / 274;
-  }
-
-  /* No text on mobile at all, per the reference art. */
-  .home-portrait__label {
-    display: none;
+    aspect-ratio: 216 / 274;
   }
 
   .home-portrait img {
