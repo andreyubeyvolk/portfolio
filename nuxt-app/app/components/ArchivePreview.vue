@@ -49,6 +49,24 @@ const currentEntry = computed(() => {
   const idx = props.openIndex ?? lastOpenIndex.value
   return idx !== null ? props.items[idx] ?? null : null
 })
+
+// Warm the browser cache for the two flat-catalog neighbors stepPreview
+// would land on next (plain Image() fetch, same trick as ProjectCard's
+// own cardPreview warming)--now that stepping is a hard cut with no
+// crossfade to paper over a still-loading photo, this is what actually
+// keeps it feeling instant: by the time the user presses the arrow key,
+// the image is normally already decoded. Fires whenever the open card
+// changes (not on close--currentEntry holds steady at lastOpenIndex then).
+watch(currentEntry, (entry) => {
+  if (!entry) return
+  const flatIdx = props.items.indexOf(entry)
+  if (flatIdx === -1) return
+  const n = props.items.length
+  const prev = props.items[(flatIdx - 1 + n) % n]
+  const next = props.items[(flatIdx + 1) % n]
+  if (prev) new Image().src = prev.src
+  if (next) new Image().src = next.src
+})
 const isGroupMode = computed(() => !!currentEntry.value?.group)
 // A series' frames are always contiguous in `items` (mirrors the static
 // site's own .archive-series-extra placement), so filtering preserves
