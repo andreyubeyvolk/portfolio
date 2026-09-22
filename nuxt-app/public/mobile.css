@@ -742,14 +742,6 @@
     pointer-events: none;
   }
 
-  /* Archive: trial of a unified dim-veil recipe (neutral gray + faint
-     grain, matching the desktop lightbox's .archive-page-veil) instead of
-     fading the content itself--same idea as the project-page override
-     below, just tested here first before rolling it out everywhere. */
-  body.archive-page.menu-is-open .site-shell {
-    opacity: 1;
-  }
-
   /* Project pages dim as ONE merged layer via the menu overlay veil (see
      .menu-overlay below). The fixed header + content are NOT faded
      individually — doing that makes the translucent fixed bar reveal the
@@ -787,14 +779,6 @@
      opacity (matches the Archive card's .card-panel::after veil). */
   body.project-page.menu-is-open .menu-overlay {
     background: rgba(255, 255, 255, 0.6);
-  }
-
-  /* Archive: same unified veil trial as .archive-page-veil (desktop
-     lightbox)—neutral gray + faint grain instead of fading .site-shell
-     itself (canceled above). */
-  body.archive-page.menu-is-open .menu-overlay {
-    background-color: rgba(232, 232, 232, 0.9);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   /* ── Full mobile menu ── */
