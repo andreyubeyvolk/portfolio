@@ -31,10 +31,17 @@
     margin-bottom: 0;
   }
 
-  /* Home/About/All-projects hero intro—same 2-paragraph idea as the global
-     rule above, but a tighter 5px gap (40% less than the default 8px). */
-  .intro-paragraph:not(:last-child) p {
-    margin-bottom: 5px;
+  /* Home/About/All-projects hero intro—sentences stack one under the other
+     (like Approach), not side by side as separate grid columns—hence the
+     single .intro-text wrapper below instead of one grid item per <p>.
+     Gap between sentences = 80% of this text's own line-height (15px font
+     * 1.2 = 18px line box * 0.8 = 14.4px, rounded to 14px). */
+  .intro-text p {
+    margin: 0;
+  }
+
+  .intro-text p:not(:last-child) {
+    margin-bottom: 14px;
   }
 
   /* ── Shell ── */
@@ -188,13 +195,13 @@
     min-height: calc(33.33vh - 16px);
   }
 
-  .section-intro.home-intro p {
+  .section-intro.home-intro .intro-text {
     grid-column: 2 / -1;
-    grid-row: 1; /* the paragraph comes before .home-portrait in the HTML,
-      but needs to sit in the *later* column—without an explicit row,
-      default sparse grid packing places this first (row 1, cols 2-4) and
-      then can't backtrack to fit the portrait into row 1's now-passed
-      column 1, pushing it down to row 2 instead */
+    grid-row: 1; /* the text comes before .home-portrait in the HTML, but
+      needs to sit in the *later* column—without an explicit row, default
+      sparse grid packing places this first (row 1, cols 2-4) and then
+      can't backtrack to fit the portrait into row 1's now-passed column 1,
+      pushing it down to row 2 instead */
     font-size: 0.9375rem;
     line-height: 1.2;
     letter-spacing: -0.5px;
@@ -934,15 +941,7 @@
     margin-bottom: 0;
   }
 
-  .about-page .section-intro.home-intro p {
-    margin: 0 0 8px;
-  }
-
-  .about-page .section-intro.home-intro p:last-child {
-    margin-bottom: 0;
-  }
-
-  .about-page .section-intro.home-intro p:not(.section-page-title) {
+  .about-page .section-intro.home-intro .intro-text {
     grid-column: 2 / -1;
   }
 
