@@ -240,6 +240,10 @@ img {
   margin-bottom: 8px;
 }
 
+.intro-paragraph:not(:last-child) p {
+  margin-bottom: 12px;
+}
+
 /* position:relative (not overflow:hidden--that's on __frame below) so the
    click-to-demo paint mark, much bigger than the portrait's own small
    square, can extend past it instead of being clipped to it. */
