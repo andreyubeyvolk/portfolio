@@ -47,7 +47,10 @@ experience:
   - company: Leonid Alexeev Design Studio
     role: Graphic designer
     years: 2011–2014
-openTo: In-house, full-time—leading design inside a team. Or as a guest expert—for a specific brief, project, or rebranding. I'm especially effective in early-stage teams building something new, where there's enough freedom to shape the visual direction from the ground up.
+openTo: |
+  In-house, full-time—leading design inside a team. Or as a guest expert—for a specific brief, project, or rebranding.
+
+  I'm especially effective in early-stage teams building something new, where there's enough freedom to shape the visual direction from the ground up.
 portrait: /assets/portrait.webp
 contacts:
   - label: Mail

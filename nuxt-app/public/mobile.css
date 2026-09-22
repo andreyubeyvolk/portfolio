@@ -34,7 +34,7 @@
   /* Home/About/All-projects hero intro—sentences stack one under the other
      (like Approach), not side by side as separate grid columns—hence the
      single .intro-text wrapper below instead of one grid item per <p>.
-     Standard site-wide paragraph-break gap (12px), same value used at
+     Standard site-wide paragraph-break gap (10px), same value used at
      every other paragraph-under-paragraph spot (Creative team direction,
      Focus/Approach title-to-desc stack below). */
   .intro-text p {
@@ -42,7 +42,7 @@
   }
 
   .intro-text p:not(:last-child) {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
   /* ── Shell ── */
@@ -1033,7 +1033,7 @@
   .about-page .about-pane .service-row {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 32px;
     border-top: 2px solid #171717;
     padding-top: 0;
