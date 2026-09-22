@@ -264,7 +264,7 @@ const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayRevea
 }
 
 .about-section__content > p:not(:last-child) {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 /* Experience rows */
