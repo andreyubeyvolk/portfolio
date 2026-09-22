@@ -96,7 +96,7 @@ const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayRevea
         <section class="about-section about-section--open-to">
           <h2 class="about-section__label">Open to</h2>
           <div class="about-section__content">
-            <p>{{ page.openTo }}</p>
+            <p v-for="(para, i) in page.openTo.trim().split('\n\n')" :key="i">{{ para.trim() }}</p>
             <figure class="open-to-photo" @click="showOpenToSplash">
               <img width="176" height="176" loading="lazy" class="open-to-portrait" :src="page.portrait" alt="" aria-hidden="true" />
               <img v-show="isOpenToSplashActive" ref="openToPaintImg" class="open-to-splash" src="/assets/facepaint-splash.svg" alt="" aria-hidden="true" />
