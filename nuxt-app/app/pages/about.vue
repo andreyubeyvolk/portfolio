@@ -74,7 +74,7 @@ const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayRevea
 
         <!-- Creative team direction—4px top line -->
         <section class="about-section">
-          <h2 class="about-section__label">Creative<br />team direction</h2>
+          <h2 class="about-section__label">Creative team direction</h2>
           <div class="about-section__content">
             <p v-for="(para, i) in page.leadingTeams.trim().split('\n\n')" :key="i">{{ para.trim() }}</p>
           </div>
