@@ -807,7 +807,13 @@ body::-webkit-scrollbar-thumb:active {
   flex-direction: column;
   gap: 0;
   opacity: 1;
-  transition: opacity 0.7s ease-out;
+  /* Was 0.7s—slow enough that the title (dark, still legible at low
+     opacity) and the cover's light-gray placeholder (#d9d9d9, nearly
+     invisible at low opacity against the #F5F4F4 page background) read
+     as arriving in separate stages, even though both fade on the exact
+     same opacity value. Short enough that the whole card crosses both
+     elements' visibility threshold before the eye can register the gap. */
+  transition: opacity 0.2s ease-out;
 }
 
 .archive-card.archive-card--more {
