@@ -31,6 +31,12 @@
     margin-bottom: 0;
   }
 
+  /* Home/About/All-projects hero intro—same 2-paragraph idea as the global
+     rule above, but a tighter 5px gap (40% less than the default 8px). */
+  .intro-paragraph:not(:last-child) p {
+    margin-bottom: 5px;
+  }
+
   /* ── Shell ── */
   body {
     overflow: auto;

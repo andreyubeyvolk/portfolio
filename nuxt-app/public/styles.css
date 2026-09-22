@@ -241,7 +241,7 @@ img {
 }
 
 .intro-paragraph:not(:last-child) p {
-  margin-bottom: 12px;
+  margin-bottom: 7px;
 }
 
 /* position:relative (not overflow:hidden--that's on __frame below) so the

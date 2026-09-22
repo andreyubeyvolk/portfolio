@@ -76,7 +76,7 @@ const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayRevea
         <section class="about-section">
           <h2 class="about-section__label">Creative<br />team direction</h2>
           <div class="about-section__content">
-            <p>{{ page.leadingTeams }}</p>
+            <p v-for="(para, i) in page.leadingTeams.trim().split('\n\n')" :key="i">{{ para.trim() }}</p>
           </div>
         </section>
 
@@ -261,6 +261,10 @@ const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayRevea
 .about-section__content > p {
   margin: 0;
   line-height: 1.2;
+}
+
+.about-section__content > p:not(:last-child) {
+  margin-bottom: 12px;
 }
 
 /* Experience rows */

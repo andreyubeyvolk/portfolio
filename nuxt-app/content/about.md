@@ -12,7 +12,7 @@ approach:
   - title: Conceptual Art Direction
     desc: Meaning before design. I go deep into every project to find the idea worth expressing—and turn it into a clear visual direction, story, and system.
   - title: Visual Athleticism
-    desc: My superpower is range: a vast visual library, strong visual judgment, and the ability to move between the big picture and the smallest detail without losing coherence.
+    desc: My superpower is range—a vast visual library, strong visual judgment, and the ability to move between the big picture and the smallest detail without losing coherence.
   - title: AI-Native Creativity
     desc: I use AI, code, and whatever else works to make creative work faster, simpler, and more accessible—without lowering the quality bar.
 focus:
@@ -24,9 +24,10 @@ focus:
     desc: Specific, considered visual work created within an existing brand—from campaigns, editorial and reports to banners, merchandise and other high-impact assets.
   - title: Design Consulting
     desc: An outside perspective on what works, what doesn't, and why—with a clear direction for improving the visual system, creative process, or AI workflow.
-leadingTeams: Setting creative direction, raising the quality bar, and helping designers grow through clear feedback, thoughtful critique, and a shared sense of where the work can go.
+leadingTeams: |
+  Setting creative direction, raising the quality bar, and helping designers grow through clear feedback, thoughtful critique, and a shared sense of where the work can go.
 
-I bring structure to the creative process, connect ideas with execution, and help teams work with more confidence, consistency, and ambition.
+  I bring structure to the creative process, connect ideas with execution, and help teams work with more confidence, consistency, and ambition.
 experience:
   - company: Sumsub
     role: Art Director
