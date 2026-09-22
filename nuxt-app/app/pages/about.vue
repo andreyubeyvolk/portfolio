@@ -249,6 +249,7 @@ const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayRevea
 
 .service-row__title {
   grid-column: 1 / 5;
+  line-height: 1.2;
 }
 
 .service-row__desc {

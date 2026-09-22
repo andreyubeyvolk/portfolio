@@ -150,37 +150,18 @@ button.archive-card {
         height: auto;
         display: block;
         opacity: 1;
-        transition: opacity 400ms ease;
       }
 
-      /* Brief crossfade while stepping between two single-image cards
-         (arrow keys, filmstrip edges, or the preview-nav prev/next
-         buttons--all funnel through the same stepPreview()/isStepping
-         state, so this applies uniformly no matter which one triggered
-         the step)--toggled off once the new image has synced its size
-         (see ArchivePreview.vue's isStepping). Covers the WHOLE card now
-         (photo + title/description/tags plaques), not just the photo:
-         the plaques' width comes from the --preview-width CSS var below,
-         which is only kept in sync while a single-image card is open--
-         stepping in from a filmstrip (which never touches that var)
-         leaves it holding a stale value from whichever single-image card
-         was open longest ago, until syncPreviewSize() recomputes it a
-         tick later. Hiding everything until that recompute finishes is
-         what actually stops that stale width from ever painting--this
-         was the real cause of the "margins on the title/description
-         plaques" report right after a series (the photo-only fade never
-         touched the plaques at all, so they rendered at the wrong width
-         for a frame, in full view).
-         Opacity only now--no scale. The user's own original ask was a
-         morph "через опасити" (via opacity); a scale on top of that read
-         as a distracting pop rather than a soft cross-dissolve, and had
-         no bearing on the actual reported "not smooth" complaint. Slowed
-         200ms -> 400ms for the same reason--fast enough not to feel
-         laggy, slow enough to actually register as a cross-dissolve
-         rather than a blink. */
-      .archive-preview__inner.is-stepping .preview-media img {
-        opacity: 0;
-      }
+      /* Stepping between two single-image cards (arrow keys, filmstrip
+         edges, or the preview-nav prev/next buttons--all funnel through
+         the same stepPreview()/isStepping state) used to get a 400ms
+         opacity crossfade here; per the user's own ask it's now a hard
+         cut--no transition on the photo at all. ArchivePreview.vue now
+         preloads the flat-catalog neighbors as soon as a card opens
+         (plain Image() warm, same trick as ProjectCard's own cardPreview
+         warming), so by the time a step actually happens the image is
+         normally already decoded and the cut is instant with nothing to
+         paper over. */
 
       .archive-preview .project-header {
         position: relative; /* lifts it above .preview-media in paint order
@@ -210,9 +191,17 @@ button.archive-card {
       .archive-preview__inner > .preview-tags {
         width: var(--preview-width, auto);
         max-width: 100%;
-        transition: opacity 400ms ease;
       }
 
+      /* No transition here (unlike the photo, this hide is load-bearing,
+         not cosmetic)--the plaques' width comes from --preview-width,
+         which is only kept in sync while a single-image card is open, so
+         stepping in from a filmstrip leaves it holding a stale value
+         until syncPreviewSize() recomputes it a tick later. An instant
+         (untransitioned) hide until that recompute finishes is what
+         actually stops that stale width from ever painting, even for a
+         single frame--this was the real cause of the "margins on the
+         title/description plaques" report right after a series. */
       .archive-preview__inner.is-stepping > .project-header,
       .archive-preview__inner.is-stepping > .preview-text,
       .archive-preview__inner.is-stepping > .preview-tags {
