@@ -43,7 +43,7 @@ const { isActive, show } = useSprayReveal(paintImg)
 <template>
   <section class="section-intro home-intro" aria-label="Andrey Ubeyvolk introduction">
     <h1 class="sr-only">Andrey Ubeyvolk—Conceptual Art Director</h1>
-    <p>Conceptual art direction with depth and vision. For startups, AI, crypto, and creative brands.</p>
+    <p>Conceptual Art Director turning ideas into distinctive visual worlds. For tech, AI, and creative brands building something new.</p>
 
     <figure class="home-portrait" @click="show">
       <div class="home-portrait__frame">

@@ -3,27 +3,27 @@ title: About—Andrey Ubeyvolk
 description: About Andrey Ubeyvolk—concept-driven, not template-driven. Finding a brand's character and making sure it stops blending in.
 intro:
   heading: Andrey
-  text: Conceptual art director with depth and vision. For startups, AI, crypto, and creative brands.
+  text: Conceptual Art Director turning ideas into distinctive visual worlds. For tech, AI, and creative brands building something new.
 photo: /assets/about-hero.webp
 approach:
-  - title: Conceptual art direction
-    desc: Meaning before design. A deep dive into every project, built as visual storytelling and shaped into beauty, aesthetics, and harmony you can actually see.
+  - title: Conceptual Art Direction
+    desc: Meaning before design. I go deep into every project to find the idea worth expressing—and turn it into a clear visual direction, story, and system.
   - title: Visual Athleticism
-    desc: My superpower is range—an enormous visual library built over years, and an eye for nuance, logic, and every detail that makes a composition hold together. I hold the helicopter view and the depth at once, and see how everything connects.
-  - title: AI-Driven Creativity
-    desc: AI runs through every stage as a thinking and creative layer. Finding unexpected connections, compressing complexity, and making teams leaner and more effective.
+    desc: My superpower is range: a vast visual library, strong visual judgment, and the ability to move between the big picture and the smallest detail without losing coherence.
+  - title: AI-Native Creativity
+    desc: I use AI, code, and whatever else works to make creative work faster, simpler, and more accessible—without lowering the quality bar.
 focus:
-  - title: Brand Core
-    desc: The business foundation before anything is made—finding your core, your silence, your central meaning.
+  - title: Brand Direction
+    desc: Finding the core idea, meaning and visual territory before design begins.
   - title: Brand Identity
-    desc: From a core visual system to a full marketing ecosystem—across every touchpoint, digital and physical. AI expands the toolkit for faster iteration and bolder concepts.
-  - title: Visual Artifacts
-    desc: Specific, considered assets created within your existing brand—when you need one thing done right.
+    desc: Turning creative direction into a coherent visual system across digital, physical and marketing touchpoints.
+  - title: Creative Assets
+    desc: Specific, considered visual work created within an existing brand—from campaigns, editorial and reports to banners, merchandise and other high-impact assets.
   - title: Design Consulting
-    desc: A sharp audit of what you have—what works, what doesn't, and why. Then a clear way forward across creative and AI workflows, used where they actually help.
-  - title: Mentoring
-    desc: For designers at any level—design principles, quality control, artistic practice, and how to apply AI in real work. A mentor-to-student approach, built on depth.
-leadingTeams: Finding or growing the strongest players for a brand design team. My experience sets the direction and raises the bar—sharper quality, more considered decisions, creative and AI workflows where they help. The aim is a team that grows past its own limits and keeps making bold work worth remembering.
+    desc: An outside perspective on what works, what doesn't, and why—with a clear direction for improving the visual system, creative process, or AI workflow.
+leadingTeams: Setting creative direction, raising the quality bar, and helping designers grow through clear feedback, thoughtful critique, and a shared sense of where the work can go.
+
+I bring structure to the creative process, connect ideas with execution, and help teams work with more confidence, consistency, and ambition.
 experience:
   - company: Sumsub
     role: Art Director
@@ -43,7 +43,7 @@ experience:
   - company: Leonid Alexeev Design Studio
     role: Graphic designer
     years: 2011–2014
-openTo: In-house, full-time—leading design inside a team. Or as a guest expert—for a specific brief, project, or rebranding.
+openTo: In-house, full-time—leading design inside a team. Or as a guest expert—for a specific brief, project, or rebranding. I'm especially effective in early-stage teams building something new, where there's enough freedom to shape the visual direction from the ground up.
 portrait: /assets/portrait.webp
 contacts:
   - label: Mail
