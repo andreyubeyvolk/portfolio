@@ -3,7 +3,10 @@ title: About—Andrey Ubeyvolk
 description: About Andrey Ubeyvolk—concept-driven, not template-driven. Finding a brand's character and making sure it stops blending in.
 intro:
   heading: Andrey
-  text: Conceptual Art Director turning ideas into distinctive visual worlds. For tech, AI, and creative brands building something new.
+  text: |
+    Conceptual Art Director turning ideas into distinctive visual worlds.
+    
+    For tech, AI, and creative brands building something new.
 photo: /assets/about-hero.webp
 approach:
   - title: Conceptual Art Direction

@@ -38,7 +38,9 @@ const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayRevea
 <template>
   <section class="section-intro home-intro" aria-label="About Andrey Ubeyvolk">
     <h1 class="section-page-title">{{ page.intro.heading }}</h1>
-    <p>{{ page.intro.text }}</p>
+    <div v-for="(para, i) in page.intro.text.split('\n\n')" :key="i" class="intro-paragraph">
+      <p>{{ para.trim() }}</p>
+    </div>
   </section>
 
   <section class="content-pane about-pane" aria-label="About content">
@@ -70,9 +72,9 @@ const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayRevea
           </div>
         </section>
 
-        <!-- Leading Teams—4px top line -->
+        <!-- Creative team direction—4px top line -->
         <section class="about-section">
-          <h2 class="about-section__label">Leading<br />Teams</h2>
+          <h2 class="about-section__label">Creative<br />team direction</h2>
           <div class="about-section__content">
             <p>{{ page.leadingTeams }}</p>
           </div>
