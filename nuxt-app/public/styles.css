@@ -242,13 +242,13 @@ img {
 
 /* Sentences stack one under the other (like Approach), not side by side—
    standard site-wide paragraph-break gap, see .about-section__content
-   > p:not(:last-child) in about.vue for the same 10px value used there. */
+   > p:not(:last-child) in about.vue for the same 8px value used there. */
 .intro-text p {
   margin: 0;
 }
 
 .intro-text p:not(:last-child) {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 /* position:relative (not overflow:hidden--that's on __frame below) so the
