@@ -1061,13 +1061,22 @@ window.initGraffiti = function initGraffiti() {
   // colored stroke keeps that same shading character instead of
   // rendering flat: each channel blends from the hue toward white by
   // the same tone/255 fraction the grayscale path always used.
-  function paintDot(targetCtx, x, y, tone, a) {
+  // isDrip: a drip animates over many later frames, well after the
+  // stroke it fell from has finished—if a newer tag gets drawn on top
+  // of that same spot in the meantime, the drip's own paint calls still
+  // keep happening afterward, and canvas has no concept of "logical"
+  // layer order, only draw-call order, so a plain source-over drip would
+  // paint right over the newer tag. Drip dots get bucketed separately
+  // (see the isDrip suffix on the key) and flushed with
+  // destination-over instead (see flushBatch)—paint that can only fill
+  // in still-blank canvas, never cover something already there.
+  function paintDot(targetCtx, x, y, tone, a, isDrip) {
     var qa = Math.round(a * 16) / 16;
     if (qa <= 0) return;
     var sub = batches.get(targetCtx);
     if (!sub) { sub = new Map(); batches.set(targetCtx, sub); }
     var colorKey = strokeColor ? strokeColor.key : 'k';
-    var key = tone + '_' + qa + '_' + colorKey;
+    var key = tone + '_' + qa + '_' + colorKey + (isDrip ? '_d' : '');
     var bucket = sub.get(key);
     if (!bucket) {
       var r = tone, g = tone, b = tone;
@@ -1077,7 +1086,7 @@ window.initGraffiti = function initGraffiti() {
         g = Math.round(strokeColor.g + (255 - strokeColor.g) * mix);
         b = Math.round(strokeColor.b + (255 - strokeColor.b) * mix);
       }
-      bucket = { style: 'rgba(' + r + ',' + g + ',' + b + ',' + qa.toFixed(3) + ')', dots: [] };
+      bucket = { style: 'rgba(' + r + ',' + g + ',' + b + ',' + qa.toFixed(3) + ')', dots: [], isDrip: !!isDrip };
       sub.set(key, bucket);
     }
     bucket.dots.push(x, y, 0.25 + Math.random() * 0.6);
@@ -1094,6 +1103,10 @@ window.initGraffiti = function initGraffiti() {
     if (!sub || !sub.size) return;
     sub.forEach(function (bucket) {
       targetCtx.fillStyle = bucket.style;
+      // destination-over for drips (see paintDot's isDrip note)—only
+      // paints into transparent canvas, so an old tag's still-falling
+      // drips can never show up over a newer tag drawn on top of them.
+      targetCtx.globalCompositeOperation = bucket.isDrip ? 'destination-over' : 'source-over';
       targetCtx.beginPath();
       var dots = bucket.dots;
       for (var i = 0; i < dots.length; i += 3) {
@@ -1106,6 +1119,7 @@ window.initGraffiti = function initGraffiti() {
       }
       targetCtx.fill();
     });
+    targetCtx.globalCompositeOperation = 'source-over';
     sub.clear();
   }
 
@@ -1310,10 +1324,10 @@ window.initGraffiti = function initGraffiti() {
         var a = d.alphaMul * (0.75 + Math.random() * 0.25);
         var dotX = d.x + (Math.random() - 0.5) * radius;
         var dotY = d.y + (Math.random() - 0.5) * 1.6;
-        paintDot(targetCtx, dotX, dotY, d.tone, a);
-        if (inView) paintDot(pvctx, articleRect.left + dotX - paneRect.left, articleRect.top + dotY - paneRect.top, d.tone, a);
-        if (inFilmstripView) paintDot(fvctx, dotX - filmstripEl.scrollLeft, dotY, d.tone, a);
-        if (inMobileView) paintDot(mpvctx, dotX, dotY - window.scrollY, d.tone, a);
+        paintDot(targetCtx, dotX, dotY, d.tone, a, true);
+        if (inView) paintDot(pvctx, articleRect.left + dotX - paneRect.left, articleRect.top + dotY - paneRect.top, d.tone, a, true);
+        if (inFilmstripView) paintDot(fvctx, dotX - filmstripEl.scrollLeft, dotY, d.tone, a, true);
+        if (inMobileView) paintDot(mpvctx, dotX, dotY - window.scrollY, d.tone, a, true);
       }
 
       if (d.dist >= d.maxDist) {
@@ -1325,10 +1339,10 @@ window.initGraffiti = function initGraffiti() {
           var ab = d.alphaMul * (0.8 + Math.random() * 0.2);
           var bx = d.x + Math.cos(ang) * r * 0.7;
           var by = d.y + Math.sin(ang) * r;
-          paintDot(targetCtx, bx, by, d.tone, ab);
-          if (inView) paintDot(pvctx, articleRect.left + bx - paneRect.left, articleRect.top + by - paneRect.top, d.tone, ab);
-          if (inFilmstripView) paintDot(fvctx, bx - filmstripEl.scrollLeft, by, d.tone, ab);
-          if (inMobileView) paintDot(mpvctx, bx, by - window.scrollY, d.tone, ab);
+          paintDot(targetCtx, bx, by, d.tone, ab, true);
+          if (inView) paintDot(pvctx, articleRect.left + bx - paneRect.left, articleRect.top + by - paneRect.top, d.tone, ab, true);
+          if (inFilmstripView) paintDot(fvctx, bx - filmstripEl.scrollLeft, by, d.tone, ab, true);
+          if (inMobileView) paintDot(mpvctx, bx, by - window.scrollY, d.tone, ab, true);
         }
         drips.splice(i, 1);
       }
