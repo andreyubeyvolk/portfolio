@@ -241,14 +241,14 @@ img {
 }
 
 /* Sentences stack one under the other (like Approach), not side by side—
-   gap = 80% of this text's own line-height (16px font * 1.2 = 19.2px line
-   box * 0.8 = 15.36px, rounded to 15px). */
+   standard site-wide paragraph-break gap, see .about-section__content
+   > p:not(:last-child) in about.vue for the same 12px value used there. */
 .intro-text p {
   margin: 0;
 }
 
 .intro-text p:not(:last-child) {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 /* position:relative (not overflow:hidden--that's on __frame below) so the
