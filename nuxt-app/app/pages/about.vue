@@ -38,8 +38,8 @@ const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayRevea
 <template>
   <section class="section-intro home-intro" aria-label="About Andrey Ubeyvolk">
     <h1 class="section-page-title">{{ page.intro.heading }}</h1>
-    <div v-for="(para, i) in page.intro.text.split('\n\n')" :key="i" class="intro-paragraph">
-      <p>{{ para.trim() }}</p>
+    <div class="intro-text">
+      <p v-for="(para, i) in page.intro.text.split('\n\n')" :key="i">{{ para.trim() }}</p>
     </div>
   </section>
 
