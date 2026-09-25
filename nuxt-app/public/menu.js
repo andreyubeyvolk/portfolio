@@ -3,6 +3,7 @@
   var overlay = document.getElementById('menu-overlay');
   var menu = document.getElementById('mobile-menu');
   var menuLinks = document.querySelectorAll('.menu-tabs a');
+  var brandLink = document.querySelector('.mobile-bar__brand');
 
   // Closed by default: keep the hidden menu out of the tab order / a11y tree.
   // (clip-path + pointer-events hide it visually but leave links tabbable.)
@@ -42,20 +43,33 @@
     });
   });
 
-  // The elements that fade via opacity when the menu opens (see mobile.css)
-  // are big—easily the whole page's content. Promoting them to their own
-  // compositing layer only for the ~300ms the fade actually runs (not
-  // permanently—these are too large to keep that memory cost around all
-  // the time) means the layer already exists by the time the transition
-  // starts, instead of the browser paying that promotion cost mid-fade.
-  var dimTargets = document.querySelectorAll('.site-shell, .project-bar, .mobile-project');
+  // Same reasoning as menuLinks above, for the one other client-side link
+  // that can navigate away while the menu is open: the bottom bar's own
+  // logo/wordmark (it swaps to plain "Andrey Ubeyvolk" text and stays
+  // clickable throughout, since the bar itself never leaves the DOM while
+  // the panel is up). Without this, clicking it navigated home but left
+  // the menu sitting open over the new page.
+  if (brandLink) {
+    brandLink.addEventListener('click', function () {
+      if (document.body.classList.contains('menu-is-open')) close();
+    });
+  }
+
+  // The veil and panel both fade via opacity when the menu opens (see
+  // mobile.css)--the veil in particular covers the whole page. Promoting
+  // them to their own compositing layer only for the ~350ms the fade
+  // actually runs (not permanently--too large to keep that memory cost
+  // around all the time) means the layer already exists by the time the
+  // transition starts, instead of the browser paying that promotion cost
+  // mid-fade.
+  var dimTargets = document.querySelectorAll('.menu-overlay, .mobile-menu');
   var dimWillChangeTimer = null;
   function primeDimLayers() {
     clearTimeout(dimWillChangeTimer);
     dimTargets.forEach(function (el) { el.style.willChange = 'opacity'; });
     dimWillChangeTimer = setTimeout(function () {
       dimTargets.forEach(function (el) { el.style.willChange = ''; });
-    }, 350);
+    }, 400);
   }
 
   function open() {
