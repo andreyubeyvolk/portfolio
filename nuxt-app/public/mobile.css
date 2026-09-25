@@ -761,6 +761,10 @@
   /* ── Overlay (catches outside clicks, transparent until the menu is
      open--see the veil below) ── */
   .menu-overlay {
+    /* display:block overrides the desktop-hide display:none at the top of
+       this file--without it the veil never renders at all. Hidden while
+       closed via opacity + pointer-events below instead. */
+    display: block;
     position: fixed;
     inset: 0;
     z-index: 99;
