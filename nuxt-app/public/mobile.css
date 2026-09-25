@@ -737,39 +737,29 @@
     overflow: hidden;
   }
 
+  /* Dimming while the menu is open is one unified gray-grain veil on
+     .menu-overlay (below), not per-element opacity--started as an
+     Archive-only trial (matching the desktop lightbox's own
+     .archive-page-veil), rolled out everywhere once it read well there.
+     .site-shell itself just needs pointer-events:none so nothing under
+     the veil is tappable; its own opacity stays untouched, avoiding the
+     double-exposure a translucent fixed bar (.project-bar) would show if
+     its own scrolled-under content were ALSO independently faded. */
   body.menu-is-open .site-shell {
-    opacity: 0.4;
     pointer-events: none;
   }
 
-  /* Archive: unified dim-veil recipe (neutral gray + faint grain,
-     matching the desktop lightbox's .archive-page-veil) instead of
-     fading the content itself--same idea as the project-page override
-     below. */
-  body.archive-page.menu-is-open .site-shell {
-    opacity: 1;
-  }
-
-  /* Project pages dim as ONE merged layer via the menu overlay veil (see
-     .menu-overlay below). The fixed header + content are NOT faded
-     individually — doing that makes the translucent fixed bar reveal the
-     content scrolled beneath it (double-exposed, not a single dim layer). */
   body.menu-is-open .project-bar,
   body.menu-is-open .mobile-project {
     pointer-events: none;
-  }
-
-  /* Card already dims the grid to 0.06; opening the menu on top must not
-     pull it back up to 0.4. The card itself dims via .card-panel::after. */
-  body.card-is-open.menu-is-open .site-shell {
-    opacity: 0.06;
   }
 
   body.menu-is-open .card-overlay {
     pointer-events: none;
   }
 
-  /* ── Overlay (catches outside clicks, transparent) ── */
+  /* ── Overlay (catches outside clicks, transparent until the menu is
+     open--see the veil below) ── */
   .menu-overlay {
     position: fixed;
     inset: 0;
@@ -780,20 +770,6 @@
 
   body.menu-is-open .menu-overlay {
     display: block;
-  }
-
-  /* Project pages: the overlay doubles as a single translucent dim layer
-     over the header + content — one unified veil instead of per-element
-     opacity (matches the Archive card's .card-panel::after veil). */
-  body.project-page.menu-is-open .menu-overlay {
-    background-color: rgba(255, 255, 255, 0.6);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-
-  /* Archive: same unified veil trial as .archive-page-veil (desktop
-     lightbox)--neutral gray + faint grain instead of fading .site-shell
-     itself (canceled above). */
-  body.archive-page.menu-is-open .menu-overlay {
     background-color: rgba(232, 232, 232, 0.91);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
