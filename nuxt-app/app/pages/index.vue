@@ -9,6 +9,7 @@ useSeoMeta({
 })
 
 useHead({
+  bodyAttrs: { class: 'home-page' },
   script: [{
     type: 'application/ld+json',
     innerHTML: JSON.stringify({
@@ -40,8 +41,9 @@ const paintImg = useTemplateRef<HTMLImageElement>('paintImg')
 const { isActive, show } = useSprayReveal(paintImg)
 
 // Placeholder reel until the real one exists--any project clip works,
-// the player sizes itself from the video's own aspect ratio.
-const REEL_SRC = '/assets/inhouse/greenflag/greenflag-15.mp4'
+// the card crops to 16:9 (desktop/tablet) or 3:4 (phone) regardless of the
+// clip's own ratio.
+const REEL_SRC = '/assets/inhouse/crypto/crypto-showreel.mp4'
 // The reel's poster is the home page's largest above-the-fold paint, so
 // fetch it at high priority instead of waiting on the <video> element.
 useHead({

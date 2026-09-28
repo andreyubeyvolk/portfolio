@@ -534,16 +534,28 @@ body::-webkit-scrollbar-thumb:active {
   gap: var(--grid-gap);
 }
 
-/* No fixed aspect-ratio here on purpose (desktop only--see mobile.css for
-   the phone crop): the reel's final shape isn't settled, so the box sizes
-   from the video's own intrinsic ratio (Vp's height:auto) instead of
-   guessing a shape and cropping to fit it. */
+/* Fixed 16:9 crop (desktop/tablet--see mobile.css for the phone 3:4 crop)
+   so a vertical or otherwise off-ratio clip fills the box instead of
+   stretching it tall at 100% width. */
 .reel-card {
   position: relative;
   grid-column: 1 / -1;
   width: 100%;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   background: var(--muted);
+}
+
+.reel-card .vp {
+  position: absolute;
+  inset: 0;
+}
+
+.reel-card .vp__video {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  object-fit: cover;
 }
 
 .home-socials {
