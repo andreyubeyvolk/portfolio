@@ -20,4 +20,5 @@
        response: the server HTML has zero children there while the
        client's post-hydration render has the full mobile markup. -->
   <MobileNav />
+  <CookieBanner />
 </template>

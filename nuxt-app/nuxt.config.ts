@@ -72,12 +72,9 @@ export default defineNuxtConfig({
         // plain tag. plugins/graffiti.client.ts is what actually calls it,
         // once per navigation.
         { src: '/graffiti.js' },
-        // Google Analytics (gtag.js)--only DEFINES window.gtag/dataLayer
-        // here. plugins/analytics.client.ts does the actual init (gated to
-        // the real domain) and fires page_view on every route change,
-        // since gtag's own automatic pageview only covers the first
-        // document load, not later client-side navigations.
-        { src: 'https://www.googletagmanager.com/gtag/js?id=G-SXEF693HCE', async: true },
+        // Google Analytics is NOT loaded here: plugins/analytics.client.ts
+        // injects gtag.js only after the visitor accepts analytics cookies
+        // in CookieBanner.
       ],
     },
   },
