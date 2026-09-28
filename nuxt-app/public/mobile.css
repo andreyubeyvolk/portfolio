@@ -3,8 +3,6 @@
    ───────────────────────────────────────────── */
 .mobile-bar,
 .home-headline,
-.reel-card__overlay-left,
-.reel-card__overlay-right,
 .menu-overlay,
 .mobile-menu,
 .open-to-photo,
@@ -267,46 +265,18 @@
     overflow: hidden;
   }
 
-  .reel-card__poster {
+  /* Fixed 3:4 phone crop--the player fills it, whatever the clip's own
+     ratio (same cover-crop the paired gallery players use). */
+  .reel-card .vp {
+    position: absolute;
+    inset: 0;
+  }
+
+  .reel-card .vp__video {
     width: 100%;
     height: 100%;
+    margin: 0;
     object-fit: cover;
-    object-position: center;
-  }
-
-  /* Hide "reel" text SVG, keep play icon */
-  .reel-card__text {
-    display: none;
-  }
-
-  .reel-card__icon {
-    width: 18px;
-  }
-
-  /* Text overlays on the reel */
-  .reel-card__overlay-left,
-  .reel-card__overlay-right {
-    display: block;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.9375rem;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -0.5px;
-    color: #fff;
-    pointer-events: none;
-  }
-
-  .reel-card__overlay-left {
-    left: 16px;
-    width: 101px;
-  }
-
-  .reel-card__overlay-right {
-    right: 16px;
-    width: 79px;
-    text-align: right;
   }
 
   /* ── All projects: full-width tap target, no divider rules ──

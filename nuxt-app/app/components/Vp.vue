@@ -10,11 +10,19 @@
 // Note: the responsive data-src-portrait/data-src-landscape source switch
 // from the original script isn't ported—no current project uses it. Add
 // it back here if one ever does.
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   src: string
   paired?: boolean
   autoplay?: 'immediate' | 'scroll'
-}>()
+  poster?: string
+  // Volume the player unmutes to (it always starts muted).
+  volume?: number
+  // 'hover' (project galleries): controls appear on pointer movement.
+  // 'click' (home reel): controls stay hidden until the video itself is
+  // clicked/tapped--moving the pointer over it only keeps already-shown
+  // controls alive, so they don't vanish mid-drag on the sliders.
+  revealOn?: 'hover' | 'click'
+}>(), { volume: 0.7, revealOn: 'hover' })
 
 const vpRef = useTemplateRef<HTMLElement>('vp')
 const videoRef = useTemplateRef<HTMLVideoElement>('video')
@@ -25,11 +33,11 @@ const state = ref<'playing' | 'paused'>('paused')
 const muted = ref(true)
 const isIdle = ref(false)
 const seekPercent = ref(0)
-const volumePercent = ref(70)
+const volumePercent = ref(props.volume * 100)
 const isDraggingSeek = ref(false)
 const isDraggingVolume = ref(false)
 
-let lastVolume = 0.7
+let lastVolume = props.volume
 let hideTimer: ReturnType<typeof setTimeout> | undefined
 let intersectionObserver: IntersectionObserver | null = null
 const HIDE_DELAY = 2500
@@ -59,7 +67,7 @@ function onMute() {
   const video = videoRef.value
   if (!video) return
   video.muted = !video.muted
-  if (!video.muted && video.volume === 0) video.volume = lastVolume || 0.7
+  if (!video.muted && video.volume === 0) video.volume = lastVolume || props.volume
   syncVolumeUi()
 }
 
@@ -159,8 +167,12 @@ onMounted(() => {
   video.addEventListener('pause', () => { state.value = 'paused'; clearTimeout(hideTimer); isIdle.value = false })
   video.addEventListener('timeupdate', onTimeUpdate)
 
-  vp.addEventListener('mousemove', showControls)
-  vp.addEventListener('mouseenter', showControls)
+  if (props.revealOn === 'click') {
+    vp.addEventListener('mousemove', () => { if (!isIdle.value) showControls() })
+  } else {
+    vp.addEventListener('mousemove', showControls)
+    vp.addEventListener('mouseenter', showControls)
+  }
   vp.addEventListener('mouseleave', hideControls)
 
   const autoplayMode = props.autoplay || 'immediate'
@@ -190,11 +202,11 @@ onBeforeUnmount(() => {
   <div
     ref="vp"
     class="vp"
-    :class="{ 'vp--paired': paired, 'is-idle': isIdle }"
+    :class="{ 'vp--paired': paired, 'vp--click-reveal': revealOn === 'click', 'is-idle': isIdle }"
     :data-state="state"
     :data-muted="muted ? 'true' : 'false'"
   >
-    <video ref="video" class="vp__video" playsinline muted loop preload="metadata" :src="src" />
+    <video ref="video" class="vp__video" playsinline muted loop preload="metadata" :poster="poster ?? videoPoster(src)" :src="src" />
 
     <div class="vp__hit" data-role="toggle" @click="onHit" />
 
