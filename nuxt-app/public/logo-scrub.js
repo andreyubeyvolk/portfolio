@@ -1,58 +1,108 @@
-// ── Logo hover-scrub (desktop only). Hovering the brand mark swaps in
-// one of the 7 brush-stroke renderings—not tracking cursor position
-// across the logo's width anymore (no "scrub as you move" sweep), just
-// one lettering per hover, advancing to the next in sequence each time
-// the cursor re-enters. Moving the cursor away always returns to the
-// plain text mark; the <a>'s own click behavior (go home) is never
-// touched. Shared across the whole site—see the matching #brand-scrub
-// CSS in graffiti.css.
+// ── Logo scrub (brand mark swap). Two input paths share one piece of
+// state (which of the 7 brush-stroke renderings--or plain text--is
+// showing), picked per interaction by pointer type rather than viewport
+// width alone:
+//   - Mouse (pointer:fine), any width #brand-scrub is actually visible at
+//     (tablet included--site-nav only hides below 641px, see mobile.css):
+//     hovering swaps in the next lettering in sequence; leaving reverts to
+//     plain text. Same behavior a desktop browser gets when resized down
+//     to tablet width.
+//   - Touch (pointer:coarse), tablet width only (641-980px--phones get
+//     their own swipe via mobile-logo-swipe.js on the bottom bar instead,
+//     and touch is rare/unsupported at real desktop width): swiping the
+//     wordmark left/right cycles the same loop, and the choice sticks
+//     (sessionStorage) instead of reverting on release--there's no
+//     "pointer left" event on touch to revert to.
 (function () {
-  // #brand-scrub itself is already hidden below this breakpoint (see
-  // styles.css/mobile.css), which makes the hover-scrub inert there on
-  // its own—but the idle-hint timer below listens on `window`, not on
-  // #brand-scrub, and touch input never fires 'mousemove' at all. That
-  // meant the 5s-idle timer effectively always fired on a phone (no
-  // mousemove ever arrives to keep re-arming it) and then just sat
-  // there forever (nothing ever calls hideTip() either, same reason)—
-  // a "Ctrl+click to tag!" hint for a desktop-only Ctrl+drag feature,
-  // permanently stuck on screen on mobile. Bailing out entirely here
-  // is simpler and more robust than gating just the idle-timer piece.
-  // (pointer: fine) on top of the width check--a wide-viewport touch
-  // device (tablet in landscape, a phone with desktop-site requested)
-  // still has no real Ctrl key, so the hint would otherwise get created
-  // and then just sit there forever with nothing able to dismiss it.
-  var desktopQuery = window.matchMedia('(min-width: 981px) and (pointer: fine)');
-  if (!desktopQuery.matches) return;
-
   var brand = document.getElementById('brand-scrub');
   if (!brand) return;
   var brushes = brand.querySelectorAll('.brand-mark--brush');
   if (!brushes.length) return;
-  // Every swap (text->lettering on enter, lettering->text on leave) now
-  // eases—there's no more "track the cursor instantly" requirement
-  // since a single hover only ever shows one lettering, never sweeping
-  // between several while the mouse is still over it.
+  // Every swap eases now (text->lettering, lettering->text or ->next
+  // lettering)--there's no more "track the cursor instantly" requirement.
   brand.classList.add('is-transitioning');
-  var nextIndex = 0;
 
+  // index 0 = plain text, 1..N = brushes[index - 1]
+  var STATE_COUNT = brushes.length + 1;
+  var currentIndex = 0;
+  function applyState(index) {
+    currentIndex = index;
+    brand.classList.toggle('is-scrubbing', index !== 0);
+    brushes.forEach(function (img, i) { img.classList.toggle('is-active', i === index - 1); });
+  }
+
+  // ── Hover path ──
+  var hoverQuery = window.matchMedia('(min-width: 641px) and (pointer: fine)');
+  var nextHoverIndex = 0;
   brand.addEventListener('mouseenter', function () {
-    var index = nextIndex;
-    nextIndex = (nextIndex + 1) % brushes.length;
-    brand.classList.add('is-scrubbing');
-    brushes.forEach(function (img, i) {
-      img.classList.toggle('is-active', i === index);
-    });
+    if (!hoverQuery.matches) return;
+    var index = nextHoverIndex;
+    nextHoverIndex = (nextHoverIndex + 1) % brushes.length;
+    applyState(index + 1);
   });
   brand.addEventListener('mouseleave', function () {
-    brand.classList.remove('is-scrubbing');
-    brushes.forEach(function (img) { img.classList.remove('is-active'); });
+    if (!hoverQuery.matches) return;
+    applyState(0);
   });
+
+  // ── Touch-swipe path (tablet width only) ──
+  // Same loop/direction/threshold as mobile-logo-swipe.js's bottom-bar
+  // version, applied to #brand-scrub's own markup instead.
+  var swipeQuery = window.matchMedia('(min-width: 641px) and (max-width: 980px) and (pointer: coarse)');
+  var STORAGE_KEY = 'brandScrubLetteringIndex';
+  var startX = 0, startY = 0, tracking = false;
+  var SWIPE_THRESHOLD = 32;
+
+  brand.addEventListener('touchstart', function (e) {
+    if (!swipeQuery.matches || e.touches.length !== 1) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    tracking = true;
+  }, { passive: true });
+
+  brand.addEventListener('touchend', function (e) {
+    if (!tracking) return;
+    tracking = false;
+    var touch = e.changedTouches[0];
+    var dx = touch.clientX - startX;
+    var dy = touch.clientY - startY;
+    if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy)) return;
+    // A real horizontal swipe, not a tap--don't also let it navigate home
+    // via the <a>'s own click.
+    e.preventDefault();
+    var step = dx > 0 ? 1 : -1;
+    applyState((currentIndex + step + STATE_COUNT) % STATE_COUNT);
+    try { sessionStorage.setItem(STORAGE_KEY, String(currentIndex)); } catch (err) { /* private-mode storage access can throw */ }
+  });
+
+  // Restores the swiped-to lettering on load/navigation--only meaningful
+  // for the touch path (hover never persists past mouseleave). Exposed for
+  // legacy-nav-scripts.client.ts's page:finish hook, same pattern
+  // mobile-logo-swipe.js uses for its own persisted state.
+  function restoreFromStorage() {
+    if (!swipeQuery.matches) return;
+    var stored = null;
+    try { stored = sessionStorage.getItem(STORAGE_KEY); } catch (err) { /* ditto */ }
+    if (stored !== null) {
+      var restored = parseInt(stored, 10);
+      if (restored >= 0 && restored < STATE_COUNT) applyState(restored);
+    }
+  }
+  restoreFromStorage();
+  window.reapplyBrandScrub = restoreFromStorage;
 
   // Nudges toward the hidden Ctrl+drag feature: five full seconds of
   // mouse inactivity anywhere on the page shows a hint at wherever the
   // cursor was last, not anchored to the logo (idle can strike with the
   // mouse sitting anywhere). Reuses .pv-icon-tip for the look (black
-  // rectangle, white text, Inter—see graffiti.css).
+  // rectangle, white text, Inter--see graffiti.css). Desktop-only: a wide
+  // touch device (tablet, or a phone with desktop-site requested) has no
+  // real Ctrl key, so the hint would otherwise get created and then just
+  // sit there forever with nothing able to dismiss it--same reasoning as
+  // before, unrelated to the hover/swipe split above.
+  var desktopQuery = window.matchMedia('(min-width: 981px) and (pointer: fine)');
+  if (!desktopQuery.matches) return;
+
   var tip = document.createElement('div');
   tip.className = 'pv-icon-tip';
   tip.textContent = 'Ctrl+click to tag!';

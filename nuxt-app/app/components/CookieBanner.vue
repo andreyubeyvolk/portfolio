@@ -69,8 +69,8 @@ watch(() => route.path, () => nextTick(measure))
           We use cookies for anonymous analytics (Google Analytics) to see how the portfolio is viewed. No ads, no cross-site tracking.
         </p>
         <div class="cookie-banner__actions">
-          <button type="button" class="cookie-banner__btn" @click="choose('denied')">Decline</button>
           <button type="button" class="cookie-banner__btn" @click="choose('granted')">Accept</button>
+          <button type="button" class="cookie-banner__btn" @click="choose('denied')">Decline</button>
         </div>
       </section>
     </div>
