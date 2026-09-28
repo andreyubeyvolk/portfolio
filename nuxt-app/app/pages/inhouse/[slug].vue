@@ -17,6 +17,10 @@ useSeoMeta({
   ogDescription: () => project.value!.description,
   twitterTitle: () => `${project.value!.title}—Andrey Ubeyvolk`,
   twitterDescription: () => project.value!.description,
+  // Per-project share preview (1200x630 JPG cropped from the cover--JPG,
+  // not WebP, so LinkedIn/iMessage/etc. reliably render it).
+  ogImage: `https://andreyubeyvolk.com/assets/inhouse/${slug}/${slug}-og.jpg`,
+  twitterImage: `https://andreyubeyvolk.com/assets/inhouse/${slug}/${slug}-og.jpg`,
 })
 
 useHead({
