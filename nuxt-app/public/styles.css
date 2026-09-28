@@ -6,6 +6,11 @@
   --scrollbar-gutter: calc(var(--scrollbar-thumb-width) + var(--scrollbar-track-padding) * 2);
   --link-underline-thickness: 1px;
   --text: #111;
+  /* The ONE gray for secondary text (captions, tags, [0001] badges, nav
+     arrows). Lightest gray passing WCAG AA 4.5:1 on both the page
+     background (#F5F4F4, 4.64:1) and the white plaques (#fff, 5.10:1).
+     Don't introduce other text grays--use this. */
+  --muted-text: #6e6e6e;
   --muted: #f2f2f2;
   --line: #d8d8d8;
 }
@@ -529,48 +534,16 @@ body::-webkit-scrollbar-thumb:active {
   gap: var(--grid-gap);
 }
 
+/* No fixed aspect-ratio here on purpose (desktop only--see mobile.css for
+   the phone crop): the reel's final shape isn't settled, so the box sizes
+   from the video's own intrinsic ratio (Vp's height:auto) instead of
+   guessing a shape and cropping to fit it. */
 .reel-card {
   position: relative;
   grid-column: 1 / -1;
-  display: block;
   width: 100%;
-  padding: 0;
   overflow: hidden;
-  border: 0;
   background: var(--muted);
-  cursor: pointer;
-}
-
-/* No fixed aspect-ratio/object-fit here on purpose (desktop only--see
-   mobile.css for the phone crop, unchanged): the real reel is still an
-   unknown size (not necessarily this placeholder's 16:9-ish shape), so
-   the box sizes from the media's own intrinsic ratio via its width/
-   height attributes instead of guessing a shape and cropping to fit it. */
-.reel-card__poster {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.reel-card__cta {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-.reel-card__icon {
-  width: 21px;
-  height: auto;
-}
-
-.reel-card__text {
-  width: 35px;
-  height: auto;
 }
 
 .home-socials {
@@ -854,14 +827,18 @@ body::-webkit-scrollbar-thumb:active {
 
 /* Small gray superscript badge—used for the "[0001]"-style numbering tail
    on archive titles, and reused as-is for an inline "[LINK]" reference in
-   a description (see renderTitleInto/renderDescriptionInto in
-   archive/index.html). #9F9F9F is the site's existing muted/caption gray
-   (already used by .preview-tags), not a new color. */
+   a description. Site-wide secondary-text gray (--muted-text). */
 .archive-num {
-  color: #9f9f9f;
+  color: var(--muted-text);
   font-size: 0.7em;
   vertical-align: super;
   text-decoration: none;
+}
+
+/* On hover the title inverts to white-on-black; the gray badge would drop
+   to ~4:1 there, so it follows the title's white instead. */
+.archive-card:hover .archive-num {
+  color: inherit;
 }
 
 /* ─── One-shot video (vp-once): silent, autoplay once in view, plays a
@@ -1234,7 +1211,7 @@ body::-webkit-scrollbar-thumb:active {
     display: block;
     font-size: 0.75rem;
     line-height: 1.4;
-    color: #9f9f9f;
+    color: var(--muted-text);
     background: #fff;
     width: 100%;
     margin-top: -4px;
