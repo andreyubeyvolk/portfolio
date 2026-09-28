@@ -28,6 +28,16 @@ const props = defineProps<{
 
 const introText = computed(() => sectionIntroText(props.section))
 
+// The cover is the page's largest above-the-fold paint. An image cover
+// gets fetchpriority="high" on the <img> itself; a video cover's first
+// visible paint is its poster, which the <video> element would otherwise
+// only request at normal priority.
+if (props.cover.type === 'video') {
+  useHead({
+    link: [{ rel: 'preload', as: 'image', href: videoPoster(props.cover.src), fetchpriority: 'high' }],
+  })
+}
+
 const panelTransitionStyle = usePanelTransitionStyle()
 
 // Flat running index across the whole gallery (a pair row counts as two),
@@ -68,6 +78,7 @@ const flatGallery = computed(() => {
               v-if="cover.type === 'image'"
               :width="cover.width"
               :height="cover.height"
+              fetchpriority="high"
               :src="cover.src"
               :alt="title"
             />
@@ -144,7 +155,7 @@ const flatGallery = computed(() => {
   </div>
 
   <div class="mobile-project">
-    <img v-if="cover.type === 'image'" :width="cover.width" :height="cover.height" :src="cover.src" :alt="title" />
+    <img v-if="cover.type === 'image'" :width="cover.width" :height="cover.height" fetchpriority="high" :src="cover.src" :alt="title" />
     <VpBare v-else :src="cover.src" :width="cover.width" :height="cover.height" />
 
     <RevealOnScroll class="mobile-project__block">

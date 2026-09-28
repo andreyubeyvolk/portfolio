@@ -2,10 +2,6 @@ import { defineContentConfig, defineCollection, z } from '@nuxt/content'
 
 export default defineContentConfig({
   collections: {
-    content: defineCollection({
-      type: 'page',
-      source: { include: '**', exclude: ['about.md', 'archive.md', 'projects/**'] },
-    }),
     // Structured data, not prose—the 'page' type only keeps a fixed set of
     // fields (title/description/body/...) and buries everything else
     // under `.meta`. A real schema instead gets these fields validated and

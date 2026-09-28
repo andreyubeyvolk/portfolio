@@ -129,7 +129,7 @@ button.archive-card {
         display: block;
         font-size: 0.75rem;
         line-height: 1.4;
-        color: #9f9f9f;
+        color: var(--muted-text);
         background: #fff;
         padding-top: 4px;
       }
@@ -377,7 +377,7 @@ button.archive-card {
         display: block;
         font-size: 0.75rem;
         line-height: 1.4;
-        color: #9f9f9f;
+        color: var(--muted-text);
         background: #fff;
         padding-top: 4px;
       }
@@ -408,9 +408,9 @@ button.archive-card {
       }
 
       /* Hint glyph: hidden until the zone is hovered a moment, then eases
-         in. Plain text "<"/">"—no circle, no icon—same house gray as the
-         [0000] number badges (#9f9f9f) with a little transparency on top,
-         so it reads consistently on both light and dark photos without
+         in. Plain text "<"/">"—no circle, no icon—same site-wide
+         secondary-text gray as the [0000] number badges (--muted-text), so
+         it reads consistently on both light and dark photos without
          needing a scrim behind it. Fades back out immediately on
          mouseleave (no delay on the way out, only on the way in). */
       .filmstrip-edge__arrow,
@@ -420,7 +420,7 @@ button.archive-card {
         font-weight: 500;
         font-size: 1.25rem;
         line-height: 1;
-        color: rgba(159, 159, 159, 0.85);
+        color: var(--muted-text);
         opacity: 0;
         transition: opacity 0.25s ease;
         pointer-events: none;

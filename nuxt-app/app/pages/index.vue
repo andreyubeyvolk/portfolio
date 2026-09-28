@@ -38,6 +38,15 @@ useHead({
 // About's "Open to" portrait).
 const paintImg = useTemplateRef<HTMLImageElement>('paintImg')
 const { isActive, show } = useSprayReveal(paintImg)
+
+// Placeholder reel until the real one exists--any project clip works,
+// the player sizes itself from the video's own aspect ratio.
+const REEL_SRC = '/assets/inhouse/greenflag/greenflag-15.mp4'
+// The reel's poster is the home page's largest above-the-fold paint, so
+// fetch it at high priority instead of waiting on the <video> element.
+useHead({
+  link: [{ rel: 'preload', as: 'image', href: videoPoster(REEL_SRC), fetchpriority: 'high' }],
+})
 </script>
 
 <template>
@@ -61,18 +70,11 @@ const { isActive, show } = useSprayReveal(paintImg)
 
   <section class="content-pane home-pane" aria-label="Showreel and contacts">
     <article class="home-view">
-      <!-- Not yet wired to actual playback on the static site either (no
-           click handler exists there)--porting the same inert visual, not
-           a regression. -->
-      <button class="reel-card" type="button" aria-label="Play reel">
-        <img width="1920" height="1080" loading="lazy" class="reel-card__poster" src="/assets/reel.webp" alt="" />
-        <span class="reel-card__cta" aria-hidden="true">
-          <img width="24" height="24" loading="lazy" class="reel-card__icon" src="/assets/reel-icon.svg" alt="" />
-          <img width="36" height="24" loading="lazy" class="reel-card__text" src="/assets/reel-text.svg" alt="" />
-        </span>
-        <span class="reel-card__overlay-left" aria-hidden="true">Art direction for startups</span>
-        <span class="reel-card__overlay-right" aria-hidden="true">and digital companies</span>
-      </button>
+      <!-- Autoplays muted on load; volume/timeline controls appear only
+           when the video itself is clicked or tapped. -->
+      <div class="reel-card">
+        <Vp :src="REEL_SRC" autoplay="immediate" reveal-on="click" :volume="0.8" />
+      </div>
 
       <NuxtLink class="home-projects-link" to="/all-projects">All projects</NuxtLink>
 

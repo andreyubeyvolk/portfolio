@@ -29,7 +29,10 @@ export default defineNuxtConfig({
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=fallback' },
+        // ital 1,700: the active nav item (desktop sidebar + mobile menu) is
+        // 700 italic--without a real italic face the browser fakes one by
+        // slanting the upright glyphs.
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&display=fallback' },
         { rel: 'stylesheet', href: '/styles.css' },
         { rel: 'stylesheet', href: '/mobile.css' },
         { rel: 'stylesheet', href: '/graffiti.css' },
@@ -69,12 +72,9 @@ export default defineNuxtConfig({
         // plain tag. plugins/graffiti.client.ts is what actually calls it,
         // once per navigation.
         { src: '/graffiti.js' },
-        // Google Analytics (gtag.js)--only DEFINES window.gtag/dataLayer
-        // here. plugins/analytics.client.ts does the actual init (gated to
-        // the real domain) and fires page_view on every route change,
-        // since gtag's own automatic pageview only covers the first
-        // document load, not later client-side navigations.
-        { src: 'https://www.googletagmanager.com/gtag/js?id=G-SXEF693HCE', async: true },
+        // Google Analytics is NOT loaded here: plugins/analytics.client.ts
+        // injects gtag.js only after the visitor accepts analytics cookies
+        // in CookieBanner.
       ],
     },
   },

@@ -32,6 +32,7 @@ onBeforeUnmount(() => observer?.disconnect())
     muted
     loop
     preload="metadata"
+    :poster="videoPoster(src)"
     :src="src"
   />
 </template>
