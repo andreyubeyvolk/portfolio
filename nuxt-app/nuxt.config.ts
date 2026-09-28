@@ -27,19 +27,21 @@ export default defineNuxtConfig({
     // Stage 7 cutover.
     head: {
       link: [
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        // ital 1,700: the active nav item (desktop sidebar + mobile menu) is
-        // 700 italic--without a real italic face the browser fakes one by
-        // slanting the upright glyphs.
-        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&display=fallback' },
+        // Self-hosted Inter (see fonts.css's own header)--was Google Fonts,
+        // a third-party render-blocking request that cost 2.5s+ on a cold
+        // connection in a Lighthouse run (measured on the jsdelivr Lenis
+        // stylesheet below, same class of cost; fonts.googleapis.com carries
+        // the identical DNS+TLS+request tax). No preconnect needed anymore
+        // since there's no such origin to warm up.
+        { rel: 'stylesheet', href: '/fonts.css' },
         { rel: 'stylesheet', href: '/styles.css' },
         { rel: 'stylesheet', href: '/mobile.css' },
         { rel: 'stylesheet', href: '/graffiti.css' },
-        // Lenis smooth-scroll library (third-party, defines window.Lenis
-        // only—doesn't touch the DOM on its own, so unlike the nav scripts
-        // there's no hydration race to worry about). See ScrollPane.vue.
-        { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.css' },
+        // Self-hosted Lenis (defines window.Lenis only—doesn't touch the DOM
+        // on its own, so unlike the nav scripts there's no hydration race to
+        // worry about; see ScrollPane.vue). Was jsdelivr--the specific
+        // render-blocking cost cited above.
+        { rel: 'stylesheet', href: '/lenis.css' },
         // Project-page template CSS (cover/gallery/video-player/info-note)
         // and the scroll-reveal fade+rise—both used only on project pages,
         // but small enough (and identical across all of them, by design)
@@ -65,7 +67,7 @@ export default defineNuxtConfig({
       // Vue's hydration (see plugins/legacy-nav-scripts.client.ts for why
       // that matters and where they're actually injected instead).
       script: [
-        { src: 'https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js' },
+        { src: '/lenis.min.js' },
         // graffiti.js only DEFINES window.initGraffiti here (see the file's
         // own header)—it doesn't touch the DOM until something calls it, so
         // unlike the nav scripts there's no hydration race loading it as a
