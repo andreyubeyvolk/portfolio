@@ -194,6 +194,27 @@
     min-height: calc(33.33vh - 16px);
   }
 
+  /* Home page only: no forced min-height--the reel below should start
+     exactly --page-margin (16px) under whichever of the portrait/intro
+     text actually extends lower, not under an artificial 33vh floor that
+     leaves dead space on short intros/tall phones. (About reuses this
+     same .home-intro class for its own text-only intro and still wants
+     the 33vh floor--this override is scoped to home-page specifically.) */
+  body.home-page .section-intro.home-intro {
+    min-height: 0;
+    margin-bottom: var(--page-margin, 16px);
+  }
+
+  /* .intro-text's own 8px margin-bottom (below) is invisible here--nothing
+     sits inside this grid row after it--but grid track sizing still counts
+     an item's margin box, so it quietly added 8px of dead space under
+     whichever of portrait/text is taller, on top of the container's own
+     margin-bottom above. Zeroed so the reel starts exactly --page-margin
+     under the actual visible content, not content + this leftover. */
+  body.home-page .section-intro.home-intro .intro-text {
+    margin-bottom: 0;
+  }
+
   .section-intro.home-intro .intro-text {
     grid-column: 2 / -1;
     grid-row: 1; /* the text comes before .home-portrait in the HTML, but
