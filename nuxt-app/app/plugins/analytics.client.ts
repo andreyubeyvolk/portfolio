@@ -1,7 +1,13 @@
-// Google Analytics, loaded only after the visitor accepts analytics cookies
-// in CookieBanner (no gtag.js request at all before that, and none ever
-// after Decline). Gated to the real domain so local dev/preview traffic
+// Google Analytics. Gated to the real domain so local dev/preview traffic
 // never reaches the production GA property.
+//
+// Consent gating only applies where the cookie-consent prompt is legally
+// required (see regionRequiresConsent--EU/EEA/UK/Switzerland, by timezone):
+// there, GA loads only after Accept in CookieBanner, and never after
+// Decline. Everywhere else the banner never shows at all (nothing to
+// distract from), so GA just loads normally--an explicit prior Decline is
+// still honored if present (e.g. a visitor who chose it while the region
+// check matched on an earlier visit).
 //
 // send_page_view is off in the config call; every pageview is sent from
 // router.afterEach instead, since gtag's own automatic pageview only fires
@@ -47,12 +53,16 @@ export default defineNuxtPlugin(() => {
     document.head.appendChild(script)
   }
 
-  // Returning visitor who already accepted: load now--the first
-  // router.afterEach below reports this page, same as any navigation.
-  if (consent.value === 'granted') load()
+  // Explicit prior decline always wins, regardless of region (see header
+  // comment). Otherwise: load immediately outside a consent-required
+  // region, or if a required region's visitor already accepted.
+  if (consent.value !== 'denied' && (consent.value === 'granted' || !regionRequiresConsent())) {
+    load()
+  }
 
-  // Accepted on this visit: load, and report the page they're already on
-  // (its own navigation happened before GA existed).
+  // Accepted on this visit (CookieBanner, consent-required region only):
+  // load, and report the page they're already on (its own navigation
+  // happened before GA existed).
   watch(consent, (value) => {
     if (value !== 'granted' || loaded) return
     load()
