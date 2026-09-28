@@ -3,7 +3,13 @@
 // per-page via each page's own useSeoMeta, layered on top of these).
 const SITE_URL = 'https://andreyubeyvolk.com'
 const route = useRoute()
-const canonicalUrl = computed(() => `${SITE_URL}${route.path}`)
+// Every route prerenders to <path>/index.html (Nuxt's default), which
+// GitHub Pages serves at the trailing-slash URL--requesting the bare path
+// gets a 301 to it. Canonical/og:url pointed at the pre-redirect address;
+// this points straight at the address that's actually served, matching
+// what a crawler lands on after following that redirect anyway.
+const canonicalPath = computed(() => route.path.endsWith('/') ? route.path : `${route.path}/`)
+const canonicalUrl = computed(() => `${SITE_URL}${canonicalPath.value}`)
 
 useSeoMeta({
   ogSiteName: 'Andrey Ubeyvolk',
