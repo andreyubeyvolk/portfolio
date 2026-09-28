@@ -10,6 +10,7 @@
 declare global {
   interface Window {
     reapplyMobileBrandLettering?: () => void
+    reapplyBrandScrub?: () => void
   }
 }
 
@@ -40,8 +41,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   // added outside Vue's own reactivity. Re-applying from storage after
   // each navigation fixes the visible reset without re-running the
   // script itself--same page:finish pattern graffiti.client.ts uses for
-  // its own per-navigation re-init.
+  // its own per-navigation re-init. logo-scrub.js's own touch-swipe state
+  // (tablet width) has the identical problem--its brush <img>s sit inside
+  // the same kind of NuxtLink--so it gets the same reapply treatment.
   nuxtApp.hook('page:finish', () => {
     window.reapplyMobileBrandLettering?.()
+    window.reapplyBrandScrub?.()
   })
 })
