@@ -8,9 +8,15 @@ export default defineEventHandler(async (event) => {
   const projectRoutes = projects.map(p => `/${p.section}/${p.slug}`)
   const routes = [...STATIC_ROUTES, ...projectRoutes]
 
+  // Every route prerenders to <path>/index.html, which GitHub Pages serves
+  // at the trailing-slash URL--the bare path 301s to it. Listing the
+  // pre-redirect address here made every single sitemap entry cost an
+  // extra redirect hop for a crawler; this is the address actually served.
+  const withTrailingSlash = (r: string) => (r.endsWith('/') ? r : `${r}/`)
+
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${routes.map(route => `  <url><loc>${SITE_URL}${route}</loc></url>`).join('\n')}
+${routes.map(route => `  <url><loc>${SITE_URL}${withTrailingSlash(route)}</loc></url>`).join('\n')}
 </urlset>
 `
 
