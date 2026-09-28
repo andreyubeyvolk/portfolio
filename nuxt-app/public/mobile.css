@@ -194,23 +194,26 @@
     min-height: calc(33.33vh - 16px);
   }
 
-  /* Home page only: no forced min-height--the reel below should start
-     exactly --page-margin (16px) under whichever of the portrait/intro
-     text actually extends lower, not under an artificial 33vh floor that
-     leaves dead space on short intros/tall phones. (About reuses this
-     same .home-intro class for its own text-only intro and still wants
-     the 33vh floor--this override is scoped to home-page specifically.) */
+  /* Home page: match the exact same vertical rhythm as Inhouse/Brands'
+     own section-intro before their card grid (.inhouse-page .section-intro.intro
+     in this same file--33.33vh floor, no extra margin after it), so the
+     reel starts at the same on-screen line as a listing page's first card
+     row instead of hugging whichever of the portrait/intro text is
+     taller. (About reuses this same .home-intro class for its own
+     text-only intro and sets its own margin-bottom separately further
+     down--this override is scoped to home-page specifically.) */
   body.home-page .section-intro.home-intro {
-    min-height: 0;
-    margin-bottom: var(--page-margin, 16px);
+    min-height: calc(33.33vh - 16px);
+    margin-bottom: 0;
   }
 
   /* .intro-text's own 8px margin-bottom (below) is invisible here--nothing
      sits inside this grid row after it--but grid track sizing still counts
-     an item's margin box, so it quietly added 8px of dead space under
-     whichever of portrait/text is taller, on top of the container's own
-     margin-bottom above. Zeroed so the reel starts exactly --page-margin
-     under the actual visible content, not content + this leftover. */
+     an item's margin box, so on a tall intro (taller than the 33.33vh
+     floor above) it would quietly add 8px of dead space under whichever
+     of portrait/text is taller. Zeroed so that edge case still lines up
+     with the floor exactly, same reasoning as the Inhouse intro having no
+     such trailing margin on its own last paragraph. */
   body.home-page .section-intro.home-intro .intro-text {
     margin-bottom: 0;
   }
@@ -790,7 +793,8 @@
     height: calc(100vh - 200px);
     height: calc(100dvh - 200px);
     background: #fff;
-    z-index: 101;
+    z-index: 103; /* above .cookie-banner (102)--an explicitly opened menu
+      still wins over the cookie prompt if both are somehow up at once */
     overflow: hidden;
 
     /* Plain opacity fade, per the user's own request ("просто появление
