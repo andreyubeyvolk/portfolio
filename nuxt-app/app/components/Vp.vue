@@ -40,6 +40,16 @@ const effectivePoster = computed(() => {
   if (isMobileViewport.value && props.posterMobile) return props.posterMobile
   return props.poster ?? videoPoster(props.src)
 })
+// Native fallback for 'immediate' reels: if this component's own JS is
+// slow to hydrate (or fails outright--a script error elsewhere, a
+// blocker), the browser can still start playback on its own once enough
+// data is buffered, same as the <source media> swap already works without
+// JS. Redundant with playWhenReady() below once JS does run (calling
+// play() on an already-playing video is a harmless no-op), so this is
+// pure downside-free insurance, not a behavior change. Left off entirely
+// for 'scroll' reels, which must stay paused until actually scrolled into
+// view.
+const isImmediateAutoplay = computed(() => (props.autoplay || 'immediate') !== 'scroll')
 
 const vpRef = useTemplateRef<HTMLElement>('vp')
 const videoRef = useTemplateRef<HTMLVideoElement>('video')
@@ -59,6 +69,13 @@ let hideTimer: ReturnType<typeof setTimeout> | undefined
 let intersectionObserver: IntersectionObserver | null = null
 const HIDE_DELAY = 2500
 
+// Whether this player is *supposed* to be autoplaying right now--true from
+// mount for 'immediate', flipped true once the scroll-triggered play
+// actually fires for 'scroll' (set in the onMounted below). Cleared the
+// moment a human calls toggle() themselves, so the visibility-driven
+// resume further down never fights a deliberate pause.
+let autoplayIntent = false
+
 // Ctrl/Cmd is graffiti.js's own "paint mode" modifier (see that file's
 // onMouseDown)--a tag drawn across the reel shouldn't also toggle
 // play/pause, seek, or change volume underneath it. graffiti.js already
@@ -72,6 +89,7 @@ function isPaintClick(e?: { ctrlKey: boolean; metaKey: boolean }) {
 
 function toggle(e?: MouseEvent) {
   if (isPaintClick(e)) return
+  autoplayIntent = false
   const video = videoRef.value
   if (!video) return
   if (video.paused) video.play().catch(() => {})
@@ -231,11 +249,13 @@ onMounted(() => {
   }
 
   const autoplayMode = props.autoplay || 'immediate'
+  autoplayIntent = autoplayMode !== 'scroll'
   if (autoplayMode === 'scroll' && 'IntersectionObserver' in window) {
     intersectionObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue
         isIdle.value = true
+        autoplayIntent = true
         playWhenReady()
         intersectionObserver?.disconnect()
       }
@@ -245,6 +265,48 @@ onMounted(() => {
     isIdle.value = true
     playWhenReady()
   }
+
+  // srcMobile only: a <source media> swap doesn't re-run on its own when
+  // the viewport crosses the breakpoint after load (only a fresh load()
+  // re-evaluates it)--so resizing a desktop window down past 640px, or
+  // rotating a tablet, silently left the *old* aspect's video playing
+  // inside the *new* breakpoint's differently-shaped crop box (confirmed:
+  // the wrong video, stretched/cropped hard by object-fit:cover). Reload
+  // to the correct source--and its matching poster--whenever the
+  // breakpoint actually changes; only resume playback immediately if it
+  // was already playing (or isn't scroll-gated), so a 'scroll' reel that
+  // hasn't been triggered yet just gets primed with the right source for
+  // whenever it eventually scrolls into view.
+  let mobileQuery: MediaQueryList | null = null
+  let onBreakpointChange: (() => void) | null = null
+  if (props.srcMobile) {
+    mobileQuery = window.matchMedia('(max-width: 640px)')
+    onBreakpointChange = () => {
+      isMobileViewport.value = mobileQuery!.matches
+      const wasPlaying = !video.paused
+      video.load()
+      if (wasPlaying || autoplayMode !== 'scroll') playWhenReady()
+    }
+    mobileQuery.addEventListener('change', onBreakpointChange)
+  }
+
+  // Chrome (and others) can suspend an autoplaying video in a tab that's
+  // hidden when playback starts--e.g. this page loaded in a background
+  // tab--and does not resume it on its own once the tab becomes visible
+  // again. Retry then, but only for a reel that's supposed to be
+  // autoplaying and isn't paused for some other reason (a real buffering
+  // stall still reports paused:false, so this won't fight that).
+  function onVisibilityChange() {
+    if (document.visibilityState === 'visible' && autoplayIntent && video.paused) {
+      video.play().catch(() => {})
+    }
+  }
+  document.addEventListener('visibilitychange', onVisibilityChange)
+
+  onBeforeUnmount(() => {
+    if (mobileQuery && onBreakpointChange) mobileQuery.removeEventListener('change', onBreakpointChange)
+    document.removeEventListener('visibilitychange', onVisibilityChange)
+  })
 })
 
 onBeforeUnmount(() => {
@@ -261,7 +323,7 @@ onBeforeUnmount(() => {
     :data-state="state"
     :data-muted="muted ? 'true' : 'false'"
   >
-    <video ref="video" class="vp__video" playsinline muted loop preload="metadata" :poster="effectivePoster">
+    <video ref="video" class="vp__video" playsinline muted loop preload="metadata" :autoplay="isImmediateAutoplay" :poster="effectivePoster">
       <source v-if="srcMobile" :src="srcMobile" media="(max-width: 640px)" />
       <source :src="src" />
     </video>
