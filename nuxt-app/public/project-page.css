@@ -216,6 +216,7 @@
 /* ─── Video player (custom controls) ─── */
 :root {
   --vp-line: rgba(255, 255, 255, 0.2);
+  --vp-buffered: rgba(255, 255, 255, 0.5);
   --vp-fill: #ffffff;
   --vp-control: #ffffff;
   --vp-gap: 16px;
@@ -331,6 +332,10 @@
   position: absolute;
   background: var(--vp-line);
 }
+.vp-slider__buffered {
+  position: absolute;
+  background: var(--vp-buffered);
+}
 .vp-slider__fill {
   position: absolute;
   background: var(--vp-fill);
@@ -370,6 +375,17 @@
   top: 50%;
   height: var(--vp-thickness);
   transform: translateY(-50%);
+}
+.vp-slider--x .vp-slider__buffered {
+  left: 0;
+  top: 50%;
+  height: var(--vp-thickness);
+  transform: translateY(-50%);
+  width: 0%;
+  /* Buffered only ever grows/shrinks in whole download chunks, so a step
+     change reads better than the fill's own instant snap-to-seek--smooths
+     it into something that looks like it's actively loading. */
+  transition: width 0.2s ease;
 }
 .vp-slider--x .vp-slider__fill {
   left: 0;
