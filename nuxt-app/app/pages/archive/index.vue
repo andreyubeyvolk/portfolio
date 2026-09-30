@@ -182,7 +182,7 @@ useHead({
               :width="card.width"
               :height="card.height"
               loading="lazy"
-              :src="card.src"
+              :src="archiveThumb(card.src)"
               :alt="card.alt"
               @load="onCoverLoad(card.src)"
               @error="onCoverLoad(card.src)"
