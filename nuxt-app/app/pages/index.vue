@@ -40,14 +40,23 @@ useHead({
 const paintImg = useTemplateRef<HTMLImageElement>('paintImg')
 const { isActive, show } = useSprayReveal(paintImg)
 
-// Placeholder reel until the real one exists--any project clip works,
-// the card crops to 16:9 (desktop/tablet) or 3:4 (phone) regardless of the
-// clip's own ratio.
-const REEL_SRC = '/assets/inhouse/crypto/crypto-showreel.mp4'
+// Real showreel (1920x1080, re-encoded from the client's Media Encoder
+// export--crf 21, SSIM 0.994 against the source--rather than their own
+// HandBrake pass, which had visibly banded on this clip's gradients/grain
+// at a much lower bitrate). Desktop/tablet only for now--no mobile cut of
+// this one exists yet, so mobile keeps the old placeholder crop via
+// srcMobile/posterMobile until a proper portrait edit replaces it.
+const REEL_SRC = '/assets/home/home-showreel.mp4'
+const REEL_SRC_MOBILE = '/assets/inhouse/crypto/crypto-showreel.mp4'
 // The reel's poster is the home page's largest above-the-fold paint, so
-// fetch it at high priority instead of waiting on the <video> element.
+// fetch it at high priority instead of waiting on the <video> element--
+// one per breakpoint (each gated by the same media the <source>/Vp
+// component itself switches on), since the two posters differ.
 useHead({
-  link: [{ rel: 'preload', as: 'image', href: videoPoster(REEL_SRC), fetchpriority: 'high' }],
+  link: [
+    { rel: 'preload', as: 'image', href: videoPoster(REEL_SRC), fetchpriority: 'high', media: '(min-width: 641px)' },
+    { rel: 'preload', as: 'image', href: videoPoster(REEL_SRC_MOBILE), fetchpriority: 'high', media: '(max-width: 640px)' },
+  ],
 })
 </script>
 
@@ -75,7 +84,14 @@ useHead({
       <!-- Autoplays muted on load; volume/timeline controls appear only
            when the video itself is clicked or tapped. -->
       <div class="reel-card">
-        <Vp :src="REEL_SRC" autoplay="immediate" reveal-on="click" :volume="0.8" />
+        <Vp
+          :src="REEL_SRC"
+          :src-mobile="REEL_SRC_MOBILE"
+          :poster-mobile="videoPoster(REEL_SRC_MOBILE)"
+          autoplay="immediate"
+          reveal-on="click"
+          :volume="0.8"
+        />
       </div>
 
       <NuxtLink class="home-projects-link" to="/all-projects">All projects</NuxtLink>

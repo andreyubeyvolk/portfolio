@@ -7,14 +7,20 @@
 // for free by full navigation—an SPA reuses the same page instance
 // across client-side navigations, so this needs to clean up after itself).
 //
-// Note: the responsive data-src-portrait/data-src-landscape source switch
-// from the original script isn't ported—no current project uses it. Add
-// it back here if one ever does.
+// srcMobile/posterMobile bring back the original script's responsive
+// data-src-portrait/data-src-landscape source switch (dropped during the
+// migration since nothing used it yet—the home reel is the first case
+// that does). The <source media> swap itself is native/CSS-only (see the
+// template), so it's correct even before hydration; only the poster needs
+// a tiny bit of JS since <video poster> can't vary by media query on its
+// own.
 const props = withDefaults(defineProps<{
   src: string
+  srcMobile?: string
   paired?: boolean
   autoplay?: 'immediate' | 'scroll'
   poster?: string
+  posterMobile?: string
   // Volume the player unmutes to (it always starts muted).
   volume?: number
   // 'hover' (project galleries): controls appear on pointer movement.
@@ -23,6 +29,17 @@ const props = withDefaults(defineProps<{
   // controls alive, so they don't vanish mid-drag on the sliders.
   revealOn?: 'hover' | 'click'
 }>(), { volume: 0.7, revealOn: 'hover' })
+
+// Only read once on mount--matches the <source media> swap above, which
+// also only resolves at load time, not live across a resize.
+const isMobileViewport = ref(false)
+onMounted(() => {
+  isMobileViewport.value = window.matchMedia('(max-width: 640px)').matches
+})
+const effectivePoster = computed(() => {
+  if (isMobileViewport.value && props.posterMobile) return props.posterMobile
+  return props.poster ?? videoPoster(props.src)
+})
 
 const vpRef = useTemplateRef<HTMLElement>('vp')
 const videoRef = useTemplateRef<HTMLVideoElement>('video')
@@ -175,20 +192,43 @@ onMounted(() => {
   }
   vp.addEventListener('mouseleave', hideControls)
 
+  // With srcMobile, the template renders <source> children instead of the
+  // old plain :src binding so the browser can pick between them by media
+  // query. Per spec, a <video> only runs its resource-selection algorithm
+  // once automatically; <source> children present when that already-
+  // resolved element gets (re)created via DOM APIs--which is exactly what
+  // Vue does when mounting/hydrating, as opposed to the browser's own HTML
+  // parser encountering static markup--need an explicit load() to be
+  // picked up at all. Without it the element just sits at
+  // readyState 0/HAVE_NOTHING forever, and play() rejects with nothing to
+  // retry it, so autoplay silently never starts. Harmless for the plain
+  // single-<source> case too (there's nothing buffered yet to lose).
+  if (props.srcMobile) video.load()
+
+  function playWhenReady() {
+    if (video.readyState >= 2) {
+      video.play().catch(() => { isIdle.value = false })
+    } else {
+      video.addEventListener('loadeddata', () => {
+        video.play().catch(() => { isIdle.value = false })
+      }, { once: true })
+    }
+  }
+
   const autoplayMode = props.autoplay || 'immediate'
   if (autoplayMode === 'scroll' && 'IntersectionObserver' in window) {
     intersectionObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue
         isIdle.value = true
-        video.play().catch(() => { isIdle.value = false })
+        playWhenReady()
         intersectionObserver?.disconnect()
       }
     }, { threshold: 0.5 })
     intersectionObserver.observe(vp)
   } else {
     isIdle.value = true
-    video.play().catch(() => { isIdle.value = false })
+    playWhenReady()
   }
 })
 
@@ -206,7 +246,10 @@ onBeforeUnmount(() => {
     :data-state="state"
     :data-muted="muted ? 'true' : 'false'"
   >
-    <video ref="video" class="vp__video" playsinline muted loop preload="metadata" :poster="poster ?? videoPoster(src)" :src="src" />
+    <video ref="video" class="vp__video" playsinline muted loop preload="metadata" :poster="effectivePoster">
+      <source v-if="srcMobile" :src="srcMobile" media="(max-width: 640px)" />
+      <source :src="src" />
+    </video>
 
     <div class="vp__hit" data-role="toggle" @click="onHit" />
 
