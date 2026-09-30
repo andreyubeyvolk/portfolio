@@ -59,14 +59,27 @@ let hideTimer: ReturnType<typeof setTimeout> | undefined
 let intersectionObserver: IntersectionObserver | null = null
 const HIDE_DELAY = 2500
 
-function toggle() {
+// Ctrl/Cmd is graffiti.js's own "paint mode" modifier (see that file's
+// onMouseDown)--a tag drawn across the reel shouldn't also toggle
+// play/pause, seek, or change volume underneath it. graffiti.js already
+// calls preventDefault() on these events for its own reasons, but that
+// only cancels the browser's default action (e.g. a link navigating), not
+// other elements' click/pointerdown handlers--this component needs its
+// own guard against the same modifier.
+function isPaintClick(e?: { ctrlKey: boolean; metaKey: boolean }) {
+  return !!e && (e.ctrlKey || e.metaKey)
+}
+
+function toggle(e?: MouseEvent) {
+  if (isPaintClick(e)) return
   const video = videoRef.value
   if (!video) return
   if (video.paused) video.play().catch(() => {})
   else video.pause()
 }
 
-function onHit() {
+function onHit(e: MouseEvent) {
+  if (isPaintClick(e)) return
   if (isIdle.value) showControls()
   else toggle()
 }
@@ -80,7 +93,8 @@ function hideControls() {
   if (videoRef.value && !videoRef.value.paused) isIdle.value = true
 }
 
-function onMute() {
+function onMute(e?: MouseEvent) {
+  if (isPaintClick(e)) return
   const video = videoRef.value
   if (!video) return
   video.muted = !video.muted
@@ -116,6 +130,7 @@ function makeDraggable(
     onChange(ratioFromEvent(el, e, vertical))
   }
   function onPointerDown(e: PointerEvent) {
+    if (isPaintClick(e)) return
     draggingFlag.value = true
     try { (e.target as HTMLElement).setPointerCapture(e.pointerId) } catch {}
     move(e)
