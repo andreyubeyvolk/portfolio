@@ -40,14 +40,12 @@ useHead({
 const paintImg = useTemplateRef<HTMLImageElement>('paintImg')
 const { isActive, show } = useSprayReveal(paintImg)
 
-// Real showreel (1920x1080, re-encoded from the client's Media Encoder
-// export--crf 21, SSIM 0.994 against the source--rather than their own
-// HandBrake pass, which had visibly banded on this clip's gradients/grain
-// at a much lower bitrate). Desktop/tablet only for now--no mobile cut of
-// this one exists yet, so mobile keeps the old placeholder crop via
-// srcMobile/posterMobile until a proper portrait edit replaces it.
+// Real showreel, one cut per breakpoint--both re-encoded from the
+// client's own exports at crf 21 (SSIM >=0.994 against each source).
+// Desktop: 1920x1080. Mobile: 1080x1440 (3:4, matching .reel-card's own
+// mobile crop), with its own dedicated cover design.
 const REEL_SRC = '/assets/home/home-showreel.mp4'
-const REEL_SRC_MOBILE = '/assets/inhouse/crypto/crypto-showreel.mp4'
+const REEL_SRC_MOBILE = '/assets/home/home-showreel-mobile.mp4'
 // The reel's poster is the home page's largest above-the-fold paint, so
 // fetch it at high priority instead of waiting on the <video> element--
 // one per breakpoint (each gated by the same media the <source>/Vp
