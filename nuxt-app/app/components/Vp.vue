@@ -60,6 +60,11 @@ const state = ref<'playing' | 'paused'>('paused')
 const muted = ref(true)
 const isIdle = ref(false)
 const seekPercent = ref(0)
+// How far ahead of playback the browser has actually downloaded--the
+// semi-transparent bar running ahead of the white played-progress line, so
+// a stall on a slow connection reads as "still loading" instead of just
+// silently freezing.
+const bufferedPercent = ref(0)
 const volumePercent = ref(props.volume * 100)
 const isDraggingSeek = ref(false)
 const isDraggingVolume = ref(false)
@@ -204,6 +209,23 @@ function onTimeUpdate() {
   seekPercent.value = (video.currentTime / video.duration) * 100
 }
 
+function onBufferedProgress() {
+  const video = videoRef.value
+  if (!video?.duration) return
+  // buffered is a set of disjoint ranges (a seek can leave a gap behind
+  // it)--the one that matters for "how far ahead can it play without
+  // stalling" is whichever range actually contains the current position.
+  const ranges = video.buffered
+  let end = 0
+  for (let i = 0; i < ranges.length; i++) {
+    if (ranges.start(i) <= video.currentTime && video.currentTime <= ranges.end(i)) {
+      end = ranges.end(i)
+      break
+    }
+  }
+  bufferedPercent.value = (end / video.duration) * 100
+}
+
 onMounted(() => {
   const video = videoRef.value
   const vp = vpRef.value
@@ -216,6 +238,11 @@ onMounted(() => {
   video.addEventListener('play', () => { state.value = 'playing'; hideTimer = setTimeout(hideControls, HIDE_DELAY) })
   video.addEventListener('pause', () => { state.value = 'paused'; clearTimeout(hideTimer); isIdle.value = false })
   video.addEventListener('timeupdate', onTimeUpdate)
+  // 'progress' fires repeatedly while data downloads; 'timeupdate' also
+  // catches the case where buffered range membership changes just from
+  // playback advancing into/out of a range without new data arriving.
+  video.addEventListener('progress', onBufferedProgress)
+  video.addEventListener('timeupdate', onBufferedProgress)
 
   if (props.revealOn === 'click') {
     vp.addEventListener('mousemove', () => { if (!isIdle.value) showControls() })
@@ -399,6 +426,7 @@ onBeforeUnmount(() => {
       @keydown="onSeekKeydown"
     >
       <div class="vp-slider__track" />
+      <div class="vp-slider__buffered" :style="{ width: bufferedPercent + '%' }" />
       <div class="vp-slider__fill" :style="{ width: seekPercent + '%' }" />
       <div class="vp-slider__head" :style="{ left: seekPercent + '%' }" />
     </div>

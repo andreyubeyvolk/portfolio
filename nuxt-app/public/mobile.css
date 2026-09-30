@@ -303,6 +303,13 @@
     object-fit: cover;
   }
 
+  /* 40% smaller than the base 45x54--same proportions, just scaled down
+     (0.6x) per the user's own call, home reel only. */
+  .reel-card .vp__big {
+    width: 27px;
+    height: 32.4px;
+  }
+
   /* ── All projects: full-width tap target, no divider rules ──
      32px margin-bottom keeps it from visually merging into the
      socials grid right below it. Width is 100% (not fit-content) and a
