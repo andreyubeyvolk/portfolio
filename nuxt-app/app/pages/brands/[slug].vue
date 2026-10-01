@@ -25,6 +25,14 @@ useSeoMeta({
 
 useHead({
   bodyAttrs: { class: 'project-page' },
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify(breadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Brands', path: '/brands' },
+      { name: project.value!.title, path: `/brands/${slug}` },
+    ])),
+  }],
 })
 </script>
 

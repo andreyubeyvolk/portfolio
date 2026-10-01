@@ -10,6 +10,13 @@ useSeoMeta({
 
 useHead({
   bodyAttrs: { class: 'brands-page' },
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify(breadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Brands', path: '/brands' },
+    ])),
+  }],
 })
 </script>
 

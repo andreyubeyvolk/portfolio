@@ -26,6 +26,13 @@ useSeoMeta({
 
 useHead({
   bodyAttrs: { class: 'all-projects-page' },
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify(breadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'All Projects', path: '/all-projects' },
+    ])),
+  }],
 })
 
 const panelTransitionStyle = usePanelTransitionStyle()
