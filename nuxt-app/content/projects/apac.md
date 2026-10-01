@@ -2,7 +2,7 @@
 slug: apac
 section: inhouse
 title: Digital Identity 3.0 in APAC
-description: Digital Identity 3.0 in APAC visual identity by Andrey Ubeyvolk.
+description: Digital Identity 3.0 in APAC visual identity by Andrey Ubeyvolk—overlapping coins symbolizing money platforms merging with Web3, in an AI-driven world.
 cover:
   type: image
   src: /assets/inhouse/apac/apac-cover.webp
@@ -16,26 +16,26 @@ gallery:
       src: /assets/inhouse/apac/apac-01.webp
       width: 2160
       height: 1440
-      alt: Digital Identity 3.0 in APAC visual 01
+      alt: Outdoor venue billboard for "Unraveling the Challenges of Digital Identity 3.0 in APAC," Singapore skyline below the headline
   - type: pair
     items:
       - type: image
         src: /assets/inhouse/apac/apac-03.webp
         width: 1080
         height: 1440
-        alt: Digital Identity 3.0 in APAC visual 03
+        alt: Black event T-shirt with the Sumsub Multiverse event title and three-circle Digital Identity 3.0 mark printed on the back
       - type: image
         src: /assets/inhouse/apac/apac-04.webp
         width: 1080
         height: 1440
-        alt: Digital Identity 3.0 in APAC visual 04
+        alt: Branded throw pillow in a rainbow gradient with the Sumsub Multiverse logo
   - type: wide
     item:
       type: image
       src: /assets/inhouse/apac/apac-02.webp
       width: 2160
       height: 1440
-      alt: Digital Identity 3.0 in APAC visual 02
+      alt: Conference stage screen reading "Opening Remarks, Andrew Sever," Sumsub's co-founder and CEO presenting on stage
   - type: video
     item:
       type: video
@@ -49,26 +49,26 @@ gallery:
       src: /assets/inhouse/apac/apac-06.webp
       width: 2160
       height: 1440
-      alt: Digital Identity 3.0 in APAC visual 06
+      alt: Event invite card listing five speaker headshots and the Singapore Fintech Association partnership logo
   - type: pair
     items:
       - type: image
         src: /assets/inhouse/apac/apac-07.webp
         width: 1080
         height: 1440
-        alt: Digital Identity 3.0 in APAC visual 07
+        alt: Instagram story graphic inviting people to join live expert talks, built around the three-circle rainbow mark
       - type: image
         src: /assets/inhouse/apac/apac-08.webp
         width: 1080
         height: 1440
-        alt: Digital Identity 3.0 in APAC visual 08
+        alt: Street billboard at dusk reading "Insights into Web3, AI, Fraud and Compliance," Singapore skyline silhouette below
   - type: wide
     item:
       type: image
       src: /assets/inhouse/apac/apac-09.webp
       width: 2160
       height: 1440
-      alt: Digital Identity 3.0 in APAC visual 09
+      alt: Laptop screen close-up showing the identity's gradient color panel and a "Deloitte" partner credit
   - type: video
     item:
       type: video
@@ -82,31 +82,31 @@ gallery:
         src: /assets/inhouse/apac/apac-11.webp
         width: 1080
         height: 1440
-        alt: Digital Identity 3.0 in APAC visual 11
+        alt: Vertical event poster mockup set against Marina Bay Sands at dusk
       - type: image
         src: /assets/inhouse/apac/apac-12.webp
         width: 1080
         height: 1440
-        alt: Digital Identity 3.0 in APAC visual 12
+        alt: Guests laughing over dinner at the event, with the event signage glowing behind them
   - type: wide
     item:
       type: image
       src: /assets/inhouse/apac/apac-13.webp
       width: 2160
       height: 1440
-      alt: Digital Identity 3.0 in APAC visual 13
+      alt: Pile of event lanyards and name badges, including one for a Lightnet Singapore attendee
   - type: pair
     items:
       - type: image
         src: /assets/inhouse/apac/apac-14.webp
         width: 1080
         height: 1440
-        alt: Digital Identity 3.0 in APAC visual 14
+        alt: Rounded badge sticker mockup carrying the event title over the three-colour rainbow arc
       - type: image
         src: /assets/inhouse/apac/apac-15.webp
         width: 1080
         height: 1440
-        alt: Digital Identity 3.0 in APAC visual 15
+        alt: Event lanyard badge for a guest from the "AI Visionary Society"
   - type: video
     item:
       type: video
@@ -120,7 +120,7 @@ gallery:
       src: /assets/inhouse/apac/apac-17.webp
       width: 2160
       height: 1780
-      alt: Digital Identity 3.0 in APAC visual 17
+      alt: Six display-ad banner mockups in different sizes promoting the Singapore event, with "Book yours now" and "Limited seats" calls to action
       tall: true
   - type: video
     item:

@@ -2,7 +2,7 @@
 slug: greenflag
 section: inhouse
 title: Welcome to Greenflag
-description: Welcome to Greenflag visual identity by Andrey Ubeyvolk.
+description: Welcome to Greenflag visual identity by Andrey Ubeyvolk—a cinematic, human-first identity for people shut out by technology.
 cover:
   type: image
   src: /assets/inhouse/greenflag/greenflag-cover.webp
@@ -24,7 +24,7 @@ gallery:
       src: /assets/inhouse/greenflag/greenflag-02.webp
       width: 2160
       height: 1440
-      alt: Greenflag visual 02
+      alt: Three Instagram post mockups for Greenflag, covering a ministry flag post, a population and spending-power stat card, and a "4th largest nation" headline portrait
   - type: video
     item:
       type: video
@@ -38,73 +38,73 @@ gallery:
         src: /assets/inhouse/greenflag/greenflag-04.webp
         width: 1080
         height: 1440
-        alt: Greenflag visual 04
+        alt: Greenflag Permanent Resident ID card mockup for Sareea Masood, featuring her photo, a QR code, and a barcode
       - type: image
         src: /assets/inhouse/greenflag/greenflag-05.webp
         width: 1080
         height: 1440
-        alt: Greenflag visual 05
+        alt: Poster reading "Be First to Explore This Nation-Sized Opportunity" over five smiling young people huddled together, with a QR code
   - type: wide
     item:
       type: image
       src: /assets/inhouse/greenflag/greenflag-06.webp
       width: 2160
       height: 1440
-      alt: Greenflag visual 06
+      alt: Infographic of nested circles narrowing from the 8.1 billion global population down to the 627.3 million people struggling with digital-service access
   - type: pair
     items:
       - type: image
         src: /assets/inhouse/greenflag/greenflag-07.webp
         width: 1080
         height: 1440
-        alt: Greenflag visual 07
+        alt: Stacked mockups of the "Greenflag—A Nation-Sized Challenge of Digital Exclusion" report cover, showing a glowing tower platform at sea
       - type: image
         src: /assets/inhouse/greenflag/greenflag-08.webp
         width: 1080
         height: 1440
-        alt: Greenflag visual 08
+        alt: Instagram infographic breaking down digital exclusion into ID problems, digital literacy, country of origin, and physical appearance changes, each with a population figure
   - type: wide
     item:
       type: image
       src: /assets/inhouse/greenflag/greenflag-09.webp
       width: 2160
       height: 1440
-      alt: Greenflag visual 09
+      alt: Two-page report spread titled "The Human Impact," covering Zaarah's and Jesús's digital-exclusion stories with pixelated, anonymized portraits of each
   - type: wide
     item:
       type: image
       src: /assets/inhouse/greenflag/greenflag-10.webp
       width: 2160
       height: 1440
-      alt: Greenflag visual 10
+      alt: Cinematic close-up of an older woman lit from below under the headline "People-Friendly Future" and the line "You won't find Greenflag on any map"
   - type: wide
     item:
       type: image
       src: /assets/inhouse/greenflag/greenflag-11.webp
       width: 2160
       height: 1440
-      alt: Greenflag visual 11
+      alt: Three presentation panels—a 627M-inhabitants stat card, a dotted outline map of Greenflag, and a "Welcome to Greenflag" poster with the tower-at-sea image
   - type: wide
     item:
       type: image
       src: /assets/inhouse/greenflag/greenflag-12.webp
       width: 2160
       height: 1440
-      alt: Greenflag visual 12
+      alt: Subway station billboard for "Welcome to Greenflag, People-Friendly Future," showing the glowing tower-at-sea image and a Watch the Film button
   - type: wide
     item:
       type: image
       src: /assets/inhouse/greenflag/greenflag-13.webp
       width: 2160
       height: 1440
-      alt: Greenflag visual 13
+      alt: Cinematic still of a laughing person with braided hair and a hoop earring under the headline "Sumsub, the name behind the nation"
   - type: pair
     items:
       - type: image
         src: /assets/inhouse/greenflag/greenflag-14.webp
         width: 1080
         height: 1440
-        alt: Greenflag visual 14
+        alt: Stat card contrasting a $10.76 trillion digital economy in 2028 with the $2.46 trillion, 23%, left excluded
       - type: video
         src: /assets/inhouse/greenflag/greenflag-15.mp4
         width: 1080
@@ -116,14 +116,14 @@ gallery:
       src: /assets/inhouse/greenflag/greenflag-16.webp
       width: 2160
       height: 1440
-      alt: Greenflag visual 16
+      alt: Research methodology spread pairing a warm photo of a woman laughing on the phone with a Data Sources list citing the World Bank, UNESCO, and ITU
   - type: pair
     items:
       - type: image
         src: /assets/inhouse/greenflag/greenflag-17.webp
         width: 1080
         height: 1440
-        alt: Greenflag visual 17
+        alt: Phone mockup of the Greenflag homepage, a tower-at-sea hero image under the headline "Welcome to Greenflag" and a Watch the Film button
       - type: video
         src: /assets/inhouse/greenflag/greenflag-18.mp4
         width: 1080
@@ -147,33 +147,33 @@ gallery:
         src: /assets/inhouse/greenflag/greenflag-21.webp
         width: 1080
         height: 1440
-        alt: Greenflag visual 21
+        alt: Film still of "You Won't Find Greenflag" breaking into scattered pixels over a dark world map and ocean
   - type: wide
     item:
       type: image
       src: /assets/inhouse/greenflag/greenflag-22.webp
       width: 2160
       height: 1440
-      alt: Greenflag visual 22
+      alt: Bar chart splitting Greenflag's 627M inhabitants into ID problems, digital literacy, appearance changes, and country of origin, next to a €6.87 trillion digital-commerce stat
   - type: wide
     item:
       type: image
       src: /assets/inhouse/greenflag/greenflag-23.webp
       width: 2160
       height: 1440
-      alt: Greenflag visual 23
+      alt: Speaker walking across a conference stage in an ornate hall, a giant screen behind him reading "27,000,000 Digitally Excluded people" over a portrait
   - type: pair
     items:
       - type: image
         src: /assets/inhouse/greenflag/greenflag-24.webp
         width: 1080
         height: 1440
-        alt: Greenflag visual 24
+        alt: Phone mockup of an Instagram ad for the Greenflag white paper, with a "Welcome to Greenflag" card above a Download button
       - type: image
         src: /assets/inhouse/greenflag/greenflag-25.webp
         width: 1080
         height: 1440
-        alt: Greenflag visual 25
+        alt: Close, warmly lit profile portrait of an older man under the headline "The Human Impact"
         note: High realism and quality of AI photography
   - type: video
     item:
