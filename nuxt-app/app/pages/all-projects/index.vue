@@ -54,7 +54,7 @@ const { isActive, show } = useSprayReveal(paintImg)
 
     <figure class="home-portrait" @click="show">
       <div class="home-portrait__frame">
-        <img width="176" height="176" src="/assets/portrait.webp" alt="Portrait of Andrey Ubeyvolk" />
+        <img width="176" height="176" src="/assets/portrait.webp" alt="Andrey Ubeyvolk, conceptual art director" />
       </div>
       <picture v-show="isActive">
         <source media="(min-width: 981px)" srcset="/assets/facepaint.svg" />

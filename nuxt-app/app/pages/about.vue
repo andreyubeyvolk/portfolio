@@ -16,13 +16,12 @@ useSeoMeta({
   twitterDescription: page.value.description,
 })
 
-// Several mobile.css rules (.about-page .about-download-mobile, .about-page
-// .open-to-portrait, etc.) are scoped to this per-page body class, same
-// convention as inhouse-page/brands-page/archive-page/project-page on the
-// static site. There's one shared <body> across the whole SPA now instead
-// of a fresh one per page load, so it has to be set reactively per page
-// rather than baked into static HTML—useHead handles swapping it cleanly
-// on every navigation.
+// Several mobile.css rules (.about-page .about-download-mobile, etc.) are
+// scoped to this per-page body class, same convention as inhouse-page/
+// brands-page/archive-page/project-page on the static site. There's one
+// shared <body> across the whole SPA now instead of a fresh one per page
+// load, so it has to be set reactively per page rather than baked into
+// static HTML—useHead handles swapping it cleanly on every navigation.
 useHead({
   bodyAttrs: { class: 'about-page' },
   script: [{
@@ -33,13 +32,6 @@ useHead({
     ])),
   }],
 })
-
-// Same click-to-reveal paint-splash demo as the home portrait, on the
-// "Open to" portrait (mobile-only--this element is display:none on
-// desktop already)--no instructional text here, just the splash itself,
-// since the Ctrl+drag hint already lives on the home page.
-const openToPaintImg = useTemplateRef<HTMLImageElement>('openToPaintImg')
-const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayReveal(openToPaintImg)
 </script>
 
 <template>
@@ -54,7 +46,13 @@ const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayRevea
     <ScrollPane>
       <article class="about-view">
         <figure class="about-photo">
-          <img width="1400" height="716" :src="page.photo" alt="Andrey Ubeyvolk" />
+          <picture>
+            <!-- Mobile gets its own square crop of the same shoot, not the
+                 desktop wide crop force-cropped square by object-fit--see
+                 photoMobile in content.config.ts. -->
+            <source media="(max-width: 640px)" :srcset="page.photoMobile" />
+            <img width="2400" height="1350" :src="page.photo" alt="Andrey Ubeyvolk, conceptual art director" />
+          </picture>
         </figure>
 
         <!-- Approach—no top line (first section) -->
@@ -104,10 +102,6 @@ const { isActive: isOpenToSplashActive, show: showOpenToSplash } = useSprayRevea
           <h2 class="about-section__label">Open to</h2>
           <div class="about-section__content">
             <p v-for="(para, i) in page.openTo.trim().split('\n\n')" :key="i">{{ para.trim() }}</p>
-            <figure class="open-to-photo" @click="showOpenToSplash">
-              <img width="176" height="176" loading="lazy" class="open-to-portrait" :src="page.portrait" alt="" aria-hidden="true" />
-              <img v-show="isOpenToSplashActive" ref="openToPaintImg" class="open-to-splash" src="/assets/facepaint-splash.svg" alt="" aria-hidden="true" />
-            </figure>
           </div>
         </section>
 

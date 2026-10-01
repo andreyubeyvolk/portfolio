@@ -8,6 +8,7 @@ intro:
     
     For tech, AI, and creative brands building something new.
 photo: /assets/about-hero.webp
+photoMobile: /assets/about-hero-mobile.webp
 approach:
   - title: Conceptual Art Direction
     desc: Meaning before design. I go deep into every project to find the idea worth expressing—and turn it into a clear visual direction, story, and system.
@@ -51,7 +52,6 @@ openTo: |
   In-house, full-time—leading design inside a team. Or as a guest expert—for a specific brief, project, or rebranding.
 
   I'm especially effective in early-stage teams building something new, where there's enough freedom to shape the visual direction from the ground up.
-portrait: /assets/portrait.webp
 contacts:
   - label: Mail
     type: email

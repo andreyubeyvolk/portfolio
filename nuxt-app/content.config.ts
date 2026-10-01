@@ -18,6 +18,11 @@ export default defineContentConfig({
           text: z.string(),
         }),
         photo: z.string(),
+        // Mobile gets its own square crop of the same shoot (the hero box
+        // is aspect-ratio:1/1 full-width on mobile vs. the desktop
+        // full-width/50vh wide crop--see .about-photo in about.vue/
+        // mobile.css), not the desktop photo force-cropped square.
+        photoMobile: z.string(),
         approach: z.array(z.object({ title: z.string(), desc: z.string() })),
         focus: z.array(z.object({ title: z.string(), desc: z.string() })),
         leadingTeams: z.string(),
@@ -27,7 +32,6 @@ export default defineContentConfig({
           years: z.string(),
         })),
         openTo: z.string(),
-        portrait: z.string(),
         contacts: z.array(z.object({
           label: z.string(),
           type: z.string().optional(),

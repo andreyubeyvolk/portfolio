@@ -5,7 +5,6 @@
 .home-headline,
 .menu-overlay,
 .mobile-menu,
-.open-to-photo,
 .about-download-mobile,
 .project-bar,
 .mobile-project,
@@ -1110,45 +1109,6 @@
 
   .about-page .about-pane .exp-row__years {
     width: 83px;
-  }
-
-  /* Open to portrait — 83×83, shown on mobile. position:relative (not
-     overflow:hidden) so the click-to-demo paint mark, bigger than the
-     portrait's own square, can extend past it--same idea as
-     .home-portrait on the home page. margin:0 overrides the browser's
-     own default <figure> margin (1em 40px)--was pushing this 40px to
-     the right of the paragraph above it, off the shared left edge. */
-  .about-page .about-pane .open-to-photo {
-    display: block;
-    position: relative;
-    width: 83px;
-    height: 83px;
-    margin: 14px 0 0;
-    cursor: pointer;
-  }
-
-  .about-page .about-pane .open-to-portrait {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
-  }
-
-  /* Same facepaint-splash.svg art as the home portrait's mobile mark
-     (textless--see about.vue), scaled to this 83px box using the same
-     size/portrait-width ratio as .home-portrait's own mobile block, and
-     centered on it the same way (left:50%+translateX(-50%)). */
-  .about-page .about-pane .open-to-splash {
-    position: absolute;
-    z-index: 1;
-    left: 50%;
-    top: -29px;
-    width: 146px;
-    height: auto;
-    aspect-ratio: 216 / 274;
-    object-fit: contain;
-    transform: translateX(-50%);
-    pointer-events: none;
   }
 
   /* Contact grid — 2 columns (≈3-of-8 + 3-of-8, since the section's
