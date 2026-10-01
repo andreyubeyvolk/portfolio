@@ -2,7 +2,7 @@
 slug: dragon
 section: inhouse
 title: AI Secures APAC
-description: AI Secures APAC visual identity by Andrey Ubeyvolk.
+description: AI Secures APAC visual identity by Andrey Ubeyvolk—a digital dragon built scale by scale from wires and glowing data, guarding against fraud.
 cover:
   type: video
   src: /assets/inhouse/dragon/dragon-cover.mp4
@@ -16,54 +16,54 @@ gallery:
         src: /assets/inhouse/dragon/dragon-01.webp
         width: 1080
         height: 1440
-        alt: AI Secures APAC visual 01
+        alt: Vertical event story mockup for "Securing APAC's Fintech Frontier with AI," the dragon's scale-and-wire texture glowing beneath the Sol&Luna, Singapore event details
       - type: image
         src: /assets/inhouse/dragon/dragon-02.webp
         width: 1080
         height: 1440
-        alt: AI Secures APAC visual 02
+        alt: Speaker badge and lanyard mockup for Hannes Bezuidenhout, VP of Business Development, the dragon scales breaking into a white flame accent above his name
   - type: wide
     item:
       type: image
       src: /assets/inhouse/dragon/dragon-03.webp
       width: 2160
       height: 1440
-      alt: AI Secures APAC visual 03
+      alt: Conference stage screen reading "Securing APAC's Fintech Frontier with AI," audience silhouettes seated in the foreground
   - type: wide
     item:
       type: image
       src: /assets/inhouse/dragon/dragon-04.webp
       width: 2160
       height: 1440
-      alt: AI Secures APAC visual 04
+      alt: Close-up of Sumsub Multiverse attendee badges laid out on a table, the pink-and-blue dragon scale pattern printed across each one
   - type: wide
     item:
       type: image
       src: /assets/inhouse/dragon/dragon-05.webp
       width: 2160
       height: 1440
-      alt: AI Secures APAC visual 05
+      alt: Speaker announcement card for Michelle Khoo, Center Lead at Deloitte Southeast Asia's Center for the Edge, alongside her headshot
   - type: wide
     item:
       type: image
       src: /assets/inhouse/dragon/dragon-06.webp
       width: 2160
       height: 1440
-      alt: AI Secures APAC visual 06
+      alt: Dominique Rose Van-Wither speaking on a discussion panel, the dragon-scale key visual glowing on the backdrop behind her
   - type: wide
     item:
       type: image
       src: /assets/inhouse/dragon/dragon-07.webp
       width: 2160
       height: 1440
-      alt: AI Secures APAC visual 07
+      alt: Tablet mockup of the event registration page, "Securing APAC's Fintech Frontier with AI" above sponsor logos for Deloitte, TRM, Hoffman Agency and Fintrail
   - type: wide
     item:
       type: image
       src: /assets/inhouse/dragon/dragon-08.webp
       width: 2160
       height: 1440
-      alt: AI Secures APAC visual 08
+      alt: Illuminated venue signage reading "APAC's Fintech Boom—27% Growth, Zero Room for Fraud," promoting the Securing APAC's Fintech Frontier with AI conference
   - type: pair
     items:
       - type: video
@@ -76,59 +76,59 @@ gallery:
         src: /assets/inhouse/dragon/dragon-10.webp
         width: 1080
         height: 1440
-        alt: AI Secures APAC visual 10
+        alt: Browser mockup of the sumsub.com event landing page, a cookie-consent banner layered over the dragon key visual thumbnail
   - type: wide
     item:
       type: image
       src: /assets/inhouse/dragon/dragon-11.webp
       width: 2160
       height: 1440
-      alt: AI Secures APAC visual 11
+      alt: Panel-discussion announcement card asking "What are the current applications of AI in fintech and crypto?" with speakers Penny Chai and Martin James Wallis
   - type: wide
     item:
       type: image
       src: /assets/inhouse/dragon/dragon-12.webp
       width: 2160
       height: 1440
-      alt: AI Secures APAC visual 12
+      alt: Circular drum-shaped signage hanging from the venue ceiling, wrapped in the dragon key visual and the event's full title
   - type: wide
     item:
       type: image
       src: /assets/inhouse/dragon/dragon-13.webp
       width: 2160
       height: 1440
-      alt: AI Secures APAC visual 13
+      alt: Guest in a checkered shirt smiling at the camera over dinner, other Sumsub Multiverse attendees chatting at tables behind him
   - type: pair
     items:
       - type: image
         src: /assets/inhouse/dragon/dragon-14.webp
         width: 1080
         height: 1440
-        alt: AI Secures APAC visual 14
+        alt: Branded swag box mockup printed with the dragon-scale key visual and a "Thank you for coming!" message
       - type: image
         src: /assets/inhouse/dragon/dragon-15.webp
         width: 1080
         height: 1440
-        alt: AI Secures APAC visual 15
+        alt: Mobile announcement card asking "How has AI and deepfakes evolved, complicating fraud detection?" with speakers Michelle Khoo and Dominique Rose Van-Winther
   - type: wide
     item:
       type: image
       src: /assets/inhouse/dragon/dragon-16.webp
       width: 2160
       height: 1440
-      alt: AI Secures APAC visual 16
+      alt: Outdoor park signpost reading "Fintech's Next Frontier Starts Here," the dragon key visual glowing against bare tree branches
   - type: pair
     items:
       - type: image
         src: /assets/inhouse/dragon/dragon-17.webp
         width: 1080
         height: 1440
-        alt: AI Secures APAC visual 17
+        alt: Female panelist speaking into a microphone on stage, the dragon key visual glowing on the backdrop beside her
       - type: image
         src: /assets/inhouse/dragon/dragon-18.webp
         width: 1080
         height: 1440
-        alt: AI Secures APAC visual 18
+        alt: Building-mounted outdoor billboard for "Securing APAC's Fintech Frontier with AI," an office tower rising behind the screen
 challenge: "Sumsub Multiverse already had its own layered visual language, built to represent the hidden depths of fraud prevention. The dragon was the stakeholder's idea from the start, but the dilemma was making it feel earned, not a tacky cliché. In 2024, AI tools couldn't yet generate complex 3D easily, so it had to be built by hand, from flat sketches through to full 3D. The challenge was reconciling a literal symbol with real specificity, without shortcuts."
 solution: "We took the dragon as the central figure, rebuilding its scales as a tangle of wires forming the tail, with AI data reading as glowing pulses running through them. Surfaces shift between solid and semi-transparent, giving the dragon a half-materialized, digital quality. White fire-like panels break through as accents, sharpening the regional read. The result: a digital dragon standing guard, tradition and AI security fused into one figure."
 kv:

@@ -25,6 +25,13 @@ useSeoMeta({
 // on every navigation.
 useHead({
   bodyAttrs: { class: 'about-page' },
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify(breadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'About', path: '/about' },
+    ])),
+  }],
 })
 
 // Same click-to-reveal paint-splash demo as the home portrait, on the

@@ -10,6 +10,13 @@ useSeoMeta({
 
 useHead({
   bodyAttrs: { class: 'inhouse-page' },
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify(breadcrumbSchema([
+      { name: 'Home', path: '/' },
+      { name: 'Inhouse', path: '/inhouse' },
+    ])),
+  }],
 })
 </script>
 
