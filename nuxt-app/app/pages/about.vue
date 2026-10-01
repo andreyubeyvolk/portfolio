@@ -156,7 +156,13 @@ useHead({
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center center;
+  /* Subject sits right-of-center in the source photo (dark negative
+     space fills the left side)--on desktop the box is wide enough that
+     no horizontal crop ever happens, but on narrower/taller boxes
+     (tablet widths, where the nav/intro columns shrink the box while
+     height:50vh stays tall) a center-anchored crop window lands on the
+     empty left side and clips into the subject from the right. */
+  object-position: right center;
 }
 
 /* Sections */
