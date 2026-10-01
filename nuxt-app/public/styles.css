@@ -558,6 +558,13 @@ body::-webkit-scrollbar-thumb:active {
   object-fit: cover;
 }
 
+/* 30% smaller than the base 45x54--same proportions, just scaled down
+   (0.7x) per the user's own call, home reel only, desktop. */
+.reel-card .vp__big {
+  width: 31.5px;
+  height: 37.8px;
+}
+
 .home-socials {
   grid-column: 9 / 17;
   display: grid;
