@@ -66,5 +66,5 @@ contacts:
     href: https://instagram.com/andreyubeyvolk/
   - label: LinkedIn
     href: https://www.linkedin.com/in/andrei-ubeyvolk-b318a817b
-resumeUrl: /assets/Andrey-Ubeyvolk-Resume.pdf
+resumeUrl: /assets/Andrey-Ubeyvolk-CV.pdf
 ---
