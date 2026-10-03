@@ -120,12 +120,12 @@ useHead({
 
         <!-- Download—desktop: cols 13-17, 4px top line; mobile: full-width section -->
         <div class="about-download">
-          <DownloadPdfButton :href="page.resumeUrl">Download PDF-resume</DownloadPdfButton>
+          <DownloadPdfButton :href="page.resumeUrl">Download PDF-CV</DownloadPdfButton>
         </div>
 
-        <!-- Mobile-only: Download full PDF section (4px divider + full-width button) -->
+        <!-- Mobile-only: Download PDF section (4px divider + full-width button) -->
         <div class="about-download-mobile">
-          <DownloadPdfButton :href="page.resumeUrl">Download full PDF-resume</DownloadPdfButton>
+          <DownloadPdfButton :href="page.resumeUrl">Download PDF-CV</DownloadPdfButton>
         </div>
       </article>
     </ScrollPane>
