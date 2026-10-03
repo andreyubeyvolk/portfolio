@@ -442,6 +442,10 @@
   opacity: 0;
   pointer-events: none;
 }
+.vp--click-reveal.is-idle .vp__big {
+  opacity: 0;
+  pointer-events: none;
+}
 .vp.is-idle { cursor: none; }
 /* Click-to-reveal (home reel): the video itself is the affordance, so the
    pointer must stay visible while controls are hidden. */

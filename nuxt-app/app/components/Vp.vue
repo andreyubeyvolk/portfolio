@@ -115,6 +115,17 @@ function showControls() {
 function hideControls() {
   if (videoRef.value && !videoRef.value.paused) isIdle.value = true
 }
+// Click-reveal (home reel): once the pointer leaves a paused player, fade
+// everything out after the usual delay so only the still frame remains;
+// coming back before it fires cancels it via showControls().
+function onLeave() {
+  clearTimeout(hideTimer)
+  if (props.revealOn === 'click' && videoRef.value?.paused) {
+    hideTimer = setTimeout(() => { isIdle.value = true }, HIDE_DELAY)
+  } else {
+    hideControls()
+  }
+}
 
 function onMute(e?: MouseEvent) {
   if (isPaintClick(e)) return
@@ -250,7 +261,7 @@ onMounted(() => {
     vp.addEventListener('mousemove', showControls)
     vp.addEventListener('mouseenter', showControls)
   }
-  vp.addEventListener('mouseleave', hideControls)
+  vp.addEventListener('mouseleave', onLeave)
 
   // With srcMobile, the template renders <source> children instead of the
   // old plain :src binding so the browser can pick between them by media

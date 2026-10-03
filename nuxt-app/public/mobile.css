@@ -566,9 +566,10 @@
        weight instead of matching the paragraph beside it, since nothing
        here ever set those explicitly (the <p> just inherited them). */
     font: inherit;
-    /* font:inherit above pulls in the SECTION's own line-height (body's
-       tight 1.0 default), not the 1.2 the paragraph beside it actually
-       uses--set explicitly so both lines of text sit at the same rhythm. */
+    /* font:inherit above pulls in the SECTION's own 16px/1.0, not the
+       15px/1.2 the paragraph beside it uses--set both explicitly so the
+       title matches it in size and shares its baseline. */
+    font-size: 0.9375rem;
     line-height: 1.2;
   }
 
@@ -979,8 +980,9 @@
     margin: 0 0 6px;
   }
 
-  /* Sections: flex row — label (84px, ≈2 of 8 columns at this width) +
-     content (flex-1, the remaining ≈6 of 8) */
+  /* Sections: flex row — label (exactly 1 of the 4 page columns, same
+     track the intro's "Andrey" sits in) + content (flex-1, the other 3),
+     so section content starts on the same line as the intro text. */
   .about-page .about-pane .about-section {
     display: flex;
     flex-direction: row;
@@ -1001,8 +1003,7 @@
 
   .about-page .about-pane .about-section__label {
     grid-column: unset;
-    width: 84px;
-    min-width: 84px;
+    width: calc((100% - 24px) / 4);
     flex-shrink: 0;
     font-size: 0.9375rem;
     font-weight: 700;
@@ -1061,11 +1062,11 @@
     margin: 0;
   }
 
-  /* Experience rows → стaircase (лесенка):
-     container = flex-col + align-items: flex-end
-     company = full width → appears left edge
-     role    = 175px → indented (266-175=91px from left)
-     years   = 83px  → most indented (266-83=183px from left) */
+  /* Experience rows → staircase (лесенка), each step on a page column:
+     container = flex-col + align-items: flex-end, 3 columns wide
+     company = full width → column 2
+     role    = 2 columns + gap → starts on column 3
+     years   = 1 column → starts on column 4 */
   .about-page .about-pane .exp-row {
     display: flex;
     flex-direction: column;
@@ -1104,11 +1105,11 @@
   }
 
   .about-page .about-pane .exp-row__role {
-    width: 175px;
+    width: calc((100% - 16px) * 2 / 3 + 8px);
   }
 
   .about-page .about-pane .exp-row__years {
-    width: 83px;
+    width: calc((100% - 16px) / 3);
   }
 
   /* Contact grid — 2 columns (≈3-of-8 + 3-of-8, since the section's
@@ -1190,9 +1191,10 @@
     margin-top: 96px;
   }
 
-  /* Match the 2nd contact column: full row minus label(84)+gap(8)+grid-gap(8)=100, halved */
+  /* Match the 2nd contact column: (row - label column - 8px gap - 8px
+     contact-grid gap) / 2 */
   .about-page .about-pane .about-download-mobile .download-pdf-btn {
-    width: calc((100% - 100px) / 2);
+    width: calc((100% - (100% - 24px) / 4 - 16px) / 2);
   }
 
   .about-page .about-pane .download-pdf-btn {
@@ -1352,9 +1354,10 @@
     border-top: 2px solid #171717;
   }
 
+  /* Exactly 1 of the 4 page columns, so the text beside it starts on
+     column 2--same line as every section intro and About's sections. */
   .mobile-project__label {
-    width: 84px;
-    min-width: 84px;
+    width: calc((100% - 24px) / 4);
     flex-shrink: 0;
     font-family: 'Inter', sans-serif;
     font-size: 0.9375rem;
@@ -1411,11 +1414,12 @@
     width: 100%;
   }
 
-  /* Download/Next buttons row — aligned with text column (right of 84px label) */
+  /* Download/Next buttons row — aligned with text column (right of the
+     label column) */
   .mobile-project__actions {
     display: flex;
     gap: 8px;
-    width: calc(100% - 84px - 8px);
+    width: calc(100% - (100% - 24px) / 4 - 8px);
   }
 
   .mobile-project__action {

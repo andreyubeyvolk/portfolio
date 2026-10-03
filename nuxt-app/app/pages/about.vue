@@ -217,6 +217,7 @@ useHead({
   margin: 0;
   background: none;
   font: inherit;
+  letter-spacing: inherit;
   line-height: 1.2;
   color: inherit;
   text-decoration: none;
