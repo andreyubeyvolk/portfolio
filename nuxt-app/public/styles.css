@@ -134,7 +134,11 @@ img {
   display: block;
   width: 120px;
   max-width: min(100%, 120px);
-  margin-bottom: 18px;
+  /* line-height matches the intro paragraphs beside it, so the wordmark
+     shares their first baseline; 15.2px + .nav-list's 4px nudge puts the
+     nav exactly two 19.2px lines below it, on the intro's line rhythm. */
+  line-height: 1.2;
+  margin-bottom: 15.2px;
   font-weight: 800;
   transition: opacity 180ms ease;
 }
@@ -168,6 +172,8 @@ img {
   color: inherit;
   cursor: pointer;
   font: inherit;
+  /* Not part of the font shorthand, and <button> doesn't inherit it. */
+  letter-spacing: inherit;
   text-decoration: none;
   transition: color 150ms ease, background-color 150ms ease;
 }
@@ -851,6 +857,9 @@ body::-webkit-scrollbar-thumb:active {
   color: var(--muted-text);
   font-size: 0.7em;
   vertical-align: super;
+  /* Keeps the raised badge from growing the title's line box--otherwise
+     titles with a badge sat ~1.3px lower than plain ones in the same row. */
+  line-height: 0;
   text-decoration: none;
 }
 
