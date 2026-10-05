@@ -15,11 +15,11 @@ useSeoMeta({
   ogSiteName: 'Andrey Ubeyvolk',
   ogType: 'website',
   ogUrl: canonicalUrl,
-  ogImage: `${SITE_URL}/assets/og-cover.jpg`,
+  ogImage: `${SITE_URL}/assets/og-cover.jpg?v=2`,
   ogImageWidth: 1200,
   ogImageHeight: 630,
   twitterCard: 'summary_large_image',
-  twitterImage: `${SITE_URL}/assets/og-cover.jpg`,
+  twitterImage: `${SITE_URL}/assets/og-cover.jpg?v=2`,
 })
 
 useHead({
