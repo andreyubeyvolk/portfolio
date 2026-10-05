@@ -31,8 +31,23 @@ function measure() {
     matchedRect.value = null
     return
   }
-  const el = document.querySelector<HTMLElement>('.home-socials')
-  matchedRect.value = el ? { left: el.getBoundingClientRect().left, width: el.getBoundingClientRect().width } : null
+  const socials = document.querySelector<HTMLElement>('.home-socials')
+  if (socials) {
+    const r = socials.getBoundingClientRect()
+    matchedRect.value = { left: r.left, width: r.width }
+    return
+  }
+  // On non-home pages .home-socials doesn't exist, but .content-pane does and
+  // occupies the same column span. .home-socials = right half of .home-view =
+  // right half of .content-pane, so mirror that proportion here.
+  const pane = document.querySelector<HTMLElement>('.content-pane')
+  if (pane) {
+    const r = pane.getBoundingClientRect()
+    const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--grid-gap')) || 0
+    matchedRect.value = { left: r.left + r.width / 2 + gap / 2, width: r.width / 2 - gap / 2 }
+    return
+  }
+  matchedRect.value = null
 }
 
 const bannerStyle = computed(() => {
