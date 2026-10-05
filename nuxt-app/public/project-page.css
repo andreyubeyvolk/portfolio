@@ -349,6 +349,31 @@
 .vp-slider.is-dragging .vp-slider__head {
   opacity: 1;
 }
+/* While the user is actively dragging a slider, thicken the track lines
+   slightly (2px → 3px) for tactile feedback--the transition on the
+   individual elements picks it up automatically since they all use
+   var(--vp-thickness). Override on the element rather than :root so it
+   scopes correctly to the active slider only. */
+.vp-slider--x.is-dragging .vp-slider__track,
+.vp-slider--x.is-dragging .vp-slider__buffered,
+.vp-slider--x.is-dragging .vp-slider__fill {
+  height: 3px;
+  transition: height 0.12s ease;
+}
+.vp-slider--y.is-dragging .vp-slider__track,
+.vp-slider--y.is-dragging .vp-slider__fill {
+  width: 3px;
+  transition: width 0.12s ease;
+}
+.vp-slider--x .vp-slider__track,
+.vp-slider--x .vp-slider__buffered,
+.vp-slider--x .vp-slider__fill {
+  transition: height 0.12s ease;
+}
+.vp-slider--y .vp-slider__track,
+.vp-slider--y .vp-slider__fill {
+  transition: width 0.12s ease;
+}
 .vp-slider--x .vp-slider__head {
   top: 50%;
   left: 0%;

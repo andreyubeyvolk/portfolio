@@ -192,4 +192,5 @@ cardPreview:
   - src: /assets/brands/stickerburg/stickerburg-19-preview.webp
     width: 480
     height: 640
+zipUrl: /assets/brands/stickerburg/stickerburg-project-images.zip
 ---
