@@ -30,6 +30,7 @@ onBeforeUnmount(() => observer?.disconnect())
     :height="height"
     playsinline
     muted
+    autoplay
     loop
     preload="metadata"
     :poster="videoPoster(src)"

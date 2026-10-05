@@ -212,4 +212,5 @@ cardPreview:
   - src: /assets/brands/ovo/ovo-09-preview.webp
     width: 480
     height: 640
+zipUrl: /assets/brands/ovo/ovo-project-images.zip
 ---
