@@ -26,6 +26,13 @@ export default defineNuxtConfig({
     // Root custom domain (andreyubeyvolk.com), no subpath--settled at the
     // Stage 7 cutover.
     head: {
+      meta: [
+        // viewport-fit=cover lets CSS env(safe-area-inset-*) return real
+        // values on iOS (notch / Dynamic Island / home indicator), required
+        // for the project-bar top padding and mobile-project bottom padding
+        // fixes. Without it every env() call returns 0.
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
+      ],
       link: [
         // Self-hosted Inter (see fonts.css's own header)--was Google Fonts,
         // a third-party render-blocking request that cost 2.5s+ on a cold

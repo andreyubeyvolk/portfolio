@@ -845,9 +845,21 @@ body::-webkit-scrollbar-thumb:active {
   transition: color 150ms ease, background-color 150ms ease;
 }
 
-.archive-card:hover .archive-title {
-  color: #fff;
-  background-color: #000;
+/* (hover: hover) and (pointer: fine) keeps this off touchscreens--without
+   it, swiping a finger across an archive card while scrolling triggers the
+   :hover state and leaves the title stuck inverted until the user taps
+   elsewhere. Mirrors the same guard already on .inhouse-card:hover. */
+@media (hover: hover) and (pointer: fine) {
+  .archive-card:hover .archive-title {
+    color: #fff;
+    background-color: #000;
+  }
+
+  /* On hover the title inverts to white-on-black; the gray badge would drop
+     to ~4:1 there, so it follows the title's white instead. */
+  .archive-card:hover .archive-num {
+    color: inherit;
+  }
 }
 
 /* Small gray superscript badge—used for the "[0001]"-style numbering tail
@@ -861,12 +873,6 @@ body::-webkit-scrollbar-thumb:active {
      titles with a badge sat ~1.3px lower than plain ones in the same row. */
   line-height: 0;
   text-decoration: none;
-}
-
-/* On hover the title inverts to white-on-black; the gray badge would drop
-   to ~4:1 there, so it follows the title's white instead. */
-.archive-card:hover .archive-num {
-  color: inherit;
 }
 
 /* ─── One-shot video (vp-once): silent, autoplay once in view, plays a

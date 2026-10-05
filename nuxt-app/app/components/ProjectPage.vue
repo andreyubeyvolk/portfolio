@@ -40,6 +40,12 @@ if (props.cover.type === 'video') {
 
 const panelTransitionStyle = usePanelTransitionStyle()
 
+// e.g. "nimax" → "Andrey_Ubeyvolk_Nimax.zip"
+const zipFilename = computed(() => {
+  const name = props.title.replace(/[^a-zA-Z0-9]+/g, '_').replace(/_+$/, '')
+  return `Andrey_Ubeyvolk_${name}.zip`
+})
+
 // Flat running index across the whole gallery (a pair row counts as two),
 // matching the static site's own "skip the first N already-visible items"
 // scroll-reveal rule—see RevealOnScroll.vue/GallerySlot.vue.
@@ -127,7 +133,7 @@ const flatGallery = computed(() => {
                   <div class="pv-actions">
                     <div class="pv-action">
                       <div class="pv-action__bar" />
-                      <a v-if="zipUrl" class="pv-action__btn" :href="zipUrl" download>Download project images</a>
+                      <a v-if="zipUrl" class="pv-action__btn" :href="zipUrl" :download="zipFilename">Download project images</a>
                       <span v-else class="pv-action__btn">Download project images</span>
                     </div>
                     <div class="pv-action">
@@ -206,7 +212,7 @@ const flatGallery = computed(() => {
         <div class="mobile-project__actions">
           <div class="mobile-project__action">
             <div class="mobile-project__action-bar" />
-            <a v-if="zipUrl" class="mobile-project__action-btn" :href="zipUrl" download>Download project images</a>
+            <a v-if="zipUrl" class="mobile-project__action-btn" :href="zipUrl" :download="zipFilename">Download project images</a>
             <span v-else class="mobile-project__action-btn">Download project images</span>
           </div>
           <div class="mobile-project__action">
