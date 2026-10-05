@@ -87,7 +87,12 @@
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.15s ease;
-  will-change: transform;
+  /* mix-blend-mode: difference makes the cursor auto-invert against the
+     background: dark on light, light on dark. will-change must live on
+     the inner tilt wrapper instead of here—putting it on a blend-mode
+     element creates a separate compositor layer that blends against a
+     blank surface rather than the actual page content. */
+  mix-blend-mode: difference;
 }
 .graffiti-cursor.is-active {
   opacity: 1;
@@ -103,11 +108,15 @@
   height: 100%;
   transform-origin: 10% 15%;
   transition: transform 0.15s ease;
+  will-change: transform;
 }
 .graffiti-cursor svg {
   display: block;
   width: 100%;
   height: 100%;
+  /* Invert to white so mix-blend-mode: difference on the parent makes
+     it appear black on light backgrounds and white on dark backgrounds. */
+  filter: invert(1);
 }
 body.graffiti-mode,
 body.graffiti-mode * {

@@ -109,13 +109,6 @@
     height: 40px;
     text-decoration: none;
     margin-left: -2px; /* nudge 2px closer to the left edge */
-    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  /* Squeeze the wordmark to 92% while a horizontal swipe is live—
-     set by mobile-logo-swipe.js on touchmove; removed on touchend/cancel. */
-  .mobile-bar__brand.is-squeezing {
-    transform: scaleX(0.92);
-    transition: transform 0.1s ease;
   }
 
   /* Text wordmark—same type as .mobile-bar__menu opposite it (same

@@ -118,9 +118,6 @@ function onTouchEnd() {
 }
 
 const activePreview = computed(() => (props.cardPreview && activeIndex.value !== null) ? props.cardPreview[activeIndex.value] : null)
-
-// True while a confirmed horizontal swipe is live--drives the cover squeeze.
-const isSqueezed = computed(() => touchIntent.value === 'horizontal')
 </script>
 
 <template>
@@ -134,7 +131,7 @@ const isSqueezed = computed(() => touchIntent.value === 'horizontal')
     @touchmove="cardPreview?.length ? onTouchMove($event) : undefined"
     @touchend="cardPreview?.length ? onTouchEnd() : undefined"
   >
-    <div class="inhouse-card__cover" :class="{ 'is-squeezed': isSqueezed }">
+    <div class="inhouse-card__cover">
       <img
         class="inhouse-card__cover-img"
         width="1080"
@@ -221,18 +218,4 @@ body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__noise {
   opacity: 1;
 }
 
-/* ── Touch swipe squeeze (mobile only) ──
-   While a horizontal preview-swipe is live the cover scales to 95%
-   width—background photo "squeezes" at the edges—and expands back on
-   release. Only fires when cardPreview exists (touchIntent is only set
-   to 'horizontal' inside the preview-swipe touch handler). Not wrapped
-   in a media query: pointer: coarse already gates the touch handlers
-   that set isSqueezed, so this CSS rule is never triggered on desktop. */
-.inhouse-card__cover {
-  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.inhouse-card__cover.is-squeezed {
-  transform: scaleX(0.95);
-  transition: transform 0.12s ease;
-}
 </style>

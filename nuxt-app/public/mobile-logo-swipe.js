@@ -80,27 +80,9 @@
     tracking = true;
   }, { passive: true });
 
-  brand.addEventListener('touchmove', function (e) {
-    if (!tracking) return;
-    var dx = e.touches[0].clientX - startX;
-    var dy = e.touches[0].clientY - startY;
-    // Add the squeeze class once the gesture is clearly horizontal
-    // (more horizontal movement than vertical, at least 8px traveled).
-    if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
-      brand.classList.add('is-squeezing');
-    }
-  }, { passive: true });
-
-  function endSwipe() {
-    tracking = false;
-    brand.classList.remove('is-squeezing');
-  }
-
   brand.addEventListener('touchend', function (e) {
     if (!tracking) return;
-    var wasTracking = tracking;
-    endSwipe();
-    if (!wasTracking) return;
+    tracking = false;
     var touch = e.changedTouches[0];
     var dx = touch.clientX - startX;
     var dy = touch.clientY - startY;
@@ -113,6 +95,4 @@
     applyState((currentIndex + step + STATE_COUNT) % STATE_COUNT);
     try { sessionStorage.setItem(STORAGE_KEY, String(currentIndex)); } catch (err) { /* ditto */ }
   });
-
-  brand.addEventListener('touchcancel', endSwipe);
 })();
