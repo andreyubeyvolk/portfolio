@@ -929,7 +929,8 @@ window.initGraffiti = function initGraffiti() {
     raw.y = smooth.y = y;
     lastStamp = { x: x, y: y };
     cursor.classList.add('is-active');
-    cursor.style.transform = 'translate(' + (x - HOTSPOT_X) + 'px,' + (y - HOTSPOT_Y) + 'px)';
+    cursor.style.left = (x - HOTSPOT_X) + 'px';
+    cursor.style.top = (y - HOTSPOT_Y) + 'px';
     // Same class the desktop Ctrl-hold path toggles--ProjectCard.vue's
     // hover-preview/darken-scale logic already checks this to suppress
     // itself while a stroke is live, and that applies just as much to a
@@ -1392,7 +1393,8 @@ window.initGraffiti = function initGraffiti() {
     var lerp = CFG.lerpSlow + lerpT * (CFG.lerpFast - CFG.lerpSlow);
     smooth.x += vx * lerp;
     smooth.y += vy * lerp;
-    cursor.style.transform = 'translate(' + (raw.x - HOTSPOT_X) + 'px,' + (raw.y - HOTSPOT_Y) + 'px)';
+    cursor.style.left = (raw.x - HOTSPOT_X) + 'px';
+    cursor.style.top = (raw.y - HOTSPOT_Y) + 'px';
     cursorTilt.style.transform = 'rotate(' + (isDrawing ? -7 : 0) + 'deg)';
 
     updateDrips();
