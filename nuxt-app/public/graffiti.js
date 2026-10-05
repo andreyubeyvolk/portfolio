@@ -389,10 +389,10 @@ window.initGraffiti = function initGraffiti() {
   cursor.innerHTML =
     '<div class="graffiti-cursor__tilt">' +
       '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
-        '<rect x="32" y="22" width="36" height="76" fill="#171717"/>' +
-        '<rect x="44" y="2" width="12" height="15" fill="#171717"/>' +
-        '<path d="M44 4L0 0V22L44 8L44 4Z" fill="#171717"/>' +
-        '<path d="M35 21C35 16.0294 39.0294 12 44 12H56C60.9706 12 65 16.0294 65 21V24H35V21Z" fill="#171717"/>' +
+        '<rect x="32" y="22" width="36" height="76" fill="#fff"/>' +
+        '<rect x="44" y="2" width="12" height="15" fill="#fff"/>' +
+        '<path d="M44 4L0 0V22L44 8L44 4Z" fill="#fff"/>' +
+        '<path d="M35 21C35 16.0294 39.0294 12 44 12H56C60.9706 12 65 16.0294 65 21V24H35V21Z" fill="#fff"/>' +
       '</svg>' +
     '</div>';
   document.body.appendChild(cursor);
