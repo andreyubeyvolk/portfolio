@@ -274,7 +274,12 @@ onMounted(() => {
   // readyState 0/HAVE_NOTHING forever, and play() rejects with nothing to
   // retry it, so autoplay silently never starts. Harmless for the plain
   // single-<source> case too (there's nothing buffered yet to lose).
-  if (props.srcMobile) video.load()
+  if (props.srcMobile) {
+    // iOS Safari doesn't reliably evaluate <source media> attributes; set src
+    // directly so the correct file is loaded regardless of browser quirks.
+    video.src = isMobileViewport.value ? props.srcMobile : props.src
+    video.load()
+  }
 
   function playWhenReady() {
     if (video.readyState >= 2) {
@@ -321,6 +326,7 @@ onMounted(() => {
     mobileQuery = window.matchMedia('(max-width: 640px)')
     onBreakpointChange = () => {
       isMobileViewport.value = mobileQuery!.matches
+      video.src = isMobileViewport.value ? props.srcMobile! : props.src
       const wasPlaying = !video.paused
       video.load()
       if (wasPlaying || autoplayMode !== 'scroll') playWhenReady()
