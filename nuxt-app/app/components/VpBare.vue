@@ -9,6 +9,10 @@ let observer: IntersectionObserver | null = null
 onMounted(() => {
   const video = videoRef.value
   if (!video) return
+  // Explicit play attempt for iOS Safari, which sometimes ignores the
+  // `autoplay` HTML attribute even with `muted playsinline` present.
+  // No-op if the browser already started playing via the attribute.
+  video.play().catch(() => {})
   observer = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue
