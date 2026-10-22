@@ -58,7 +58,10 @@ const volumeRef = useTemplateRef<HTMLElement>('volume')
 
 const state = ref<'playing' | 'paused'>('paused')
 const muted = ref(true)
-const isIdle = ref(false)
+// Click-reveal players (home reel) start hidden in the server HTML too, so
+// the controls never flash during load/hydration before the JS marks the
+// player idle.
+const isIdle = ref(props.revealOn === 'click')
 const seekPercent = ref(0)
 // How far ahead of playback the browser has actually downloaded--the
 // semi-transparent bar running ahead of the white played-progress line, so
@@ -247,7 +250,13 @@ onMounted(() => {
   syncVolumeUi()
 
   video.addEventListener('play', () => { state.value = 'playing'; hideTimer = setTimeout(hideControls, HIDE_DELAY) })
-  video.addEventListener('pause', () => { state.value = 'paused'; clearTimeout(hideTimer); isIdle.value = false })
+  video.addEventListener('pause', () => {
+    state.value = 'paused'
+    clearTimeout(hideTimer)
+    // Click-reveal: a pause the visitor didn't ask for (a source reload at
+    // mount) must not pop the controls open--they only appear on a click.
+    if (props.revealOn !== 'click') isIdle.value = false
+  })
   video.addEventListener('timeupdate', onTimeUpdate)
   // 'progress' fires repeatedly while data downloads; 'timeupdate' also
   // catches the case where buffered range membership changes just from

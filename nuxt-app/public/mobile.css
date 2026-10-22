@@ -8,8 +8,17 @@
 .about-download-mobile,
 .project-bar,
 .mobile-project,
-.section-page-title {
+.section-page-title,
+.home-contacts-toggle {
   display: none;
+}
+
+/* The collapsible wrapper around .home-socials only exists for phone; on
+   desktop/tablet it must vanish from layout so .home-socials stays a
+   direct grid item of .home-view. */
+.home-contacts,
+.home-contacts__clip {
+  display: contents;
 }
 
 /* ─────────────────────────────────────────────
@@ -202,8 +211,8 @@
      text-only intro and sets its own margin-bottom separately further
      down--this override is scoped to home-page specifically.) */
   body.home-page .section-intro.home-intro {
-    min-height: calc(33.33vh - 16px);
-    margin-bottom: 0;
+    min-height: 0;
+    margin-bottom: var(--page-margin, 16px);
   }
 
   /* .intro-text's own 8px margin-bottom (below) is invisible here--nothing
@@ -275,8 +284,14 @@
     margin: 0;
   }
 
+  /* Two equal columns, 8px apart--the same tracks .home-socials uses--so
+     "All projects" starts exactly on YouTube's column. The reel and the
+     contacts block span both. */
   .home-view {
-    display: block;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 8px;
+    row-gap: 0;
   }
 
   /* ── Showreel ── */
@@ -284,7 +299,7 @@
     width: 100%;
     height: auto;
     aspect-ratio: 3 / 4;
-    margin-bottom: 8px;
+    margin-bottom: 0; /* the 8px gap to the buttons below is their own margin-top */
     overflow: hidden;
   }
 
@@ -321,18 +336,23 @@
     top: 50%;
   }
 
-  /* ── All projects: full-width tap target, no divider rules ──
-     32px margin-bottom keeps it from visually merging into the
-     socials grid right below it. Width is 100% (not fit-content) and a
-     ::before bleeds the :active fill up through the 8px residual gap
-     (this element's 8px margin-top collapses against .reel-card's own
-     8px margin-bottom, per adjacent-sibling margin collapsing—not a
-     16px sum) so the highlight reads flush against the cover above,
-     the same bleed-up trick the desktop hover version uses. */
-  .home-projects-link {
+  /* ── Contacts / All projects: a two-column button row under the reel,
+     no divider rules. Contacts sits in column 1, All projects starts on
+     column 2 (the same column YouTube starts on below). Width is 100%
+     (not fit-content) and a ::before bleeds the :active fill up through
+     the 8px gap (each button's own margin-top--the reel has none now)
+     so the highlight reads flush against the cover above, the same
+     bleed-up trick the desktop hover version uses. */
+  .home-projects-link,
+  .home-contacts-toggle {
     display: block;
+    grid-column: auto;
+    align-self: start;
     width: 100%;
-    margin: 8px 0 32px;
+    margin: 8px 0 0;
+    padding: 0;
+    border: 0;
+    background: none;
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.2;
@@ -341,28 +361,66 @@
     text-decoration: none;
     text-align: left;
     position: relative;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .home-projects-link::before {
+  .home-projects-link::before,
+  .home-contacts-toggle::before {
     content: '';
     position: absolute;
     left: 0;
     right: 0;
     bottom: 100%;
-    /* Adjacent margins collapse (both 8px), so the real gap is 8px, not
-       their 8+8 sum—measured via getBoundingClientRect, not assumed. */
     height: 8px;
     background: transparent;
     pointer-events: none;
   }
 
-  .home-projects-link:active {
+  .home-projects-link:active,
+  .home-contacts-toggle:active {
     color: #fff;
     background-color: #171717;
   }
 
-  .home-projects-link:active::before {
+  .home-projects-link:active::before,
+  .home-contacts-toggle:active::before {
     background-color: #171717;
+  }
+
+  /* Open = "current", same cue as the active nav item. */
+  .home-contacts-toggle.is-open {
+    font-style: italic;
+  }
+
+  /* Contacts block: starts collapsed to 0 height and grows downward, so the
+     content stays still while the clip window moves (the site's wipe
+     principle)--it reads as sliding out from under the button. 32px gap
+     above it is the same spacing "All projects" used to leave. Hidden
+     links drop out of the tab order until it's open. */
+  .home-contacts {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    scroll-margin-bottom: 136px; /* clears the fixed bottom bar when scrolled into view */
+    transition: grid-template-rows 700ms cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 700ms;
+  }
+
+  .home-contacts.is-open {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition: grid-template-rows 700ms cubic-bezier(0.16, 1, 0.3, 1), visibility 0s;
+  }
+
+  .home-contacts__clip {
+    display: block;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .home-contacts__clip > .home-socials {
+    margin-top: 32px;
   }
 
   /* ── Social links ── */

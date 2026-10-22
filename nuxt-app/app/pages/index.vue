@@ -40,6 +40,23 @@ useHead({
 const paintImg = useTemplateRef<HTMLImageElement>('paintImg')
 const { isActive, show } = useSprayReveal(paintImg)
 
+// Phone: Contacts button opens/closes the socials block (see mobile.css).
+// Once opened, scroll just far enough that it clears the fixed bottom bar--
+// after the open animation, since it grows from 0 height.
+const isContactsOpen = ref(false)
+const contactsRef = useTemplateRef<HTMLElement>('contactsRef')
+let scrollTimer: ReturnType<typeof setTimeout> | undefined
+function toggleContacts() {
+  isContactsOpen.value = !isContactsOpen.value
+  clearTimeout(scrollTimer)
+  if (isContactsOpen.value) {
+    scrollTimer = setTimeout(() => {
+      contactsRef.value?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }, 700)
+  }
+}
+onBeforeUnmount(() => clearTimeout(scrollTimer))
+
 // Real showreel, one cut per breakpoint--both re-encoded from the
 // client's own exports at crf 21 (SSIM >=0.994 against each source).
 // Desktop: 1920x1080. Mobile: 1080x1440 (3:4, matching .reel-card's own
@@ -92,16 +109,32 @@ useHead({
         />
       </div>
 
+      <!-- Phone only (hidden by CSS elsewhere): Contacts toggles the socials
+           block open below the button row; on desktop/tablet the socials
+           are always visible beside "All projects" and this is display:none. -->
+      <button
+        class="home-contacts-toggle"
+        :class="{ 'is-open': isContactsOpen }"
+        type="button"
+        aria-controls="home-contacts"
+        :aria-expanded="isContactsOpen"
+        @click="toggleContacts"
+      >Contacts</button>
+
       <NuxtLink class="home-projects-link" to="/all-projects">All projects</NuxtLink>
 
-      <address class="home-socials">
-        <CopyEmailButton class="copy-mail-link" email="6169393@gmail.com">Mail</CopyEmailButton>
-        <a href="https://t.me/andreyubeyvolk" target="_blank" rel="noreferrer">Telegram</a>
-        <a href="https://www.linkedin.com/in/andrei-ubeyvolk-b318a817b" target="_blank" rel="noreferrer">LinkedIn</a>
-        <a href="https://www.youtube.com/@visual_athleticism" target="_blank" rel="noreferrer">YouTube</a>
-        <a href="https://t.me/visual_athleticism" target="_blank" rel="noreferrer">Telegram Channel</a>
-        <a href="https://instagram.com/andreyubeyvolk/" target="_blank" rel="noreferrer">Instagram</a>
-      </address>
+      <div id="home-contacts" ref="contactsRef" class="home-contacts" :class="{ 'is-open': isContactsOpen }">
+        <div class="home-contacts__clip">
+          <address class="home-socials">
+            <CopyEmailButton class="copy-mail-link" email="6169393@gmail.com">Mail</CopyEmailButton>
+            <a href="https://t.me/andreyubeyvolk" target="_blank" rel="noreferrer">Telegram</a>
+            <a href="https://www.linkedin.com/in/andrei-ubeyvolk-b318a817b" target="_blank" rel="noreferrer">LinkedIn</a>
+            <a href="https://www.youtube.com/@visual_athleticism" target="_blank" rel="noreferrer">YouTube</a>
+            <a href="https://t.me/visual_athleticism" target="_blank" rel="noreferrer">Telegram Channel</a>
+            <a href="https://instagram.com/andreyubeyvolk/" target="_blank" rel="noreferrer">Instagram</a>
+          </address>
+        </div>
+      </div>
     </article>
   </section>
 </template>
