@@ -82,6 +82,7 @@ const flatGallery = computed(() => {
           <figure class="pv-cover">
             <img
               v-if="cover.type === 'image'"
+              v-pinch-zoom
               :width="cover.width"
               :height="cover.height"
               fetchpriority="high"
@@ -161,7 +162,7 @@ const flatGallery = computed(() => {
   </div>
 
   <div class="mobile-project">
-    <img v-if="cover.type === 'image'" :width="cover.width" :height="cover.height" fetchpriority="high" :src="cover.src" :alt="title" />
+    <img v-if="cover.type === 'image'" v-pinch-zoom :width="cover.width" :height="cover.height" fetchpriority="high" :src="cover.src" :alt="title" />
     <VpBare v-else :src="cover.src" :width="cover.width" :height="cover.height" />
 
     <RevealOnScroll class="mobile-project__block">

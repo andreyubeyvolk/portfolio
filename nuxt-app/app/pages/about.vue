@@ -51,7 +51,7 @@ useHead({
                  desktop wide crop force-cropped square by object-fit--see
                  photoMobile in content.config.ts. -->
             <source media="(max-width: 640px)" :srcset="page.photoMobile" />
-            <img width="2400" height="1350" :src="page.photo" alt="Andrey Ubeyvolk, conceptual art director" />
+            <img v-pinch-zoom width="2400" height="1350" :src="page.photo" alt="Andrey Ubeyvolk, conceptual art director" />
           </picture>
         </figure>
 

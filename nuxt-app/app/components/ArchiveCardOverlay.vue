@@ -198,7 +198,7 @@ onBeforeUnmount(() => {
 
       <template v-if="!isPhoneMode">
         <div class="card-panel__image-wrap">
-          <img ref="tabletImg" class="card-panel__image" :src="currentEntry?.src" :alt="currentEntry?.alt || ''" @load="onTabletImgLoad" />
+          <img ref="tabletImg" v-pinch-zoom class="card-panel__image" :src="currentEntry?.src" :alt="currentEntry?.alt || ''" @load="onTabletImgLoad" />
         </div>
         <div class="card-panel__desc">
           <p v-if="currentEntry && splitArchiveDescription(currentEntry.description, currentEntry.link)" class="card-panel__desc-text">
@@ -219,7 +219,7 @@ onBeforeUnmount(() => {
       >
         <div v-for="slide in items" :key="slide.src" class="card-slide">
           <div class="card-panel__image-wrap">
-            <img class="card-panel__image" loading="lazy" :src="slide.src" :alt="slide.alt" />
+            <img v-pinch-zoom class="card-panel__image" loading="lazy" :src="slide.src" :alt="slide.alt" />
           </div>
           <div class="card-panel__desc">
             <p v-if="splitArchiveDescription(slide.description, slide.link)" class="card-panel__desc-text">

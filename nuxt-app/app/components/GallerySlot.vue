@@ -161,7 +161,7 @@ onBeforeUnmount(() => {
     @mousemove="item.tip ? onTipMove($event) : undefined"
     @mouseleave="item.tip ? onTipLeave() : undefined"
   >
-    <img v-if="item.type === 'image'" :width="item.width" :height="item.height" loading="lazy" :src="item.src" :alt="item.alt || ''" />
+    <img v-if="item.type === 'image'" v-pinch-zoom :width="item.width" :height="item.height" loading="lazy" :src="item.src" :alt="item.alt || ''" />
     <!-- `paired` (cropped, absolutely positioned to fill the box) only
          makes sense when there IS a sized box (a wrapperClass) to fill--a
          standalone top-level video (empty wrapperClass, see

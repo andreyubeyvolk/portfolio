@@ -54,15 +54,11 @@
   /* ── Shell ── */
   body {
     overflow: auto;
-    /* A long-press ANYWHERE selectable races the browser's own native
-       text-selection callout, which fires independent of graffiti.js's
-       own long-press-to-draw timer--JS can skip arming a stroke near
-       text, but it can't suppress the browser's own selection UI once
-       something in the touched area is selectable at all (confirmed:
-       it was still triggering on background near text, not just text
-       itself). Making the whole page unselectable by default and
-       opting real body-copy paragraphs back in below is what actually
-       stops it, not a JS check alone. */
+    /* A long-press near anything selectable triggers the browser's own
+       native selection/callout UI, which would fight the photo loupe's
+       long-press (see usePinchZoom.ts). Making the whole page
+       unselectable by default and opting real body-copy paragraphs back
+       in below is what actually stops it. */
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
