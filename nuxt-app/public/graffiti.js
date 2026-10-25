@@ -7,17 +7,6 @@
 // press Backspace, Delete, Space, or Escape (while not typing in a text
 // field), or just reload/leave the page.
 //
-// Touch (phone/tablet): hold a finger still for 3s to arm a stroke (the
-// same spray-can cursor appears at that point)—drag while held, lift to
-// end it. Two fingers tapped together quickly (no long-press) erases
-// everything, same as Escape. Touch strokes are content-relative to the
-// PAGE's own scroll (mobile has no desktop-style custom-scrolled pane—
-// the whole page scrolls natively, see mobile.css/ScrollPane.vue's
-// Lenis being desktop-gated), so a tag stays on whatever it was drawn
-// over as the page scrolls, same principle as the desktop pane canvas
-// just keyed to window.scrollY instead of a specific element's
-// scrollTop.
-//
 // Shared across every Brands page (originally a nimax-only prototype;
 // see graffiti.css for the matching styles and logo-scrub.js for the
 // separate logo hover-scrub feature it ships alongside). Targets
@@ -108,17 +97,10 @@
 window.initGraffiti = function initGraffiti() {
   // (pointer: fine) alongside the width check--Ctrl+drag needs a real
   // keyboard+mouse, so a wide-viewport touch device (tablet landscape,
-  // "desktop site" on a phone) should never arm this either.
+  // "desktop site" on a phone) should never arm this either. Desktop only:
+  // there is no touch drawing.
   var desktopQuery = window.matchMedia('(min-width: 981px) and (pointer: fine)');
-  // Touch tagging (long-press to arm, see the bottom of this file) is a
-  // separate, additive input path--gated on touch capability, not on
-  // desktopQuery, so it works on phones/tablets even where the Ctrl+drag
-  // path above is inert. A hybrid device (touchscreen laptop) can
-  // legitimately have both true at once; that's fine, they don't
-  // conflict (one needs a held Ctrl key, the other a 3s hold with no
-  // modifier).
-  var touchCapable = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  if (!desktopQuery.matches && !touchCapable) return function () {};
+  if (!desktopQuery.matches) return function () {};
 
   // Values below are andrey's own tuned pass from the settings
   // panel (2026-09-12)—dialed in by eye, not derived from
@@ -325,58 +307,6 @@ window.initGraffiti = function initGraffiti() {
     fvctx.restore();
   }
 
-  // Mobile touch strokes: same off-screen-store/on-screen-view split as
-  // the desktop pane above, but keyed to window.scrollY (the whole page
-  // scrolls natively on mobile--no .content-pane__scroll to speak of)
-  // instead of a specific element's scrollTop, and covering the FULL
-  // page width/height rather than a narrower content column (mobile has
-  // no sidebar to carve out). Only ever used for touch-armed strokes
-  // (see stampDot)--desktop mouse strokes never touch this.
-  var mobilePaneCanvas = document.createElement('canvas');
-  var mpctx = mobilePaneCanvas.getContext('2d');
-  var mobilePaneView = document.createElement('canvas');
-  mobilePaneView.id = 'graffiti-mobile-pane-view';
-  document.body.appendChild(mobilePaneView);
-  var mpvctx = mobilePaneView.getContext('2d');
-  var lastPageScrollY = 0;
-
-  // (Re)sizes the off-screen store to the page's own full scrollable
-  // height--called on resize and whenever that height changes (a
-  // ResizeObserver on <body>, since mobile pages load/reflow images
-  // asynchronously same as the desktop pane's gallery does). Always
-  // starts blank on a real resize (rare mid-stroke edge case, same
-  // acceptable tradeoff as the desktop pane/filmstrip canvases).
-  function setupMobilePaneCanvas() {
-    if (!touchCapable) return;
-    var w = window.innerWidth;
-    var h = Math.max(document.documentElement.scrollHeight, window.innerHeight);
-    mobilePaneCanvas.width = Math.round(w * dpr);
-    mobilePaneCanvas.height = Math.round(h * dpr);
-    mpctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    mobilePaneView.width = Math.round(w * dpr);
-    mobilePaneView.height = Math.round(window.innerHeight * dpr);
-    mobilePaneView.style.width = w + 'px';
-    mobilePaneView.style.height = window.innerHeight + 'px';
-    mobilePaneView.style.left = '0px';
-    mobilePaneView.style.top = '0px';
-    mpvctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    lastPageScrollY = window.scrollY;
-    blitMobilePane();
-  }
-
-  // Same idea as blitPane, just against window.scrollY instead of an
-  // element's scrollTop.
-  function blitMobilePane() {
-    var sy = Math.round(window.scrollY * dpr);
-    var sw = mobilePaneView.width, sh = mobilePaneView.height;
-    if (sw <= 0 || sh <= 0) return;
-    mpvctx.save();
-    mpvctx.setTransform(1, 0, 0, 1, 0, 0);
-    mpvctx.clearRect(0, 0, sw, sh);
-    mpvctx.drawImage(mobilePaneCanvas, 0, sy, sw, sh, 0, 0, sw, sh);
-    mpvctx.restore();
-  }
-
   var articleRect = null;
   function updateArticleRect() { articleRect = article ? article.getBoundingClientRect() : null; }
 
@@ -422,11 +352,10 @@ window.initGraffiti = function initGraffiti() {
   // resize instead: below the breakpoint, every overlay hides and
   // Ctrl-mode is force-released; above it, everything comes back.
   function resize() {
-    if (!desktopQuery.matches && !touchCapable) {
+    if (!desktopQuery.matches) {
       canvas.style.display = 'none';
       paneView.style.display = 'none';
       filmstripView.style.display = 'none';
-      mobilePaneView.style.display = 'none';
       setCtrlMode(false);
       return;
     }
@@ -438,26 +367,8 @@ window.initGraffiti = function initGraffiti() {
     canvas.style.height = window.innerHeight + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    if (!desktopQuery.matches) {
-      // Touch-only (no fine pointer/desktop width): no desktop pane/
-      // card/filmstrip concept in play here (mobile.css lets
-      // .content-pane flow with the natively-scrolling body instead of
-      // the desktop's Lenis-driven .content-pane__scroll)--paneRect/
-      // cardRect simply stay null (never assigned below), which is
-      // exactly what already makes stampDot's routing fall through past
-      // those branches on its own. Touch strokes instead get their own
-      // mobile pane, keyed to the page's own scroll (see
-      // setupMobilePaneCanvas/stampDot).
-      paneView.style.display = 'none';
-      filmstripView.style.display = 'none';
-      mobilePaneView.style.display = touchCapable ? '' : 'none';
-      if (touchCapable) setupMobilePaneCanvas();
-      resetDripState();
-      return;
-    }
     paneView.style.display = '';
     filmstripView.style.display = '';
-    mobilePaneView.style.display = 'none';
 
     updatePaneRect();
     updateCardRect();
@@ -509,15 +420,6 @@ window.initGraffiti = function initGraffiti() {
     resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(article);
   }
-  // Same idea for the mobile pane's own off-screen store: the page's
-  // total scroll height changes as lazy images load in, same reasoning
-  // as the desktop pane's own observer above.
-  var mobileResizeObserver = null;
-  if (touchCapable && 'ResizeObserver' in window) {
-    mobileResizeObserver = new ResizeObserver(resize);
-    mobileResizeObserver.observe(document.body);
-  }
-
   // Copies just the visible slice of the off-screen pane store
   // into the small on-screen view canvas—the step that actually
   // makes the gallery's full-height paint storage above free to
@@ -556,13 +458,7 @@ window.initGraffiti = function initGraffiti() {
   var scrollWatchRafId = null;
   function scrollWatchTick() {
     scrollWatchRafId = requestAnimationFrame(scrollWatchTick);
-    if (!desktopQuery.matches) {
-      if (touchCapable && window.scrollY !== lastPageScrollY) {
-        lastPageScrollY = window.scrollY;
-        blitMobilePane();
-      }
-      return;
-    }
+    if (!desktopQuery.matches) return;
     if (pane && pane.scrollTop !== lastScrollTop) {
       lastScrollTop = pane.scrollTop;
       updateArticleRect();
@@ -680,26 +576,13 @@ window.initGraffiti = function initGraffiti() {
       // triggered above the header or below the current bottom
       // fold is still logically on the pane (see stampDot for
       // why), just not necessarily visible the moment it starts.
-      var inFilmstrip = !touchArmed && filmstripEl && filmstripRect && x >= filmstripRect.left && x <= filmstripRect.right && y >= filmstripRect.top && y <= filmstripRect.bottom;
-      var inPane = !touchArmed && !inFilmstrip && paneRect && x >= paneRect.left && x <= paneRightEdge;
+      var inFilmstrip = filmstripEl && filmstripRect && x >= filmstripRect.left && x <= filmstripRect.right && y >= filmstripRect.top && y <= filmstripRect.bottom;
+      var inPane = !inFilmstrip && paneRect && x >= paneRect.left && x <= paneRightEdge;
       // Captured now, not read live at render time: a drip can still
       // be falling several strokes (and color-modifier changes) later,
       // and should keep the color of the stroke that triggered it.
       var drip = { vel: 0, dist: 0, maxDist: CFG.dripMaxDistMin + Math.random() * CFG.dripMaxDistRange, color: strokeColor };
-      if (touchArmed) {
-        // Same reasoning as stampDot's own touchArmed branch: mobile has
-        // no fixed/pane split, just content-relative-to-window.scrollY
-        // storage--without this branch, every mobile drip fell through
-        // to the 'fixed' case below and got stored in raw SCREEN
-        // coordinates on the non-scrolling canvas, which read as the
-        // drip staying put on screen while the page (and the tag it fell
-        // from) scrolled out from under it.
-        drip.space = 'mobile';
-        drip.x = x;
-        drip.y = y + window.scrollY;
-        drip.tone = 0;
-        drip.alphaMul = 1;
-      } else if (inFilmstrip) {
+      if (inFilmstrip) {
         drip.space = 'filmstrip';
         drip.x = x - filmstripRect.left + filmstripEl.scrollLeft;
         drip.y = y - filmstripRect.top;
@@ -751,16 +634,14 @@ window.initGraffiti = function initGraffiti() {
     // The on-screen canvases only—paneCanvas is the off-screen store
     // now and was never visible to begin with, so animating that
     // would do nothing.
-    var visible = [canvas, paneView, filmstripView, mobilePaneView];
+    var visible = [canvas, paneView, filmstripView];
     var finish = function () {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       pctx.clearRect(0, 0, paneCanvas.width, paneCanvas.height);
       fctx.clearRect(0, 0, filmstripCanvas.width, filmstripCanvas.height);
-      mpctx.clearRect(0, 0, mobilePaneCanvas.width, mobilePaneCanvas.height);
       resetDripState();
       blitPane();
       blitFilmstrip();
-      blitMobilePane();
       clearing = false;
     };
     if (CLEAR_EFFECT === 'wipe') {
@@ -902,130 +783,6 @@ window.initGraffiti = function initGraffiti() {
   function onClick(e) { if (ctrlHeld) e.preventDefault(); }
   window.addEventListener('click', onClick, true);
 
-  // ── Touch tagging: long-press to arm, draw while held, lift to end ──
-  // "После долгого зажатия пальцем... появляется курсор-балончик и ты
-  // начинаешь тегать? как только убираешь палец - линия заканчивается."
-  // Reuses the exact same smoothing/stamping pipeline as the mouse path
-  // (isDrawing/lastStamp/smooth/raw, tick()'s stamp loop)--arming just
-  // seeds those the same way onMouseDown does, so nothing downstream
-  // needs to know or care whether the stroke came from a mouse or a
-  // finger. Erasing is a two-finger tap (quick, both fingers together,
-  // never triggered a long-press draw)--no OS permission prompt, no
-  // conflict with an ordinary one-finger scroll/tap, unlike e.g.
-  // shake-to-undo (needs a DeviceMotion permission dialog on iOS).
-  var LONG_PRESS_MS = 3000;
-  var MOVE_CANCEL_PX = 10;
-  var TWO_FINGER_TAP_MS = 400;
-  var touchArmed = false;
-  var longPressTimer = null;
-  var touchStartX = 0, touchStartY = 0;
-  var twoFingerStart = null; // { time } while exactly 2 fingers are down
-
-  function armTouchDrawing(x, y) {
-    touchArmed = true;
-    isDrawing = true;
-    strokeColor = null;
-    raw.x = smooth.x = x;
-    raw.y = smooth.y = y;
-    lastStamp = { x: x, y: y };
-    cursor.classList.add('is-active');
-    cursor.style.left = (x - HOTSPOT_X) + 'px';
-    cursor.style.top = (y - HOTSPOT_Y) + 'px';
-    // Same class the desktop Ctrl-hold path toggles--ProjectCard.vue's
-    // hover-preview/darken-scale logic already checks this to suppress
-    // itself while a stroke is live, and that applies just as much to a
-    // touch-drag preview interaction.
-    document.body.classList.add('graffiti-mode');
-    if (navigator.vibrate) navigator.vibrate(20); // no-op where unsupported (iOS Safari)
-  }
-  function disarmTouchDrawing() {
-    touchArmed = false;
-    isDrawing = false;
-    lastStamp = null;
-    cursor.classList.remove('is-active');
-    document.body.classList.remove('graffiti-mode');
-  }
-
-  // A long-press directly on a rendered character races the browser's own
-  // native text-selection hold (which fires well under our 3s)--whichever
-  // wins, the loser reads as broken (either the tag never arms, or normal
-  // text selection gets hijacked). Skipping arming entirely when the touch
-  // actually lands on a glyph sidesteps the race instead of trying to win
-  // it, and leaves text selection completely untouched. caretRangeFromPoint
-  // always returns the NEAREST text node even from empty space nearby, so
-  // this also checks the touch point actually falls inside that
-  // character's own rendered box--not just "some text is somewhere around
-  // here"--which is what "путает зону текста и зону фона" was about.
-  function isOverGlyph(x, y) {
-    if (!document.caretRangeFromPoint) return false;
-    var range = document.caretRangeFromPoint(x, y);
-    if (!range || range.startContainer.nodeType !== Node.TEXT_NODE) return false;
-    var textNode = range.startContainer;
-    var offset = range.startOffset;
-    var glyphRange = document.createRange();
-    glyphRange.setStart(textNode, Math.max(0, offset - 1));
-    glyphRange.setEnd(textNode, Math.min(textNode.textContent.length, offset + 1));
-    var rects = glyphRange.getClientRects();
-    for (var i = 0; i < rects.length; i++) {
-      var r = rects[i];
-      if (x >= r.left - 2 && x <= r.right + 2 && y >= r.top - 2 && y <= r.bottom + 2) return true;
-    }
-    return false;
-  }
-
-  function onTouchStart(e) {
-    if (e.touches.length === 2) {
-      clearTimeout(longPressTimer);
-      twoFingerStart = { time: performance.now() };
-      return;
-    }
-    twoFingerStart = null;
-    if (e.touches.length !== 1 || touchArmed) return;
-    var t = e.touches[0];
-    if (isOverGlyph(t.clientX, t.clientY)) return; // let native text selection have it, untouched
-    touchStartX = t.clientX;
-    touchStartY = t.clientY;
-    clearTimeout(longPressTimer);
-    longPressTimer = setTimeout(function () { armTouchDrawing(touchStartX, touchStartY); }, LONG_PRESS_MS);
-  }
-  function onTouchMove(e) {
-    var t = e.touches[0];
-    if (!t) return;
-    if (touchArmed) {
-      e.preventDefault(); // stop the page scrolling once a stroke is actually live
-      raw.x = t.clientX;
-      raw.y = t.clientY;
-      return;
-    }
-    // Still waiting out the long-press: real movement means this is a
-    // scroll/swipe, not a hold--cancel arming rather than fight it.
-    if (Math.hypot(t.clientX - touchStartX, t.clientY - touchStartY) > MOVE_CANCEL_PX) {
-      clearTimeout(longPressTimer);
-    }
-  }
-  function onTouchEnd(e) {
-    clearTimeout(longPressTimer);
-    if (touchArmed) { disarmTouchDrawing(); return; }
-    if (twoFingerStart && e.touches.length === 0 && performance.now() - twoFingerStart.time < TWO_FINGER_TAP_MS) {
-      clearAll();
-    }
-    twoFingerStart = null;
-  }
-  function onTouchCancel() {
-    clearTimeout(longPressTimer);
-    twoFingerStart = null;
-    disarmTouchDrawing();
-  }
-  if (touchCapable) {
-    // touchmove is deliberately NOT passive--onTouchMove needs to call
-    // preventDefault() once a stroke is armed, to stop the page
-    // scrolling out from under a live drawing gesture.
-    window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchmove', onTouchMove, { passive: false });
-    window.addEventListener('touchend', onTouchEnd, { passive: true });
-    window.addEventListener('touchcancel', onTouchCancel, { passive: true });
-  }
-
   // Routes each dot to whichever layer actually represents where
   // it landed: inside .content-pane, it goes on the pane's own
   // (scrolling) canvas in content-relative coordinates, with the
@@ -1125,16 +882,6 @@ window.initGraffiti = function initGraffiti() {
   }
 
   function stampDot(x, y, alpha) {
-    // Touch strokes route to the mobile pane unconditionally--there's no
-    // fixed/pane split to reason about on mobile (no sidebar, the whole
-    // page scrolls as one), just content-relative-to-window.scrollY
-    // storage plus a direct mirror onto the visible slice, same
-    // principle as the desktop pane below.
-    if (touchArmed) {
-      paintDot(mpctx, x, y + window.scrollY, 0, alpha);
-      paintDot(mpvctx, x, y, 0, alpha);
-      return;
-    }
     // Filmstrip membership first: while the Archive lightbox's series
     // filmstrip is open, it visually covers the same screen rectangle
     // the pane's own paneRect occupies (ArchivePreview.vue now nests
@@ -1306,7 +1053,7 @@ window.initGraffiti = function initGraffiti() {
       d.y += fall;
       d.dist += fall;
 
-      var targetCtx = d.space === 'pane' ? pctx : (d.space === 'filmstrip' ? fctx : (d.space === 'mobile' ? mpctx : ctx));
+      var targetCtx = d.space === 'pane' ? pctx : (d.space === 'filmstrip' ? fctx : ctx);
       // Same reasoning as stampDot: a pane-space drip's (x, y) are
       // content-relative for persistence, but drawing them AGAIN
       // directly onto the small view canvas whenever they're
@@ -1317,7 +1064,6 @@ window.initGraffiti = function initGraffiti() {
       var inView = d.space === 'pane' && paneRect && articleRect &&
         (articleRect.top + d.y) >= paneRect.top && (articleRect.top + d.y) <= paneRect.bottom;
       var inFilmstripView = d.space === 'filmstrip' && filmstripEl && filmstripRect;
-      var inMobileView = d.space === 'mobile' && (d.y - window.scrollY) >= 0 && (d.y - window.scrollY) <= window.innerHeight;
       var progress = Math.min(1, d.dist / d.maxDist);
       var radius = 1 + progress * 2.6;
       var n = 3 + Math.round(progress * 3);
@@ -1328,7 +1074,6 @@ window.initGraffiti = function initGraffiti() {
         paintDot(targetCtx, dotX, dotY, d.tone, a, true);
         if (inView) paintDot(pvctx, articleRect.left + dotX - paneRect.left, articleRect.top + dotY - paneRect.top, d.tone, a, true);
         if (inFilmstripView) paintDot(fvctx, dotX - filmstripEl.scrollLeft, dotY, d.tone, a, true);
-        if (inMobileView) paintDot(mpvctx, dotX, dotY - window.scrollY, d.tone, a, true);
       }
 
       if (d.dist >= d.maxDist) {
@@ -1343,7 +1088,6 @@ window.initGraffiti = function initGraffiti() {
           paintDot(targetCtx, bx, by, d.tone, ab, true);
           if (inView) paintDot(pvctx, articleRect.left + bx - paneRect.left, articleRect.top + by - paneRect.top, d.tone, ab, true);
           if (inFilmstripView) paintDot(fvctx, bx - filmstripEl.scrollLeft, by, d.tone, ab, true);
-          if (inMobileView) paintDot(mpvctx, bx, by - window.scrollY, d.tone, ab, true);
         }
         drips.splice(i, 1);
       }
@@ -1360,7 +1104,7 @@ window.initGraffiti = function initGraffiti() {
 
   function tick() {
     rafId = requestAnimationFrame(tick);
-    if (!ctrlHeld && !touchArmed) return;
+    if (!ctrlHeld) return;
 
     // Falling behind 30fps (33ms/frame) backs qualityScale off
     // fast; comfortably ahead of it recovers slowly—asymmetric on
@@ -1406,8 +1150,6 @@ window.initGraffiti = function initGraffiti() {
     // drawn straight onto pvctx too (see updateDrips).
     flushBatch(pctx);
     flushBatch(pvctx);
-    flushBatch(mpctx);
-    flushBatch(mpvctx);
 
     if (!isDrawing || !lastStamp) return;
 
@@ -1448,8 +1190,6 @@ window.initGraffiti = function initGraffiti() {
     flushBatch(pvctx);
     flushBatch(fctx);
     flushBatch(fvctx);
-    flushBatch(mpctx);
-    flushBatch(mpvctx);
   }
   tick();
 
@@ -1469,21 +1209,12 @@ window.initGraffiti = function initGraffiti() {
     window.removeEventListener('mousedown', onMouseDown);
     window.removeEventListener('mouseup', onMouseUp);
     window.removeEventListener('click', onClick, true);
-    if (touchCapable) {
-      window.removeEventListener('touchstart', onTouchStart);
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend', onTouchEnd);
-      window.removeEventListener('touchcancel', onTouchCancel);
-    }
-    clearTimeout(longPressTimer);
     if (resizeObserver) resizeObserver.disconnect();
-    if (mobileResizeObserver) mobileResizeObserver.disconnect();
     document.body.classList.remove('graffiti-mode');
     if (window.clearGraffiti === clearAll) delete window.clearGraffiti;
     canvas.remove();
     paneView.remove();
     filmstripView.remove();
-    mobilePaneView.remove();
     cursor.remove();
   };
 };
