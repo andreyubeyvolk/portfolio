@@ -102,6 +102,20 @@ a {
   }
 }
 
+/* Internal cross-link inside running copy (see LinkedText.vue): the only
+   resting cue a link in all-bold text has, since touch has no hover. The
+   hover inversion above already covers it (it's a <p> descendant); :active
+   is the touch equivalent. */
+.text-link {
+  text-decoration: underline;
+  text-decoration-thickness: var(--link-underline-thickness);
+  text-underline-offset: 2px;
+}
+.text-link:active {
+  color: #fff;
+  background-color: #000;
+}
+
 button {
   color: inherit;
   font: inherit;

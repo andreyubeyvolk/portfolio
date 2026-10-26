@@ -5,6 +5,6 @@
 // (see NextProjectButton.vue)—when a new project ships, add its slug to
 // the matching array, in the order it should appear in that sequence.
 export const PROJECT_ORDER: Record<'inhouse' | 'brands', string[]> = {
-  inhouse: ['igaming', 'crypto', 'finance', 'identity', 'greenflag', 'apac', 'roadmap', 'dragon'],
+  inhouse: ['sumsub', 'igaming', 'crypto', 'finance', 'identity', 'greenflag', 'apac', 'roadmap', 'dragon'],
   brands: ['nimax', 'stickerburg', 'valera', 'ovo'],
 }
