@@ -46,7 +46,7 @@ gallery:
         width: 1080
         height: 1440
         player: bare
-        note: "People in banners"
+        note: "People and photostyle in banners"
       - type: image
         src: /assets/inhouse/sumsub/sumsub-06.webp
         width: 1080
@@ -86,7 +86,7 @@ gallery:
       width: 2160
       height: 1440
       alt: "Grid of isometric illustrations on white in mint and navy: a bank, charts, coins, ID cards, a laptop and a suitcase"
-      note: "Illustration evolution"
+      note: "Three stages of illustration evolution"
   - type: wide
     item:
       type: video
@@ -134,7 +134,7 @@ gallery:
         width: 1080
         height: 1440
         alt: "White T-shirt with hand-sprayed blue graffiti reading \"Offsite\" and a small black patch"
-        note: "Custom graffiti merch"
+        note: "Custom graffiti merch for design team offsite"
       - type: image
         src: /assets/inhouse/sumsub/sumsub-18.webp
         width: 1080
@@ -182,7 +182,7 @@ gallery:
       width: 2160
       height: 1440
       player: bare
-      note: "Identity Passport: Multiverse"
+      note: "Identity Passport example: Multiverse"
   - type: wide
     item:
       type: image
@@ -211,7 +211,7 @@ gallery:
       width: 2160
       height: 1440
       alt: "Browser-framed card \"Educational session about gambling\" with an isometric roulette wheel and cards on navy and blue"
-      note: "Google Slides template"
+      note: "Part of a Google Slides template"
   - type: pair
     items:
       - type: image
@@ -235,7 +235,7 @@ gallery:
       width: 2160
       height: 1440
       player: bare
-      note: "Identity Passport: Fintech"
+      note: "Identity Passport example: Fintech"
   - type: pair
     items:
       - type: image
@@ -296,10 +296,23 @@ gallery:
       height: 1440
       alt: "Woman in a gray blazer holding a phone beside a \"Verified! Start Trading\" notification in front of a glass tower"
 challenge: "B2B compliance platforms tend to default to the same visual register: corporate blue, banking-grade seriousness, templated type. Sumsub already had one recognizable asset—a pixel-based logo—but nothing existed around it. No color logic, no layout principles, no unified approach across channels. The identity needed to work across dozens of contexts—conference booths, ad banners, sub-brands, special projects. It had to sustain the pace of a marketing team producing assets at high velocity. And it had to remain instantly recognizable as Sumsub, whether on a trade show wall in Dubai or a 300px social banner."
-solution: "The pixel logo became the anchor. Its structure gave the brand its core idea—an identity built on digital pixels and bento blocks, a modular visual language reflecting the nature of the product: an all-in-one compliance platform you can configure to fit. The block-based grid scaled from a single banner to a full exhibition booth without breaking. The existing color palette was refined into a clear system. The bento blocks acted as a frame—consistent enough to be recognized, open enough to hold any creative content inside. This is easy to see across the marketing banner archive: the visual style is immediately coherent, yet no two campaigns look identical. For every sub-brand or product launch, we packaged the identity into concise Identity Passports—compact reference files that gave any team member an instant, clear understanding of how to work with that project visually. As the brand matured, AI became part of the creative process—as a collaborator for generating visual directions and analyzing briefs before strategy was set. The system stayed open to evolution, and the brand grew with that openness. A huge thank you to every colleague and designer I built this with."
+solution: "The pixel logo became the anchor. Its structure gave the brand its core idea—an identity built on digital pixels and bento blocks, a modular visual language reflecting the nature of the product: an all-in-one compliance platform you can configure to fit. The block-based grid scaled from a single banner to a full exhibition booth without breaking. The existing color palette was refined into a clear system. The bento blocks acted as a frame—consistent enough to be recognized, open enough to hold any creative content inside. This is easy to see across the marketing banner archive: the visual style is immediately coherent, yet no two campaigns look identical. For every sub-brand or product launch, we packaged the identity into concise Identity Passports—compact reference files that gave any team member an instant, clear understanding of how to work with that project visually. As the brand matured, AI became part of the creative process—as a collaborator for generating visual directions and analyzing briefs before strategy was set. In [iGaming system](/inhouse/igaming) it produced the 3D cubes, animation, and a consistent character style; in [Crypto identity](/inhouse/crypto), nearly every image and 3D object. The system stayed open to evolution, and the brand grew with that openness. A huge thank you to every colleague and designer I built this with."
 kv:
   src: /assets/inhouse/sumsub/sumsub-kv.webp
   width: 206
   height: 206
 zipUrl: /assets/inhouse/sumsub/sumsub-project-images.zip
+cardPreview:
+  - src: /assets/inhouse/sumsub/sumsub-20-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/sumsub/sumsub-sides-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/sumsub/sumsub-18-preview.webp
+    width: 480
+    height: 640
+  - src: /assets/inhouse/sumsub/sumsub-36-preview.webp
+    width: 480
+    height: 640
 ---

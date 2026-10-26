@@ -17,13 +17,17 @@ onMounted(() => {
   // swamp a phone connection (the observer below starts the rest on scroll).
   const rect = video.getBoundingClientRect()
   if (rect.top < window.innerHeight && rect.bottom > 0) video.play().catch(() => {})
+  // Plays while on screen, pauses once it has fully left the viewport. A
+  // project page can hold ten of these (up to 2160x1440): left running
+  // after being scrolled past, they all decode at once, which makes seeks
+  // and loop restarts stall and, on phones, hits the limit on concurrent
+  // video decoders so some stop playing altogether.
   observer = new IntersectionObserver((entries) => {
     for (const entry of entries) {
-      if (!entry.isIntersecting) continue
-      video.play().catch(() => {})
-      observer?.disconnect()
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) video.play().catch(() => {})
+      else if (!entry.isIntersecting) video.pause()
     }
-  }, { threshold: 0.5 })
+  }, { threshold: [0, 0.5] })
   observer.observe(video)
 })
 
