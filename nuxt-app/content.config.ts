@@ -85,6 +85,15 @@ export default defineContentConfig({
             // since nothing stops a future project from wanting a
             // full-width silent standalone clip either.
             z.object({ type: z.literal('video'), item: mediaItem }),
+            // A text section dropped between gallery rows (same look as the
+            // About row under the cover). `hidden: true` keeps it in the
+            // data but out of the page until its copy is ready.
+            z.object({
+              type: z.literal('text'),
+              label: z.string(),
+              text: z.string(),
+              hidden: z.boolean().optional(),
+            }),
           ])),
           challenge: z.string(),
           solution: z.string(),

@@ -12,6 +12,7 @@ type GalleryRow =
   | { type: 'wide', item: GalleryMediaItem }
   | { type: 'pair', items: [GalleryMediaItem, GalleryMediaItem] }
   | { type: 'video', item: GalleryMediaItem }
+  | { type: 'text', label: string, text: string, hidden?: boolean }
 
 const props = defineProps<{
   section: 'inhouse' | 'brands'
@@ -51,7 +52,10 @@ const zipFilename = computed(() => {
 // scroll-reveal rule—see RevealOnScroll.vue/GallerySlot.vue.
 const flatGallery = computed(() => {
   let idx = 0
-  return props.gallery.map((row) => {
+  return props.gallery.filter(row => !(row.type === 'text' && row.hidden)).map((row) => {
+    // A text row isn't a photo--it must not shift the "skip the first N
+    // already-visible items" count.
+    if (row.type === 'text') return { ...row, flatIndex: idx }
     if (row.type === 'pair') {
       const out = { ...row, flatIndexes: [idx, idx + 1] as [number, number] }
       idx += 2
@@ -94,12 +98,16 @@ const flatGallery = computed(() => {
 
           <RevealOnScroll class="pv-row pv-row--about">
             <span class="pv-row__label">About</span>
-            <p class="pv-row__content">{{ about }}</p>
+            <p class="pv-row__content"><LinkedText :text="about" /></p>
           </RevealOnScroll>
 
           <template v-for="(row, i) in flatGallery" :key="i">
+            <RevealOnScroll v-if="row.type === 'text'" class="pv-row pv-row--about">
+              <span class="pv-row__label">{{ row.label }}</span>
+              <p class="pv-row__content"><LinkedText :text="row.text" /></p>
+            </RevealOnScroll>
             <GallerySlot
-              v-if="row.type === 'wide'"
+              v-else-if="row.type === 'wide'"
               :item="row.item"
               wrapper-class="pv-wide"
               :skip-reveal="row.flatIndex === 0"
@@ -119,7 +127,7 @@ const flatGallery = computed(() => {
           <div class="pv-info">
             <RevealOnScroll class="pv-row">
               <span class="pv-row__label">Challenge</span>
-              <p class="pv-row__content">{{ challenge }}</p>
+              <p class="pv-row__content"><LinkedText :text="challenge" /></p>
             </RevealOnScroll>
 
             <div class="pv-solution-block">
@@ -128,7 +136,7 @@ const flatGallery = computed(() => {
                 <span class="pv-row__label">Solution</span>
                 <div class="pv-solution">
                   <div class="pv-solution__body">
-                    <p>{{ solution }}</p>
+                    <p><LinkedText :text="solution" /></p>
                     <KvIcon variant="desktop" :src="kv.src" :width="kv.width" :height="kv.height" />
                   </div>
                   <div class="pv-actions">
@@ -167,12 +175,16 @@ const flatGallery = computed(() => {
 
     <RevealOnScroll class="mobile-project__block">
       <span class="mobile-project__label">About</span>
-      <p class="mobile-project__text">{{ about }}</p>
+      <p class="mobile-project__text"><LinkedText :text="about" /></p>
     </RevealOnScroll>
 
     <template v-for="(row, i) in flatGallery" :key="i">
+      <RevealOnScroll v-if="row.type === 'text'" class="mobile-project__block">
+        <span class="mobile-project__label">{{ row.label }}</span>
+        <p class="mobile-project__text"><LinkedText :text="row.text" /></p>
+      </RevealOnScroll>
       <GallerySlot
-        v-if="row.type === 'wide'"
+        v-else-if="row.type === 'wide'"
         :item="row.item"
         wrapper-class="mobile-project__photo"
         :skip-reveal="row.flatIndex! < 2"
@@ -198,14 +210,14 @@ const flatGallery = computed(() => {
     <div class="mobile-project__blocks">
       <RevealOnScroll class="mobile-project__block">
         <span class="mobile-project__label">Challenge</span>
-        <p class="mobile-project__text">{{ challenge }}</p>
+        <p class="mobile-project__text"><LinkedText :text="challenge" /></p>
       </RevealOnScroll>
 
       <div class="mobile-solution-group">
         <RevealOnScroll class="mobile-project__block mobile-project__block--divider">
           <span class="mobile-project__label">Solution</span>
           <div class="mobile-project__solution">
-            <p class="mobile-project__text">{{ solution }}</p>
+            <p class="mobile-project__text"><LinkedText :text="solution" /></p>
             <KvIcon variant="mobile" :src="kv.src" :width="kv.width" :height="kv.height" />
           </div>
         </RevealOnScroll>
