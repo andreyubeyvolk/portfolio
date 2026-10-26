@@ -123,9 +123,9 @@ gallery:
       height: 1440
       alt: "Product screenshot of a \"Create new level\" dialog in the Sumsub dashboard on an electric blue background"
       note: "Illustrations in the product"
-  # Business sits after photo 16 for now--move the block to reposition it.
+  # Impact sits after photo 16 for now--move the block to reposition it.
   - type: text
-    label: "Business"
+    label: "Impact"
     text: "The brand grew with the company from 400 to 1000+ employees. Clients responded positively, social channels gained real traction, conferences filled venues, and the work earned international recognition. The [Greenflag](/inhouse/greenflag) project is one I’m proud to have shaped visually—the brand packaging was my work, and it went on to win significant international awards. Instagram grew from zero to 30–40K followers, built together with the social and marketing team through consistent content and a strong visual identity that made every post immediately recognizable. Special projects like the [Multiverse](/inhouse/finance) and Roadshow conferences ran at least twice a year each—each time filling the room and generating strong community engagement around Sumsub’s anti-fraud mission. Each required a full production cycle: booth design, screen content, presentations, merch. At live crypto conferences in Dubai and Singapore I worked hands-on—preparing booth materials for print, producing video for screens, and creating custom merch on-site. Hand-painted t-shirts and tote bags drew queues, sparked social buzz, and opened direct conversations with clients. The identity became distinctive enough that competing startups began copying it. That’s the clearest measure of visual trust a brand can earn."
   - type: pair
     items:
@@ -261,7 +261,7 @@ gallery:
         src: /assets/inhouse/sumsub/sumsub-35.webp
         width: 1080
         height: 1440
-        alt: "Sheet of stickers on blue reading \"Sumsub Design Team\", \"No fraud. No worries.\" and \"The power of one\""
+        alt: "Two sheets of black-and-white stickers on holographic backing, on a blue background: \"Sumsub Design Team\", \"No fraud. No worries.\", \"The power of one\" and \"Paws Up for Pups\""
         note: "Holographic offsite stickers"
       - type: image
         src: /assets/inhouse/sumsub/sumsub-36.webp
