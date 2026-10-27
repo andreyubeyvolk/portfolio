@@ -98,13 +98,13 @@ const flatGallery = computed(() => {
 
           <RevealOnScroll class="pv-row pv-row--about">
             <span class="pv-row__label">About</span>
-            <p class="pv-row__content"><LinkedText :text="about" /></p>
+            <TextBlock class="pv-row__content" :text="about" />
           </RevealOnScroll>
 
           <template v-for="(row, i) in flatGallery" :key="i">
             <RevealOnScroll v-if="row.type === 'text'" class="pv-row pv-row--about">
               <span class="pv-row__label">{{ row.label }}</span>
-              <p class="pv-row__content"><LinkedText :text="row.text" /></p>
+              <TextBlock class="pv-row__content" :text="row.text" />
             </RevealOnScroll>
             <GallerySlot
               v-else-if="row.type === 'wide'"
@@ -127,7 +127,7 @@ const flatGallery = computed(() => {
           <div class="pv-info">
             <RevealOnScroll class="pv-row">
               <span class="pv-row__label">Challenge</span>
-              <p class="pv-row__content"><LinkedText :text="challenge" /></p>
+              <TextBlock class="pv-row__content" :text="challenge" />
             </RevealOnScroll>
 
             <div class="pv-solution-block">
@@ -136,7 +136,7 @@ const flatGallery = computed(() => {
                 <span class="pv-row__label">Solution</span>
                 <div class="pv-solution">
                   <div class="pv-solution__body">
-                    <p><LinkedText :text="solution" /></p>
+                    <TextBlock class="pv-solution__text" :text="solution" />
                     <KvIcon variant="desktop" :src="kv.src" :width="kv.width" :height="kv.height" />
                   </div>
                   <div class="pv-actions">
@@ -171,17 +171,19 @@ const flatGallery = computed(() => {
 
   <div class="mobile-project">
     <img v-if="cover.type === 'image'" v-pinch-zoom :width="cover.width" :height="cover.height" fetchpriority="high" :src="cover.src" :alt="title" />
-    <VpBare v-else :src="cover.src" :width="cover.width" :height="cover.height" />
+    <div v-else class="mobile-project__video">
+      <VpBare :src="cover.src" :width="cover.width" :height="cover.height" />
+    </div>
 
     <RevealOnScroll class="mobile-project__block">
       <span class="mobile-project__label">About</span>
-      <p class="mobile-project__text"><LinkedText :text="about" /></p>
+      <TextBlock class="mobile-project__text" :text="about" />
     </RevealOnScroll>
 
     <template v-for="(row, i) in flatGallery" :key="i">
       <RevealOnScroll v-if="row.type === 'text'" class="mobile-project__block">
         <span class="mobile-project__label">{{ row.label }}</span>
-        <p class="mobile-project__text"><LinkedText :text="row.text" /></p>
+        <TextBlock class="mobile-project__text" :text="row.text" />
       </RevealOnScroll>
       <GallerySlot
         v-else-if="row.type === 'wide'"
@@ -210,14 +212,14 @@ const flatGallery = computed(() => {
     <div class="mobile-project__blocks">
       <RevealOnScroll class="mobile-project__block">
         <span class="mobile-project__label">Challenge</span>
-        <p class="mobile-project__text"><LinkedText :text="challenge" /></p>
+        <TextBlock class="mobile-project__text" :text="challenge" />
       </RevealOnScroll>
 
       <div class="mobile-solution-group">
         <RevealOnScroll class="mobile-project__block mobile-project__block--divider">
           <span class="mobile-project__label">Solution</span>
           <div class="mobile-project__solution">
-            <p class="mobile-project__text"><LinkedText :text="solution" /></p>
+            <TextBlock class="mobile-project__text" :text="solution" />
             <KvIcon variant="mobile" :src="kv.src" :width="kv.width" :height="kv.height" />
           </div>
         </RevealOnScroll>

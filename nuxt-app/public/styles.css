@@ -116,6 +116,15 @@ a {
   background-color: #000;
 }
 
+/* Multi-paragraph project copy (TextBlock.vue): the site-wide 8px
+   paragraph gap, no margins otherwise. */
+.text-block p {
+  margin: 0;
+}
+.text-block p + p {
+  margin-top: 8px;
+}
+
 button {
   color: inherit;
   font: inherit;

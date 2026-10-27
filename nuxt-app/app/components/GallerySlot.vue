@@ -194,5 +194,8 @@ onBeforeUnmount(() => {
    browser's own default <figure> margin would otherwise leak in. */
 .gallery-slot {
   margin: 0;
+  /* Anchors the absolutely positioned poster <img> of a bare video that
+     sits directly in a slot with no sized wrapper class (VpBare.vue). */
+  position: relative;
 }
 </style>

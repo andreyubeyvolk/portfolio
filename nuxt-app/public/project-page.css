@@ -11,6 +11,12 @@
   padding-bottom: 58px;
 }
 
+/* Paragraph stack inside the Solution text (see TextBlock.vue)--keeps the
+   same 1.2 as every other piece of project copy. */
+.pv-solution__text {
+  line-height: 1.2;
+}
+
 /* Cover: full width, 3:2 */
 .pv-cover {
   width: 100%;
@@ -197,12 +203,38 @@
   color: #fff;
 }
 
-/* Bare video: silent, looping, autoplay-on-scroll, no player chrome. */
+/* Bare video: silent, looping, autoplay-on-scroll, no player chrome.
+   Sits above its own poster <img> (.vp-bare__poster, see VpBare.vue) and
+   stays transparent until it has painted a real frame, so the browser's
+   black "between poster and first frame" flash is never on screen. The
+   slot (figure) is the positioning context for the poster. */
 .vp-bare {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   height: auto;
   margin: 0;
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+.vp-bare.is-ready {
+  opacity: 1;
+}
+.vp-bare__poster {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  object-fit: cover;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vp-bare {
+    transition: none;
+  }
 }
 .pv-pair__photo .vp-bare {
   position: absolute;
@@ -235,10 +267,43 @@
 }
 
 .vp__video {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   height: auto;
   margin: -2px 0;
+}
+
+/* Poster still under the video (see Vp.vue). The video stays transparent
+   until it has presented a frame, then fades in over the still--the
+   player's own #000 background is never the thing on screen between the
+   two. Only once the component is running (.is-enhanced), so without JS the
+   natively autoplaying video is shown as before. */
+.vp__poster {
+  display: contents;
+}
+.vp__poster img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  object-fit: cover;
+  pointer-events: none;
+}
+.vp.is-enhanced .vp__video {
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+.vp.is-enhanced.is-ready .vp__video {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vp.is-enhanced .vp__video {
+    transition: none;
+  }
 }
 
 .vp--paired {
