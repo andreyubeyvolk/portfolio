@@ -36,10 +36,18 @@ const isMobileViewport = ref(false)
 onMounted(() => {
   isMobileViewport.value = window.matchMedia('(max-width: 640px)').matches
 })
-const effectivePoster = computed(() => {
-  if (isMobileViewport.value && props.posterMobile) return props.posterMobile
-  return props.poster ?? videoPoster(props.src)
-})
+// The poster is a real <img> UNDER the video (a <picture> picks the mobile
+// one in plain HTML, before any JS runs), not the video's own `poster`
+// attribute: between "poster cleared" and "first frame painted" browsers
+// flash black (this player's background is #000), and a video that loses
+// its frames later would show a black rectangle. With the still underneath
+// and the video transparent until it has really presented a frame, both
+// fall back to the still instead. `is-enhanced` is only added once this
+// component is running, so without JS the native autoplay fallback below
+// still shows the video as before.
+const posterSrc = computed(() => props.poster ?? videoPoster(props.src))
+const isEnhanced = ref(false)
+const isReady = ref(false)
 // Native fallback for 'immediate' reels: if this component's own JS is
 // slow to hydrate (or fails outright--a script error elsewhere, a
 // blocker), the browser can still start playback on its own once enough
@@ -97,11 +105,18 @@ function isPaintClick(e?: { ctrlKey: boolean; metaKey: boolean }) {
 
 function toggle(e?: MouseEvent) {
   if (isPaintClick(e)) return
-  autoplayIntent = false
   const video = videoRef.value
   if (!video) return
-  if (video.paused) video.play().catch(() => {})
-  else video.pause()
+  // The visitor's own choice decides whether scrolling away and back (or a
+  // backgrounded tab) is allowed to resume playback: they pressed play ->
+  // yes, they paused it -> no.
+  if (video.paused) {
+    autoplayIntent = true
+    video.play().catch(() => {})
+  } else {
+    autoplayIntent = false
+    video.pause()
+  }
 }
 
 function onHit(e: MouseEvent) {
@@ -221,6 +236,9 @@ function onTimeUpdate() {
   const video = videoRef.value
   if (!video?.duration) return
   seekPercent.value = (video.currentTime / video.duration) * 100
+  // Second "a frame is showing" signal next to requestVideoFrameCallback
+  // (see onMounted), so the video can never stay invisible.
+  if (!isReady.value && !video.paused && video.currentTime > 0.05) isReady.value = true
 }
 
 function onBufferedProgress() {
@@ -249,13 +267,34 @@ onMounted(() => {
   video.volume = lastVolume
   syncVolumeUi()
 
+  // Paused by leaving the viewport (not by the visitor)--see the observer
+  // below. Declared up here so the pause handler can tell the two apart.
+  let pausedByScroll = false
+  isEnhanced.value = true
+  if (video.readyState >= 2 && !video.paused && video.currentTime > 0.05) isReady.value = true
+
+  // Presented-frame heartbeat: marks the video ready on its first frame and
+  // lets the watchdog below notice a decoder that has stopped delivering.
+  const hasFrameCallback = 'requestVideoFrameCallback' in video
+  let frameCallbackId = 0
+  let lastFrameAt = performance.now()
+  let lastRecoverAt = 0
+  if (hasFrameCallback) {
+    const tick = () => {
+      lastFrameAt = performance.now()
+      if (!isReady.value && !video.paused) isReady.value = true
+      frameCallbackId = video.requestVideoFrameCallback(tick)
+    }
+    frameCallbackId = video.requestVideoFrameCallback(tick)
+  }
+
   video.addEventListener('play', () => { state.value = 'playing'; hideTimer = setTimeout(hideControls, HIDE_DELAY) })
   video.addEventListener('pause', () => {
     state.value = 'paused'
     clearTimeout(hideTimer)
     // Click-reveal: a pause the visitor didn't ask for (a source reload at
     // mount) must not pop the controls open--they only appear on a click.
-    if (props.revealOn !== 'click') isIdle.value = false
+    if (props.revealOn !== 'click' && !pausedByScroll) isIdle.value = false
   })
   video.addEventListener('timeupdate', onTimeUpdate)
   // 'progress' fires repeatedly while data downloads; 'timeupdate' also
@@ -302,21 +341,60 @@ onMounted(() => {
 
   const autoplayMode = props.autoplay || 'immediate'
   autoplayIntent = autoplayMode !== 'scroll'
-  if (autoplayMode === 'scroll' && 'IntersectionObserver' in window) {
-    intersectionObserver = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue
-        isIdle.value = true
-        autoplayIntent = true
-        playWhenReady()
-        intersectionObserver?.disconnect()
-      }
-    }, { threshold: 0.5 })
-    intersectionObserver.observe(vp)
-  } else {
+  let started = false
+  if (autoplayMode !== 'scroll' || !('IntersectionObserver' in window)) {
+    started = true
     isIdle.value = true
     playWhenReady()
   }
+  // Persistent (not one-shot): 'scroll' players still start the first time
+  // they're half in view, and every player now pauses once it has fully left
+  // the viewport and resumes on return--unless the visitor paused it
+  // themselves (toggle() clears autoplayIntent). A paused-offscreen video
+  // also drops back to its poster, so a frame the browser has evicted from
+  // GPU memory can never show up as a black box when it scrolls back.
+  if ('IntersectionObserver' in window) {
+    intersectionObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          if (!started) {
+            started = true
+            isIdle.value = true
+            autoplayIntent = true
+            playWhenReady()
+          } else if (pausedByScroll && autoplayIntent) {
+            pausedByScroll = false
+            video.play().catch(() => {})
+          }
+        } else if (!entry.isIntersecting && started && !video.paused) {
+          pausedByScroll = true
+          video.pause()
+          isReady.value = false
+        }
+      }
+    }, { threshold: [0, 0.5] })
+    intersectionObserver.observe(vp)
+  }
+
+  // Watchdog: a video that should be playing but has stopped presenting
+  // frames (dead decoder after a long session, tab restored from the
+  // background) gets reloaded and resumed from where it was.
+  function recover() {
+    lastRecoverAt = performance.now()
+    const resumeAt = video.currentTime
+    isReady.value = false
+    video.addEventListener('loadedmetadata', () => {
+      try { video.currentTime = resumeAt } catch { /* seekable range not ready--start over */ }
+      playWhenReady()
+    }, { once: true })
+    video.load()
+  }
+  const watchdog = setInterval(() => {
+    if (!hasFrameCallback || !started || document.visibilityState !== 'visible') return
+    if (video.paused || video.seeking || video.readyState < 3) return
+    const now = performance.now()
+    if (now - lastFrameAt > 3000 && now - lastRecoverAt > 8000) recover()
+  }, 1500)
 
   // srcMobile only: a <source media> swap doesn't re-run on its own when
   // the viewport crosses the breakpoint after load (only a fresh load()
@@ -359,6 +437,8 @@ onMounted(() => {
   onBeforeUnmount(() => {
     if (mobileQuery && onBreakpointChange) mobileQuery.removeEventListener('change', onBreakpointChange)
     document.removeEventListener('visibilitychange', onVisibilityChange)
+    clearInterval(watchdog)
+    if (frameCallbackId && 'cancelVideoFrameCallback' in video) video.cancelVideoFrameCallback(frameCallbackId)
   })
 })
 
@@ -372,11 +452,15 @@ onBeforeUnmount(() => {
   <div
     ref="vp"
     class="vp"
-    :class="{ 'vp--paired': paired, 'vp--click-reveal': revealOn === 'click', 'is-idle': isIdle }"
+    :class="{ 'vp--paired': paired, 'vp--click-reveal': revealOn === 'click', 'is-idle': isIdle, 'is-enhanced': isEnhanced, 'is-ready': isReady }"
     :data-state="state"
     :data-muted="muted ? 'true' : 'false'"
   >
-    <video ref="video" class="vp__video" playsinline muted loop preload="metadata" :autoplay="isImmediateAutoplay" :poster="effectivePoster">
+    <picture class="vp__poster">
+      <source v-if="posterMobile" media="(max-width: 640px)" :srcset="posterMobile" />
+      <img :src="posterSrc" alt="" aria-hidden="true" decoding="async" />
+    </picture>
+    <video ref="video" class="vp__video" playsinline muted loop preload="metadata" :autoplay="isImmediateAutoplay">
       <source v-if="srcMobile" :src="srcMobile" media="(max-width: 640px)" />
       <source :src="src" />
     </video>

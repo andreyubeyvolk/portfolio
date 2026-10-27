@@ -1391,6 +1391,14 @@
     min-height: calc(33.33vh - 56px); /* 56px = 40px project bar + 16px gap */
   }
 
+  /* Video cover: the positioning context for VpBare's poster <img> */
+  .mobile-project__video {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
   /* Photos: full width, auto height, no margin (gap handles spacing) */
   .mobile-project__photo {
     width: 100%;

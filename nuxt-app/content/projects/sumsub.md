@@ -115,6 +115,10 @@ gallery:
         height: 1440
         player: bare
         note: "Side projects in ads"
+  # Team sits before photo 16 for now--move the block to reposition it.
+  - type: text
+    label: "Team"
+    text: "I led the brand team at different stages of growth—both a larger brand team and a smaller, focused creative unit at different points. At peak we reached up to 8 people, covering visual and motion design. The team was international and distributed, with designers across multiple countries. My approach was consistent: portfolio reviews with growth goals, craft-focused mentoring, task planning, and cross-team coordination.\n\nPart of the journey was leading the team through a period of global turbulence—relocation, uncertainty, emotional strain. It was a real challenge on a human level. But the team held together, stayed focused, and continued delivering at the highest standard throughout.\n\nThe designers I hired became the reliable core of the team—proactive, high-agency, never dropping the quality bar regardless of deadlines. I’m genuinely grateful to each of them for the work we did side by side."
   - type: wide
     item:
       type: image
@@ -123,10 +127,6 @@ gallery:
       height: 1440
       alt: "Product screenshot of a \"Create new level\" dialog in the Sumsub dashboard on an electric blue background"
       note: "Illustrations in the product"
-  # Impact sits after photo 16 for now--move the block to reposition it.
-  - type: text
-    label: "Impact"
-    text: "The brand grew with the company from 400 to 1000+ employees. Clients responded positively, social channels gained real traction, conferences filled venues, and the work earned international recognition. The [Greenflag](/inhouse/greenflag) project is one I’m proud to have shaped visually—the brand packaging was my work, and it went on to win significant international awards. Instagram grew from zero to 30–40K followers, built together with the social and marketing team through consistent content and a strong visual identity that made every post immediately recognizable. Special projects like the [Multiverse](/inhouse/finance) and Roadshow conferences ran at least twice a year each—each time filling the room and generating strong community engagement around Sumsub’s anti-fraud mission. Each required a full production cycle: booth design, screen content, presentations, merch. At live crypto conferences in Dubai and Singapore I worked hands-on—preparing booth materials for print, producing video for screens, and creating custom merch on-site. Hand-painted t-shirts and tote bags drew queues, sparked social buzz, and opened direct conversations with clients. The identity became distinctive enough that competing startups began copying it. That’s the clearest measure of visual trust a brand can earn."
   - type: pair
     items:
       - type: image
@@ -182,7 +182,7 @@ gallery:
       width: 2160
       height: 1440
       player: bare
-      note: "Identity Passport example: Multiverse"
+      note: "Identity Passport: Multiverse London"
   - type: wide
     item:
       type: image
@@ -224,10 +224,10 @@ gallery:
         width: 1080
         height: 1440
         alt: "Smiling woman with glasses at a laptop, with a \"Kelly Parker—Match\" verification tag"
-  # Team sits before the Fintech passport for now--move the block to reposition it.
+  # Impact sits before the Fintech passport for now--move the block to reposition it.
   - type: text
-    label: "Team"
-    text: "I led the brand team at different stages of the company’s growth—both a larger brand team and a smaller, focused creative unit at different points. At peak the brand team reached up to 10 people, covering visual and motion design. The team was international; mentoring and cross-departmental communication happened in English. My approach was consistent: thorough portfolio reviews with defined growth goals, craft-focused design mentoring, task planning, and inter-team coordination. I ran internal brand surveys to map perception and identify improvement areas. The designers I hired became the reliable core of the brand team—highly agentic, proactive, and capable of owning the most complex challenges. I’m genuinely grateful to each of them for the trust and the work we did side by side—never dropping the quality bar, regardless of deadlines or the challenge at hand."
+    label: "Impact"
+    text: "The brand grew with the company from 400 to 1000+ employees and earned international recognition along the way. 92% of internal stakeholders immediately recognize the brand’s visual identity. The [Greenflag](/inhouse/greenflag) project—whose brand packaging I shaped—went on to win significant international awards. Instagram grew from zero to 30–40K followers, built together with the social and marketing team through a visual identity that made every post immediately recognizable.\n\n[Multiverse](/inhouse/finance) and Roadshow conferences ran at least twice a year, consistently filling venues and building Sumsub’s anti-fraud community. At live crypto conferences in Dubai and Singapore I worked hands-on—print materials, screen video, and custom on-site merch. Hand-painted t-shirts and tote bags drew queues and sparked direct client conversations.\n\nThe identity became distinctive enough that competing startups began copying it. That’s the clearest measure of visual trust a brand can earn."
   - type: wide
     item:
       type: video
@@ -296,7 +296,7 @@ gallery:
       height: 1440
       alt: "Woman in a gray blazer holding a phone beside a \"Verified! Start Trading\" notification in front of a glass tower"
 challenge: "B2B compliance platforms tend to default to the same visual register: corporate blue, banking-grade seriousness, templated type. Sumsub already had one recognizable asset—a pixel-based logo—but nothing existed around it. No color logic, no layout principles, no unified approach across channels. The identity needed to work across dozens of contexts—conference booths, ad banners, sub-brands, special projects. It had to sustain the pace of a marketing team producing assets at high velocity. And it had to remain instantly recognizable as Sumsub, whether on a trade show wall in Dubai or a 300px social banner."
-solution: "The pixel logo became the anchor. Its structure gave the brand its core idea—an identity built on digital pixels and bento blocks, a modular visual language reflecting the nature of the product: an all-in-one compliance platform you can configure to fit. The block-based grid scaled from a single banner to a full exhibition booth without breaking. The existing color palette was refined into a clear system. The bento blocks acted as a frame—consistent enough to be recognized, open enough to hold any creative content inside. This is easy to see across the marketing banner archive: the visual style is immediately coherent, yet no two campaigns look identical. For every sub-brand or product launch, we packaged the identity into concise Identity Passports—compact reference files that gave any team member an instant, clear understanding of how to work with that project visually. As the brand matured, AI became part of the creative process—as a collaborator for generating visual directions and analyzing briefs before strategy was set. In [iGaming system](/inhouse/igaming) it produced the 3D cubes, animation, and a consistent character style; in [Crypto identity](/inhouse/crypto), nearly every image and 3D object. The system stayed open to evolution, and the brand grew with that openness. A huge thank you to every colleague and designer I built this with."
+solution: "The pixel logo became the anchor—an identity built on digital pixels and bento blocks, reflecting the product itself: an all-in-one compliance platform you can configure to fit. The block-based grid scaled from a single banner to a full exhibition booth. The existing palette was refined into a clear system.\n\nThe bento blocks acted as a frame—consistent enough to be recognized, open enough to hold any creative content inside. This is easy to see across the marketing banner archive: coherent style, endlessly varied execution. For every sub-brand or launch, we packaged the work into concise Identity Passports—compact reference files that gave any team member instant clarity on how to work with that project visually.\n\nAs the brand matured, AI became part of the creative process—as a collaborator for generating visual directions and analyzing briefs. The system stayed open to evolution, and the brand grew with that openness.\n\nA huge thank you to every colleague and designer I built this with."
 kv:
   src: /assets/inhouse/sumsub/sumsub-kv.webp
   width: 206
