@@ -197,7 +197,7 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
 /* Suppressed while a graffiti stroke is live (body.graffiti-mode, see
    isGraffitiDrawing() above)--drawing over the grid shouldn't also darken
    whatever card happens to be under the cursor. */
-body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__cover-img {
+body:not(.graffiti-mode) .inhouse-card:not(.inhouse-card--coming-soon):hover .inhouse-card__cover-img {
   filter: brightness(0.9);
   transition: filter 1400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -216,7 +216,7 @@ body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__cover-img {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   transition: opacity 900ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__noise {
+body:not(.graffiti-mode) .inhouse-card:not(.inhouse-card--coming-soon):hover .inhouse-card__noise {
   opacity: 0.3;
   transition: opacity 1400ms cubic-bezier(0.16, 1, 0.3, 1);
 }
