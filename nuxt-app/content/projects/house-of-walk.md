@@ -159,19 +159,13 @@ gallery:
       width: 2160
       height: 1440
       alt: House of Walk visual system overview
-  - type: wide
-    item:
-      type: image
-      src: /assets/brands/house-of-walk/house-of-walk-24.webp
-      width: 1080
-      height: 1440
-      alt: House of Walk photo archive — Paris city walk
 challenge: "Initially, the project was conceived as a simple, quick solution for storing photographs, without a dedicated identity or a thoroughly developed visual system. The main goal was to independently build and launch a functional space using Claude Code, without involving a developer.\n\nAt the same time, a large volume of photographs needed to be processed and organized, the website architecture had to be planned, and numerous technical challenges had to be solved—all while maintaining simplicity and attention to detail."
 solution: "Using Claude Code and a vibe coding approach, the website's simple framework gradually evolved through visual nuances, animations, and sound effects. Scroll sounds and short swooshes when collapsing photographs became small but expressive interface details.\n\nThe visual identity developed around three associations: travel, the world, and retrospection. The planet became the starting point, leading to an airport-inspired aesthetic. The monospaced typeface Spline Sans Mono evokes departure boards, while Impact gives the logo a distinctive accent. Editorial elements—paper textures, postcards, original covers for city essays, and a tracing-paper effect when loading photographs—brought the visual system together.\n\nAlongside the website, three additional tools were built using vibe coding: an application for animating interface screens, a photo filter inspired by airport X-ray scanners, and a tool for previewing Instagram carousels.\n\nAs a result, House of Walk became more than a visual archive. It became a playground for experimenting with AI-assisted development, bringing art direction, design, and custom tool creation together in a single process."
 kv:
   src: /assets/brands/house-of-walk/house-of-walk-kv.webp
   width: 412
   height: 410
+  canvas: true
 cardPreview:
   - src: /assets/brands/house-of-walk/house-of-walk-11-preview.webp
     width: 480

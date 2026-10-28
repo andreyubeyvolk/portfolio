@@ -23,7 +23,7 @@ const props = defineProps<{
   gallery: GalleryRow[]
   challenge: string
   solution: string
-  kv: { src: string, width: number, height: number }
+  kv: { src: string, width: number, height: number, canvas?: boolean }
   zipUrl?: string
 }>()
 
@@ -137,7 +137,7 @@ const flatGallery = computed(() => {
                 <div class="pv-solution">
                   <div class="pv-solution__body">
                     <TextBlock class="pv-solution__text" :text="solution" />
-                    <KvIcon variant="desktop" :src="kv.src" :width="kv.width" :height="kv.height" />
+                    <KvIcon variant="desktop" :src="kv.src" :width="kv.width" :height="kv.height" :canvas="kv.canvas" />
                   </div>
                   <div class="pv-actions">
                     <div class="pv-action">

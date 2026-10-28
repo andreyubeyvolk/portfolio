@@ -13,16 +13,22 @@ const props = defineProps<{
   width: number
   height: number
   variant: 'desktop' | 'mobile'
+  canvas?: boolean
 }>()
 
 const tipRef = useTemplateRef<HTMLElement>('tip')
 const tipVisible = ref(false)
 const tipStyle = ref({ left: '0px', top: '0px' })
+const spinning = ref(false)
 const { scrollTo: scrollPaneTo } = useScrollToPane('.project-scroll')
 
 function scrollToTop() {
   tipVisible.value = false
   scrollPaneTo(0)
+}
+
+function onMouseEnter() {
+  spinning.value = true
 }
 
 function onMouseMove(e: MouseEvent) {
@@ -43,6 +49,7 @@ function onMouseMove(e: MouseEvent) {
 
 function onMouseLeave() {
   tipVisible.value = false
+  spinning.value = false
 }
 
 function onMobileKeydown(e: KeyboardEvent) {
@@ -60,10 +67,12 @@ function onMobileKeydown(e: KeyboardEvent) {
     type="button"
     aria-label="Scroll to top"
     @click="scrollToTop"
+    @mouseenter="onMouseEnter"
     @mousemove="onMouseMove"
     @mouseleave="onMouseLeave"
   >
-    <img :width="width" :height="height" loading="lazy" :src="src" alt="" aria-hidden="true" />
+    <GlobeCanvas v-if="canvas" :size="103" :spinning="spinning" />
+    <img v-else :width="width" :height="height" loading="lazy" :src="src" alt="" aria-hidden="true" />
     <Teleport to="body">
       <div ref="tip" class="pv-icon-tip" :class="{ 'is-visible': tipVisible }" :style="tipStyle">To top ↑</div>
     </Teleport>
