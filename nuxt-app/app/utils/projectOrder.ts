@@ -6,5 +6,5 @@
 // the matching array, in the order it should appear in that sequence.
 export const PROJECT_ORDER: Record<'inhouse' | 'brands', string[]> = {
   inhouse: ['sumsub', 'igaming', 'crypto', 'finance', 'identity', 'greenflag', 'apac', 'roadmap', 'dragon'],
-  brands: ['nimax', 'stickerburg', 'valera', 'ovo'],
+  brands: ['house-of-walk', 'nimax', 'stickerburg', 'valera', 'ovo'],
 }
