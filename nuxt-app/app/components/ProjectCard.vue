@@ -21,6 +21,7 @@ const props = defineProps<{
   slug: string
   title: string
   cardPreview?: CardPreviewItem[]
+  comingSoon?: boolean
 }>()
 
 const cardRef = useTemplateRef('cardRef')
@@ -121,7 +122,29 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
 </script>
 
 <template>
+  <!-- Coming soon: non-clickable div, blurred cover, "Coming soon" overlay -->
+  <div
+    v-if="comingSoon"
+    class="inhouse-card inhouse-card--coming-soon"
+  >
+    <div class="inhouse-card__cover">
+      <img
+        class="inhouse-card__cover-img"
+        width="1080"
+        height="1440"
+        :src="`/assets/${section}/${slug}/${slug}-card.webp`"
+        :alt="title"
+      />
+      <div class="inhouse-card__noise" aria-hidden="true"></div>
+      <div class="inhouse-card__coming-soon-label" aria-hidden="true">
+        <span>Coming soon</span>
+      </div>
+    </div>
+    <span class="inhouse-title">{{ title }}</span>
+  </div>
+
   <NuxtLink
+    v-else
     ref="cardRef"
     class="inhouse-card"
     :to="`/${section}/${slug}`"
@@ -218,4 +241,45 @@ body:not(.graffiti-mode) .inhouse-card:hover .inhouse-card__noise {
   opacity: 1;
 }
 
+/* ─── Coming soon card ─────────────────────────────────────────── */
+
+.inhouse-card--coming-soon {
+  cursor: default;
+}
+
+/* Default: grayscale + heavy blur. Scale up slightly to hide blur-edge bleed
+   (overflow:hidden on .inhouse-card__cover clips the scale overhang). */
+.inhouse-card--coming-soon .inhouse-card__cover-img {
+  filter: grayscale(1) blur(20px) brightness(0.55);
+  transform: scale(1.08);
+  transition: filter 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hover: color returns, blur stays, title stays unchanged */
+@media (hover: hover) and (pointer: fine) {
+  .inhouse-card--coming-soon:hover .inhouse-card__cover-img {
+    filter: grayscale(0) blur(20px) brightness(0.7);
+    transform: scale(1.08);
+    transition: filter 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+/* "Coming soon" text — centered over the blurred cover */
+.inhouse-card__coming-soon-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.inhouse-card__coming-soon-label span {
+  color: #fff;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+}
 </style>

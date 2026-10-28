@@ -764,6 +764,11 @@ body::-webkit-scrollbar-thumb:active {
     color: inherit;
     background-color: transparent;
   }
+
+  .inhouse-card.inhouse-card--coming-soon:hover .inhouse-title {
+    color: inherit;
+    background-color: transparent;
+  }
 }
 
 .load-more-btn {

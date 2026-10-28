@@ -104,7 +104,9 @@ export default defineContentConfig({
             src: z.string(),
             width: z.number(),
             height: z.number(),
+            canvas: z.boolean().optional(),
           }),
+          comingSoon: z.boolean().optional(),
           zipUrl: z.string().optional(),
           // Listing-card hover preview (ProjectCard.vue): up to 4 gallery
           // photos that cycle in as the cursor (or a touch drag) crosses
