@@ -137,7 +137,7 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
       />
       <div class="inhouse-card__noise" aria-hidden="true"></div>
       <div class="inhouse-card__coming-soon-label" aria-hidden="true">
-        <span>Coming soon</span>
+        <span>Coming<br>soon</span>
       </div>
     </div>
     <span class="inhouse-title">{{ title }}</span>
@@ -277,9 +277,21 @@ body:not(.graffiti-mode) .inhouse-card:not(.inhouse-card--coming-soon):hover .in
 
 .inhouse-card__coming-soon-label span {
   color: #fff;
-  font-size: 1.0625rem;
+  font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: 0.01em;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  line-height: 1.2;
+}
+
+@media (max-width: 640px) {
+  .inhouse-card--coming-soon .inhouse-card__cover-img {
+    filter: grayscale(1) blur(16px) brightness(0.55);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .inhouse-card--coming-soon:hover .inhouse-card__cover-img {
+      filter: grayscale(0) blur(16px) brightness(0.7);
+    }
+  }
 }
 </style>
