@@ -133,10 +133,6 @@
   line-height: 1.2;
 }
 
-@keyframes spin-globe {
-  to { transform: rotate(360deg); }
-}
-
 .pv-icon {
   margin: 0;
   line-height: 0;
@@ -146,16 +142,15 @@
   border: 0;
   background: none;
   cursor: pointer;
-  overflow: visible;
 }
 .pv-icon img {
   display: block;
   height: 103px;
   width: auto;
-  animation: spin-globe 5s linear infinite paused;
+  transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .pv-icon:hover img {
-  animation-play-state: running;
+  transform: rotate(-10deg);
 }
 
 .mobile-project__icon {
