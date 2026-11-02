@@ -9,7 +9,8 @@ const parts = computed(() => parseInlineLinks(props.text))
 
 <template>
   <template v-for="(part, i) in parts" :key="i">
-    <NuxtLink v-if="part.to" class="text-link" :to="part.to">{{ part.text }}</NuxtLink>
+    <a v-if="part.href" class="text-link" :href="part.href" target="_blank" rel="noopener">{{ part.text }}</a>
+    <NuxtLink v-else-if="part.to" class="text-link" :to="part.to">{{ part.text }}</NuxtLink>
     <template v-else>{{ part.text }}</template>
   </template>
 </template>

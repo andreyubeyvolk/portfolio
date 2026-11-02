@@ -8,7 +8,7 @@ cover:
   src: /assets/brands/house-of-walk/house-of-walk-cover.webp
   width: 2160
   height: 1435
-about: "House of Walk is a personal visual archive of photographs, stories, travels, and everyday moments. A space that preserves a personal perspective on the world and makes it possible to revisit memories. The project also became an experiment at the intersection of art direction, design, and AI-assisted development—a way to take a digital product from idea to launch using Claude Code."
+about: "[House of Walk](https://houseofwalk.org/) is a personal visual archive of photographs, stories, travels, and everyday moments. A space that preserves a personal perspective on the world and makes it possible to revisit memories. The project also became an experiment at the intersection of art direction, design, and AI-assisted development—a way to take a digital product from idea to launch using Claude Code."
 gallery:
   - type: wide
     item:
