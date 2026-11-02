@@ -170,7 +170,7 @@ kv:
   src: /assets/brands/house-of-walk/house-of-walk-kv.webp
   width: 412
   height: 410
-comingSoon: true
+zipUrl: /assets/brands/house-of-walk/house-of-walk-project-images.zip
 cardPreview:
   - src: /assets/brands/house-of-walk/house-of-walk-11-preview.webp
     width: 480
