@@ -17,7 +17,7 @@ gallery:
       width: 2160
       height: 1440
       alt: House of Walk website homepage
-      tip: "Штампы из China Art Museum"
+      note: "Stamps from the China Art Museum"
   - type: pair
     items:
       - type: image
@@ -58,7 +58,7 @@ gallery:
         width: 1080
         height: 1440
         alt: House of Walk city essay cover
-        tip: "дарк и лайт версия интерфейса"
+        note: "Dark and light interface versions"
       - type: image
         src: /assets/brands/house-of-walk/house-of-walk-08.webp
         width: 1080
@@ -83,15 +83,15 @@ gallery:
         width: 1080
         height: 1440
         player: bare
-        tip: "анимация сделана с помощью вайбкодинга"
+        note: "Animation made with vibe coding"
   - type: wide
     item:
-      type: image
-      src: /assets/brands/house-of-walk/house-of-walk-12.webp
+      type: video
+      src: /assets/brands/house-of-walk/house-of-walk-12.mp4
       width: 2160
       height: 1440
-      alt: House of Walk texture and paper effect
-      tip: "интерактивная игра через вайбкодинг"
+      player: bare
+      note: "Interactive game made with vibe coding"
   - type: wide
     item:
       type: image
@@ -111,7 +111,7 @@ gallery:
         width: 1080
         height: 1440
         alt: House of Walk tool — X-ray photo filter
-        tip: "обложки текстовых эссе о городах"
+        note: "Covers for text essays about cities"
   - type: wide
     item:
       type: video
