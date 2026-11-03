@@ -20,8 +20,8 @@ useSeoMeta({
 })
 useHead({ bodyAttrs: { class: 'project-page' } })
 
-const albumSrc = '/albums/sumsub/index.html?embed=1&v=4'
-const flatSrc = '/albums/sumsub/flat/index.html?v=4'
+const albumSrc = '/albums/sumsub/index.html?embed=1&v=5'
+const flatSrc = '/albums/sumsub/flat/index.html?v=5'
 
 const gallery = computed(() => {
   const rows = [...project.value!.gallery] as any[]

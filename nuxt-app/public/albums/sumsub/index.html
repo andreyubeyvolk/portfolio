@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="only light">   <!-- keeps "force dark" modes of some phone browsers from recolouring the album -->
 <title>Moleskine</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -584,6 +585,9 @@ const EMBED = QS.has('embed');
 const parentQS = (() => { try { return parent !== window ? new URLSearchParams(parent.location.search) : null; } catch (e) { return null; } })();   // same-origin page that embeds us: ?lite=1 on ITS url also counts
 const LITE = QS.get('lite') === '1' || (parentQS && parentQS.get('lite') === '1') || /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 let embedVisible = true;
+const embedPost = m => { try { parent.postMessage(Object.assign({ source: 'moleskine-album' }, m), '*'); } catch (e) {} };
+const EMBED_V = EMBED ? QS.get('v') : null;          // the page's version tag: also put on config.json and every picture, so a new export is never mixed with cached old files
+const versioned = u => (EMBED_V && u && !u.startsWith('data:') ? u + (u.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(EMBED_V) : u);
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -743,10 +747,11 @@ function applyScale() {
   el.persp.style.perspective = (ST.persp * s) + 'px';
   applyZoom();
 }
+const EMBED_CLOSED = .70, EMBED_OPEN = .90;              // share of the auto-fit size: the shut book (cover / back) is shown smaller, the open one grows to 90% when it opens
 function embedZoom() {
   const s = fitScale(), vw = el.persp.clientWidth / s, vh = el.persp.clientHeight / s;        // what the frame shows, in stage pixels
-  if (S.pose === 'closed') return Math.min(vw * .9 / 740, vh * .93 / 950);
-  return Math.min(vw * .965 / (1400 + 2 * ST.fanMax * ST.fanGap * .9), vh * .94 / 950);
+  if (S.pose !== 'open') return Math.min(vw * .9 / 740, vh * .93 / 950) * EMBED_CLOSED;       // closed, or closing onto its back
+  return Math.min(vw * .965 / (1400 + 2 * ST.fanMax * ST.fanGap * .9), vh * .94 / 950) * EMBED_OPEN;
 }
 function applyZoom() {
   const z = EMBED ? embedZoom() : (S.pose === 'closed' ? ST.zoomClosed : ST.zoomOpen) / 100;
@@ -2307,8 +2312,14 @@ function openAtInstant(n) {                           // no animation: used for 
   el.pageL.style.visibility = el.pageR.style.visibility = 'visible'; el.hint.style.display = 'none';
   el.book.getBoundingClientRect(); setTimeout(() => nodes.forEach(x => x.classList.remove('notrans')), 60); refreshUI();
 }
+function openBackInstant() {                          // the shut book seen from behind, no animation (?at=back: the last still of the flat version)
+  const nodes = [el.book, el.bflip, el.zoom]; nodes.forEach(x => x.classList.add('notrans'));
+  S.back = true; document.body.classList.add('back-view'); el.hint.style.display = 'none';
+  el.bflip.style.transform = 'rotateY(180deg)'; layoutBook();
+  el.book.getBoundingClientRect(); setTimeout(() => nodes.forEach(x => x.classList.remove('notrans')), 60); refreshUI();
+}
 function embedBoot() {
-  const post = m => { try { parent.postMessage(Object.assign({ source: 'moleskine-album' }, m), '*'); } catch (e) {} };
+  const post = embedPost;
   ST.sound = false; applySetting('sound');
   // ONE tap handler for mouse, touch and pen: pointer down+up close together = a tap; the whole left half turns back, the whole right half forward,
   // wherever the finger/cursor is (photo, sticker, gutter, empty space). The browser's own `click` is swallowed so nothing is handled twice.
@@ -2347,22 +2358,55 @@ function embedBoot() {
   // open by itself a moment after the frame is on screen; stop rendering while it is not
   let opened = false, t = 0;
   const open = () => { if (!opened && S.pose === 'closed' && !S.busy) { opened = true; openBook(); watchFps(); } };
-  if (QS.has('at')) { const n = +QS.get('at'); if (n > 0) openAtInstant(n); opened = true; }          // ?at=N: spread N at once; ?at=0: the closed album (stills for the flat version)
+  if (QS.has('at')) { const a = QS.get('at'); if (a === 'back') openBackInstant(); else if (+a > 0) openAtInstant(+a); opened = true; }          // ?at=N: spread N at once; ?at=0: the closed album; ?at=back: its back (stills for the flat version)
   if (QS.has('at')) imagesReady(document.body).then(() => requestAnimationFrame(() => requestAnimationFrame(() => { document.title = 'baked'; })));       // tells bake_flat.js that every picture is decoded and painted
   else if ('IntersectionObserver' in window) {
     new IntersectionObserver(es => { for (const e of es) { embedVisible = e.isIntersecting; if (e.isIntersecting && e.intersectionRatio >= .55) { clearTimeout(t); t = setTimeout(open, 900); } else clearTimeout(t); } }, { threshold: [0, .55, 1] }).observe(document.documentElement);
   } else setTimeout(open, 1200);
-  imagesReady(el.coverLayer).then(() => post({ type: 'ready' }));
+  // a picture that fails to load (flaky network) is asked for again a few times, with a changed URL so that no cached failure is reused
+  const tries = new WeakMap();
+  addEventListener('error', e => {
+    const im = e.target; if (!im || im.tagName !== 'IMG') return;
+    const n = (tries.get(im) || 0) + 1; if (n > 3) return; tries.set(im, n);
+    const base = (im.getAttribute('src') || '').replace(/([?&])_r=\d+&?/, '$1').replace(/[?&]$/, ''); if (!base || base.startsWith('data:')) return;
+    setTimeout(() => { im.src = base + (base.includes('?') ? '&' : '?') + '_r=' + n; }, n * n * 1200);
+  }, true);
+  // a turn that never finishes (an exception half-way, a decode that never returns) must not freeze the album: reset after 9 s and let the page switch to the flat version
+  let busyFor = 0;
+  setInterval(() => {
+    if (!S.busy || document.hidden || !embedVisible) { busyFor = 0; return; }
+    if (++busyFor < 9) return; busyFor = 0;
+    try { el.leaf.style.display = 'none'; $('front-ghost').innerHTML = ''; $('back-ghost').innerHTML = ''; S.busy = false; if (S.pose === 'open') { el.pageL.style.visibility = el.pageR.style.visibility = 'visible'; renderPages(); updateFan(); } layoutBook(); refreshUI(); } catch (e) {}
+    post({ type: 'slow', fps: 0, reason: 'stuck' });
+  }, 1000);
+  // "ready" = the cover is really there (loaded and decoded). With a dead network the page keeps its poster and is told so, instead of fading in an empty book
+  (async () => {
+    for (let i = 0; i < 100; i++) {
+      if ([...el.coverLayer.querySelectorAll('img')].every(im => im.complete && im.naturalWidth > 0)) { await imagesReady(el.coverLayer); post({ type: 'ready' }); return; }
+      await wait(200);
+    }
+    post({ type: 'error', reason: 'cover' });
+  })();
 }
 (async function loadInitial() {
   let cfg = null, from = '';
   if (!CLEAN) { try { const a = await IDB.get('autosave'); if (a && a.data) { cfg = a.data; from = 'auto'; savedAt = a.t; } } catch (e) {} }
-  if (!cfg) { try { const r = await fetch('config.json'); if (r.ok) { cfg = await r.json(); from = 'file'; } } catch (e) {} }
-  if (cfg) { try { importConfig(cfg); if (from === 'auto' && !CLEAN) toast('Загружено автосохранение'); } catch (e) { console.error(e); } }
+  // on the web page a flaky network gets four tries (about 8 s in all); the editor just tries once
+  for (let i = 0; i < (EMBED ? 4 : 1) && !cfg; i++) {
+    if (i) await wait(i * i * 700);
+    try { const r = await fetch(versioned('config.json'), i ? { cache: 'reload' } : undefined); if (r.ok) { cfg = await r.json(); from = 'file'; } } catch (e) {}
+  }
+  if (cfg && EMBED_V) {
+    const one = it => { if (it && it.src) it.src = versioned(it.src); }, grp = g => g && ['images', 'stickers'].forEach(k => (g[k] || []).forEach(one));
+    (cfg.pages || []).forEach(p => { grp(p.left); grp(p.right); (p.span || []).forEach(one); }); grp(cfg.cover); grp(cfg.back);
+    if (cfg.settings) ['bgImg', 'bellyImg'].forEach(k => { if (cfg.settings[k]) cfg.settings[k] = versioned(cfg.settings[k]); });
+  }
+  let broken = !cfg;
+  if (cfg) { try { importConfig(cfg); if (from === 'auto' && !CLEAN) toast('Загружено автосохранение'); } catch (e) { console.error(e); broken = true; } }
   else histReset();
   [1, 2, 3].forEach(prefetchSpread);
   updateSaveInfo(); READY = true;
-  if (EMBED) embedBoot();
+  if (EMBED) { if (broken) embedPost({ type: 'error', reason: 'config' }); else embedBoot(); }      // no config = no album: the page keeps its poster (or tries the flat version)
   if (IS_DEV) { togglePanel(true); setTimeout(() => { if (S.pose === 'closed') openBook(); }, 300); }
 })();
 </script>
