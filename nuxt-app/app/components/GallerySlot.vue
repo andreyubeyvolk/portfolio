@@ -15,6 +15,7 @@ export interface GalleryMediaItem {
   // page, poster the still shown while it loads / if it never does.
   type: 'image' | 'video' | 'embed'
   poster?: string
+  flatSrc?: string
   title?: string
   src: string
   width: number
@@ -166,7 +167,7 @@ onBeforeUnmount(() => {
     @mouseleave="item.tip ? onTipLeave() : undefined"
   >
     <img v-if="item.type === 'image'" v-pinch-zoom :width="item.width" :height="item.height" loading="lazy" :src="item.src" :alt="item.alt || ''" />
-    <AlbumEmbed v-else-if="item.type === 'embed'" :src="item.src" :poster="item.poster" :title="item.title || item.alt" />
+    <AlbumEmbed v-else-if="item.type === 'embed'" :src="item.src" :flat-src="item.flatSrc" :poster="item.poster" :title="item.title || item.alt" />
     <!-- `paired` (cropped, absolutely positioned to fill the box) only
          makes sense when there IS a sized box (a wrapperClass) to fill--a
          standalone top-level video (empty wrapperClass, see

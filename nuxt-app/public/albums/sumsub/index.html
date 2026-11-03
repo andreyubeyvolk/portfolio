@@ -285,7 +285,7 @@ body.strip-on #counter, body.strip-on #hint, body.strip-on #toast { left: calc(v
 /* ───────── EMBED / LITE ───────── */
 html { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 body.embed #ui { display: none !important; }
-@media (pointer: coarse) { body.embed .card { pointer-events: none; } }          /* a tap anywhere on a half turns the page; the thin cards at the sides must not catch it */
+body.embed .card { pointer-events: none; }          /* a click anywhere on a half turns the page; the thin cards at the sides must not catch it */
 body.lite #ground { filter: blur(18px); }
 
 /* ───────── UI (Aurora tokens, light panel) ───────── */
@@ -1184,7 +1184,7 @@ function setLeaf(p, fwd) {
   (fwd ? $('pr-flip') : $('pl-flip')).style.background = `linear-gradient(${fwd ? 90 : 270}deg, rgba(0,0,0,${k}), rgba(0,0,0,0) 80%)`;
 }
 // decode pictures before they are shown, so a turning page never flashes empty or half-drawn
-const imagesReady = (...boxes) => Promise.race([Promise.all(boxes.flatMap(b => [...b.querySelectorAll('img')]).map(i => i.decode ? i.decode().catch(() => {}) : 0)), wait(800)]);
+const imagesReady = (...boxes) => Promise.race([Promise.all(boxes.flatMap(b => [...b.querySelectorAll('img')]).map(i => i.decode ? i.decode().catch(() => {}) : 0)), wait(EMBED ? 3000 : 800)]);
 const imgCache = new Map();
 function prefetchSpread(n) {
   if (n < 1 || n > S.total || !pages[n - 1]) return;
@@ -1237,11 +1237,11 @@ async function flip(dir, ms) {
   const t0 = performance.now();
   await new Promise(res => {
     setTimeout(res, ms + 120);
-    (function step(now) {
-      const p = clamp((now - t0) / ms, 0, 1);
+    (function step() {
+      const p = clamp((performance.now() - t0) / ms, 0, 1);      // not the rAF timestamp: inside an iframe it can run on a different clock than performance.now(), which froze the leaf at 0 (no turn, only the sliding card)
       setLeaf(p, fwd);
       if (p < 1) requestAnimationFrame(step); else res();
-    })(t0);
+    })();
   });
   if (fwd) el.plc.replaceChildren(...$('leaf-b').childNodes); else el.prc.replaceChildren(...$('leaf-f').childNodes);
   if (slidePage) { slidePage.style.visibility = 'visible'; slideCard.remove(); }
@@ -2310,20 +2310,45 @@ function openAtInstant(n) {                           // no animation: used for 
 function embedBoot() {
   const post = m => { try { parent.postMessage(Object.assign({ source: 'moleskine-album' }, m), '*'); } catch (e) {} };
   ST.sound = false; applySetting('sound');
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { ST.flipMs = 260; ST.openMs = 450; }
-  // taps: the whole left half turns back, the whole right half forward (see the click handler); swipes do the same on touch screens
+  // ONE tap handler for mouse, touch and pen: pointer down+up close together = a tap; the whole left half turns back, the whole right half forward,
+  // wherever the finger/cursor is (photo, sticker, gutter, empty space). The browser's own `click` is swallowed so nothing is handled twice.
   let sx = 0, sy = 0, st = 0, sid = null;
-  addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') return; sx = e.clientX; sy = e.clientY; st = performance.now(); sid = e.pointerId; }, { passive: true });
+  const tapAt = x => { if (S.busy) return; if (S.pose === 'closed') openBook(); else if (S.pose === 'open') flip(x < innerWidth / 2 ? -1 : 1); };
+  addEventListener('pointerdown', e => { if (e.button > 0) return; sid = e.pointerId; sx = e.clientX; sy = e.clientY; st = performance.now(); }, true);
   addEventListener('pointerup', e => {
-    if (e.pointerId !== sid) return; sid = null; const dx = e.clientX - sx, dy = e.clientY - sy;
-    if (performance.now() - st < 700 && Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.6) { dragEndT = performance.now(); if (S.pose === 'open') flip(dx < 0 ? 1 : -1); else if (S.pose === 'closed' && dx < 0) openBook(); }
-  }, { passive: true });
+    if (e.pointerId !== sid) return; sid = null; const dx = e.clientX - sx, dy = e.clientY - sy, dt = performance.now() - st;
+    if (Math.hypot(dx, dy) < 10 && dt < 800) tapAt(e.clientX);
+    else if (e.pointerType !== 'mouse' && dt < 700 && Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.6) { if (S.pose === 'open') flip(dx < 0 ? 1 : -1); else if (S.pose === 'closed' && dx < 0) openBook(); }
+  }, true);
+  addEventListener('click', e => { e.stopImmediatePropagation(); }, true);
   // the page that embeds us scrolls smoothly (Lenis): wheel events over the frame never reach it, so they are handed over
   if (parent !== window) addEventListener('wheel', e => { e.preventDefault(); post({ type: 'wheel', dx: e.deltaX, dy: e.deltaY, mode: e.deltaMode }); }, { passive: false });
+  // every picture is fetched in the background (two at a time, nearest spreads first) so a turning page finds its pictures in the cache
+  const urls = []; pages.forEach((pg, i) => [...pg.left.images, ...pg.left.stickers, ...pg.right.images, ...pg.right.stickers, ...(pg.span || [])].forEach(d => { if (d.src && !d.src.startsWith('data:')) urls.push([i, d.src]); }));
+  urls.sort((a, b) => a[0] - b[0]); let qi = 0;
+  const pump = () => { if (qi >= urls.length) return; const u = urls[qi++][1]; fetch(u).then(r => r.blob()).catch(() => {}).then(pump); };
+  setTimeout(() => { pump(); pump(); }, 600);
+  // a slow device tells the page, which then switches to the flat version
+  // Windows of 2.5 s are measured only while the frame is visible and frames keep coming (a hidden / throttled tab is not a slow device); two slow windows
+  // in total = slow, two fast ones = fine, stop watching either way.
+  const watchFps = () => {
+    let n = 0, t0 = 0, last = 0, slow = 0, fast = 0;
+    const tick = t => {
+      if (document.hidden || !embedVisible || (last && t - last > 400)) { n = 0; t0 = 0; last = 0; requestAnimationFrame(tick); return; }
+      last = t; if (!t0) t0 = t; n++;
+      if (t - t0 > 2500) {
+        const fps = n / ((t - t0) / 1000); n = 0; t0 = 0;
+        if (fps < 18) { if (++slow >= 2) { post({ type: 'slow', fps: Math.round(fps) }); return; } } else if (++fast >= 2) return;
+      }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
   // open by itself a moment after the frame is on screen; stop rendering while it is not
   let opened = false, t = 0;
-  const open = () => { if (!opened && S.pose === 'closed' && !S.busy) { opened = true; openBook(); } };
-  if (QS.has('at')) { openAtInstant(+QS.get('at') || 1); opened = true; }
+  const open = () => { if (!opened && S.pose === 'closed' && !S.busy) { opened = true; openBook(); watchFps(); } };
+  if (QS.has('at')) { const n = +QS.get('at'); if (n > 0) openAtInstant(n); opened = true; }          // ?at=N: spread N at once; ?at=0: the closed album (stills for the flat version)
+  if (QS.has('at')) imagesReady(document.body).then(() => requestAnimationFrame(() => requestAnimationFrame(() => { document.title = 'baked'; })));       // tells bake_flat.js that every picture is decoded and painted
   else if ('IntersectionObserver' in window) {
     new IntersectionObserver(es => { for (const e of es) { embedVisible = e.isIntersecting; if (e.isIntersecting && e.intersectionRatio >= .55) { clearTimeout(t); t = setTimeout(open, 900); } else clearTimeout(t); } }, { threshold: [0, .55, 1] }).observe(document.documentElement);
   } else setTimeout(open, 1200);
