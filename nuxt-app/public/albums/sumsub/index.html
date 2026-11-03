@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moleskine</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cur-rot: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 9a8 8 0 1 0 1.5 7.5' stroke='%23fff' stroke-width='5'/%3E%3Cpath d='M20 4v6h-6' stroke='%23fff' stroke-width='5'/%3E%3Cpath d='M20 9a8 8 0 1 0 1.5 7.5' stroke='%2315171C' stroke-width='2.2'/%3E%3Cpath d='M20 4v6h-6' stroke='%2315171C' stroke-width='2.2'/%3E%3C/g%3E%3C/svg%3E") 14 14, crosshair;
+  --pw: clamp(300px, 34vw, 384px); --pl: calc(var(--pw) + 24px);
+  --hgC: 25px; --hgW: 20px; --hgD: 1; --hgE: .55;
+  --bo: 3px; --bsw: 16px; --bsa: .32; --bth: 1.2px; --stk-fx: none; --stk-dyn: .4;
+  --hk: 24px; --hb: 3px;
+  --T: 64px;            /* book thickness */
+  --cover: #171717;
+  --grain: .14;
+  --paper: #f4efe4;
+  --et: 2px;
+  --e1: #e6dfcb; --e2: #dcd4be; --e3: #d1c9b2; --e4: #c5bca5; --e5: #b9af98; --pa: #efe9d8; --pb: #d3cbb5;
+  --band: #101010;
+  --bandX: 560px;
+  --bandW: 40px;
+  --ribbon: #121212;
+  --ribbonX: 54px;
+  --ribbonLen: 74px;
+  --thread: #ebe2cb;
+  --gutter: .45;
+  --belly: #d9d6ee;
+  --bellyY: 50%;
+  --bellyH: 22%;
+  --tr: 850ms;
+  --bg: #141828;
+}
+html, body { width: 100%; height: 100%; overflow: hidden;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif; user-select: none; -webkit-user-select: none; }
+body::before { content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse 90% 75% at 50% 38%, rgba(255,255,255,var(--glow,.08)) 0%, rgba(255,255,255,0) 70%),
+              radial-gradient(ellipse 120% 100% at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,var(--vig,.35)) 100%); }
+
+/* ───────── 3D STAGE ───────── */
+#persp { position: fixed; inset: 0; perspective: 2600px; perspective-origin: 50% 46%; pointer-events: none; z-index: 1; }
+#root  { position: absolute; left: 50%; top: 50%; width: 2160px; height: 1440px; margin: -720px 0 0 -1080px;
+         transform-style: preserve-3d; transform-origin: 50% 50%; }
+#zoom  { position: absolute; inset: 0; transform-style: preserve-3d; transform-origin: 50% 50%;
+         transition: transform .9s cubic-bezier(.45,0,.2,1); }
+#pivot { position: absolute; left: 1080px; top: 720px; width: 0; height: 0; transform-style: preserve-3d; }
+#bflip { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; transform-origin: 0 0;
+         transition: transform var(--tr) cubic-bezier(.45,0,.2,1); }
+#book  { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d;
+         transition: transform var(--tr) cubic-bezier(.45,0,.2,1); }
+.notrans, .notrans * { transition: none !important; }
+
+#ground { position: absolute; left: -345px; top: -470px; width: 690px; height: 940px; background: #000; opacity: .5;
+  border-radius: 40px; filter: blur(34px); transform: translateZ(-90px);
+  transition: width var(--tr) ease, left var(--tr) ease, opacity var(--tr) ease; pointer-events: none; }
+#ground.open { left: -700px; width: 1400px; opacity: .42; }
+
+/* ───────── COVER PLATES ───────── */
+.plate { position: absolute; left: 0; top: -10px; width: 690px; height: 920px; transform-style: preserve-3d; transform-origin: 0 50%;
+  transition: transform var(--tr) cubic-bezier(.5,0,.25,1); }
+.face { position: absolute; inset: 0; backface-visibility: hidden; outline: 1px solid transparent; }
+.face.b { transform: rotateY(180deg); }
+.cover-face { background-color: var(--cover); border-radius: 0 22px 22px 0; overflow: hidden; isolation: isolate; clip-path: inset(0 round 0 22px 22px 0); }
+.face.b.cover-face { border-radius: 22px 0 0 22px; clip-path: inset(0 round 22px 0 0 22px); }   /* face.b is mirrored: its local left edge is the opening edge */
+.cover-face::before { content: ''; position: absolute; inset: 0; border-radius: inherit; opacity: var(--grain); pointer-events: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 0 0 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.035' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  .6 0 0 0 -.05'/%3E%3C/filter%3E%3Crect width='420' height='420' filter='url(%23m)'/%3E%3C/svg%3E");
+}
+/* hinge groove + rounded spine shading on outer cover */
+.cover-face .hinge { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--hgC) + var(--hgW) * 1.4 + 6px); pointer-events: none;     /* hgD depth, hgW width, hgC distance from the spine edge, hgE shade at the very edge (settings) */
+  background:
+    linear-gradient(90deg, rgba(0,0,0,var(--hgE)) 0, rgba(0,0,0,0) 14px),
+    linear-gradient(90deg, transparent 0, transparent calc(var(--hgC) - var(--hgW) * .25), rgba(0,0,0,calc(.6 * var(--hgD))) var(--hgC), rgba(0,0,0,calc(.22 * var(--hgD))) calc(var(--hgC) + var(--hgW) * .3), rgba(255,255,255,calc(.10 * var(--hgD))) calc(var(--hgC) + var(--hgW) * .55), rgba(255,255,255,calc(.04 * var(--hgD))) calc(var(--hgC) + var(--hgW) * .85), transparent calc(var(--hgC) + var(--hgW) * 1.35)); }
+.cover-face .hinge.mirror { left: auto; right: 0; transform: scaleX(-1); }
+.cover-gloss { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+#gloss-blob { position: absolute; left: 0; top: 0; width: 1400px; height: 1120px; will-change: transform, opacity; pointer-events: none;
+  background: radial-gradient(closest-side, #fff 0%, rgba(255,255,255,.35) 45%, rgba(255,255,255,0) 100%); opacity: 0; }
+.inset { position: absolute; top: 10px; height: 900px; width: 680px; background: var(--paper); overflow: hidden; }
+.inset.l { left: 10px; border-radius: 12px 3px 3px 12px; }   /* face.b of front plate (mirrored space) */
+.inset.r { left: 0;    border-radius: 3px 12px 12px 3px; box-shadow: inset 4px 0 0 var(--cover); }   /* the outermost 4px at the spine stay cover-coloured: no cream can show at the very edge */   /* face.a of back plate */
+
+/* elastic band */
+.band { position: absolute; width: var(--bandW);
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.075) 0 1px, rgba(0,0,0,.18) 1px 3px),
+    linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 14%, rgba(255,255,255,.12) 50%, rgba(0,0,0,0) 86%, rgba(0,0,0,.55) 100%),
+    var(--band);
+  box-shadow: -3px 0 6px rgba(0,0,0,.5), 3px 0 6px rgba(0,0,0,.4); pointer-events: none; }
+.band.front { top: 0; bottom: 0; left: var(--bandX); transform: translateZ(2.5px); backface-visibility: hidden; }
+.band.front.back-outer { left: auto; right: calc(var(--bandX) - 0px); }
+.band.tab { left: var(--bandX); height: 24px; transform: translateZ(4px); border-radius: 0 0 3px 3px; }
+.band.tab.top { top: 0; } .band.tab.bot { bottom: 0; border-radius: 3px 3px 0 0; }
+.band-wrap { position: absolute; left: var(--bandX); width: var(--bandW); height: calc(var(--T) + 6px); transform-origin: 0 0;
+  background: linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 14%, rgba(255,255,255,.1) 50%, rgba(0,0,0,0) 86%, rgba(0,0,0,.55) 100%),
+              repeating-linear-gradient(90deg, rgba(255,255,255,.07) 0 1px, rgba(0,0,0,.15) 1px 3px), var(--band);
+  transition: opacity .35s; pointer-events: none; }
+#wrap-top { top: -13px; transform: translateZ(calc(var(--T) / -2 - 3px)) rotateX(90deg); }
+#wrap-bot { top: 913px; transform: translateZ(calc(var(--T) / 2 + 3px)) rotateX(-90deg); }
+.is-open .band-wrap, .is-open .pb, .is-open .belly-wrap { opacity: 0; }
+
+/* belly band (paper wrapper) */
+.belly { position: absolute; left: calc(var(--bo) * -1); width: calc(690px + var(--bo) * 2); top: var(--bellyY); height: var(--bellyH);
+  transform: translateZ(1.2px); backface-visibility: hidden;
+  background-color: var(--belly); background-size: cover; background-position: center; pointer-events: none;
+  box-shadow: 0 var(--bth) calc(var(--bth) * 1.8) rgba(0,0,0,.42), 0 calc(var(--bth) * -.45) 0 rgba(255,255,255,.28);   /* paper thickness: lit top edge, shadow underneath */
+  transition: opacity .35s, transform .5s; }
+/* the band folds over the board edges: a narrow shade at the very edge, a soft lit rounding just inside it (width/strength are settings) */
+.belly::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,calc(var(--bsa) * 1.15)) 0, rgba(0,0,0,calc(var(--bsa) * .6)) calc(var(--bsw) * .2), rgba(255,255,255,calc(var(--bsa) * .3)) calc(var(--bsw) * .62), rgba(255,255,255,0) var(--bsw)),
+    linear-gradient(270deg, rgba(0,0,0,var(--bsa)) 0, rgba(0,0,0,calc(var(--bsa) * .55)) calc(var(--bsw) * .2), rgba(255,255,255,calc(var(--bsa) * .26)) calc(var(--bsw) * .62), rgba(255,255,255,0) var(--bsw)); }
+.belly-off .belly, .belly-off .belly-wrap { display: none; }
+.is-open .belly { opacity: 0; transform: translateZ(1.2px) translateX(30px); }
+.pile .belly { opacity: 1; transform: translateZ(1.2px); }
+.band-off .band, .band-off .band-wrap { display: none; }
+
+#cover-top { position: absolute; inset: 0; transform: translateZ(2px); backface-visibility: hidden; overflow: hidden; clip-path: inset(0 round 6px 22px 22px 6px); pointer-events: none; }
+#cover-layer, #back-layer { position: absolute; inset: 0; z-index: 5; }
+#back-layer .item { pointer-events: none !important; } body.back-view #back-layer .item.editable { pointer-events: auto !important; }
+.is-open #cover-layer .item { pointer-events: none !important; }
+.face.b .cover-face-fix { display: none; }
+
+/* ───────── PAGE BLOCK FILLER (closed state) ───────── */
+.pb { position: absolute; backface-visibility: hidden; transition: opacity .4s; pointer-events: none; }
+#pb-right  { left: 680px; top: 12px; width: calc(var(--T) - 8px); height: 876px; transform-origin: 0 0;
+  transform: translateZ(calc((var(--T) - 8px) / 2)) rotateY(90deg);
+  background: repeating-linear-gradient(90deg, var(--pa) 0 1.2px, var(--pb) 1.2px 2.4px); box-shadow: inset 0 0 20px rgba(0,0,0,.25); }
+#pb-top    { left: 3px; top: 0; width: 665px; height: calc(var(--T) - 8px); transform-origin: 0 0;
+  transform: translateZ(calc((var(--T) - 8px) / -2)) rotateX(90deg);
+  background: repeating-linear-gradient(0deg, var(--pa) 0 1.2px, var(--pb) 1.2px 2.4px); box-shadow: inset 0 0 16px rgba(0,0,0,.25); }
+#pb-bot    { left: 3px; top: 900px; width: 665px; height: calc(var(--T) - 8px); transform-origin: 0 0;
+  transform: translateZ(calc((var(--T) - 8px) / 2)) rotateX(-90deg);
+  background: repeating-linear-gradient(0deg, var(--pa) 0 1.2px, var(--pb) 1.2px 2.4px); box-shadow: inset 0 0 16px rgba(0,0,0,.25); }
+/* the spine face sits almost flush with the plate edges (a 2px gap showed the white paper inside as a thin line when seen at an angle), is 1.5px longer at both ends so it tucks over the cover corners, and a dark backing plane sits just behind it so no seam can ever show paper */
+#pb-spine  { left: 0; top: -10px; width: calc(var(--T) + 3px); height: 920px; transform-origin: 0 0;
+  transform: translate3d(.4px, 0, calc(var(--T) / -2 - 1.5px)) rotateY(-90deg);
+  background-color: var(--cover);
+  background-image: linear-gradient(90deg, rgba(0,0,0,.75) 0, rgba(0,0,0,.2) 12%, rgba(255,255,255,.12) 38%, rgba(255,255,255,.2) 50%, rgba(255,255,255,.06) 64%, rgba(0,0,0,.35) 88%, rgba(0,0,0,.8) 100%); }
+.belly-wrap { position: absolute; transition: opacity .35s; background: var(--belly); pointer-events: none; }
+#belly-r { left: 0; top: var(--bellyY); width: calc(var(--T) - 8px); height: var(--bellyH); }
+#belly-s { left: 1.5px; top: var(--bellyY); width: var(--T); height: var(--bellyH); }
+/* a dark core inside the closed book: a ray that slips between the spine face and a cover edge at a shallow angle meets this instead of the cream paper of the back cover (that was the thin white line along the spine) */
+#pb-core { left: 0; top: 0; width: 680px; height: 900px; background: #0b0b0b; transform: translateZ(0); }
+#pb-spine-in { left: 0; top: -8px; width: var(--T); height: 916px; transform-origin: 0 0; transform: translate3d(1.6px, 0, calc(var(--T) / -2)) rotateY(-90deg);
+  background: color-mix(in srgb, var(--cover) 45%, #000); }
+#pb-right .belly-wrap, #pb-spine .belly-wrap { box-shadow: 0 0 2px rgba(0,0,0,.4); }
+
+#spine-bridge { position: absolute; left: -6px; top: -10px; width: 12px; height: 920px; background: var(--cover); transform: translateZ(-3.4px); opacity: 0; transition: opacity .3s; pointer-events: none; }
+.is-open #spine-bridge { opacity: 1; }
+#ribbon { position: absolute; left: var(--ribbonX); top: 880px; width: 13px; height: calc(var(--ribbonLen) + 20px);
+  transform: translateZ(1.6px); backface-visibility: hidden;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,.07) 0 1px, rgba(0,0,0,.16) 1px 3px),
+    linear-gradient(90deg, rgba(0,0,0,.5), rgba(255,255,255,.14) 45%, rgba(0,0,0,.45)), var(--ribbon);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 9px), 0 100%); box-shadow: 1px 0 5px rgba(0,0,0,.5); pointer-events: none; }
+
+/* ───────── PAGES ───────── */
+.paper { background-color: var(--paper);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E"); }
+.page { position: absolute; top: 0; width: 680px; height: 900px; overflow: hidden; outline: 1px solid transparent; pointer-events: auto; }
+#page-L { left: -680px; border-radius: 12px 3px 3px 12px;
+  box-shadow: calc(var(--et) * -.2) calc(var(--et) * .2) 0 var(--e1), calc(var(--et) * -.4) calc(var(--et) * .4) 0 var(--e2), calc(var(--et) * -.6) calc(var(--et) * .6) 0 var(--e3), calc(var(--et) * -.8) calc(var(--et) * .8) 0 var(--e4), calc(var(--et) * -1) var(--et) 0 var(--e5); }
+#page-R { left: 0; border-radius: 3px 12px 12px 3px;
+  box-shadow: calc(var(--et) * .2) calc(var(--et) * .2) 0 var(--e1), calc(var(--et) * .4) calc(var(--et) * .4) 0 var(--e2), calc(var(--et) * .6) calc(var(--et) * .6) 0 var(--e3), calc(var(--et) * .8) calc(var(--et) * .8) 0 var(--e4), var(--et) var(--et) 0 var(--e5); }
+.page-content { position: absolute; inset: 0; }
+.shade { position: absolute; inset: 0; pointer-events: none; }
+.gutter-l { background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,calc(var(--gutter) * .22)) 55%, rgba(0,0,0,calc(var(--gutter) * .75)) 100%); }
+.gutter-r { background: linear-gradient(270deg, rgba(0,0,0,0) 0%, rgba(0,0,0,calc(var(--gutter) * .22)) 55%, rgba(0,0,0,calc(var(--gutter) * .75)) 100%); }
+.gutter-l, .gutter-r { position: absolute; top: 0; bottom: 0; width: 90px; pointer-events: none; }
+.gutter-l { left: auto; right: 0; } .gutter-r { right: auto; left: 0; }
+
+/* stitched spine thread */
+/* crease + stitches sit high above the page plane so the turning leaf never hides them (it lifts only a few px near the spine) */
+/* both overlays float above the page, so perspective/tilt parallax pushes their ends 1-4px past the page edge (light stitch tips showed on the black frame): inset them and fade the ends */
+#stitch { position: absolute; left: -7px; top: 16px; width: 14px; height: 868px; pointer-events: none; transform: translateZ(32px);
+  background-repeat: repeat-y; filter: drop-shadow(0 0 1px rgba(0,0,0,.35)); transition: opacity .3s;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%); }
+#stitch.hidden, #stitch.away, #crease.away { opacity: 0; }
+#crease { position: absolute; left: -40px; top: 8px; width: 80px; height: 884px; pointer-events: none; transform: translateZ(31px); transition: opacity .3s;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  background: linear-gradient(90deg, rgba(0,0,0,0) 0, rgba(0,0,0,calc(var(--gutter) * .25)) 30%, rgba(0,0,0,calc(var(--gutter) * .9)) 49%, rgba(0,0,0,calc(var(--gutter) * 1.1)) 50%, rgba(0,0,0,calc(var(--gutter) * .6)) 51%, rgba(0,0,0,calc(var(--gutter) * .25)) 70%, rgba(0,0,0,0) 100%); }
+
+/* ───────── FAN CARDS ───────── */
+.fan { position: absolute; left: 0; top: 0; width: 0; height: 900px; transform-style: flat; perspective: var(--fp, 3200px); perspective-origin: 0 450px; transform: translateZ(-1.5px); }
+.card { position: absolute; top: 0; width: 680px; height: 900px; overflow: hidden; outline: 1px solid transparent;
+  transition: transform var(--tr) cubic-bezier(.4,0,.2,1), opacity var(--tr); pointer-events: auto; cursor: pointer; }
+.card.L { left: -680px; transform-origin: 100% 50%; border-radius: 12px 3px 3px 12px;
+  box-shadow: calc(var(--et) * -.2) calc(var(--et) * .2) 0 var(--e1), calc(var(--et) * -.4) calc(var(--et) * .4) 0 var(--e2), calc(var(--et) * -.6) calc(var(--et) * .6) 0 var(--e3), calc(var(--et) * -.8) calc(var(--et) * .8) 0 var(--e4), calc(var(--et) * -1) var(--et) 0 var(--e5); }
+.card.R { left: 0;      transform-origin: 0 50%;    border-radius: 3px 12px 12px 3px;
+  box-shadow: calc(var(--et) * .2) calc(var(--et) * .2) 0 var(--e1), calc(var(--et) * .4) calc(var(--et) * .4) 0 var(--e2), calc(var(--et) * .6) calc(var(--et) * .6) 0 var(--e3), calc(var(--et) * .8) calc(var(--et) * .8) 0 var(--e4), var(--et) var(--et) 0 var(--e5); }
+.cm { background: linear-gradient(270deg, rgba(0,0,0,.14), rgba(0,0,0,.05)); opacity: var(--mr, 0); }
+.card.L .cm { background: linear-gradient(90deg, rgba(0,0,0,.14), rgba(0,0,0,.05)); opacity: var(--ml, 0); }
+#leaf .face.b .cm { opacity: var(--ml, 0); }
+.card .card-shade { position: absolute; inset: 0; pointer-events: none; transition: opacity var(--tr); }
+
+/* flipping leaf */
+#leaf { position: absolute; left: 0; top: 0; width: 680px; height: 900px; transform-style: preserve-3d; transform-origin: 0 50%; display: none; pointer-events: none; }
+#leaf .face { overflow: hidden; box-shadow: calc(var(--et) * .2) calc(var(--et) * .2) 0 var(--e1), calc(var(--et) * .4) calc(var(--et) * .4) 0 var(--e2), calc(var(--et) * .6) calc(var(--et) * .6) 0 var(--e3), calc(var(--et) * .8) calc(var(--et) * .8) 0 var(--e4), var(--et) var(--et) 0 var(--e5); }
+#leaf .item, #leaf .empty-hint { pointer-events: none !important; } #leaf .hdl, #leaf .ring { display: none !important; }
+#leaf .face.a { border-radius: 3px 12px 12px 3px; }
+#leaf .face.b { border-radius: 12px 3px 3px 12px; }   /* the back face is mirrored (rotateY 180): its local LEFT edge is the outer edge once the leaf lies on the left page; the old 3/12 order made the page lose its rounded corners during turns, mostly backwards */
+
+/* ───────── ITEMS ON PAGES ───────── */
+.item { position: absolute; left: 0; top: 0; transform-origin: center center; }
+.item.editable { pointer-events: auto; cursor: pointer; } .item.editable.sel { cursor: move; }
+.item img { display: block; width: 100%; height: auto; pointer-events: none; -webkit-user-drag: none; }
+.item.stk > img { filter: var(--stk-fx); }
+.item .dyn { position: absolute; inset: 0; pointer-events: none; opacity: var(--stk-dyn);
+  -webkit-mask-image: var(--stk-mask); mask-image: var(--stk-mask); -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }   /* mouse highlight only where the sticker is */
+.item .ring { position: absolute; inset: -3px; border: calc(var(--hb, 3px) / var(--is, 1)) dashed #15171C; box-shadow: 0 0 0 calc(var(--hb, 3px) / var(--is, 1) / 2) rgba(255,255,255,.85); pointer-events: none; display: none; }
+.item .hdl { --sz: calc(var(--hk, 24px) / var(--is, 1)); position: absolute; width: var(--sz); height: var(--sz); margin: calc(var(--sz) / -2) 0 0 calc(var(--sz) / -2); border-radius: 2px; background: #fff;
+  border: calc(var(--hb, 3px) / var(--is, 1)) solid #15171C; display: none; z-index: 9; box-shadow: 0 0 0 calc(var(--hb, 3px) / var(--is, 1) / 2) rgba(255,255,255,.9), 0 1px 4px rgba(0,0,0,.45); }
+.item .hdl::before { content: ''; position: absolute; inset: calc(var(--sz) * -1); }
+.item .hdl[data-h=nw]{left:var(--nwx,0%);top:var(--nwy,0%);cursor:nwse-resize} .item .hdl[data-h=ne]{left:var(--nex,100%);top:var(--ney,0%);cursor:nesw-resize}
+.item .hdl[data-h=sw]{left:var(--swx,0%);top:var(--swy,100%);cursor:nesw-resize} .item .hdl[data-h=se]{left:var(--sex,100%);top:var(--sey,100%);cursor:nwse-resize}
+.item .hdl[data-h=rot]{left:var(--rx,50%);top:var(--ry,calc(var(--sz) * 1.6));cursor:var(--cur-rot);background:#15171C;border-radius:50%}
+.item.sel .ring, .item.sel .hdl { display: block; }
+
+/* ───────── COLOUR GRADE: one look for every photo (variables are set from the settings; chips override them locally for their previews) ───────── */
+:root { --g-filter: none; --g-tint: #000; --g-tint-a: 0; --g-blend: soft-light; --g-warm: #ff9a3c; --g-warm-a: 0; --g-fade: 0; --g-vig: 0; --g-grain: 0; --g-noise: none; }
+.gx, .gf, .gn { position: absolute; inset: 0; pointer-events: none; display: none; }
+.gx { box-shadow: inset 0 0 140px 20px rgba(0,0,0,var(--g-vig)); }
+.gx::before, .gx::after { content: ''; position: absolute; inset: 0; display: none; }
+.gx::before { background: var(--g-tint); opacity: var(--g-tint-a); mix-blend-mode: var(--g-blend); }
+.gx::after  { background: var(--g-warm); opacity: var(--g-warm-a); mix-blend-mode: soft-light; }
+.gf { background: #3a3d46; opacity: calc(var(--g-fade) * 2); mix-blend-mode: lighten; }                      /* lifted blacks (matte) */
+.gn { background-image: var(--g-noise); background-size: 200px; opacity: var(--g-grain); mix-blend-mode: overlay; }   /* film grain */
+body.grade-on .item.img > img { filter: var(--g-filter); }   /* stickers get the look through --stk-fx */
+body.grade-on.g-gx .item.img > .gx, body.grade-on.grade-stk.g-gx .item.stk > .gx { display: block; }
+body.grade-on.g-tint .item.img > .gx::before, body.grade-on.grade-stk.g-tint .item.stk > .gx::before { display: block; }
+body.grade-on.g-warm .item.img > .gx::after, body.grade-on.grade-stk.g-warm .item.stk > .gx::after { display: block; }
+body.grade-on.g-fade .item.img > .gf, body.grade-on.grade-stk.g-fade .item.stk > .gf { display: block; }
+body.grade-on.g-grain .item.img > .gn, body.grade-on.grade-stk.g-grain .item.stk > .gn { display: block; }
+.gph { position: relative; display: block; overflow: hidden; border-radius: 6px; height: 54px; background: #ddd; isolation: isolate; }
+.gph img { display: block; width: 100%; height: 100%; object-fit: cover; filter: var(--g-filter); }
+.gph > .gx, .gph > .gf, .gph > .gn { display: block; } .gph > .gx::before, .gph > .gx::after { display: block; } .gph > .gx { box-shadow: inset 0 0 26px 3px rgba(0,0,0,var(--g-vig)); }
+.gpack { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.gchip { border: 0; padding: 0; background: none; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 4px; border-radius: 8px; font: 500 11px/1.2 Inter, system-ui, sans-serif; color: var(--u-soft); }
+.gchip .gph { box-shadow: 0 0 0 1px rgba(20,23,28,.14); }
+.gchip[aria-checked=true] .gph { box-shadow: 0 0 0 2.5px var(--u-ink); } .gchip[aria-checked=true] { color: var(--u-text); font-weight: 600; }
+.gchip:disabled { cursor: default; }
+
+/* ───────── PAGE STRIP (preview + reorder) ───────── */
+:root { --sw: 214px; --sr: 238px; }
+#strip { position: fixed; top: 12px; right: 12px; bottom: 12px; width: var(--sw); display: none; flex-direction: column; background: var(--u-panel); border-radius: 20px;
+  box-shadow: var(--sh-lg), 0 2px 8px rgba(20,26,36,.06); color: var(--u-text); font-size: 13px; z-index: 60; overflow: hidden; }
+body.strip-on #strip { display: flex; }
+body.strip-on #persp { right: var(--sr); }
+body.strip-on #counter, body.strip-on #hint, body.strip-on #toast { left: calc(var(--pl) + (100% - var(--pl) - var(--sr)) / 2); }
+#strip-head { display: flex; align-items: center; gap: 8px; padding: 16px 12px 8px 16px; }
+#strip-head h3 { flex: 1; font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+#strip-n { font-size: 12px; color: var(--u-muted); }
+#strip-list { flex: 1; overflow-y: auto; padding: 6px 10px 12px; display: flex; flex-direction: column; gap: 12px; scrollbar-width: thin; }
+#strip-list::-webkit-scrollbar { width: 6px; } #strip-list::-webkit-scrollbar-thumb { background: rgba(20,26,36,.22); border-radius: 3px; }
+#strip-hint { padding: 0 16px 14px; font-size: 11.5px; line-height: 1.45; color: var(--u-muted); }
+.sp { position: relative; background: var(--u-panel2); border-radius: 12px; padding: 4px 6px 8px; flex: none; }
+.sp.cur { box-shadow: 0 0 0 2px var(--u-ink); }
+.sp-h { display: flex; align-items: center; gap: 2px; height: 28px; cursor: grab; user-select: none; }
+.sp-grip { color: var(--u-gray); font-size: 15px; line-height: 1; padding: 0 2px; }
+.sp-go { flex: 1; text-align: left; border: 0; background: transparent; font: 600 12px Inter, system-ui, sans-serif; color: var(--u-soft); cursor: pointer; padding: 3px 4px; border-radius: 6px; }
+.sp-go:hover { background: var(--u-accent-soft); }
+.sp-acts { display: flex; gap: 2px; opacity: 0; transition: opacity 140ms; }
+.sp:hover .sp-acts, .sp:focus-within .sp-acts { opacity: 1; }
+.mini { min-width: 22px; height: 22px; padding: 0; border: 0; border-radius: 6px; background: #fff; box-shadow: var(--sh-sm); cursor: pointer; font: 600 12px/1 Inter, system-ui, sans-serif; color: var(--u-text); }
+.mini:hover { background: #eef1f5; } .mini.armed { background: var(--u-ink); color: #fff; padding: 0 7px; }
+.sp-pages { display: flex; gap: 2px; justify-content: center; }
+.th { position: relative; width: 84px; height: 111px; overflow: hidden; flex: none; cursor: grab; box-shadow: 0 0 0 1px rgba(20,23,28,.14); border-radius: 2px 4px 4px 2px; }
+.th.left { border-radius: 4px 2px 2px 4px; }
+.th-in { position: absolute; left: 0; top: 0; width: 680px; height: 900px; transform: scale(.1235); transform-origin: 0 0; pointer-events: none; }
+.th.dragging, .sp.dragging { opacity: .4; }
+.th.drop { box-shadow: 0 0 0 3px var(--u-ink); }
+.sp.ins-b::before, .sp.ins-a::after { content: ''; position: absolute; left: 6px; right: 6px; height: 3px; border-radius: 2px; background: var(--u-ink); z-index: 2; }
+.sp.cov .sp-h { cursor: pointer; } .sp.cov .sp-pages { padding-bottom: 2px; }
+.th.cover { background: var(--cover); border-radius: 4px; cursor: pointer; } .th-in.cv { width: 690px; height: 920px; transform: scale(.1217); }
+.th.act { box-shadow: 0 0 0 2.5px var(--u-ink); }
+.th-add { position: absolute; right: 3px; bottom: 3px; width: 22px; height: 22px; border: 0; border-radius: 50%; background: var(--u-ink); color: #fff; font: 600 15px/1 Inter, system-ui, sans-serif; cursor: pointer; opacity: 0; transition: opacity 140ms; z-index: 2; box-shadow: var(--sh-sm); padding: 0; }
+.th:hover .th-add, .th-add:focus-visible { opacity: 1; }
+#drag-layer { position: absolute; left: -680px; top: 0; width: 1360px; height: 900px; transform: translateZ(9px); pointer-events: none; display: none; }   /* a sticker being dragged is drawn here: above both pages and not clipped by them */
+.mat { border-radius: 10px; background: rgba(20,26,36,.045); padding: 4px 12px 12px; }
+.mat > summary { font-weight: 600; font-size: 13px; cursor: pointer; padding: 8px 0; }
+.mat-in { display: flex; flex-direction: column; gap: 10px; padding-top: 6px; }
+.sp.ins-b::before { top: -8px; } .sp.ins-a::after { bottom: -8px; }
+
+/* ───────── EMBED / LITE ───────── */
+html { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+body.embed #ui { display: none !important; }
+@media (pointer: coarse) { body.embed .card { pointer-events: none; } }          /* a tap anywhere on a half turns the page; the thin cards at the sides must not catch it */
+body.lite #ground { filter: blur(18px); }
+
+/* ───────── UI (Aurora tokens, light panel) ───────── */
+:root {
+  --u-panel: #FFFFFF; --u-panel2: #F5F7FA; --u-track: #E5E9F0;
+  /* --u-gray is #838B9A (not Aurora's #8B93A1): 3.2:1 on --u-panel2 for tracks/switch/borders (WCAG 1.4.11); the on-state uses --u-ink instead of --u-accent for the same reason */
+  --u-text: #15181D; --u-soft: #3A3F49; --u-muted: #6B7280; --u-gray: #838B9A;
+  --u-dark: #15171C; --u-accent: #15171C; --u-ink: #15171C; --u-accent-soft: rgba(20,23,28,.08);   /* monochrome: the accent IS the ink */
+  --sh-sm: 0 2px 8px rgba(20,26,36,.06); --sh-md: 0 8px 24px rgba(20,26,36,.08); --sh-lg: 0 18px 48px rgba(20,26,36,.14);
+  --ease: cubic-bezier(.16,1,.3,1);
+  --hint-ink: rgba(255,255,255,.6);
+}
+#ui { position: fixed; inset: 0; z-index: 50; pointer-events: none; font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
+#ui > * { pointer-events: auto; }
+#ui :focus-visible { outline: 2px solid var(--u-ink); outline-offset: 2px; }
+.fab { position: fixed; width: 44px; height: 44px; border-radius: 999px; border: 0; background: rgba(255,255,255,.94); color: var(--u-text);
+  box-shadow: var(--sh-md); cursor: pointer; display: grid; place-items: center; transition: transform 380ms var(--ease), box-shadow 220ms var(--ease), background 140ms; }
+.fab:hover { background: #fff; box-shadow: var(--sh-lg); }
+.fab svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#btn-mute { left: 20px; bottom: 20px; } #btn-gear { left: 20px; top: 20px; }
+#btn-gear[aria-pressed=true] { background: var(--u-dark); color: #fff; }
+body.editing .fab { transform: translateX(var(--pl)); }
+#counter { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); color: var(--hint-ink); font-size: 13px; letter-spacing: .18em; pointer-events: none; }
+#hint { position: fixed; left: 50%; bottom: 64px; transform: translateX(-50%); color: var(--hint-ink); font-size: 14px; letter-spacing: .12em; pointer-events: none; animation: pulse 2.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:.95} }
+body.editing #counter, body.editing #hint { left: calc(var(--pl) + (100% - var(--pl)) / 2); }
+body.editing #hint { opacity: .4; animation: none; }
+#edit-hint { position: fixed; left: calc(var(--pl) + 24px); bottom: 20px; max-width: calc(100% - var(--pl) - 120px); font-size: 12px; line-height: 1.5; color: var(--hint-ink); display: none; pointer-events: none; }
+body.editing #edit-hint { display: block; }
+body.editing #persp { left: var(--pl); }
+body.open-book:not(.editing) { cursor: pointer; }   /* the whole open book is a click target: left = back (the first page leads to the cover), right = forward */
+body.editing .item.editable { outline: 1px dashed rgba(20,23,28,.5); }
+body.editing .item.stk.editable { outline: none; }          /* a sticker has a shape: no rectangle around it (the selection ring appears only when it is selected) */
+body.clean .fab, body.clean #panel, body.clean #edit-hint, body.clean #strip { display: none !important; }
+
+/* panel */
+#panel { position: fixed; top: 12px; left: 12px; bottom: 12px; width: var(--pw); display: none; flex-direction: column; background: var(--u-panel);
+  border-radius: 20px; box-shadow: var(--sh-lg), 0 2px 8px rgba(20,26,36,.06); color: var(--u-text); font-size: 13px; z-index: 60; overflow: hidden; }
+#panel.open { display: flex; }
+#panel-head { display: flex; align-items: center; gap: 6px; padding: 18px 16px 10px 20px; }
+#panel-head h2 { flex: 1; font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
+.ibtn { width: 32px; height: 32px; border-radius: 8px; border: 0; background: var(--u-panel2); color: var(--u-text); display: grid; place-items: center; cursor: pointer; flex: none; transition: background 140ms; }
+.ibtn:hover { background: #E9EDF3; } .ibtn:disabled { opacity: .4; cursor: default; }
+.ibtn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+#panel-body { flex: 1; overflow-y: auto; padding: 6px 12px 18px; display: flex; flex-direction: column; gap: 20px; scrollbar-width: thin; }
+#panel-body::-webkit-scrollbar { width: 6px; } #panel-body::-webkit-scrollbar-thumb { background: rgba(20,26,36,.22); border-radius: 3px; }
+
+.sec { background: var(--u-panel2); border-radius: 12px; flex: none; }
+.sec-h { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: 12px; }
+.sec-h svg { width: 18px; height: 18px; fill: none; stroke: var(--u-soft); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 220ms var(--ease); }
+.sec.open .sec-h svg { transform: rotate(180deg); }
+.sec-b { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 220ms var(--ease); }
+.sec.open .sec-b { grid-template-rows: 1fr; }
+.sec-clip { overflow: hidden; min-height: 0; visibility: hidden; transition: visibility 0s 220ms; }
+.sec.open .sec-clip { visibility: visible; transition-delay: 0s; }
+.sec-in { display: flex; flex-direction: column; gap: 12px; padding: 2px 16px 16px; }
+
+.ctl { display: flex; flex-direction: column; gap: 6px; }
+.ctl.dim { opacity: .4; }
+.ctl-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 28px; }
+.ctl-top label, .sw-row label { font-size: 13px; font-weight: 500; color: var(--u-soft); }
+.ctl-val { display: flex; align-items: center; gap: 4px; }
+.num { width: 64px; height: 28px; border: 0; border-radius: 8px; background: #fff; box-shadow: inset 0 0 0 1px var(--u-gray); text-align: right;
+  font: 500 13px/1 Inter, system-ui, sans-serif; color: var(--u-text); padding: 0 8px; -moz-appearance: textfield; }
+.num::-webkit-inner-spin-button, .num::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.num:focus { box-shadow: inset 0 0 0 2px var(--u-ink); outline: none; }
+.unit { font-size: 12px; color: var(--u-muted); min-width: 16px; }
+.rst { width: 24px; height: 24px; border-radius: 999px; border: 0; background: transparent; color: var(--u-ink); cursor: pointer; font-size: 15px; line-height: 1; visibility: hidden; flex: none; }
+.ctl.dirty .rst { visibility: visible; } .rst:hover { background: var(--u-accent-soft); }
+.hash { color: var(--u-muted); font: 500 12px/1 Inter, system-ui, sans-serif; margin-left: 2px; }
+.hex-in { width: 78px; height: 28px; border: 0; border-radius: 8px; background: #fff; box-shadow: inset 0 0 0 1px var(--u-gray); font: 500 12.5px/1 Inter, system-ui, sans-serif; text-transform: uppercase; letter-spacing: .03em; padding: 0 8px; color: var(--u-text); }
+.hex-in:focus { box-shadow: inset 0 0 0 2px var(--u-ink); outline: none; } .hex-in::placeholder { color: var(--u-gray); }
+.recent { display: flex; gap: 6px; flex-wrap: wrap; }
+.rc { width: 22px; height: 22px; border-radius: 6px; border: 0; cursor: pointer; padding: 0; box-shadow: inset 0 0 0 1px rgba(20,23,28,.22); transition: transform 120ms; }
+.rc:hover { transform: scale(1.12); } .rc.on { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--u-ink); } .rc:disabled { cursor: default; transform: none; }
+.hex { font: 500 12px/1 Inter, system-ui, sans-serif; color: var(--u-muted); text-transform: uppercase; letter-spacing: .02em; }
+.ctl-val input[type=color] { width: 36px; height: 28px; padding: 0; border: 0; border-radius: 8px; background: none; cursor: pointer; box-shadow: inset 0 0 0 1px var(--u-gray); }
+.ctl-val input[type=color]::-webkit-color-swatch-wrapper { padding: 3px; } .ctl-val input[type=color]::-webkit-color-swatch { border: 0; border-radius: 5px; }
+
+/* slider: ticks every "nice" interval, default marker, native thumb geometry compensated (rail inset = thumb radius) */
+.sl { position: relative; height: 32px; }
+.sl-rail { position: absolute; left: 9px; right: 9px; top: 0; bottom: 0; pointer-events: none; }
+.sl-track { position: absolute; left: -9px; right: -9px; top: 12px; height: 4px; border-radius: 2px; background: var(--u-gray); }
+.sl-fill { position: absolute; left: -9px; top: 12px; height: 4px; border-radius: 2px 0 0 2px; background: var(--u-ink); }
+.sl-ticks b { position: absolute; top: 22px; width: 1px; height: 6px; margin-left: -.5px; background: rgba(20,26,36,.45); }
+.sl-def { position: absolute; top: 23px; width: 8px; height: 8px; margin-left: -4px; background: var(--u-dark); transform: rotate(45deg); border-radius: 1px; box-shadow: 0 0 0 1.5px var(--u-panel2); }
+.sl input { position: absolute; left: 0; top: 0; width: 100%; height: 28px; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; touch-action: pan-y; }
+.sl input::-webkit-slider-runnable-track { height: 28px; background: transparent; }
+.sl input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: 5px; border-radius: 50%; background: #fff; border: 2px solid var(--u-ink); box-shadow: var(--sh-sm); transition: transform 140ms var(--ease), box-shadow 140ms; }
+.sl input:hover::-webkit-slider-thumb { transform: scale(1.08); } .sl input:active::-webkit-slider-thumb { transform: scale(1.14); }
+.sl.on-snap input::-webkit-slider-thumb { box-shadow: 0 0 0 4px var(--u-accent-soft), var(--sh-sm); }
+.sl input:focus-visible { outline: none; } .sl input:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--u-ink); outline-offset: 2px; }
+.sl input:focus-visible::-moz-range-thumb { outline: 2px solid var(--u-ink); outline-offset: 2px; }
+.sl input::-moz-range-track { height: 28px; background: transparent; }
+.sl input::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 2px solid var(--u-ink); box-shadow: var(--sh-sm); }
+.sl input:disabled { cursor: default; }
+
+/* switch */
+.sw-row { flex-direction: row; align-items: center; justify-content: space-between; min-height: 28px; }
+.sw { position: relative; width: 44px; height: 24px; border-radius: 999px; border: 0; background: var(--u-gray); cursor: pointer; transition: background 220ms var(--ease); flex: none; }
+.sw i { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: var(--sh-sm); transition: transform 220ms var(--ease); display: grid; place-items: center; font-style: normal; font-size: 11px; font-weight: 700; color: var(--u-ink); }
+.sw[aria-checked=true] { background: var(--u-ink); } .sw[aria-checked=true] i { transform: translateX(20px); } .sw[aria-checked=true] i::after { content: '✓'; }
+.sw:disabled { cursor: default; }
+.sw-row .ctl-val { gap: 8px; }
+
+/* segmented control */
+.seg { position: relative; display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); background: var(--u-track); border-radius: 10px; padding: 3px; }
+.seg .pill { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / var(--n, 3)); background: #fff; border-radius: 8px; box-shadow: var(--sh-sm); transition: transform 220ms var(--ease); transform: translateX(calc(var(--i, 0) * 100%)); }
+.seg button { position: relative; z-index: 1; height: 30px; border: 0; background: transparent; font: 500 13px Inter, system-ui, sans-serif; color: var(--u-soft); cursor: pointer; border-radius: 8px; }
+.seg button[aria-checked=true] { color: var(--u-text); font-weight: 600; }
+
+.btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { flex: 1; min-width: 0; height: 36px; padding: 0 12px; border: 0; border-radius: 8px; background: #fff; box-shadow: var(--sh-sm); font: 500 13px Inter, system-ui, sans-serif; color: var(--u-text); cursor: pointer; transition: box-shadow 140ms, background 140ms; white-space: nowrap; }
+.btn:hover { box-shadow: var(--sh-md); } .btn.pri { background: var(--u-dark); color: #fff; } .btn:disabled { opacity: .4; cursor: default; }
+.btn.armed { background: #FDECEA; color: #B42318; }
+.hintx { font-size: 12px; line-height: 1.5; color: var(--u-muted); }
+.hintx b { color: var(--u-soft); font-weight: 600; }
+.name-in { flex: 1; min-width: 0; height: 36px; border: 0; border-radius: 8px; background: #fff; box-shadow: inset 0 0 0 1px var(--u-gray); padding: 0 12px; font: 400 13px Inter, system-ui, sans-serif; color: var(--u-text); }
+.name-in:focus { outline: none; box-shadow: inset 0 0 0 2px var(--u-ink); }
+.list { display: flex; flex-direction: column; gap: 6px; }
+.rowi { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 10px; border-radius: 8px; background: #fff; box-shadow: var(--sh-sm); }
+.rowi.sel { box-shadow: 0 0 0 2px var(--u-ink); }
+.rowi > .nm { flex: 1; min-width: 0; font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; background: none; border: 0; text-align: left; color: var(--u-text); font-family: inherit; }
+.rowi img { width: 32px; height: 32px; border-radius: 6px; object-fit: cover; background: #ddd; flex: none; }
+.rowi .ibtn { width: 28px; height: 28px; background: transparent; } .rowi .ibtn:hover { background: var(--u-panel2); }
+.rowi .ibtn.armed { background: #FDECEA; color: #B42318; width: auto; padding: 0 8px; font: 600 12px Inter, system-ui, sans-serif; }
+
+#toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 16px); background: var(--u-dark); color: #fff; font: 500 13px Inter, system-ui, sans-serif; padding: 10px 18px; border-radius: 999px; box-shadow: var(--sh-lg); opacity: 0; pointer-events: none; transition: opacity 220ms, transform 220ms var(--ease); z-index: 80; }
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+body.editing #toast { left: calc(var(--pl) + (100% - var(--pl)) / 2); }
+
+.guide { position: absolute; pointer-events: none; z-index: 30; display: none; }
+.guide.v { top: 0; bottom: 0; width: 0; border-left: 2px dashed #fff; mix-blend-mode: difference; }
+.guide.h { left: 0; right: 0; height: 0; border-top: 2px dashed #fff; mix-blend-mode: difference; }
+.empty-hint { cursor: default; position: absolute; inset: 40px; display: none; align-items: center; justify-content: center; text-align: center; font: 500 28px/1.35 Inter, system-ui, sans-serif; color: rgba(20,24,40,.38); border: 3px dashed rgba(20,24,40,.2); border-radius: 18px; padding: 40px; pointer-events: none; }
+body.editing .empty-hint { display: flex; pointer-events: auto; cursor: pointer; }
+body.editing .empty-hint:hover { border-color: rgba(20,23,28,.7); color: rgba(20,23,28,.8); }
+.tfbox { display: flex; flex-direction: column; gap: 12px; padding: 12px; margin: 2px 0 6px; background: #fff; border-radius: 8px; box-shadow: var(--sh-sm); }
+#pl-mouse { background: linear-gradient(90deg, rgba(0,0,0,.14), rgba(0,0,0,.05)); opacity: var(--ml, 0); will-change: opacity; }
+#pr-mouse { background: linear-gradient(270deg, rgba(0,0,0,.14), rgba(0,0,0,.05)); opacity: var(--mr, 0); will-change: opacity; }
+/* background: colour -> picture -> tint -> gradients -> vignette -> noise */
+html { background: var(--bg); }   /* body stays transparent so the background stack (z-index -1) is not painted over */
+#bgstack { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: var(--bg); pointer-events: none; }
+#bg-img { position: absolute; inset: 0; display: none; background-repeat: no-repeat; background-position: center; background-size: cover; transform-origin: 50% 50%; }
+#bg-tint, #bg-gt, #bg-gb, #bg-vig { position: absolute; inset: 0; }
+#bg-tint { background: var(--tint, #000); opacity: var(--tint-a, 0); }
+#bg-gt { bottom: auto; height: var(--gt-h, 40%); background: linear-gradient(to bottom, var(--gcol, #000), transparent); opacity: var(--gt, 0); }
+#bg-gb { top: auto; height: var(--gb-h, 40%); background: linear-gradient(to top, var(--gcol, #000), transparent); opacity: var(--gb, 0); }
+#bg-vig { background: radial-gradient(ellipse closest-corner at 50% 50%, transparent var(--bvin, 40%), var(--bvcol, #000) 100%); opacity: var(--bvig, 0); }
+#bg-noise { position: absolute; inset: -50%; display: none; opacity: var(--noise, 0); mix-blend-mode: var(--nblend, overlay); background-size: var(--nsize, 256px); }
+#bg-noise.live { animation: grain .9s steps(1) infinite; }
+@keyframes grain { 0%{transform:translate(0,0)} 12%{transform:translate(-4%,-9%)} 25%{transform:translate(6%,3%)} 37%{transform:translate(-8%,7%)} 50%{transform:translate(3%,-6%)} 62%{transform:translate(-5%,4%)} 75%{transform:translate(8%,-2%)} 87%{transform:translate(-2%,8%)} }
+#bg-edit { position: fixed; left: var(--pl); right: 0; top: 0; bottom: 0; display: none; cursor: move; touch-action: none; z-index: 40; }
+body.bg-editing #bg-edit { display: block; }
+#bg-edit::after { content: 'Тяни — двигать фон · колесо — масштаб · Esc — готово'; position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--u-dark); color: #fff; font: 500 13px Inter, system-ui, sans-serif; padding: 10px 16px; border-radius: 999px; pointer-events: none; white-space: nowrap; }
+select.sel { height: 32px; max-width: 190px; border: 0; border-radius: 8px; background: #fff; box-shadow: inset 0 0 0 1px var(--u-gray); padding: 0 10px; font: 500 13px Inter, system-ui, sans-serif; color: var(--u-text); cursor: pointer; }
+select.sel:disabled { cursor: default; }
+/* cursors that follow what is happening, also while the pointer leaves the handle */
+body.cur-grab, body.cur-grab * { cursor: grabbing !important; }
+body.cur-nwse, body.cur-nwse * { cursor: nwse-resize !important; }
+body.cur-nesw, body.cur-nesw * { cursor: nesw-resize !important; }
+body.cur-rot, body.cur-rot * { cursor: var(--cur-rot) !important; }
+#bg-edit { cursor: grab; } body.bg-drag #bg-edit { cursor: grabbing; }
+.ctl.dim, .ctl.dim * { cursor: not-allowed; }
+#drag-tip { position: fixed; left: 0; top: 0; z-index: 90; display: none; pointer-events: none; background: var(--u-dark); color: #fff; font: 600 12px Inter, system-ui, sans-serif; padding: 4px 9px; border-radius: 6px; box-shadow: var(--sh-md); }
+.navarrow { position: fixed; left: 0; top: 0; width: 48px; height: 48px; border-radius: 999px; border: 0; background: rgba(255,255,255,.94); color: var(--u-text); box-shadow: var(--sh-md); display: grid; place-items: center; cursor: pointer;
+  opacity: 0; pointer-events: none; transform: translate(-50%, -50%) scale(.88); transition: opacity 220ms var(--ease), transform 220ms var(--ease); z-index: 45; }
+.navarrow.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+.navarrow svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+body.editing .navarrow, body.bg-editing .navarrow { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .navarrow { transition-duration: .01ms !important; }
+  #bg-noise.live { animation: none; }
+  #panel *, #panel *::-webkit-slider-thumb, .fab, #toast { transition-duration: .01ms !important; }
+  #hint { animation: none; opacity: .75; }
+}
+@media (max-width: 520px) {
+  #strip { display: none !important; } body.strip-on #persp { right: 0; }              /* narrow screens: panel becomes a bottom sheet, the book stays visible above it */
+  #panel { left: 12px; right: 12px; width: auto; top: auto; height: 52%; }
+  body.editing #persp { left: 0; bottom: 52%; }
+  body.editing .fab { transform: none; } body.editing #btn-mute { display: none; }
+  body.editing #counter, body.editing #hint, body.editing #toast { left: 50%; }
+  #edit-hint { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="bgstack"><div id="bg-img"></div><div id="bg-tint"></div><div id="bg-gt"></div><div id="bg-gb"></div><div id="bg-vig"></div><div id="bg-noise"></div></div>
+<svg id="stk-defs" width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false"><defs id="stk-defs-in"></defs></svg>
+<div id="persp"><div id="root"><div id="zoom"><div id="pivot">
+  <div id="ground"></div>
+  <div id="bflip"><div id="book">
+
+    <!-- closed-state filler: page block edges + spine -->
+    <div class="pb" id="pb-right"><div class="belly-wrap" id="belly-r"></div></div>
+    <div class="pb" id="pb-top"></div>
+    <div class="pb" id="pb-bot"></div>
+    <div class="pb" id="pb-core"></div>
+    <div class="pb" id="pb-spine-in"></div>
+    <div class="pb" id="pb-spine"><div class="belly-wrap" id="belly-s"></div></div>
+    <div class="band-wrap" id="wrap-top"></div>
+    <div class="band-wrap" id="wrap-bot"></div>
+    <div id="ribbon"></div>
+
+    <div class="fan" id="fan-L"></div>
+    <div class="fan" id="fan-R"></div>
+
+    <!-- back cover (right) -->
+    <div id="spine-bridge"></div>
+    <div class="plate" id="plate-b">
+      <div class="face a cover-face" style="background-color:var(--cover)">
+        <div class="inset r paper"><div class="page-content" id="back-ghost"></div><div class="shade gutter-r"></div></div>
+      </div>
+      <div class="face b cover-face" id="back-outer">
+        <div class="hinge mirror"></div>
+        <div class="band front back-outer" style="transform:none"></div>
+        <div id="back-layer"></div>
+      </div>
+      <div class="band tab top"></div><div class="band tab bot"></div>
+    </div>
+
+    <!-- pages -->
+    <div class="page paper" id="page-R"><div class="page-content" id="pr-content"></div><div class="shade gutter-r"></div><div class="shade" id="pr-mouse"></div><div class="shade" id="pr-flip"></div></div>
+    <div class="page paper" id="page-L"><div class="page-content" id="pl-content"></div><div class="shade gutter-l"></div><div class="shade" id="pl-mouse"></div><div class="shade" id="pl-flip"></div></div>
+    <div id="crease"></div>
+    <div id="stitch"></div>
+    <div id="drag-layer"></div>
+
+    <!-- flipping leaf -->
+    <div id="leaf">
+      <div class="face a paper"><div class="page-content" id="leaf-f"></div><div class="shade gutter-r"></div><div class="shade cm"></div><div class="shade" id="leaf-fs"></div></div>
+      <div class="face b paper"><div class="page-content" id="leaf-b"></div><div class="shade gutter-r"></div><div class="shade cm"></div><div class="shade" id="leaf-bs"></div></div>
+    </div>
+
+    <!-- front cover (hinged left) -->
+    <div class="plate" id="plate-f">
+      <div class="face a cover-face" id="cover-outer">
+        <div class="hinge"></div>
+        <div class="cover-gloss" id="cover-gloss"><i id="gloss-blob"></i></div>
+      </div>
+      <div class="face b cover-face">
+        <div class="inset l paper"><div class="page-content" id="front-ghost"></div><div class="shade gutter-l"></div></div>
+      </div>
+      <div class="belly" id="belly"></div>
+      <div id="cover-top"><div id="cover-layer"></div></div>
+      <div class="band front" id="band-front"></div>
+    </div>
+
+  </div></div>
+</div></div></div></div>
+
+<div id="ui">
+  <div id="drag-tip"></div>
+  <button class="navarrow" id="nav-l" aria-label="Назад"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button class="navarrow" id="nav-r" aria-label="Вперёд"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  <div id="bg-edit"></div>
+  <div id="counter"></div>
+  <div id="hint">click to open</div>
+  <div id="edit-hint"><b>Shift</b> — по оси и шаг 15° · <b>Alt</b> — без привязки · <b>колесо</b> — масштаб · <b>двойной клик</b> — сброс · <b>стрелки</b> — сдвиг (Shift ×10) · <b>Delete</b> — удалить · <b>Ctrl+Z</b> — отмена</div>
+  <button class="fab" id="btn-mute" aria-label="Звук"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path id="snd-on" d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/><path id="snd-off" style="display:none" d="M23 9l-6 6M17 9l6 6"/></svg></button>
+  <button class="fab" id="btn-gear" aria-label="Настройки" aria-pressed="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></button>
+
+  <div id="panel" role="dialog" aria-label="Настройки блокнота">
+    <div id="panel-head">
+      <h2>Настройки</h2>
+      <button class="ibtn" id="h-undo" aria-label="Отменить (Ctrl+Z)" title="Отменить (Ctrl+Z)" disabled><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg></button>
+      <button class="ibtn" id="h-redo" aria-label="Повторить (Ctrl+Shift+Z)" title="Повторить (Ctrl+Shift+Z)" disabled><svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 000 11H13"/></svg></button>
+      <button class="ibtn" id="panel-close" aria-label="Закрыть настройки" title="Закрыть"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div id="panel-body"></div>
+  </div>
+  <aside id="strip" aria-label="Порядок страниц">
+    <div id="strip-head"><h3>Страницы</h3><span id="strip-n"></span><button class="ibtn" id="strip-add" aria-label="Добавить фото" title="Добавить фото (можно сразу несколько)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button class="ibtn" id="strip-x" aria-label="Скрыть панель страниц" title="Скрыть"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="strip-list"></div>
+    <div id="strip-hint">Клик — открыть и выбрать страницу (туда идут новые фото и стикеры). «+» — добавить фото, можно несколько. Тяни: разворот за ⠿; страницу на страницу — обмен; фото или стикер из блокнота — сюда.</div>
+  </aside>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <input type="file" id="f-photo" accept="image/*,.heic,.heif" style="display:none">
+  <input type="file" id="f-sticker" accept="image/png,image/webp,image/svg+xml,image/gif" style="display:none">
+  <input type="file" id="f-config" accept=".json" style="display:none">
+  <input type="file" id="f-belly" accept="image/*,.heic,.heif" style="display:none">
+  <input type="file" id="f-replace" accept="image/*,.heic,.heif" style="display:none">
+  <input type="file" id="f-photo-multi" accept="image/*,.heic,.heif" multiple style="display:none">
+</div>
+
+<script>
+'use strict';
+const W = 680, H = 900, OV = 10;
+const $ = id => document.getElementById(id);
+const IS_DEV = /[?&]dev/.test(location.search);
+/* ?embed=1 = the album inside a web page: no UI, no editing, always loads config.json, auto-fits its frame, opens by itself when scrolled into view.
+   ?lite=1 (or any iPhone/iPad) = cheaper rendering (no SVG lighting on stickers). ?at=N opens spread N at once (used to render the poster still). */
+const QS = new URLSearchParams(location.search);
+const EMBED = QS.has('embed');
+const LITE = QS.get('lite') === '1' || /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let embedVisible = true;
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+/* ═══════════ SETTINGS SCHEMA ═══════════ */
+// d = default (taken from the user's exported config), unit = suffix shown next to the value, dep = parent switch
+const SCHEMA = [
+  { id:'view', title: 'Вид', open: true, items: [
+    { k:'zoomClosed', t:'range', l:'Зум закрытой', unit:'%',  min:40, max:220, step:1, d:91 },
+    { k:'zoomOpen',   t:'range', l:'Зум открытой', unit:'%',  min:40, max:160, step:1, d:129 },
+    { k:'persp',      t:'range', l:'Перспектива',  unit:'px', min:1000, max:9000, step:100, d:6900 },
+    { k:'shadow',     t:'range', l:'Тень на столе',unit:'%',  min:0, max:100, step:1, d:7 },
+  ]},
+  { id:'grade', title: 'Цветокоррекция фото', items: [
+    { k:'gradeOn',     t:'bool',  l:'Единый фильтр на все фото', d:true },
+    { k:'gradePreset', t:'gpack', l:'Фильтр', d:'none', dep:'gradeOn' },
+    { k:'gradeK',      t:'range', l:'Интенсивность', unit:'%', min:0, max:150, step:1, d:100, dep:'gradeOn' },
+    { k:'gBright',     t:'range', l:'Яркость',       unit:'',  min:-50, max:50, step:1, d:0, dep:'gradeOn' },
+    { k:'gContrast',   t:'range', l:'Контраст',      unit:'',  min:-50, max:50, step:1, d:0, dep:'gradeOn' },
+    { k:'gSat',        t:'range', l:'Насыщенность',  unit:'',  min:-100, max:100, step:1, d:0, dep:'gradeOn' },
+    { k:'gWarm',       t:'range', l:'Теплота (холод ↔ тепло)', unit:'', min:-100, max:100, step:1, d:0, dep:'gradeOn' },
+    { k:'gFade',       t:'range', l:'Выцветание (матовость)',  unit:'%', min:0, max:60, step:1, d:0, dep:'gradeOn' },
+    { k:'gVig',        t:'range', l:'Виньетка на фото',        unit:'%', min:0, max:80, step:1, d:0, dep:'gradeOn' },
+    { k:'gGrain',      t:'range', l:'Зерно плёнки',            unit:'%', min:0, max:60, step:1, d:0, dep:'gradeOn' },
+    { k:'gradeStk',    t:'bool',  l:'Применять и к стикерам',  d:false, dep:'gradeOn' },
+    { k:'gradeReset',  t:'action', l:'Сбросить фильтр', btn:'Сбросить', dep:'gradeOn' },
+  ]},
+  { id:'stk', title: 'Стикеры: по умолчанию (для новых)', items: [
+    { k:'stkOn',     t:'bool',  l:'Объём и свет по форме стикера', d:true },
+    { k:'stkBevel',  t:'range', l:'Скругление края',        unit:'px', min:0, max:14, step:.5, d:4, dep:'stkOn' },
+    { k:'stkHeight', t:'range', l:'Объём (выпуклость)',     unit:'',   min:0, max:14, step:.5, d:3.5,   dep:'stkOn' },
+    { k:'stkThick',  t:'range', l:'Толщина (кромка снизу)', unit:'px', min:0, max:6,  step:.5, d:1,   dep:'stkOn' },
+    { k:'stkBorder', t:'range', l:'Белая кромка вокруг',    unit:'px', min:0, max:10, step:.5, d:0,   dep:'stkOn' },
+    { k:'stkLamps',  t:'range', l:'Количество ламп (бликов)', unit:'',  min:0, max:3,  step:1,  d:2,   dep:'stkOn' },
+    { k:'stkShine',  t:'range', l:'Яркость бликов',         unit:'%',  min:0, max:200, step:5, d:40,  dep:'stkOn' },
+    { k:'stkSharp',  t:'range', l:'Резкость бликов',        unit:'',   min:1, max:80, step:1,  d:8,  dep:'stkOn' },
+    { k:'stkAz',     t:'range', l:'Направление света',      unit:'°',  min:0, max:360, step:5, d:225, dep:'stkOn' },
+    { k:'stkElev',   t:'range', l:'Высота ламп',            unit:'°',  min:10, max:85, step:1, d:50,  dep:'stkOn' },
+    { k:'stkShadow', t:'range', l:'Тень на бумаге',         unit:'%',  min:0, max:100, step:1, d:35 },
+    { k:'stkShBlur', t:'range', l:'Размытие тени',          unit:'px', min:0, max:14, step:.5, d:3 },
+    { k:'stkDyn',    t:'range', l:'Блик от мыши',           unit:'%',  min:0, max:100, step:1, d:40 },
+  ]},
+  { id:'bgmain', title: 'Фон', items: [
+    { k:'bg',      t:'color', l:'Цвет', d:'#ebebeb' },
+    { k:'bgImg',   t:'file',  l:'Картинка', d:'' },
+    { k:'bgFit',   t:'seg',   l:'Как лежит', d:'cover', dep:'bgImg', opts:[{v:'cover',t:'Заполнить'},{v:'contain',t:'Вписать'},{v:'stretch',t:'Растянуть'}] },
+    { k:'bgScale', t:'range', l:'Масштаб', unit:'%', min:10, max:400, step:1, d:100, dep:'bgImg' },
+    { k:'bgX',     t:'range', l:'Сдвиг по X', unit:'%', min:-100, max:100, step:1, d:0, dep:'bgImg' },
+    { k:'bgY',     t:'range', l:'Сдвиг по Y', unit:'%', min:-100, max:100, step:1, d:0, dep:'bgImg' },
+    { k:'bgEdit',  t:'action', l:'Двигать мышью', btn:'Править на экране', dep:'bgImg' },
+  ]},
+  { id:'bgfx', title: 'Фон: свет и тень', items: [
+    { k:'bgTintA',    t:'range', l:'Заливка',       unit:'%', min:0, max:100, step:1, d:0 },
+    { k:'bgTint',     t:'color', l:'Цвет заливки',  d:'#000000', dep:'bgTintA' },
+    { k:'bgGradTop',  t:'range', l:'Градиент сверху', unit:'%', min:0, max:100, step:1, d:0 },
+    { k:'bgGradTopH', t:'range', l:'Высота сверху',   unit:'%', min:5, max:100, step:1, d:40, dep:'bgGradTop' },
+    { k:'bgGradBot',  t:'range', l:'Градиент снизу',  unit:'%', min:0, max:100, step:1, d:0 },
+    { k:'bgGradBotH', t:'range', l:'Высота снизу',    unit:'%', min:5, max:100, step:1, d:40, dep:'bgGradBot' },
+    { k:'bgGradColor',t:'color', l:'Цвет градиентов', d:'#000000' },
+    { k:'bgVig',      t:'range', l:'Виньетка',        unit:'%', min:0, max:100, step:1, d:0 },
+    { k:'bgVigSize',  t:'range', l:'Размер виньетки', unit:'%', min:10, max:100, step:1, d:60, dep:'bgVig' },
+    { k:'bgVigColor', t:'color', l:'Цвет виньетки',   d:'#000000', dep:'bgVig' },
+    { k:'glow',       t:'range', l:'Свечение',        unit:'%', min:0, max:40, step:1, d:4 },
+  ]},
+  { id:'bgnoise', title: 'Фон: шум', items: [
+    { k:'bgNoise',      t:'range', l:'Количество',   unit:'%', min:0, max:100, step:1, d:0 },
+    { k:'bgNoiseSize',  t:'range', l:'Размер зерна', unit:'%', min:25, max:400, step:5, d:100, dep:'bgNoise' },
+    { k:'bgNoiseBlend', t:'select',l:'Наложение',    d:'overlay', dep:'bgNoise', opts:[{v:'normal',t:'Обычное'},{v:'overlay',t:'Overlay'},{v:'soft-light',t:'Мягкий свет'},{v:'hard-light',t:'Жёсткий свет'},{v:'multiply',t:'Умножение'},{v:'screen',t:'Экран'}] },
+    { k:'bgNoiseMono',  t:'bool',  l:'Чёрно-белый',  d:true,  dep:'bgNoise' },
+    { k:'bgNoiseLive',  t:'bool',  l:'Живое мерцание', d:false, dep:'bgNoise' },
+  ]},
+  { id:'tilt', title: 'Наклон и физика', items: [
+    { k:'tiltMax',    t:'range', l:'Наклон мышью', unit:'°', min:0, max:12, step:.5, d:1 },
+    { k:'openRx',     t:'range', l:'Открыт X',     unit:'°', min:-25, max:25, step:.5, d:-3 },
+    { k:'openRy',     t:'range', l:'Открыт Y',     unit:'°', min:-25, max:25, step:.5, d:0 },
+    { k:'closedRx',   t:'range', l:'Закрыт X',     unit:'°', min:-25, max:25, step:.5, d:-2 },
+    { k:'closedRy',   t:'range', l:'Закрыт Y',     unit:'°', min:-25, max:25, step:.5, d:5 },
+    { k:'stiff',      t:'range', l:'Упругость',    min:1, max:30, step:.5, d:23 },
+    { k:'damp',       t:'range', l:'Вязкость',     min:5, max:80, step:1, d:33 },
+    { k:'light',      t:'range', l:'Блики и тени', unit:'%', min:0, max:100, step:1, d:45 },
+  ]},
+  { id:'fan', title: 'Веер страниц', items: [
+    { k:'fanMax',   t:'range', l:'Кол-во сбоку', min:0, max:8, step:1, d:1 },
+    { k:'fanAngle', t:'range', l:'Угол',         unit:'°',  min:10, max:70, step:1, d:10 },
+    { k:'fanGap',   t:'range', l:'Шаг',          unit:'px', min:10, max:160, step:1, d:20 },
+    { k:'fanDepth', t:'range', l:'Глубина',      unit:'px', min:0, max:120, step:1, d:12 },
+    { k:'fanShade', t:'range', l:'Затемнение',   unit:'%',  min:0, max:100, step:1, d:50 },
+  ]},
+  { id:'cover', title: 'Обложка', items: [
+    { k:'coverColor', t:'color', l:'Цвет',         d:'#171717' },
+    { k:'grain',      t:'range', l:'Фактура',      unit:'%',  min:0, max:60, step:1, d:14 },
+    { k:'gloss',      t:'range', l:'Блик',         unit:'%',  min:0, max:40, step:1, d:3 },
+    { k:'glossSize',  t:'range', l:'Размер блика', unit:'px', min:300, max:2400, step:50, d:700 },
+    { k:'thickness',  t:'range', l:'Толщина',      unit:'px', min:20, max:160, step:1, d:42 },
+    { k:'hingeD',     t:'range', l:'Впуклость шва (глубина)', unit:'%',  min:0, max:200, step:5, d:100 },
+    { k:'hingeW',     t:'range', l:'Ширина канавки',         unit:'px', min:6, max:70, step:1, d:20 },
+    { k:'hingeP',     t:'range', l:'Положение канавки',      unit:'px', min:8, max:80, step:1, d:25 },
+    { k:'hingeE',     t:'range', l:'Тень у самой кромки',    unit:'%',  min:0, max:100, step:1, d:55 },
+  ]},
+  { id:'band', title: 'Резинка и закладка', items: [
+    { k:'bandOn',     t:'bool',  l:'Резинка',       d:false },
+    { k:'bandColor',  t:'color', l:'Цвет резинки',  d:'#101010', dep:'bandOn' },
+    { k:'bandW',      t:'range', l:'Ширина резинки',unit:'px', min:16, max:90, step:1, d:33, dep:'bandOn' },
+    { k:'bandX',      t:'range', l:'Позиция резинки',unit:'px',min:380, max:640, step:1, d:560, dep:'bandOn' },
+    { k:'ribbonOn',   t:'bool',  l:'Закладка',      d:false },
+    { k:'ribbonColor',t:'color', l:'Цвет закладки', d:'#121212', dep:'ribbonOn' },
+    { k:'ribbonLen',  t:'range', l:'Длина закладки',unit:'px', min:10, max:200, step:1, d:74, dep:'ribbonOn' },
+    { k:'ribbonX',    t:'range', l:'Позиция закладки',unit:'px',min:20, max:300, step:1, d:54, dep:'ribbonOn' },
+  ]},
+  { id:'belly', title: 'Лента-обёртка', items: [
+    { k:'bellyOn',    t:'bool',  l:'Показать',     d:true },
+    { k:'bellyColor', t:'color', l:'Цвет',         d:'#d9d6ee', dep:'bellyOn' },
+    { k:'bellyY',     t:'range', l:'Положение',    unit:'%', min:5, max:85, step:1, d:46, dep:'bellyOn' },
+    { k:'bellyH',     t:'range', l:'Высота',       unit:'%', min:6, max:50, step:1, d:22, dep:'bellyOn' },
+    { k:'bellyOver',  t:'range', l:'Выступ за контур обложки', unit:'px', min:0, max:10, step:.5, d:3, dep:'bellyOn' },
+    { k:'bellyShW',   t:'range', l:'Ширина тени у краёв (сгиб)', unit:'px', min:0, max:80, step:1, d:16, dep:'bellyOn' },
+    { k:'bellyShA',   t:'range', l:'Сила тени у краёв',        unit:'%', min:0, max:80, step:1, d:32, dep:'bellyOn' },
+    { k:'bellyThick', t:'range', l:'Толщина бумаги (кромка)',  unit:'px', min:0, max:6, step:.1, d:1.2, dep:'bellyOn' },
+    { k:'bellyImg',   t:'file',  l:'Картинка',     d:'', dep:'bellyOn' },
+  ]},
+  { id:'pages', title: 'Страницы и шов', items: [
+    { k:'paper',      t:'color', l:'Бумага',       d:'#f4efe4' },
+    { k:'edgeT',      t:'range', l:'Толщина листов (тень сбоку)', unit:'px', min:0, max:12, step:.5, d:2 },
+    { k:'gutter',     t:'range', l:'Тень корешка', unit:'%', min:0, max:100, step:1, d:17 },
+    { k:'stitch',     t:'bool',  l:'Стежки',       d:true },
+    { k:'thread',     t:'color', l:'Нитка',        d:'#878787', dep:'stitch' },
+  ]},
+  { id:'motion', title: 'Анимация и звук', items: [
+    { k:'flipMs',     t:'range', l:'Листание',     unit:'мс', min:250, max:2000, step:10, d:500 },
+    { k:'openMs',     t:'range', l:'Открытие',     unit:'мс', min:300, max:2500, step:10, d:1000 },
+    { k:'sound',      t:'bool',  l:'Звук',         d:false },
+  ]},
+];
+const DEF = {}; SCHEMA.forEach(g => g.items.forEach(i => { if ('d' in i) DEF[i.k] = i.d; }));
+const ST = Object.assign({}, DEF);
+
+/* ═══════════ STATE & DATA ═══════════ */
+const S = { pose: 'closed', spread: 0, total: 6, busy: false, back: false, side: 'right' };   // back = the closed book is turned over; side = the page of the open spread that new things go to
+let pages = [], coverDat = { images: [], stickers: [] }, backDat = { images: [], stickers: [] };
+function initPages(n) {
+  const old = pages; S.total = n;
+  pages = Array.from({ length: n }, (_, i) => old[i] || { id: i, left: { images: [], stickers: [] }, right: { images: [], stickers: [] }, span: [] });
+}
+initPages(6);
+let _id = 1; const uid = () => String(_id++);
+
+/* ═══════════ DOM ═══════════ */
+const el = { persp:$('persp'), root:$('root'), zoom:$('zoom'), pivot:$('pivot'), bflip:$('bflip'), book:$('book'), ground:$('ground'),
+  plateF:$('plate-f'), plateB:$('plate-b'), pageL:$('page-L'), pageR:$('page-R'), plc:$('pl-content'), prc:$('pr-content'),
+  fanL:$('fan-L'), fanR:$('fan-R'), leaf:$('leaf'), gloss:$('cover-gloss'), coverLayer:$('cover-layer'), stitch:$('stitch'),
+  hint:$('hint'), counter:$('counter') };
+
+/* ═══════════ SCALE / ZOOM ═══════════ */
+function fitScale() { return Math.min(el.persp.clientWidth / 2160, el.persp.clientHeight / 1440); }
+function applyScale() {
+  const s = fitScale();
+  el.root.style.transform = `scale(${s})`;
+  el.persp.style.perspective = (ST.persp * s) + 'px';
+  applyZoom();
+}
+function embedZoom() {
+  const s = fitScale(), vw = el.persp.clientWidth / s, vh = el.persp.clientHeight / s;        // what the frame shows, in stage pixels
+  if (S.pose === 'closed') return Math.min(vw * .9 / 740, vh * .93 / 950);
+  return Math.min(vw * .965 / (1400 + 2 * ST.fanMax * ST.fanGap * .9), vh * .94 / 950);
+}
+function applyZoom() {
+  const z = EMBED ? embedZoom() : (S.pose === 'closed' ? ST.zoomClosed : ST.zoomOpen) / 100;
+  el.zoom.style.transform = `scale(${z})`;
+  const k = 1 / (fitScale() * z);   // selection handles keep a constant on-screen size
+  document.documentElement.style.setProperty('--hk', (12 * k) + 'px'); document.documentElement.style.setProperty('--hb', (2 * k) + 'px');
+}
+addEventListener('resize', applyScale);
+
+/* ═══════════ APPLY SETTINGS ═══════════ */
+const hex2rgb = h => { h = h.replace('#', ''); if (h.length === 3) h = h.replace(/./g, c => c + c); const n = parseInt(h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+const rgb2hex = a => '#' + a.map(v => Math.round(clamp(v, 0, 255)).toString(16).padStart(2, '0')).join('');
+const mixHex = (a, b, t) => { const x = hex2rgb(a), y = hex2rgb(b); return rgb2hex(x.map((v, i) => v + (y[i] - v) * t)); };
+const lum = h => { const [r, g, b] = hex2rgb(h).map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * r + .7152 * g + .0722 * b; };
+function threadSvg(c) {
+  const dark = mixHex(c, '#000000', .3), lite = mixHex(c, '#ffffff', .55);
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="60"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="${dark}"/><stop offset=".5" stop-color="${lite}"/><stop offset="1" stop-color="${dark}"/></linearGradient></defs>` +
+    `<circle cx="7" cy="4" r="2.6" fill="#372f25" opacity=".75"/><circle cx="7" cy="56" r="2.6" fill="#372f25" opacity=".75"/>` +
+    `<rect x="5.2" y="1" width="3.6" height="58" rx="1.6" fill="url(#g)"/><rect x="8.8" y="3" width="1.6" height="54" fill="#000" opacity=".18"/></svg>`);
+}
+function noiseSvg(mono) {
+  const m = mono ? '0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0 0 0 0 1' : '1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 1';
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><filter id="n" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="matrix" values="${m}"/></filter><rect width="256" height="256" filter="url(#n)"/></svg>`);
+}
+const blobCache = new Map();
+function srcFor(src) {
+  if (!src || !src.startsWith('data:')) return src;
+  let u = blobCache.get(src); if (u) return u;
+  try {
+    const i = src.indexOf(','), meta = src.slice(5, i), mime = meta.split(';')[0] || 'application/octet-stream', data = src.slice(i + 1);
+    let bytes;
+    if (/;base64$/.test(meta)) { const bin = atob(data); bytes = new Uint8Array(bin.length); for (let k = 0; k < bin.length; k++) bytes[k] = bin.charCodeAt(k); }
+    else bytes = new TextEncoder().encode(decodeURIComponent(data));
+    u = URL.createObjectURL(new Blob([bytes], { type: mime }));
+  } catch (e) { u = src; }
+  blobCache.set(src, u); return u;
+}
+function applySetting(k) {
+  const r = document.documentElement.style, v = ST[k];
+  switch (k) {
+    case 'zoomClosed': case 'zoomOpen': applyZoom(); break;
+    case 'persp': r.setProperty('--fp', v + 'px'); applyScale(); updateFan(); break;
+    case 'bg': {
+      r.setProperty('--bg', v); const light = lum(v) > .45;
+      document.body.classList.toggle('light-bg', light);
+      r.setProperty('--vig', light ? .08 : .35);
+      r.setProperty('--hint-ink', light ? 'rgba(20,24,40,.62)' : 'rgba(255,255,255,.6)');
+      break;
+    }
+    case 'glow': r.setProperty('--glow', v / 100); break;
+    case 'bgImg': case 'bgFit': case 'bgScale': case 'bgX': case 'bgY': {
+      const im = $('bg-img'); im.style.display = ST.bgImg ? 'block' : 'none';
+      if (k === 'bgImg') im.style.backgroundImage = v ? `url("${srcFor(v)}")` : '';
+      im.style.backgroundSize = ST.bgFit === 'stretch' ? '100% 100%' : ST.bgFit;
+      im.style.transform = `translate(${ST.bgX}%,${ST.bgY}%) scale(${ST.bgScale / 100})`;
+      break;
+    }
+    case 'bgTint': r.setProperty('--tint', v); break;
+    case 'bgTintA': r.setProperty('--tint-a', v / 100); break;
+    case 'bgGradColor': r.setProperty('--gcol', v); break;
+    case 'bgGradTop': r.setProperty('--gt', v / 100); break;
+    case 'bgGradTopH': r.setProperty('--gt-h', v + '%'); break;
+    case 'bgGradBot': r.setProperty('--gb', v / 100); break;
+    case 'bgGradBotH': r.setProperty('--gb-h', v + '%'); break;
+    case 'bgVig': r.setProperty('--bvig', v / 100); break;
+    case 'bgVigSize': r.setProperty('--bvin', (100 - v) + '%'); break;
+    case 'bgVigColor': r.setProperty('--bvcol', v); break;
+    case 'bgNoise': r.setProperty('--noise', v / 100); $('bg-noise').style.display = v ? 'block' : 'none'; break;
+    case 'bgNoiseSize': r.setProperty('--nsize', (256 * v / 100) + 'px'); break;
+    case 'bgNoiseBlend': r.setProperty('--nblend', v); break;
+    case 'bgNoiseMono': $('bg-noise').style.backgroundImage = `url("${noiseSvg(v)}")`; break;
+    case 'bgNoiseLive': $('bg-noise').classList.toggle('live', !!v); break;
+    case 'gradeOn': case 'gradePreset': case 'gradeK': case 'gBright': case 'gContrast': case 'gSat': case 'gWarm': case 'gFade': case 'gVig': case 'gGrain': case 'gradeStk': applyGrade(); break;
+    case 'stkOn': case 'stkBevel': case 'stkHeight': case 'stkThick': case 'stkBorder': case 'stkLamps': case 'stkShine': case 'stkSharp': case 'stkAz': case 'stkElev': case 'stkShadow': case 'stkShBlur': case 'stkDyn': applyStk(); break;
+    case 'shadow': el.ground.style.opacity = v / 100 * (S.pose === 'closed' ? 1 : .85); break;
+    case 'coverColor': r.setProperty('--cover', v); break;
+    case 'grain': r.setProperty('--grain', v / 100); break;
+    case 'thickness': r.setProperty('--T', v + 'px'); layoutPlates(); break;
+    case 'hingeD': r.setProperty('--hgD', (v / 100).toFixed(3)); break;
+    case 'hingeW': r.setProperty('--hgW', v + 'px'); break;
+    case 'hingeP': r.setProperty('--hgC', v + 'px'); break;
+    case 'hingeE': r.setProperty('--hgE', (v / 100).toFixed(3)); break;
+    case 'bandOn': document.body.classList.toggle('band-off', !v); break;
+    case 'bandColor': r.setProperty('--band', v); break;
+    case 'bandW': r.setProperty('--bandW', v + 'px'); break;
+    case 'bandX': r.setProperty('--bandX', v + 'px'); break;
+    case 'ribbonOn': $('ribbon').style.display = v ? '' : 'none'; break;
+    case 'ribbonColor': r.setProperty('--ribbon', v); break;
+    case 'ribbonLen': r.setProperty('--ribbonLen', v + 'px'); break;
+    case 'ribbonX': r.setProperty('--ribbonX', v + 'px'); break;
+    case 'bellyOn': document.body.classList.toggle('belly-off', !v); break;
+    case 'bellyColor': r.setProperty('--belly', v); break;
+    case 'bellyY': r.setProperty('--bellyY', v + '%'); break;
+    case 'bellyH': r.setProperty('--bellyH', v + '%'); break;
+    case 'bellyOver': r.setProperty('--bo', v + 'px'); break;
+    case 'bellyShW': r.setProperty('--bsw', v + 'px'); break;
+    case 'bellyShA': r.setProperty('--bsa', (v / 100).toFixed(3)); break;
+    case 'bellyThick': r.setProperty('--bth', v + 'px'); break;
+    case 'bellyImg': $('belly').style.backgroundImage = v ? `url("${srcFor(v)}")` : ''; break;
+    case 'paper': {          // thickness edges (page stack, closed-book block) are tints of the paper colour
+      r.setProperty('--paper', v);
+      [.07, .13, .2, .27, .34].forEach((t, i) => r.setProperty('--e' + (i + 1), mixHex(v, '#000000', t)));
+      r.setProperty('--pa', mixHex(v, '#000000', .03)); r.setProperty('--pb', mixHex(v, '#000000', .15));
+      break;
+    }
+    case 'gutter': r.setProperty('--gutter', v / 100); break;
+    case 'edgeT': r.setProperty('--et', v + 'px'); break;
+    case 'stitch': el.stitch.classList.toggle('hidden', !v); break;
+    case 'thread': el.stitch.style.backgroundImage = `url("${threadSvg(v)}")`; break;
+    case 'fanMax': case 'fanAngle': case 'fanGap': case 'fanDepth': case 'fanShade': updateFan(); break;
+    case 'sound': { $('snd-on').style.display = v ? '' : 'none'; $('snd-off').style.display = v ? 'none' : ''; break; }
+  }
+}
+function applyAll() { Object.keys(DEF).forEach(applySetting); }
+
+/* ═══════════ COLOUR GRADE ═══════════ */
+// each look = values at 100% intensity; the intensity slider interpolates from "no change" (can go past 100% for a stronger look), the manual sliders are added on top
+const GP = [
+  { id:'none',       n:'Без фильтра',     p:{} },
+  { id:'warmfilm',   n:'Тёплая плёнка',   p:{ b:102, c:104, s:110, sep:10, tint:'#ffb35c', ta:.22, bl:'soft-light', fade:.05, vig:.25, grain:.22 } },
+  { id:'cool',       n:'Холодное утро',   p:{ b:103, c:100, s:90, h:-6, tint:'#6aa0ff', ta:.20, bl:'soft-light', fade:.06, vig:.15 } },
+  { id:'golden',     n:'Золотой час',     p:{ b:104, c:108, s:118, tint:'#ff8a3a', ta:.32, bl:'soft-light', vig:.20 } },
+  { id:'tealorange', n:'Кино: бирюза',    p:{ c:112, s:112, h:-4, tint:'#08a0a0', ta:.26, bl:'soft-light', vig:.30, grain:.12 } },
+  { id:'matte',      n:'Матовый',         p:{ b:104, c:88, s:84, tint:'#8aa0b8', ta:.10, bl:'soft-light', fade:.16 } },
+  { id:'pastel',     n:'Пастель',         p:{ b:110, c:82, s:72, tint:'#ffc4e6', ta:.16, bl:'soft-light', fade:.12 } },
+  { id:'polaroid',   n:'Полароид',        p:{ b:106, c:92, s:86, sep:18, tint:'#ffd29a', ta:.20, bl:'soft-light', fade:.10, vig:.30, grain:.20 } },
+  { id:'kodak',      n:'Выцветший Kodak', p:{ c:92, s:92, sep:10, tint:'#f2c27b', ta:.14, bl:'soft-light', fade:.12, grain:.30 } },
+  { id:'vivid',      n:'Яркий',           p:{ b:103, c:112, s:145 } },
+  { id:'moody',      n:'Мрачный',         p:{ b:88, c:125, s:84, tint:'#223a5a', ta:.22, bl:'soft-light', vig:.50, grain:.10 } },
+  { id:'sepia',      n:'Сепия',           p:{ b:102, c:96, s:90, sep:78, tint:'#c99a5b', ta:.12, bl:'soft-light', vig:.35, fade:.06 } },
+  { id:'bw',         n:'Чёрно-белый',     p:{ b:102, c:112, gray:100, vig:.25, grain:.25 } },
+  { id:'noir',       n:'Нуар',            p:{ b:92, c:150, gray:100, vig:.50, grain:.35 } },
+];
+const GPM = Object.fromEntries(GP.map(p => [p.id, p]));
+const G0 = { b:100, c:100, s:100, h:0, sep:0, gray:0, ta:0, fade:0, vig:0, grain:0 };
+function gradeVars(pre, k, m) {
+  const p = { ...G0, ...pre.p }, L = n => G0[n] + (p[n] - G0[n]) * k;
+  const b = Math.max(0, L('b') + m.b), c = Math.max(0, L('c') + m.c), s = Math.max(0, L('s') + m.s), h = L('h'), sep = clamp(L('sep'), 0, 100), gray = clamp(L('gray'), 0, 100);
+  const ta = clamp(L('ta'), 0, 1), fade = clamp(L('fade') + m.fade / 100, 0, .6), vig = clamp(L('vig') + m.vig / 100, 0, .9), grain = clamp(L('grain') + m.grain / 100, 0, 1);
+  const wa = Math.abs(m.warm) / 100 * .42, wc = m.warm >= 0 ? '#ff9a3c' : '#4a8dff';
+  const f = [b !== 100 && `brightness(${(b / 100).toFixed(3)})`, c !== 100 && `contrast(${(c / 100).toFixed(3)})`, s !== 100 && `saturate(${(s / 100).toFixed(3)})`, Math.abs(h) > .01 && `hue-rotate(${h.toFixed(1)}deg)`, sep > .01 && `sepia(${(sep / 100).toFixed(3)})`, gray > .01 && `grayscale(${(gray / 100).toFixed(3)})`].filter(Boolean).join(' ') || 'none';
+  return { vars: { '--g-filter': f, '--g-tint': p.tint || '#000000', '--g-tint-a': ta.toFixed(3), '--g-blend': p.bl || 'soft-light', '--g-warm': wc, '--g-warm-a': wa.toFixed(3), '--g-fade': fade.toFixed(3), '--g-vig': vig.toFixed(3), '--g-grain': grain.toFixed(3) },
+           on: { tint: ta > .003, warm: wa > .003, fade: fade > .003, vig: vig > .003, grain: grain > .003 } };
+}
+let gNoise = '';
+function applyGrade() {
+  const r = document.documentElement.style, c = document.body.classList;
+  if (!gNoise) { gNoise = `url("${noiseSvg(true)}")`; r.setProperty('--g-noise', gNoise); }
+  const v = gradeVars(GPM[ST.gradePreset] || GPM.none, ST.gradeK / 100, { b: ST.gBright, c: ST.gContrast, s: ST.gSat, warm: ST.gWarm, fade: ST.gFade, vig: ST.gVig, grain: ST.gGrain });
+  Object.entries(v.vars).forEach(([k, val]) => r.setProperty(k, val));
+  c.toggle('grade-on', !!ST.gradeOn); c.toggle('grade-stk', !!ST.gradeStk);
+  c.toggle('g-gx', v.on.tint || v.on.warm || v.on.vig); c.toggle('g-tint', v.on.tint); c.toggle('g-warm', v.on.warm); c.toggle('g-fade', v.on.fade); c.toggle('g-grain', v.on.grain);
+  document.querySelectorAll('.gchip').forEach(b => b.setAttribute('aria-checked', b.dataset.p === ST.gradePreset ? 'true' : 'false'));
+  gradeFilterNow = v.vars['--g-filter']; applyStk();
+}
+function resetGrade() {
+  ['gradePreset', 'gradeK', 'gBright', 'gContrast', 'gSat', 'gWarm', 'gFade', 'gVig', 'gGrain'].forEach(k => { ST[k] = DEF[k]; applySetting(k); });
+  syncAllRows(); scheduleSave(); toast('Фильтр сброшен');
+}
+// previews of every look on one of the album's own photos (a built-in landscape when the album is empty)
+function sampleLandscape() {
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260"><defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a8fd8"/><stop offset=".62" stop-color="#f4d9a8"/></linearGradient></defs><rect width="400" height="260" fill="url(#s)"/><circle cx="290" cy="120" r="30" fill="#fff3c4"/><path d="M0 170 Q70 120 150 165 T300 150 T400 160 V260 H0Z" fill="#5a8a5a"/><path d="M0 205 Q90 165 190 200 T400 195 V260 H0Z" fill="#2f5d45"/><rect x="60" y="175" width="26" height="20" fill="#d9503f"/><rect x="92" y="180" width="18" height="15" fill="#f2c14e"/><circle cx="330" cy="215" r="14" fill="#e8e1cf"/></svg>');
+}
+function renderGradeChips() {
+  const chips = document.querySelectorAll('.gchip'); if (!chips.length) return;
+  let first = null; for (const pg of pages) { first = pg.span[0] || pg.left.images[0] || pg.right.images[0]; if (first) break; }
+  const src = first ? srcFor(first.src) : sampleLandscape(), zero = { b: 0, c: 0, s: 0, warm: 0, fade: 0, vig: 0, grain: 0 };
+  chips.forEach(b => {
+    const ph = b.querySelector('.gph'), im = ph.querySelector('img'); if (im.getAttribute('src') !== src) im.src = src;
+    Object.entries(gradeVars(GPM[b.dataset.p], 1, zero).vars).forEach(([k, val]) => ph.style.setProperty(k, val));
+  });
+}
+
+/* ═══════════ STICKER MATERIAL: every sticker has its OWN settings (d.m) and its own SVG filter #stk-<id>; the group in the settings only holds the defaults for NEW stickers ═══════════ */
+let gradeFilterNow = 'none';
+const STK_KEYS = ['stkOn', 'stkBevel', 'stkHeight', 'stkThick', 'stkBorder', 'stkLamps', 'stkShine', 'stkSharp', 'stkAz', 'stkElev', 'stkShadow', 'stkShBlur', 'stkDyn'];
+const stkDefaults = () => Object.fromEntries(STK_KEYS.map(k => [k, ST[k]]));
+const stkP = d => (d && d.m) ? { ...stkDefaults(), ...d.m } : stkDefaults();       // stickers without d.m (old files) follow the defaults
+const stkFilterXml = id => `<filter id="stk-${id}" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+  <feFlood flood-color="#000000" flood-opacity="0" result="none"/>
+  <feMorphology data-r="dil" in="SourceAlpha" operator="dilate" radius="0" result="dil"/>
+  <feFlood flood-color="#ffffff" result="wh"/>
+  <feComposite in="wh" in2="dil" operator="in" result="border"/>
+  <feMerge result="base"><feMergeNode data-r="mb" in="border"/><feMergeNode in="SourceGraphic"/></feMerge>
+  <feOffset data-r="off" in="base" dx="0" dy="1" result="offA"/>
+  <feColorMatrix in="offA" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0" result="edge"/>
+  <feGaussianBlur data-r="blur" in="base" stdDeviation="2.5" result="bump"/>
+  <feDiffuseLighting data-r="diff" in="bump" surfaceScale="4" diffuseConstant="1.3" lighting-color="#ffffff" result="diff"><feDistantLight data-r="dl" azimuth="225" elevation="50"/></feDiffuseLighting>
+  <feComposite in="base" in2="diff" operator="arithmetic" k1="1" k2="0" k3="0" k4="0" result="shaded"/>
+  ${[1, 2, 3].map(i => `<feSpecularLighting data-r="sp${i}" in="bump" surfaceScale="4" specularConstant="0.9" specularExponent="20" lighting-color="#ffffff" result="sp${i}"><feDistantLight data-r="l${i}" azimuth="225" elevation="40"/></feSpecularLighting><feComposite in="sp${i}" in2="base" operator="in" result="sp${i}c"/>`).join('')}
+  <feMerge><feMergeNode in="edge"/><feMergeNode in="shaded"/><feMergeNode data-r="m1" in="sp1c"/><feMergeNode data-r="m2" in="sp2c"/><feMergeNode data-r="m3" in="sp3c"/></feMerge>
+</filter>`;
+function applyStkItem(d) {                          // writes this sticker's material into its own filter (only when something changed)
+  let f = document.getElementById('stk-' + d.id);
+  if (!f) { $('stk-defs-in').insertAdjacentHTML('beforeend', stkFilterXml(d.id)); f = document.getElementById('stk-' + d.id); }
+  const p = stkP(d), key = JSON.stringify(p); if (f._k === key) return;
+  f._k = key;
+  const q = r => f.querySelector(`[data-r="${r}"]`), H = p.stkHeight, elv = clamp(p.stkElev, 5, 89);
+  q('dil').setAttribute('radius', p.stkBorder);
+  q('mb').setAttribute('in', p.stkBorder > 0 ? 'border' : 'none');      // no border = no white layer at all (a zero-radius dilation still leaves a light fringe along the antialiased edge)
+  q('blur').setAttribute('stdDeviation', Math.max(.01, p.stkBevel));
+  q('off').setAttribute('dy', p.stkThick);
+  q('diff').setAttribute('surfaceScale', H); q('diff').setAttribute('diffuseConstant', (1 / Math.sin(elv * Math.PI / 180)).toFixed(3));
+  q('dl').setAttribute('azimuth', p.stkAz); q('dl').setAttribute('elevation', elv);
+  for (let i = 1; i <= 3; i++) {                    // lamps are spread evenly around the sticker
+    const on = i <= p.stkLamps, sp = q('sp' + i), l = q('l' + i);
+    q('m' + i).setAttribute('in', on ? 'sp' + i + 'c' : 'none');          // a lamp that is off is cut out of the merge (a zero-strength lighting result is opaque black in Chrome)
+    sp.setAttribute('surfaceScale', H); sp.setAttribute('specularConstant', (p.stkShine / 100 * 1.1).toFixed(3)); sp.setAttribute('specularExponent', clamp(p.stkSharp, 1, 128));
+    l.setAttribute('azimuth', ((p.stkAz + (i - 1) * 360 / Math.max(1, p.stkLamps)) % 360).toFixed(1)); l.setAttribute('elevation', clamp(elv - 25, 8, 60));   // lamps sit lower than the shading light, so flat areas stay clean
+  }
+}
+function stkFx(d) {
+  const p = stkP(d), parts = [];
+  if (ST.gradeOn && ST.gradeStk && gradeFilterNow !== 'none') parts.push(gradeFilterNow);
+  if (p.stkOn && !LITE) { applyStkItem(d); parts.push(`url(#stk-${d.id})`); }
+  if (p.stkShadow > 0) parts.push(`drop-shadow(0 ${(1 + p.stkThick * .6).toFixed(1)}px ${p.stkShBlur}px rgba(0,0,0,${(p.stkShadow / 100 * .6).toFixed(3)}))`);
+  return parts.join(' ') || 'none';
+}
+function styleStk(n) { const d = n._sd; if (!d) return; n.style.setProperty('--stk-fx', stkFx(d)); n.style.setProperty('--stk-dyn', (stkP(d).stkDyn / 100).toFixed(3)); }
+function refreshStk(d) { document.querySelectorAll('.item.stk').forEach(n => { if (n._sd && n._sd.id === d.id) styleStk(n); }); }
+function purgeStkFilters() {
+  const keep = new Set(), add = a => (a || []).forEach(x => keep.add('stk-' + x.id));
+  pages.forEach(pg => { add(pg.left.stickers); add(pg.right.stickers); }); add(coverDat.stickers); add(backDat.stickers);
+  document.querySelectorAll('#stk-defs-in > filter').forEach(f => { if (!keep.has(f.id)) f.remove(); });
+}
+function applyStk() { document.querySelectorAll('.item.stk').forEach(styleStk); }       // defaults or the grade changed: restyle (stickers with their own d.m only react to the grade)
+
+/* ═══════════ SOUND ═══════════ */
+let actx;
+function playFlip(vol = 1) {
+  if (!ST.sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const len = Math.floor(actx.sampleRate * .32), buf = actx.createBuffer(1, len, actx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.2) * .35;
+    const src = actx.createBufferSource(), g = actx.createGain(), f = actx.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.value = 2400; f.Q.value = .5;
+    src.buffer = buf; src.connect(f); f.connect(g); g.connect(actx.destination);
+    g.gain.value = .8 * vol; src.start();
+  } catch (e) {}
+}
+$('btn-mute').onclick = () => { ST.sound = !ST.sound; applySetting('sound'); syncRow('sound'); };
+
+/* ═══════════ POSES & LAYOUT ═══════════ */
+const T = () => ST.thickness;
+function slot(side, i) {
+  const a = ST.fanAngle, th = a * Math.PI / 180, d = ST.persp, dz = ST.fanDepth;
+  const f = d / (d + W * Math.sin(th) + i * dz);
+  const x = (W + 6 + i * ST.fanGap) / f - W * Math.cos(th);
+  return side === 'L' ? { x: -x, z: -i * dz, a: -a } : { x, z: -i * dz, a };
+}
+const FLATL = 'translate3d(0,0,0) rotateY(0deg)';
+const nLeftCards  = () => S.pose === 'open' ? clamp(S.spread - 2, 0, ST.fanMax) : 0;
+const nRightCards = () => S.pose === 'open' ? clamp(S.total - S.spread, 0, ST.fanMax) : 0;
+
+function layoutPlates() {
+  const t = T(), f = el.plateF.style, b = el.plateB.style;
+  if (S.pose === 'closed') {
+    f.transform = `translateZ(${t / 2}px) rotateY(0deg)`;
+    b.transform = `translateZ(${-t / 2}px) rotateY(0deg)`;
+  } else if (S.pose === 'back') {      // the shut cover lands on top of the pile at the same height it has in the closed book
+    f.transform = `translateZ(${-t / 2}px) rotateY(-180deg)`;
+    b.transform = `translateZ(${t / 2}px) rotateY(-180deg)`;
+  } else {
+    f.transform = `translateZ(-3px) rotateY(-180deg)`;
+    b.transform = `translateZ(-3px) rotateY(0deg)`;
+  }
+}
+function layoutBook() {
+  const shift = S.pose === 'closed' ? -(W + OV) / 2 : S.pose === 'back' ? (W + OV) / 2 : 0;
+  el.book.style.transform = `translate3d(${shift}px,-450px,0)`;
+  el.book.classList.toggle('is-open', S.pose !== 'closed');
+  document.body.classList.toggle('open-book', S.pose === 'open');
+  el.book.classList.toggle('pile', S.pose === 'back');
+  $('cover-outer').style.pointerEvents = S.pose === 'closed' && !S.back ? 'auto' : 'none'; $('back-outer').style.pointerEvents = S.pose === 'closed' && S.back ? 'auto' : 'none';
+  el.ground.classList.toggle('open', S.pose === 'open');
+  applyZoom(); layoutPlates();
+  applySetting('shadow');
+}
+function setDur(ms) { document.documentElement.style.setProperty('--tr', ms + 'ms'); el.zoom.style.transitionDuration = ms + 'ms'; }
+
+/* ═══════════ PAGE CONTENT ═══════════ */
+function fillPage(container, idx, side, ghost) {
+  container.innerHTML = '';
+  if (idx < 0 || idx >= pages.length) return;
+  const pd = pages[idx][side], spans = pages[idx].span || [];
+  spans.forEach(d => container.appendChild(buildItem(d, { idx, side, type: 'span' }, ghost)));      // the same photo is built on both pages; each page clips its own half
+  pd.images.forEach(d => container.appendChild(buildItem(d, { idx, side, type: 'img' }, ghost)));
+  pd.stickers.forEach(d => container.appendChild(buildItem(d, { idx, side, type: 'stk' }, ghost)));
+  if (!ghost && !spans.length && !pd.images.length && !pd.stickers.length) container.insertAdjacentHTML('beforeend', `<div class="empty-hint" data-side="${side}">Перетащи фото сюда<br>или дважды кликни, чтобы выбрать файл</div>`);
+}
+function renderPages() {
+  if (S.pose !== 'open') return;
+  fillPage(el.plc, S.spread - 1, 'left');
+  fillPage(el.prc, S.spread - 1, 'right');
+  refreshFanContent();
+}
+function renderCover() {
+  el.coverLayer.innerHTML = '';
+  coverDat.images.forEach(d => el.coverLayer.appendChild(buildItem(d, { type: 'cover-img' })));
+  coverDat.stickers.forEach(d => el.coverLayer.appendChild(buildItem(d, { type: 'cover-stk' })));
+}
+function renderBack() {
+  const L = $('back-layer'); L.innerHTML = '';
+  backDat.images.forEach(d => L.appendChild(buildItem(d, { type: 'back-img' })));
+  backDat.stickers.forEach(d => L.appendChild(buildItem(d, { type: 'back-stk' })));
+}
+
+/* ═══════════ FAN ═══════════ */
+const cards = new Map();
+function cardContent(c) {
+  const box = c.querySelector('.page-content'); box.innerHTML = '';
+  const k = +c.dataset.k;
+  if (c.classList.contains('L')) fillPage(box, k + 1, 'left', true); else fillPage(box, k, 'right', true);
+}
+function makeCard(side, k) {
+  const c = document.createElement('div');
+  c.className = 'card paper ' + side; c.dataset.k = k; c.dataset.side = side;
+  c.innerHTML = `<div class="page-content"></div><div class="shade gutter-${side === 'L' ? 'l' : 'r'}"></div><div class="shade cm"></div><div class="card-shade"></div>`;
+  cardContent(c);
+  c.addEventListener('click', e => { e.stopPropagation(); onCardClick(side, k); });
+  return c;
+}
+let fanFlipKey = null;      // while a page turns: key of the card that becomes the page (every OTHER card that leaves the stack just fades out where it is)
+function updateFan() {
+  const want = new Map();
+  if (S.pose === 'open') {
+    for (let i = 1; i <= nLeftCards(); i++)  { const k = S.spread - 2 - i; want.set('L' + k, { side: 'L', k, i }); }
+    for (let i = 1; i <= nRightCards(); i++) { const k = S.spread - 1 + i; want.set('R' + k, { side: 'R', k, i }); }
+  }
+  cards.forEach((c, key) => {
+    if (want.has(key)) return;
+    cards.delete(key);
+    if (fanFlipKey && key !== fanFlipKey) {     // pushed out of the visible stack by the turn: it must not fly over the page, it just fades away
+      c.style.pointerEvents = 'none'; c.style.transition = `opacity ${Math.round(ST.flipMs * .6)}ms`; c.style.opacity = 0;
+      setTimeout(() => c.remove(), ST.flipMs + 100); return;
+    }
+    c.style.transform = FLATL; c.style.pointerEvents = 'none'; c.style.zIndex = '150';   // the sliding card must stay ABOVE the fan card that takes its slot (equal z-index let the newer card hide the incoming page until the leaf landed)
+    const sh = c.querySelector('.card-shade'); if (sh) sh.style.opacity = 0;   // darkness fades out while the card becomes the page
+    setTimeout(() => c.remove(), S.pose === 'open' ? ST.flipMs + 100 : ST.openMs * .6);
+  });
+  want.forEach((w, key) => {
+    let c = cards.get(key);
+    if (!c) {
+      c = makeCard(w.side, w.k); cards.set(key, c);
+      (w.side === 'L' ? el.fanL : el.fanR).appendChild(c);
+      c.style.transform = FLATL; c.getBoundingClientRect();
+    }
+    const p = slot(w.side, w.i);
+    c.style.zIndex = String(100 - w.i);
+    c.style.transform = `translate3d(${p.x}px,0,${p.z}px) rotateY(${p.a}deg)`;
+    const sh = c.querySelector('.card-shade'), dark = ST.fanShade / 100 * (w.i / (ST.fanMax + 1));
+    sh.style.background = `linear-gradient(${w.side === 'L' ? 270 : 90}deg, rgba(0,0,0,${dark}) 0%, rgba(0,0,0,${dark * .6}) 100%)`;
+  });
+}
+function refreshFanContent() { cards.forEach(cardContent); }
+async function onCardClick(side, k) {
+  if (S.busy || S.pose !== 'open') return;
+  await goTo(side === 'L' ? k + 2 : k + 1);
+}
+
+/* ═══════════ OPEN / CLOSE / FLIP ═══════════ */
+async function turnOver(on) {                     // closed book: front <-> back cover
+  if (S.busy || S.pose !== 'closed' || S.back === on) return;
+  S.busy = true; playFlip(.6); setDur(ST.openMs); el.hint.style.display = 'none';
+  if (sel) deselect();
+  S.back = on; document.body.classList.toggle('back-view', on); layoutBook();
+  el.bflip.style.transform = on ? 'rotateY(180deg)' : 'rotateY(0deg)';
+  await wait(ST.openMs + 60);
+  if (!on) el.hint.style.display = '';
+  S.busy = false; refreshUI();
+}
+async function goCover() { if (S.busy) return; if (S.pose === 'open') await closeFront(); else if (S.back) await turnOver(false); }
+async function goBack() { if (S.busy) return; if (S.pose === 'open') await closeFront(); if (S.pose === 'closed' && !S.back) await turnOver(true); }
+async function openBook() {
+  if (S.pose !== 'closed' || S.busy) return;
+  if (S.back) await turnOver(false);
+  if (S.busy) return;
+  S.busy = true; el.hint.style.display = 'none'; playFlip();
+  setDur(ST.openMs);
+  S.spread = 1;
+  fillPage($('front-ghost'), 0, 'left', true);
+  fillPage(el.prc, 0, 'right');
+  await imagesReady($('front-ghost'), el.prc);          // first spread is decoded before the cover starts to open
+  el.pageL.style.visibility = 'hidden'; el.pageR.style.visibility = 'visible';
+  S.pose = 'open'; layoutBook();
+  setTimeout(() => setSpine(true), ST.openMs * .62);      // stitches + crease appear only once the cover has opened
+  setTimeout(() => updateFan(), ST.openMs * .72);
+  await wait(ST.openMs);
+  fillPage(el.plc, 0, 'left'); el.pageL.style.visibility = 'visible';
+  $('front-ghost').innerHTML = '';
+  S.busy = false; refreshUI(); prefetchAround();
+}
+async function closeFront() {
+  if (S.pose !== 'open' || S.busy) return;
+  S.busy = true; playFlip(); setDur(ST.openMs);
+  fillPage($('front-ghost'), 0, 'left', true);
+  el.pageL.style.visibility = 'hidden'; setSpine(false);
+  S.pose = 'closed'; updateFan(); layoutBook();
+  await wait(ST.openMs);
+  el.pageR.style.visibility = 'hidden';
+  S.spread = 0; el.hint.style.display = ''; $('front-ghost').innerHTML = '';
+  S.busy = false; refreshUI();
+}
+async function closeFromEnd() {
+  if (S.pose !== 'open' || S.busy) return;
+  S.busy = true; playFlip(); setDur(ST.openMs);
+  fillPage($('back-ghost'), S.total - 1, 'right', true);
+  el.pageR.style.visibility = 'hidden'; setSpine(false);
+  S.pose = 'back'; S.spread = S.total + 1; // no cards
+  cards.forEach((c, k) => { c.style.transform = FLATL; c.style.pointerEvents = 'none'; setTimeout(() => c.remove(), ST.openMs); });
+  cards.clear(); layoutBook();
+  await wait(ST.openMs + 60);
+  // the shut book seen from behind IS the closed book turned 180 degrees: swap to that real geometry (spine, page edges, thickness) without a visible jump
+  [el.book, el.bflip].forEach(n => n.classList.add('notrans'));
+  S.pose = 'closed'; S.spread = 0;
+  el.pageL.style.visibility = 'hidden'; $('back-ghost').innerHTML = '';
+  el.bflip.style.transform = 'rotateY(180deg)';
+  layoutBook(); el.book.getBoundingClientRect();
+  [el.book, el.bflip].forEach(n => n.classList.remove('notrans'));
+  // ...and turn it over to show the front cover
+  el.bflip.style.transform = 'rotateY(360deg)'; playFlip(.6);
+  await wait(ST.openMs + 60);
+  el.bflip.classList.add('notrans'); el.bflip.style.transform = 'rotateY(0deg)'; el.bflip.getBoundingClientRect(); el.bflip.classList.remove('notrans');
+  el.hint.style.display = ''; S.busy = false; refreshUI();
+}
+function setSpine(on) { el.stitch.classList.toggle('away', !on); $('crease').classList.toggle('away', !on); }
+const ease = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+function setLeaf(p, fwd) {
+  const e = ease(fwd ? p : 1 - p), ang = -180 * e, sin = Math.sin(Math.abs(ang) * Math.PI / 180);
+  el.leaf.style.transform = `translateZ(${2.5 + sin * 10}px) rotateY(${ang}deg) rotateX(${sin * 1.4}deg)`;
+  $('leaf-fs').style.background = $('leaf-bs').style.background = `rgba(0,0,0,${.5 * sin * ST.light / 100})`;
+  const k = Math.sin(Math.PI * (fwd ? p : 1 - p)) * .42 * ST.light / 100;
+  (fwd ? $('pr-flip') : $('pl-flip')).style.background = `linear-gradient(${fwd ? 90 : 270}deg, rgba(0,0,0,${k}), rgba(0,0,0,0) 80%)`;
+}
+// decode pictures before they are shown, so a turning page never flashes empty or half-drawn
+const imagesReady = (...boxes) => Promise.race([Promise.all(boxes.flatMap(b => [...b.querySelectorAll('img')]).map(i => i.decode ? i.decode().catch(() => {}) : 0)), wait(800)]);
+const imgCache = new Map();
+function prefetchSpread(n) {
+  if (n < 1 || n > S.total || !pages[n - 1]) return;
+  const pg = pages[n - 1];
+  [...pg.left.images, ...pg.left.stickers, ...pg.right.images, ...pg.right.stickers, ...(pg.span || [])].forEach(d => {
+    if (imgCache.has(d.src)) return; const i = new Image(); i.src = srcFor(d.src); imgCache.set(d.src, i); i.decode && i.decode().catch(() => {});
+    if (imgCache.size > 60) imgCache.delete(imgCache.keys().next().value);
+  });
+}
+function prefetchAround() { const go = () => [S.spread, S.spread + 1, S.spread - 1, S.spread + 2].forEach(prefetchSpread); (window.requestIdleCallback || setTimeout)(go); }
+async function flip(dir, ms) {
+  if (S.busy || S.pose !== 'open') return false;
+  const s = S.spread;
+  if (dir > 0 && s >= S.total) { await closeFromEnd(); return true; }
+  if (dir < 0 && s <= 1) { await closeFront(); return true; }
+  S.busy = true; ms = ms || ST.flipMs; setDur(ms); playFlip();
+  const fwd = dir > 0, leaf = el.leaf;
+  // the page about to be revealed is the card sticking out beside the book: that card slides into place, so the real page stays hidden until the leaf lands (otherwise the same page is drawn twice)
+  const slideCard = fwd ? cards.get('R' + s) : cards.get('L' + (s - 3)), slidePage = slideCard ? (fwd ? el.pageR : el.pageL) : null;
+  if (sel) deselect();
+  // the face that lands on the book is built with real (editable) items and later MOVED into the page, so nothing is re-created or re-decoded at the end of the turn
+  if (fwd) { fillPage($('leaf-f'), s - 1, 'right', true); fillPage($('leaf-b'), s, 'left', false); }
+  else { fillPage($('leaf-b'), s - 1, 'left', true); fillPage($('leaf-f'), s - 2, 'right', false); }
+  // the incoming page is built OFF-screen and decoded first; the real page keeps showing what it shows until the leaf is on top of it
+  // (hiding it earlier, while waiting for the decode, uncovered the next photo for a few frames: the flicker right before the turn)
+  const landing = document.createElement('div'); fillPage(landing, fwd ? s : s - 2, fwd ? 'right' : 'left');
+  // the card that will carry the covered page is created now (behind the real page, so nobody sees it) and decoded together with everything else
+  const outKey = fwd ? 'L' + (s - 2) : 'R' + (s - 1);
+  let preCard = null;
+  if (ST.fanMax >= 1 && (fwd ? s >= 2 : true) && !cards.has(outKey)) {
+    preCard = makeCard(fwd ? 'L' : 'R', fwd ? s - 2 : s - 1); cards.set(outKey, preCard);
+    (fwd ? el.fanL : el.fanR).appendChild(preCard); preCard.style.transform = FLATL; preCard.style.zIndex = '1'; preCard.getBoundingClientRect();
+  }
+  await imagesReady($('leaf-f'), $('leaf-b'), landing, ...(slideCard ? [slideCard] : []), ...(preCard ? [preCard] : []));
+  // from here on everything happens in ONE synchronous block (no frame is painted in between)
+  (fwd ? el.prc : el.plc).replaceChildren(...landing.childNodes);
+  if (slidePage) slidePage.style.visibility = 'hidden';
+  fanFlipKey = slideCard ? (fwd ? 'R' + s : 'L' + (s - 3)) : '-';
+  S.spread = s + dir; updateFan(); refreshUI(); fanFlipKey = null;
+  // the page that gets COVERED (left one when turning forward, right one when turning back) becomes the first card of its fan: while the leaf lands on it, it slides sideways out of the way
+  const outPage = fwd ? el.pageL : el.pageR, outCard = cards.get(outKey);
+  if (outCard) {
+    const target = outCard.style.transform, sh = outCard.querySelector('.card-shade'), tr = `${Math.round(ms * .62)}ms cubic-bezier(.4,0,.2,1) ${Math.round(ms * .38)}ms`;
+    outCard.style.transition = 'none'; outCard.style.transform = FLATL; if (sh) { sh.style.transition = 'none'; sh.style.opacity = 0; } outCard.getBoundingClientRect();     // starts exactly where the page is (no shade yet)...
+    outCard.style.transition = `transform ${tr}`; outCard.style.transform = target; if (sh) { sh.style.transition = `opacity ${tr}`; sh.style.opacity = 1; }   // ...and leaves, darkening, once the leaf starts covering it
+    outPage.style.visibility = 'hidden';
+  }
+  leaf.style.display = 'block';
+  sp.vx += dir * .22;
+  const t0 = performance.now();
+  await new Promise(res => {
+    setTimeout(res, ms + 120);
+    (function step(now) {
+      const p = clamp((now - t0) / ms, 0, 1);
+      setLeaf(p, fwd);
+      if (p < 1) requestAnimationFrame(step); else res();
+    })(t0);
+  });
+  if (fwd) el.plc.replaceChildren(...$('leaf-b').childNodes); else el.prc.replaceChildren(...$('leaf-f').childNodes);
+  if (slidePage) { slidePage.style.visibility = 'visible'; slideCard.remove(); }
+  if (outCard) { outPage.style.visibility = 'visible'; outCard.style.transition = ''; const sh = outCard.querySelector('.card-shade'); if (sh) sh.style.transition = ''; }
+  leaf.style.display = 'none'; $('pr-flip').style.background = $('pl-flip').style.background = '';
+  S.busy = false; refreshUI(); prefetchAround();
+  return true;
+}
+async function goTo(target) {
+  target = clamp(target, 1, S.total);
+  while (S.spread !== target && S.pose === 'open') {
+    const d = target > S.spread ? 1 : -1;
+    const steps = Math.abs(target - S.spread);
+    const ok = await flip(d, steps > 1 ? Math.max(260, ST.flipMs * .45) : ST.flipMs);
+    if (!ok) break;
+  }
+}
+
+/* arrows that show where a click turns the page (outer part of each page, and the stack beside it) */
+let navRaf = 0, mouseIn = true;
+function updateNav() {
+  navRaf = 0;
+  const L = $('nav-l'), R = $('nav-r'), hide = () => { L.classList.remove('show'); R.classList.remove('show'); };
+  if (S.pose !== 'open' || S.busy || editing() || document.body.classList.contains('bg-editing') || !mouseIn) return hide();
+  const rR = el.pageR.getBoundingClientRect(), rL = el.pageL.getBoundingClientRect(), mx = sp.mx * innerWidth, my = sp.my * innerHeight;
+  let right = rR.right, left = rL.left; cards.forEach(c => { const r = c.getBoundingClientRect(); if (c.classList.contains('R')) right = Math.max(right, r.right); else left = Math.min(left, r.left); });
+  const inY = my > rR.top - 90 && my < rR.bottom + 90, cy = (rR.top + rR.bottom) / 2;
+  const zr = inY && mx > rR.left + rR.width * .58, zl = inY && mx < rL.right - rL.width * .58;
+  const place = (n, x) => { n.style.left = clamp(x, 34, innerWidth - 34) + 'px'; n.style.top = cy + 'px'; };
+  place(R, right + 36 < innerWidth - 40 ? right + 36 : rR.right - 40); place(L, left - 36 > 40 ? left - 36 : rL.left + 40);
+  R.title = S.spread >= S.total ? 'Закрыть блокнот' : 'Дальше'; L.title = S.spread <= 1 ? 'К обложке' : 'Назад';
+  R.classList.toggle('show', zr); L.classList.toggle('show', zl);
+}
+const navSoon = () => { if (!navRaf) navRaf = requestAnimationFrame(updateNav); };
+function refreshUI() {
+  el.counter.textContent = S.pose === 'open' && S.spread >= 1 && S.spread <= S.total ? `${S.spread * 2 - 1} — ${S.spread * 2}` : '';
+  $('n-label').textContent = S.pose === 'open' ? `Разворот ${S.spread} / ${S.total}` : S.back ? 'Задняя обложка' : 'Обложка';
+  updateAddWhere();
+  renderLayers(); lt.d = lt.p = ''; updateLight(); navSoon(); markStrip();
+}
+
+/* ═══════════ POINTER: TILT, LIGHT, CLICKS ═══════════ */
+const sp = { tx: 0, ty: 0, x: 0, y: 0, vx: 0, vy: 0, mx: .5, my: .5, openT: 0 };
+let lastMove = 0;
+function setPointer(cx, cy) {
+  sp.mx = cx / innerWidth; sp.my = cy / innerHeight;
+  sp.tx = clamp((sp.mx - .5) * 2, -1, 1); sp.ty = clamp((sp.my - .5) * 2, -1, 1);
+}
+addEventListener('mousemove', e => { setPointer(e.clientX, e.clientY); lastMove = performance.now(); mouseIn = true; navSoon(); });
+function neutral() { sp.tx = 0; sp.ty = 0; sp.mx = .5; sp.my = .5; mouseIn = false; navSoon(); }
+document.addEventListener('mouseleave', neutral);
+document.documentElement.addEventListener('mouseleave', neutral);
+document.addEventListener('mouseout', e => { if (!e.relatedTarget && !e.toElement) neutral(); });
+addEventListener('blur', neutral);
+
+let lastT = performance.now();
+requestAnimationFrame(function loop(t) {
+  if (EMBED && !embedVisible) { lastT = t; requestAnimationFrame(loop); return; }
+  const dt = clamp((t - lastT) / 16.667, .2, 6); lastT = t;
+  const k = ST.stiff * .008;
+  for (let rem = dt; rem > 0; ) {
+    const h = Math.min(1, rem); rem -= h; const d = Math.pow(1 - ST.damp / 100, h);
+    sp.vx = (sp.vx + (sp.tx - sp.x) * k * h) * d; sp.x += sp.vx * h;
+    sp.vy = (sp.vy + (sp.ty - sp.y) * k * h) * d; sp.y += sp.vy * h;
+    sp.openT += ((S.pose === 'closed' ? 0 : 1) - sp.openT) * Math.min(1, .07 * h);
+  }
+  sp.x = clamp(sp.x, -1.6, 1.6); sp.y = clamp(sp.y, -1.6, 1.6);
+  const bx = ST.closedRx + (ST.openRx - ST.closedRx) * sp.openT;
+  const by = ST.closedRy + (ST.openRy - ST.closedRy) * sp.openT;
+  const rx = bx - sp.y * ST.tiltMax, ry = by + sp.x * ST.tiltMax;
+  const pv = `rotateX(${rx.toFixed(3)}deg) rotateY(${ry.toFixed(3)}deg)`;
+  if (pv !== lt.pv) { lt.pv = pv; el.pivot.style.transform = pv; el.ground.style.translate = `${(ry * -3).toFixed(1)}px ${(rx * 3).toFixed(1)}px`; updateLight(); }
+  requestAnimationFrame(loop);
+});
+// only compositor-friendly properties change per frame (transform / opacity); gradients are static, so big photos are never re-rasterised while the mouse moves
+const lt = { g: '', p: '', d: '', pv: '' };
+function updateLight() {
+  const L = ST.light / 100;
+  const g = [sp.mx.toFixed(3), sp.my.toFixed(3), ST.gloss, ST.glossSize, L].join();
+  if (g !== lt.g) {
+    lt.g = g; const w = ST.glossSize, h = w * .8, b = $('gloss-blob');
+    b.style.width = w + 'px'; b.style.height = h + 'px'; b.style.opacity = clamp(ST.gloss / 100 * (.6 + L), 0, 1);
+    b.style.transform = `translate(${sp.mx * 690 - w / 2}px,${sp.my * 920 - h / 2}px)`;
+  }
+  if (S.pose === 'open') {
+    const p = [sp.mx.toFixed(3), L].join();
+    if (p !== lt.p) { lt.p = p; const rt = document.documentElement.style; rt.setProperty('--ml', clamp((.3 + (1 - sp.mx) * .7) * L * 1.5, 0, 1).toFixed(3)); rt.setProperty('--mr', clamp((.3 + sp.mx * .7) * L * 1.5, 0, 1).toFixed(3)); }
+  }
+  const dk = sp.mx.toFixed(2) + ',' + sp.my.toFixed(2) + ',' + L;
+  if (dk !== lt.d) {
+    lt.d = dk;
+    document.querySelectorAll('.item .dyn').forEach(n => {
+      const r = n.parentElement.getBoundingClientRect(); if (!r.width) return;
+      const lx = ((sp.mx * innerWidth - r.left) / r.width * 100).toFixed(0), ly = ((sp.my * innerHeight - r.top) / r.height * 100).toFixed(0);
+      n.style.background = `radial-gradient(ellipse 65% 50% at ${lx}% ${ly}%, rgba(255,255,255,${.4 * L}) 0%, rgba(255,255,255,${.08 * L}) 50%, transparent 100%)`;
+    });
+  }
+}
+
+/* ═══════════ INPUT: EDIT MODE, KEYS, CLICKS ═══════════ */
+const editing = () => $('panel').classList.contains('open');
+const mods = { alt: false, shift: false };
+addEventListener('pointermove', e => { mods.alt = e.altKey; mods.shift = e.shiftKey; }, true);
+addEventListener('keydown', e => { if (e.key === 'Alt') mods.alt = true; if (e.key === 'Shift') mods.shift = true; });
+addEventListener('keyup', e => { if (e.key === 'Alt') mods.alt = false; if (e.key === 'Shift') mods.shift = false; });
+$('cover-outer').addEventListener('click', e => { if (S.pose !== 'closed' || S.back || e.target.closest('.item')) return; if (editing() && sel) { deselect(); return; } openBook(); });
+$('back-outer').addEventListener('click', e => { if (S.pose !== 'closed' || !S.back || e.target.closest('.item')) return; if (editing()) { if (sel) deselect(); return; } turnOver(false); });
+$('cover-outer').style.cursor = 'pointer';
+addEventListener('click', e => {
+  if (performance.now() - dragEndT < 350) return;            // the click that ends a drag must not deselect what was just moved
+  // composedPath is captured at dispatch time: a row re-rendered by its own click handler is already detached, so closest() would miss #ui
+  if (e.composedPath().some(n => n.id === 'ui' || (n.classList && (n.classList.contains('item') || n.classList.contains('card'))))) return;
+  if (S.pose === 'closed') { if (EMBED) { openBook(); return; } if (editing() && sel) deselect(); return; }           // empty space around the book: drop the selection so the sticker can be seen as it is
+  if (editing()) { if (S.pose === 'open') { S.side = e.clientX < el.pageR.getBoundingClientRect().left ? 'left' : 'right'; markStrip(); updateAddWhere(); } deselect(); return; }
+  flip(e.clientX < innerWidth / 2 ? -1 : 1);
+});
+const isTyping = t => t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || (t.tagName === 'INPUT' && !/^(range|checkbox|button|radio|color)$/.test(t.type));
+addEventListener('keydown', e => {
+  const mod = e.ctrlKey || e.metaKey;
+  if (mod && (e.code === 'KeyZ' || e.code === 'KeyY')) {   // e.code: works on any keyboard layout
+    if (isTyping(e.target)) return;
+    e.preventDefault(); (e.code === 'KeyY' || e.shiftKey) ? redo() : undo(); return;
+  }
+  if (isTyping(e.target)) return;
+  if (e.target.tagName === 'INPUT' && !/^(Delete|Backspace)$/.test(e.code)) return;     // sliders / pickers keep their own keys; only Delete reaches the selection
+  if (mod || e.altKey) return;
+  if (editing() && sel && /^Arrow/.test(e.code)) { e.preventDefault(); nudge(e); return; }   // arrows move the selected object (Shift = x10)
+  switch (e.code) {
+    case 'ArrowRight': case 'PageDown': S.pose === 'closed' ? openBook() : flip(1); break;
+    case 'ArrowLeft': case 'PageUp': flip(-1); break;
+    case 'Enter': if (e.target.tagName !== 'BUTTON') openBook(); break;
+    case 'Escape': if (document.body.classList.contains('bg-editing')) toggleBgEdit(false); else if (editing()) { if (sel) deselect(); else togglePanel(false); } else closeFront(); break;
+    case 'Delete': case 'Backspace': if (sel) { e.preventDefault(); deleteItem(sel.d, sel.ctx); } break;
+  }
+});
+
+/* toast: one active message, new call replaces text and restarts the timer */
+let toastT;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600); }
+
+/* ═══════════ HISTORY (undo / redo) ═══════════ */
+const hist = { stack: [], keys: [], i: -1 };
+const cloneItems = a => a.map(x => (x.m ? { ...x, m: { ...x.m } } : { ...x }));           // strings (photo data) stay shared, so snapshots are cheap
+const clonePage = p => ({ id: p.id, span: cloneItems(p.span || []), left: { images: cloneItems(p.left.images), stickers: cloneItems(p.left.stickers) }, right: { images: cloneItems(p.right.images), stickers: cloneItems(p.right.stickers) } });
+const snapshot = () => ({ total: S.total, pages: pages.map(clonePage), cover: { images: cloneItems(coverDat.images), stickers: cloneItems(coverDat.stickers) }, back: { images: cloneItems(backDat.images), stickers: cloneItems(backDat.stickers) } });
+const snapKey = s => JSON.stringify(s, (k, v) => k === 'src' ? v.length + ':' + v.slice(-32) : v);
+function updateHistBtns() { $('h-undo').disabled = hist.i <= 0; $('h-redo').disabled = hist.i >= hist.stack.length - 1; }
+function commit() {
+  const s = snapshot(), key = snapKey(s);
+  if (hist.i >= 0 && hist.keys[hist.i] === key) { scheduleSave(); return; }
+  hist.stack.length = hist.keys.length = hist.i + 1;
+  hist.stack.push(s); hist.keys.push(key);
+  if (hist.stack.length > 120) { hist.stack.shift(); hist.keys.shift(); }
+  hist.i = hist.stack.length - 1; updateHistBtns(); scheduleSave(); afterChangeSoon();
+}
+function histReset() { hist.stack = []; hist.keys = []; hist.i = -1; commit(); }
+function restore(s) {
+  pages = s.pages.map(clonePage); coverDat = { images: cloneItems(s.cover.images), stickers: cloneItems(s.cover.stickers) }; backDat = s.back ? { images: cloneItems(s.back.images), stickers: cloneItems(s.back.stickers) } : { images: [], stickers: [] };
+  S.total = s.total; if (totalCtl) totalCtl.refresh();
+  sel = null; renderCover(); renderBack(); afterChangeSoon();
+  if (S.pose === 'open') { S.spread = Math.min(S.spread, S.total); renderPages(); updateFan(); }
+  syncTransform(); refreshUI();
+}
+function undo() { if (hist.i <= 0 || S.busy) return; hist.i--; restore(hist.stack[hist.i]); updateHistBtns(); scheduleSave(); toast('Отменено'); }
+function redo() { if (hist.i >= hist.stack.length - 1 || S.busy) return; hist.i++; restore(hist.stack[hist.i]); updateHistBtns(); scheduleSave(); toast('Повторено'); }
+
+/* ═══════════ AUTOSAVE (IndexedDB: photos don't fit in localStorage) ═══════════ */
+const CLEAN = EMBED || /[?&]clean/.test(location.search);
+const IDB = {
+  db: null,
+  open() { return this.db ? Promise.resolve(this.db) : new Promise((res, rej) => { const r = indexedDB.open('moleskine', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => { this.db = r.result; res(r.result); }; r.onerror = () => rej(r.error); }); },
+  async get(k) { const db = await this.open(); return new Promise((res, rej) => { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); },
+  async set(k, v) { const db = await this.open(); return new Promise((res, rej) => { const q = db.transaction('kv', 'readwrite').objectStore('kv').put(v, k); q.onsuccess = () => res(); q.onerror = () => rej(q.error); }); },
+  async del(k) { const db = await this.open(); return new Promise((res, rej) => { const q = db.transaction('kv', 'readwrite').objectStore('kv').delete(k); q.onsuccess = () => res(); q.onerror = () => rej(q.error); }); },
+};
+let saveT, savedAt = 0, READY = false, persistAsked = false;
+function updateSaveInfo() { const n = $('save-info'); if (n) n.textContent = savedAt ? 'Автосохранение: ' + new Date(savedAt).toLocaleTimeString() : 'Автосохранение: ещё не сохранялось'; }
+function scheduleSave() {
+  if (CLEAN || !READY) return;
+  clearTimeout(saveT);
+  saveT = setTimeout(async () => {
+    try {
+      savedAt = Date.now(); await IDB.set('autosave', { t: savedAt, data: exportConfig() }); updateSaveInfo();
+      if (!persistAsked && navigator.storage && navigator.storage.persist) { persistAsked = true; navigator.storage.persist(); }
+    } catch (e) {}
+  }, 700);
+}
+
+/* ═══════════ ITEMS (photos / stickers) ═══════════ */
+const dimsOf = ctx => ctx && ctx.type && /^(cover|back)/.test(ctx.type) ? [690, 920] : ctx && ctx.type === 'span' ? [2 * W, H] : [W, H];
+const offOf = ctx => ctx && ctx.type === 'span' && ctx.side === 'right' ? W : 0;                // the right page shows the spread photo shifted one page to the left
+const twins = d => [...document.querySelectorAll(`.item.editable[data-uid="${d.id}"]`)];
+// items move with transform (compositor only) instead of left/top, so dragging a big photo does not re-layout the page
+function applyItem(n, d) {
+  applyOne(n, d);
+  if (n._span && n._d) twins(d).forEach(t => { if (t !== n) applyOne(t, d); });                // the other half of a spread photo follows
+}
+function applyOne(n, d) {
+  const [cw, ch] = n._dim || [W, H], s = n.style, sc = d.scale || 1;
+  s.width = n._span ? (d.w || 40) * cw / 100 + 'px' : (d.w || 40) + '%'; s.opacity = d.opacity ?? 1; s.setProperty('--is', sc);
+  s.transform = `translate3d(${d.x * cw / 100 - (n._off || 0)}px,${d.y * ch / 100}px,0) translate(-50%,-50%) rotate(${d.rotation || 0}deg) scale(${sc})`;
+  if (n._d && n.classList.contains('sel')) placeHandles(n, d);
+}
+// the real corners of a big photo are outside the sheet: handles go to the corners clamped into the visible page (works for any size and rotation)
+function placeHandles(n, d) {
+  const lw = n.offsetWidth, lh = n.offsetHeight; if (!lw || !lh) return;
+  const st = n.style, [cw, ch] = n._dim, sc = d.scale || 1, th = (d.rotation || 0) * Math.PI / 180, cos = Math.cos(th), sin = Math.sin(th);
+  const cx = d.x * cw / 100, cy = d.y * ch / 100, hk = parseFloat(document.documentElement.style.getPropertyValue('--hk')) || 24, m = hk * .8;
+  const toPage = (vx, vy) => [cx + vx * cos - vy * sin, cy + vx * sin + vy * cos];                          // item-local offset from centre (unscaled) -> page px
+  const toItem = (px, py) => { const vx = px - cx, vy = py - cy; return [((vx * cos + vy * sin) / sc + lw / 2) / lw * 100, ((-vx * sin + vy * cos) / sc + lh / 2) / lh * 100]; };
+  const inPage = ([x, y]) => [clamp(x, m, cw - m), clamp(y, m, ch - m)];
+  const put = (key, sx, sy) => { const [x, y] = toItem(...inPage(toPage(sx * lw / 2 * sc, sy * lh / 2 * sc))); st.setProperty('--' + key + 'x', x + '%'); st.setProperty('--' + key + 'y', y + '%'); };
+  put('nw', -1, -1); put('ne', 1, -1); put('sw', -1, 1); put('se', 1, 1);
+  const top = toPage(0, -lh / 2 * sc), dir = [-sin, cos], r = inPage([top[0] + dir[0] * hk * 1.8, top[1] + dir[1] * hk * 1.8]);   // rotate handle: just inside the top edge
+  const [rx, ry] = toItem(r[0], r[1]); st.setProperty('--rx', rx + '%'); st.setProperty('--ry', ry + '%');
+}
+function buildItem(d, ctx, ghost) {
+  const n = document.createElement('div');
+  n.className = 'item ' + (d.type === 'stk' ? 'stk' : 'img'); n.dataset.uid = d.id; n._dim = dimsOf(ctx); n._span = ctx.type === 'span'; n._off = offOf(ctx);
+  const img = document.createElement('img'); img.src = srcFor(d.src); img.draggable = false; n.appendChild(img);
+  n.insertAdjacentHTML('beforeend', '<i class="gx"></i><i class="gf"></i><i class="gn"></i>');   // colour-grade layers (shown only when a filter is on)
+  img.addEventListener('load', () => { if (n.classList.contains('sel')) applyItem(n, d); });
+  if (d.type === 'stk') { n.insertAdjacentHTML('beforeend', '<div class="dyn"></div>'); n.style.setProperty('--stk-mask', `url("${srcFor(d.src)}")`); n._sd = d; styleStk(n); }
+  applyItem(n, d);
+  if (!ghost) {
+    n._d = d; n._ctx = ctx;
+    n.classList.add('editable');
+    n.insertAdjacentHTML('beforeend', '<div class="ring"></div><i class="hdl" data-h="nw"></i><i class="hdl" data-h="ne"></i><i class="hdl" data-h="sw"></i><i class="hdl" data-h="se"></i><i class="hdl" data-h="rot"></i>');
+    n.addEventListener('pointerdown', e => onItemDown(e, n, d, ctx));
+    n.addEventListener('dblclick', e => { if (!editing()) return; e.stopPropagation(); e.preventDefault(); select(n, d, ctx); fitToggle(); });   // double-click: snap to the page edges (again: fit inside)
+    n.addEventListener('wheel', onItemWheel, { passive: false });
+    if (sel && sel.d.id === d.id) { n.classList.add('sel'); sel.el = n; markSelPage(n); }
+  } else n.style.pointerEvents = 'none';
+  return n;
+}
+let sel = null, wheelT, syncRaf = 0, dragEndT = 0, nudgeT = 0;
+function syncSoon() { if (syncRaf) return; syncRaf = requestAnimationFrame(() => { syncRaf = 0; syncTransform(); }); }
+function markSelPage(n) {
+  document.querySelectorAll('.page.has-sel').forEach(p => p.classList.remove('has-sel'));
+}
+function select(n, d, ctx) {
+  document.querySelectorAll('.item.sel').forEach(x => x.classList.remove('sel'));
+  sel = { el: n, d, ctx }; twins(d).forEach(x => x.classList.add('sel')); n.classList.add('sel'); markSelPage(n); applyItem(n, d); syncTransform(); renderLayers();
+  if (ctx.type === 'img' || ctx.type === 'stk') { S.side = ctx.side; markStrip(); updateAddWhere(); }
+}
+function deselect() { document.querySelectorAll('.item.sel').forEach(x => x.classList.remove('sel')); sel = null; markSelPage(null); syncTransform(); renderLayers(); }
+function guide(par, axis, pos) {
+  let g = par.querySelector('.guide.' + axis);
+  if (!g) { g = document.createElement('div'); g.className = 'guide ' + axis; par.appendChild(g); }
+  if (pos == null) { g.style.display = 'none'; return; }
+  g.style.display = 'block'; g.style[axis === 'v' ? 'left' : 'top'] = pos + '%';
+}
+function guides(n, d, gx, gy) {              // snap lines: a spread photo shows them on both pages (spread % -> page %)
+  (n._span ? twins(d) : [n]).forEach(x => {
+    const par = x.parentElement; if (!par) return;
+    const v = gx == null ? null : x._span ? gx * 2 - (x._off ? 100 : 0) : gx;
+    guide(par, 'v', v != null && v >= 0 && v <= 100 ? v : null); guide(par, 'h', gy);
+  });
+}
+function nudge(e) {
+  const d = sel.d, [cw, ch] = sel.el._dim, st = e.shiftKey ? 10 : 1;
+  d.x += (e.code === 'ArrowLeft' ? -st : e.code === 'ArrowRight' ? st : 0) / cw * 100; d.y += (e.code === 'ArrowUp' ? -st : e.code === 'ArrowDown' ? st : 0) / ch * 100;
+  applyItem(sel.el, d); syncSoon();
+  clearTimeout(nudgeT); nudgeT = setTimeout(() => { refreshFanContent(); commit(); }, 400);
+}
+// while a page item is dragged it is drawn in #drag-layer (spread coordinates, above both pages, not clipped), so it can travel from one page to the other
+function makeGhost(n, d, ctx) {
+  const L = $('drag-layer'); L.style.display = 'block';
+  const gd = { ...d }, g = buildItem(gd, { idx: ctx.idx, side: 'left', type: 'span' }, true);
+  g._gd = gd; L.appendChild(g); n.style.visibility = 'hidden'; return g;
+}
+function updateGhost(g, d, ctx) {
+  const gd = g._gd; gd.x = (d.x * W / 100 + (ctx.side === 'right' ? W : 0)) / (2 * W) * 100; gd.y = d.y; gd.w = d.w / 2; gd.scale = d.scale; gd.rotation = d.rotation; gd.opacity = d.opacity;
+  applyOne(g, gd);
+}
+function moveItemTo(d, ctx, to) {                         // to: { idx, side } page | { board: 'cover'|'back' }; centre = put it in the middle, x = new x on the target page
+  const l = listFor(ctx), i = l.indexOf(d); if (i >= 0) l.splice(i, 1);
+  const stk = d.type === 'stk'; let nctx;
+  if (to.board) { const dat = to.board === 'back' ? backDat : coverDat; (stk ? dat.stickers : dat.images).push(d); nctx = { type: to.board + '-' + (stk ? 'stk' : 'img') }; }
+  else { const pg = pages[to.idx][to.side]; (stk ? pg.stickers : pg.images).push(d); nctx = { idx: to.idx, side: to.side, type: stk ? 'stk' : 'img' }; }
+  if (to.centre) { d.x = 50; d.y = 50; } else if (to.x != null) d.x = to.x;
+  sel = null; renderCover(); renderBack(); if (S.pose === 'open') renderPages();
+  syncTransform(); renderLayers(); commit();
+  const visible = to.board ? (S.pose === 'closed' && (to.board === 'back') === S.back) : (S.pose === 'open' && to.idx === S.spread - 1);
+  if (visible) setTimeout(() => { const nn = document.querySelector(`.item.editable[data-uid="${d.id}"]`); if (nn) select(nn, d, nctx); }, 30);
+  else toast(to.board ? 'Перенесено на ' + (to.board === 'back' ? 'заднюю обложку' : 'обложку') : 'Перенесено: разворот ' + (to.idx + 1) + ', ' + (to.side === 'left' ? 'левая' : 'правая') + ' страница');
+}
+function finishMove(d, ctx, th, crossed) {
+  let to = null;
+  if (th) {
+    if (th.dataset.side) to = { idx: +th.dataset.i, side: th.dataset.side, centre: true };
+    else { const b = th.closest('.sp').dataset.cov; if (!ctx.type.startsWith(b)) to = { board: b, centre: true }; }
+    if (to && to.idx === ctx.idx && to.side === ctx.side) to = null;
+  } else if (crossed && ctx.idx != null) {
+    if (ctx.side === 'left' && d.x > 100) to = { idx: ctx.idx, side: 'right', x: d.x - 100 };
+    else if (ctx.side === 'right' && d.x < 0) to = { idx: ctx.idx, side: 'left', x: d.x + 100 };
+  }
+  if (!to) return false;
+  moveItemTo(d, ctx, to); return true;
+}
+function onItemDown(e, n, d, ctx) {
+  if (!editing() || e.button > 0) return;
+  e.stopPropagation(); e.preventDefault();
+  select(n, d, ctx);
+  const ae = document.activeElement; if (ae && ae !== document.body && ae.blur) ae.blur();       // a focused slider/field would swallow Delete and the arrow keys
+  const h = e.target.dataset && e.target.dataset.h, mode = h ? (h === 'rot' ? 'rot' : 'scale') : 'move';
+  const par = n.parentElement, pr = par.getBoundingClientRect(), k = pr.width / par.offsetWidth || 1, pw = n._span ? n._dim[0] : par.offsetWidth, ph = n._span ? n._dim[1] : par.offsetHeight;
+  const r = n.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const sx = e.clientX, sy = e.clientY, x0 = d.x, y0 = d.y, s0 = d.scale || 1, r0 = d.rotation || 0;
+  const dist0 = Math.hypot(sx - cx, sy - cy) || 1, a0 = Math.atan2(sy - cy, sx - cx);
+  const hw0 = n.offsetWidth / 2 / pw * 100, hh0 = n.offsetHeight / 2 / ph * 100;   // measured once, not on every move
+  let axis = null, moved = false, ghost = null, dropTh = null;
+  const canCross = mode === 'move' && S.pose === 'open' && (ctx.type === 'img' || ctx.type === 'stk'), canDrop = mode === 'move' && ctx.type !== 'span';
+  const curCls = mode === 'rot' ? 'cur-rot' : mode === 'scale' ? (h === 'nw' || h === 'se' ? 'cur-nwse' : 'cur-nesw') : 'cur-grab', tip = $('drag-tip');
+  try { n.setPointerCapture(e.pointerId); } catch (x) {}
+  const move = ev => {
+    if (!moved) { if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < 4) return; moved = true; n.style.willChange = 'transform'; document.body.classList.add(curCls); }   // a plain click never changes the photo
+    if (mode === 'move') {
+      let dx = (ev.clientX - sx) / k / pw * 100, dy = (ev.clientY - sy) / k / ph * 100;
+      if (ev.shiftKey) {                     // Shift: lock to the dominant axis
+        if (!axis && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 6) axis = Math.abs(dx * pw) > Math.abs(dy * ph) ? 'x' : 'y';
+        if (axis === 'x') dy = 0; else if (axis === 'y') dx = 0;
+      } else axis = null;
+      let nx = x0 + dx, ny = y0 + dy, gx = null, gy = null;
+      if (!ev.altKey) {                      // snap to page centre / edges, with a visible guide line; Alt = free
+        const sc = d.scale || 1, hw = hw0 * sc, hh = hh0 * sc, thr = 1.4;
+        for (const [t, g] of [[50, 50], [hw, 0], [100 - hw, 100]]) if (Math.abs(nx - t) < thr) { nx = t; gx = g; break; }
+        for (const [t, g] of [[50, 50], [hh, 0], [100 - hh, 100]]) if (Math.abs(ny - t) < thr) { ny = t; gy = g; break; }
+      }
+      d.x = nx; d.y = ny; guides(n, d, gx, gy);
+    } else if (mode === 'scale') d.scale = clamp(s0 * Math.hypot(ev.clientX - cx, ev.clientY - cy) / dist0, .05, 8);
+    else { let rot = r0 + (Math.atan2(ev.clientY - cy, ev.clientX - cx) - a0) * 180 / Math.PI; if (ev.shiftKey) rot = Math.round(rot / 15) * 15; d.rotation = rot; }
+    applyItem(n, d); syncSoon();
+    if (mode === 'move') {
+      if (canCross && !ghost) ghost = makeGhost(n, d, ctx);
+      if (ghost) updateGhost(ghost, d, ctx);
+      if (canDrop) {                                   // over a page/cover in the strip: highlight it as the drop target
+        const t = document.elementFromPoint(ev.clientX, ev.clientY), th = t && t.closest ? t.closest('.th[data-side], .th.cover') : null;
+        if (th !== dropTh) { if (dropTh) dropTh.classList.remove('drop'); dropTh = th; if (th) th.classList.add('drop'); }
+      }
+    }
+    if (mode !== 'move') { tip.textContent = mode === 'rot' ? Math.round(d.rotation) + '°' : Math.round((d.scale || 1) * 100) + '%'; tip.style.display = 'block'; tip.style.transform = `translate(${ev.clientX + 16}px,${ev.clientY + 16}px)`; }
+  };
+  const up = ev => {
+    document.body.classList.remove(curCls); tip.style.display = 'none';
+    removeEventListener('pointermove', move); removeEventListener('pointerup', up); removeEventListener('pointercancel', up);
+    if (ghost) { ghost.remove(); $('drag-layer').style.display = 'none'; }
+    n.style.visibility = ''; const th = dropTh; if (dropTh) dropTh.classList.remove('drop');
+    n.style.willChange = ''; guides(n, d, null, null); refreshFanContent(); syncTransform();
+    if (moved) { dragEndT = performance.now(); if (mode === 'move' && ev && ev.type === 'pointerup' && finishMove(d, ctx, th, !!ghost)) return; commit(); }
+  };
+  addEventListener('pointermove', move); addEventListener('pointerup', up); addEventListener('pointercancel', up);
+}
+function onItemWheel(e) {
+  if (!editing()) return; const n = e.currentTarget;
+  if (!sel || sel.d !== n._d) return;
+  e.preventDefault(); const d = n._d;
+  d.scale = clamp((d.scale || 1) * Math.exp(-e.deltaY * .0012), .05, 8);   // exponential zoom feels natural
+  applyItem(n, d); syncSoon();
+  clearTimeout(wheelT); wheelT = setTimeout(() => { refreshFanContent(); commit(); }, 400);
+}
+
+/* photo import: shrink huge originals (keeps dragging smooth and the autosave small), then size to the page */
+const loadImg = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+async function prepareSrc(src) {
+  try {
+    const img = await loadImg(src), iw = img.naturalWidth, ih = img.naturalHeight, m = Math.max(iw, ih), MAX = 2400;
+    if (m <= MAX || /^data:image\/svg/.test(src)) return { src, iw, ih };
+    const k = MAX / m, c = document.createElement('canvas'); c.width = Math.round(iw * k); c.height = Math.round(ih * k);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return { src: /^data:image\/(png|webp|gif)/.test(src) ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', .9), iw: c.width, ih: c.height };
+  } catch (e) { return { src, iw: 0, ih: 0 }; }
+}
+// width (% of the page) so the picture covers the whole sheet ('cover': crops the overflow) or fits entirely ('contain')
+function fitPct(iw, ih, cw, ch, mode = 'cover') {
+  if (!iw || !ih) return 80;
+  const a = iw / ih, wide = a >= cw / ch, byH = a * ch / cw * 100;
+  return mode === 'cover' ? (wide ? byH : 100) : (wide ? 100 : byH);
+}
+const addTargetNow = () => S.pose === 'open' ? (S.side || 'right') : S.back ? 'back' : 'cover';
+async function addItem(src, target, type, at) {           // `at` = explicit place ({ idx } for a page; any object for a board): then the current view does not matter
+  if (target === 'auto') target = addTargetNow();
+  const board = target === 'cover' || target === 'back';
+  if (!at && (board ? S.pose !== 'closed' : S.pose !== 'open')) { toast(board ? 'Чтобы добавить на обложку, закрой блокнот (Esc)' : 'Открой блокнот, чтобы добавить на страницу'); return null; }
+  const prep = type === 'stk' ? { src, iw: 0, ih: 0 } : await prepareSrc(src);
+  if (target === 'span' && type === 'stk') target = S.side || 'right';            // stickers stay on one page
+  const [cw, ch] = board ? [690, 920] : target === 'span' ? [2 * W, H] : [W, H];
+  const d = type === 'stk' ? { id: uid(), type: 'stk', src, x: 50, y: 50, w: 28, scale: 1, rotation: 0, opacity: 1, m: stkDefaults() }
+                           : { id: uid(), type: 'img', src: prep.src, x: 50, y: 50, w: fitPct(prep.iw, prep.ih, cw, ch, 'cover'), scale: 1, rotation: 0, opacity: 1 };
+  let ctx;
+  if (board) {
+    const dat = target === 'back' ? backDat : coverDat, kind = target === 'back' ? 'back' : 'cover';
+    (type === 'stk' ? dat.stickers : dat.images).push(d); renderCover(); renderBack(); ctx = { type: kind + '-' + (type === 'stk' ? 'stk' : 'img') };
+  } else {
+    const idx = at && at.idx != null ? at.idx : S.spread - 1;
+    if (target === 'span') { (pages[idx].span = pages[idx].span || []).push(d); ctx = { idx, side: 'left', type: 'span' }; }
+    else { (type === 'stk' ? pages[idx][target].stickers : pages[idx][target].images).push(d); ctx = { idx, side: target, type }; }
+    if (S.pose === 'open' && idx === S.spread - 1) renderPages();
+  }
+  commit();
+  if (!at) setTimeout(() => { const n = document.querySelector(`.item.editable[data-uid="${d.id}"]`); if (n) select(n, d, ctx); }, 30);
+  return d;
+}
+function listFor(ctx) {
+  if (ctx.type === 'cover-img') return coverDat.images; if (ctx.type === 'cover-stk') return coverDat.stickers;
+  if (ctx.type === 'back-img') return backDat.images; if (ctx.type === 'back-stk') return backDat.stickers;
+  if (ctx.type === 'span') return pages[ctx.idx].span;
+  return ctx.type === 'img' ? pages[ctx.idx][ctx.side].images : pages[ctx.idx][ctx.side].stickers;
+}
+function deleteItem(d, ctx) {
+  const l = listFor(ctx), i = l.indexOf(d); if (i >= 0) l.splice(i, 1);
+  sel = null; markSelPage(null); rerenderCtx(ctx); syncTransform(); renderLayers(); commit();
+}
+function moveItem(d, ctx, dir) {
+  const l = listFor(ctx), i = l.indexOf(d), j = i + dir; if (i < 0 || j < 0 || j >= l.length) return;
+  [l[i], l[j]] = [l[j], l[i]]; rerenderCtx(ctx); renderLayers(); commit();
+}
+function fitToggle() {
+  if (!sel) return; const { el: n, d, ctx } = sel, img = n.querySelector('img'); if (!img || !img.naturalWidth) return;
+  const [cw, ch] = dimsOf(ctx), cov = fitPct(img.naturalWidth, img.naturalHeight, cw, ch, 'cover');
+  fitSel(Math.abs(d.w - cov) < .6 && (d.scale || 1) === 1 && Math.abs(d.x - 50) < .5 && Math.abs(d.y - 50) < .5 ? 'contain' : 'cover');
+}
+function fitSel(mode) {
+  if (!sel) return; const { el: n, d, ctx } = sel, img = n.querySelector('img'); if (!img || !img.naturalWidth) return;
+  const [cw, ch] = dimsOf(ctx);
+  Object.assign(d, { x: 50, y: 50, scale: 1, rotation: 0, w: fitPct(img.naturalWidth, img.naturalHeight, cw, ch, mode) });
+  applyItem(n, d); syncTransform(); refreshFanContent(); commit(); toast(mode === 'cover' ? 'Фото заполнило лист' : 'Фото вписано в лист');
+}
+/* the selected page photo becomes ONE photo across both pages (filling the spread); a spread photo goes back onto a single page */
+function toggleSpread() {
+  if (!sel || S.pose !== 'open') return; const { el: n, d, ctx } = sel, pg = pages[ctx.idx], im = n.querySelector('img');
+  const iw = im && im.naturalWidth, ih = im && im.naturalHeight; let nc;
+  if (ctx.type === 'img') {
+    const i = pg[ctx.side].images.indexOf(d); if (i < 0) return; pg[ctx.side].images.splice(i, 1); (pg.span = pg.span || []).push(d);
+    Object.assign(d, { x: 50, y: 50, scale: 1, rotation: 0, w: fitPct(iw, ih, 2 * W, H, 'cover') }); nc = { idx: ctx.idx, side: 'left', type: 'span' };
+  } else if (ctx.type === 'span') {
+    const i = pg.span.indexOf(d); if (i < 0) return; const side = d.x < 50 ? 'left' : 'right'; pg.span.splice(i, 1); pg[side].images.push(d);
+    Object.assign(d, { x: 50, y: 50, scale: 1, rotation: 0, w: fitPct(iw, ih, W, H, 'cover') }); nc = { idx: ctx.idx, side, type: 'img' };
+  } else return;
+  sel = null; renderPages(); syncTransform();
+  const nn = document.querySelector(`.item.editable[data-uid="${d.id}"]`); if (nn) select(nn, d, nc);
+  commit(); toast(nc.type === 'span' ? 'Фото растянуто на весь разворот' : 'Фото вернулось на одну страницу');
+}
+async function replaceSrc(d, ctx, src) {
+  const p = d.type === 'stk' ? { src } : await prepareSrc(src); d.src = p.src;
+  rerenderCtx(ctx); if (sel && sel.d === d) { const n = document.querySelector(`.item.editable[data-uid="${d.id}"]`); if (n) select(n, d, ctx); }
+  commit(); toast('Изображение заменено');
+}
+function rerenderCtx(ctx) { if (ctx.type.startsWith('cover')) renderCover(); else if (ctx.type.startsWith('back')) renderBack(); else renderPages(); }
+/* picture files: HEIC/HEIF (iPhone photos) are not drawn by most browsers, so they are converted to JPEG on the way in */
+const isHeic = f => /^image\/hei[cf]/i.test(f.type || '') || /\.(heic|heif)$/i.test(f.name || '');
+const isPicture = f => !!f && ((f.type || '').startsWith('image/') || isHeic(f));
+const blobToDataURL = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = e => res(e.target.result); r.onerror = () => rej(r.error); r.readAsDataURL(b); });
+let heicLib = null;
+const loadHeicLib = () => heicLib || (heicLib = new Promise((res, rej) => {        // the converter (libheif) is big: it is fetched only when a HEIC file shows up
+  const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+  sc.onload = () => window.heic2any ? res(window.heic2any) : rej(new Error('lib')); sc.onerror = () => { heicLib = null; rej(new Error('offline')); };
+  document.head.appendChild(sc);
+}));
+async function heicToJpeg(f) {
+  try {                                       // Safari (and Windows with the HEIF extension) decode it natively
+    const bmp = await createImageBitmap(f), k = Math.min(1, 2400 / Math.max(bmp.width, bmp.height)), c = document.createElement('canvas');
+    c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k); c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height); if (bmp.close) bmp.close();
+    return c.toDataURL('image/jpeg', .9);
+  } catch (e) {}
+  const conv = await loadHeicLib(), out = await conv({ blob: f, toType: 'image/jpeg', quality: .9 });
+  return blobToDataURL(Array.isArray(out) ? out[0] : out);
+}
+async function readImage(f) {
+  if (!isHeic(f)) return blobToDataURL(f);
+  toast('Конвертирую HEIC…');
+  try { const r = await heicToJpeg(f); toast('HEIC готов'); return r; }
+  catch (e) { toast(e && e.message === 'offline' ? 'HEIC: конвертер не загрузился (нужен интернет)' : 'Не удалось прочитать HEIC-файл'); return null; }
+}
+const readFile = async (f, cb) => { const s = await readImage(f); if (s) cb(s); };
+
+/* drag & drop: onto an existing item = replace it, onto empty page = add */
+addEventListener('dragover', e => e.preventDefault());
+addEventListener('drop', e => {
+  e.preventDefault(); if (EMBED) return; const f = e.dataTransfer.files[0]; if (!isPicture(f)) return;
+  readFile(f, src => {
+    const hit = document.elementsFromPoint(e.clientX, e.clientY).find(x => x.classList && x.classList.contains('editable'));
+    if (hit && hit._d) { replaceSrc(hit._d, hit._ctx, src); return; }
+    const stk = /png|webp|svg|gif/.test(f.type) && e.shiftKey;
+    if (S.pose === 'closed') addItem(src, S.back ? 'back' : 'cover', stk ? 'stk' : 'img');
+    else { const sx = el.pageR.getBoundingClientRect().left; addItem(src, e.altKey && !stk ? 'span' : e.clientX < sx ? 'left' : 'right', stk ? 'stk' : 'img'); }   // Alt = across the whole spread
+  });
+});
+/* double-click on the "drop a photo here" hint opens the file picker for that page */
+let photoTarget = null;
+const pickPhoto = target => { photoTarget = target; $('f-photo').click(); };
+addEventListener('dblclick', e => { const h = e.target.closest && e.target.closest('.empty-hint'); if (h && editing()) pickPhoto(h.dataset.side); });
+
+/* ═══════════ PANEL: COMPONENTS ═══════════ */
+const UIS = (() => { try { return JSON.parse(localStorage.getItem('mlsk.ui') || '{}'); } catch (e) { return {}; } })();
+const saveUIS = () => { try { localStorage.setItem('mlsk.ui', JSON.stringify(UIS)); } catch (e) {} };
+function makeSection(id, title, defOpen) {
+  const open = UIS['sec_' + id] ?? defOpen;
+  const s = document.createElement('section'); s.className = 'sec' + (open ? ' open' : ''); s.dataset.sec = id;
+  s.innerHTML = `<h3 class="sec-h" tabindex="0" role="button" aria-expanded="${open}"><span>${title}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></h3><div class="sec-b"><div class="sec-clip"><div class="sec-in"></div></div></div>`;
+  const h = s.querySelector('.sec-h');
+  const toggle = () => { const o = s.classList.toggle('open'); h.setAttribute('aria-expanded', o); UIS['sec_' + id] = o; saveUIS(); };
+  h.addEventListener('click', toggle);
+  h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+  $('panel-body').appendChild(s);
+  return s.querySelector('.sec-in');
+}
+function niceStep(range) { const raw = range / 10, p = Math.pow(10, Math.floor(Math.log10(raw))); for (const m of [1, 2, 2.5, 5, 10]) if (m * p >= raw - 1e-9) return m * p; return p * 10; }
+const decs = s => { const t = String(s); return t.includes('.') ? t.split('.')[1].length : 0; };
+
+/* slider: ticks at even "nice" intervals, a marker at the default, and a magnet that only pulls while dragging (Alt = free) */
+function makeSlider({ min, max, step, def, label, onInput, onCommit }) {
+  const wrap = document.createElement('div'); wrap.className = 'sl';
+  wrap.innerHTML = '<div class="sl-rail"><div class="sl-track"></div><div class="sl-fill"></div><div class="sl-ticks"></div><i class="sl-def" aria-hidden="true" title="По умолчанию"></i></div><input type="range">';
+  const input = wrap.querySelector('input'), fill = wrap.querySelector('.sl-fill'), ticksEl = wrap.querySelector('.sl-ticks'), defEl = wrap.querySelector('.sl-def');
+  input.min = min; input.max = max; input.step = step; input.value = def; input.setAttribute('aria-label', label);
+  const R = max - min, ts = niceStep(R), targets = [];
+  const addT = v => { v = +v.toFixed(6); if (v >= min - 1e-9 && v <= max + 1e-9 && !targets.includes(v)) targets.push(v); };
+  addT(min); addT(max); for (let v = Math.ceil(min / ts - 1e-9) * ts; v <= max + 1e-9; v += ts) addT(v);
+  targets.sort((a, b) => a - b);
+  ticksEl.innerHTML = targets.map(v => `<b style="left:${(v - min) / R * 100}%"></b>`).join('');
+  defEl.style.left = ((def - min) / R * 100) + '%';
+  const snapList = targets.concat([def]), thr = R * .022;
+  let dragging = false;
+  input.addEventListener('pointerdown', () => { dragging = true; });
+  const end = () => { dragging = false; }; addEventListener('pointerup', end); addEventListener('pointercancel', end);
+  const paint = v => { fill.style.width = `calc(${(v - min) / R * 100}% + 9px)`; wrap.classList.toggle('on-snap', snapList.some(t => Math.abs(t - v) < 1e-6)); };
+  input.addEventListener('input', () => {
+    let v = +input.value;
+    if (dragging && !mods.alt) { let best = null, bd = thr; for (const t of snapList) { const dd = Math.abs(t - v); if (dd <= bd) { bd = dd; best = t; } } if (best !== null) { v = best; input.value = v; } }
+    paint(v); onInput(v);
+  });
+  input.addEventListener('change', () => onCommit && onCommit());
+  paint(def);
+  return { el: wrap, input, set(v) { input.value = v; paint(+input.value); } };
+}
+let ctlId = 0;
+function makeCtl({ label, unit = '', min, max, step, def, get, set, commit }) {
+  const id = 'c' + (++ctlId), dp = decs(step), fmt = v => (+v).toFixed(dp);
+  const row = document.createElement('div'); row.className = 'ctl';
+  row.innerHTML = `<div class="ctl-top"><label for="${id}">${label}</label><div class="ctl-val"><input type="number" class="num" id="${id}" min="${min}" max="${max}" step="${step}" inputmode="decimal"><span class="unit">${unit}</span><button type="button" class="rst" aria-label="Сбросить: ${label}" title="По умолчанию: ${def}">↺</button></div></div>`;
+  const num = row.querySelector('.num'), rst = row.querySelector('.rst');
+  const apply = v => { set(v); row.classList.toggle('dirty', Math.abs(v - def) > 1e-9); };
+  const slider = makeSlider({ min, max, step, def, label, onInput: v => { num.value = fmt(v); apply(v); }, onCommit: commit });
+  row.appendChild(slider.el);
+  const reset = () => { slider.set(def); num.value = fmt(def); apply(def); commit && commit(); };
+  slider.input.addEventListener('dblclick', reset); rst.addEventListener('click', reset);
+  num.addEventListener('change', () => {
+    let v = parseFloat(num.value); if (isNaN(v)) v = get();
+    v = clamp(Math.round((v - min) / step) * step + min, min, max); v = +v.toFixed(dp);
+    slider.set(v); num.value = fmt(v); apply(v); commit && commit();
+  });
+  const refresh = () => { const v = get(); slider.set(v); num.value = fmt(v); row.classList.toggle('dirty', Math.abs(v - def) > 1e-9); };
+  refresh();
+  return { el: row, refresh };
+}
+function makeSwitch({ label, def, get, set }) {
+  const id = 'sw' + (++ctlId);
+  const row = document.createElement('div'); row.className = 'ctl sw-row';
+  row.innerHTML = `<label id="${id}">${label}</label><div class="ctl-val"><button type="button" class="rst" aria-label="Сбросить: ${label}">↺</button><button type="button" class="sw" role="switch" aria-labelledby="${id}" aria-checked="false"><i></i></button></div>`;
+  const sw = row.querySelector('.sw'), rst = row.querySelector('.rst');
+  const show = v => { sw.setAttribute('aria-checked', !!v); row.classList.toggle('dirty', !!v !== !!def); };
+  sw.addEventListener('click', () => { const v = sw.getAttribute('aria-checked') !== 'true'; show(v); set(v); });
+  rst.addEventListener('click', () => { show(def); set(def); });
+  const refresh = () => show(get()); refresh();
+  return { el: row, refresh };
+}
+/* colour rows: native picker + a hex field that takes "ebebeb", "#ebebeb" or "#EBE" (so a pasted code just works) + the last 6 colours that were APPLIED for this setting (saved in this browser) */
+const loadRecent = k => { try { const a = JSON.parse(localStorage.getItem('mlsk.recent.' + k) || '[]'); return Array.isArray(a) ? a.filter(x => /^#[0-9a-f]{6}$/i.test(x)).slice(0, 6) : []; } catch (e) { return []; } };
+const saveRecent = (k, a) => { try { localStorage.setItem('mlsk.recent.' + k, JSON.stringify(a.slice(0, 6))); } catch (e) {} };
+function parseHex(t) {
+  const m = String(t || '').replace(/^[\s"']+|[\s"';]+$/g, '').match(/^#?([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i); if (!m) return null;
+  let h = m[1]; if (h.length === 3 || h.length === 4) h = h.slice(0, 3).replace(/./g, c => c + c); else if (h.length === 8) h = h.slice(0, 6);
+  return '#' + h.toLowerCase();
+}
+function makeColor({ label, def, get, set, key }) {
+  const id = 'col' + (++ctlId);
+  const row = document.createElement('div'); row.className = 'ctl';
+  row.innerHTML = `<div class="ctl-top"><label for="${id}">${label}</label><div class="ctl-val"><button type="button" class="rst" aria-label="Сбросить: ${label}">↺</button><input type="color" id="${id}"><span class="hash" aria-hidden="true">#</span><input type="text" class="hex-in" maxlength="12" spellcheck="false" autocomplete="off" placeholder="RRGGBB" aria-label="Код цвета: ${label}"></div></div><div class="recent" role="group" aria-label="Последние цвета: ${label}"></div>`;
+  const c = row.querySelector('input[type=color]'), hx = row.querySelector('.hex-in'), rst = row.querySelector('.rst'), rec = row.querySelector('.recent');
+  let recent = key ? loadRecent(key) : [];
+  const renderRecent = () => {
+    rec.innerHTML = ''; rec.style.display = recent.length ? '' : 'none';
+    recent.forEach(col => { const b = document.createElement('button'); b.type = 'button'; b.className = 'rc' + (col === c.value.toLowerCase() ? ' on' : ''); b.style.background = col; b.title = col.toUpperCase(); b.setAttribute('aria-label', 'Цвет ' + col.toUpperCase()); b.onclick = () => { show(col); set(col); remember(col); }; rec.append(b); });
+  };
+  const remember = col => { if (!key) return; col = col.toLowerCase(); recent = [col, ...recent.filter(x => x !== col)].slice(0, 6); saveRecent(key, recent); renderRecent(); };
+  const show = v => { c.value = v; hx.value = v.slice(1).toUpperCase(); row.classList.toggle('dirty', v.toLowerCase() !== def.toLowerCase()); renderRecent(); };
+  const live = v => { c.value = v; row.classList.toggle('dirty', v.toLowerCase() !== def.toLowerCase()); set(v); renderRecent(); };   // while typing: apply without rewriting the field
+  c.addEventListener('input', () => { show(c.value); set(c.value); });
+  c.addEventListener('change', () => remember(c.value));
+  hx.addEventListener('input', () => { const v = /^#?[0-9a-f]{6}$/i.test(hx.value.trim()) ? parseHex(hx.value) : null; if (v) live(v); });
+  hx.addEventListener('paste', e => { const v = parseHex((e.clipboardData || window.clipboardData).getData('text')); if (v) { e.preventDefault(); show(v); set(v); remember(v); } });
+  const commitHex = () => { const v = parseHex(hx.value); if (v) { show(v); set(v); remember(v); } else hx.value = c.value.slice(1).toUpperCase(); };
+  hx.addEventListener('change', commitHex);
+  hx.addEventListener('keydown', e => { if (e.key === 'Enter') { commitHex(); hx.blur(); } else if (e.key === 'Escape') { hx.value = c.value.slice(1).toUpperCase(); hx.blur(); e.stopPropagation(); } });
+  rst.addEventListener('click', () => { show(def); set(def); });
+  const refresh = () => show(get()); refresh();
+  if (!recent.length && key) { recent = [c.value.toLowerCase()]; renderRecent(); }          // nothing saved yet: offer the current colour
+  return { el: row, refresh };
+}
+function makeSeg(options, value, onChange) {
+  const seg = document.createElement('div'); seg.className = 'seg'; seg.setAttribute('role', 'radiogroup'); seg.setAttribute('aria-label', 'Куда добавить');
+  seg.style.setProperty('--n', options.length);
+  seg.innerHTML = '<i class="pill"></i>' + options.map(o => `<button type="button" role="radio" data-v="${o.v}" aria-checked="false">${o.t}</button>`).join('');
+  const btns = [...seg.querySelectorAll('button')];
+  const set = v => { btns.forEach((b, i) => { const on = b.dataset.v === v; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1; if (on) seg.style.setProperty('--i', i); }); };
+  btns.forEach((b, i) => {
+    b.addEventListener('click', () => { set(b.dataset.v); onChange(b.dataset.v); });
+    b.addEventListener('keydown', e => { const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!d) return; e.preventDefault(); const nb = btns[(i + d + btns.length) % btns.length]; nb.focus(); nb.click(); });
+  });
+  set(value); return { el: seg, set };
+}
+function arm(btn, run, armedText = 'Точно?') {
+  let t = null; const orig = btn.innerHTML;
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    if (t) { clearTimeout(t); t = null; btn.classList.remove('armed'); btn.innerHTML = orig; run(); }
+    else { btn.classList.add('armed'); btn.textContent = armedText; t = setTimeout(() => { t = null; btn.classList.remove('armed'); btn.innerHTML = orig; }, 2500); }
+  });
+}
+const el$ = (html) => { const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstElementChild; };
+
+/* ═══════════ PAGE STRIP: preview + reorder; also where you pick the cover / page that new things go to ═══════════ */
+let stripDirty = true, stripT = 0, dragInfo = null, lastStripCur = '', stripPick = null;
+const ADD_BTN = '<button type="button" class="th-add" aria-label="Добавить фото" title="Добавить фото сюда (можно сразу несколько)">+</button>';
+// several files from the strip fill consecutive pages (new spreads are appended when the album ends); one file goes to the clicked page / cover
+async function addPhotosFromStrip(files) {
+  const list = [...files].filter(isPicture); if (!list.length) return;
+  let place = stripPick || (S.pose === 'open' ? { idx: S.spread - 1, side: S.side } : { board: S.back ? 'back' : 'cover' }), n = 0; stripPick = null;
+  for (const f of list) {
+    const src = await readImage(f); if (!src) continue;
+    if (place.board) await addItem(src, place.board, 'img', {});
+    else {
+      if (place.idx >= pages.length) {
+        if (pages.length >= 20) { toast('Максимум 20 разворотов'); break; }
+        pages.push(newPage()); S.total = pages.length; pages.forEach((pg, i) => { pg.id = i; }); if (totalCtl) totalCtl.refresh();
+      }
+      await addItem(src, place.side, 'img', { idx: place.idx });
+      place = place.side === 'left' ? { idx: place.idx, side: 'right' } : { idx: place.idx + 1, side: 'left' };
+    }
+    n++;
+  }
+  if (n) toast(n === 1 ? 'Фото добавлено' : 'Добавлено фото: ' + n);
+}
+const stripOn = () => editing() && UIS.strip !== false;
+function stripFlag() { document.body.classList.toggle('strip-on', stripOn()); }
+function afterChangeSoon() { if (!stripT) stripT = setTimeout(() => { stripT = 0; renderStrip(); renderGradeChips(); purgeStkFilters(); }, 120); }
+const newPage = () => ({ id: 0, left: { images: [], stickers: [] }, right: { images: [], stickers: [] }, span: [] });
+function updateAddWhere() {
+  const n = $('add-where'); if (!n) return; const t = addTargetNow();
+  n.textContent = t === 'cover' ? 'обложку' : t === 'back' ? 'заднюю обложку' : (t === 'left' ? 'левую' : 'правую') + ' страницу, разворот ' + S.spread;
+  const b = $('a-span'); if (b) b.style.display = S.pose === 'open' ? '' : 'none';
+}
+function covRow(kind) {                         // the front / back cover as entries of the same list
+  const row = document.createElement('div'); row.className = 'sp cov'; row.dataset.cov = kind;
+  const label = kind === 'cover' ? 'Обложка' : 'Задняя обложка', dat = kind === 'cover' ? coverDat : backDat;
+  row.innerHTML = `<div class="sp-h"><button type="button" class="sp-go" aria-label="Открыть: ${label}">${label}</button></div><div class="sp-pages"></div>`;
+  const th = document.createElement('div'); th.className = 'th cover'; th.title = label; th.innerHTML = '<div class="th-in cv"></div>';
+  dat.images.forEach(d => th.firstChild.appendChild(buildItem(d, { type: kind + '-img' }, true))); dat.stickers.forEach(d => th.firstChild.appendChild(buildItem(d, { type: kind + '-stk' }, true)));
+  th.insertAdjacentHTML('beforeend', ADD_BTN); row.querySelector('.sp-pages').append(th); return row;
+}
+function renderStrip() {
+  if (!stripOn()) { stripDirty = true; return; }
+  stripDirty = false;
+  const box = $('strip-list'), keep = box.scrollTop; box.innerHTML = '';
+  box.append(covRow('cover'));
+  pages.forEach((pg, i) => {
+    const row = document.createElement('div'); row.className = 'sp'; row.dataset.i = i;
+    row.innerHTML = `<div class="sp-h" draggable="true" title="Перетащи, чтобы переставить разворот"><span class="sp-grip" aria-hidden="true">⠿</span><button type="button" class="sp-go" aria-label="Открыть разворот ${i + 1}">${i * 2 + 1}–${i * 2 + 2}</button><span class="sp-acts"><button type="button" class="mini" data-a="up" title="Разворот выше" aria-label="Поднять разворот">↑</button><button type="button" class="mini" data-a="down" title="Разворот ниже" aria-label="Опустить разворот">↓</button><button type="button" class="mini" data-a="add" title="Добавить пустой разворот после" aria-label="Добавить разворот после">+</button><button type="button" class="mini" data-a="del" title="Удалить разворот" aria-label="Удалить разворот">×</button></span></div><div class="sp-pages"></div>`;
+    const pp = row.querySelector('.sp-pages');
+    ['left', 'right'].forEach(side => {
+      const th = document.createElement('div'); th.className = 'th paper ' + side; th.draggable = true; th.dataset.i = i; th.dataset.side = side;
+      th.title = 'Клик — открыть и выбрать эту страницу. Перетащи на другую страницу — поменяются местами'; th.innerHTML = '<div class="th-in"></div>'; fillPage(th.firstChild, i, side, true); th.insertAdjacentHTML('beforeend', ADD_BTN); pp.append(th);
+    });
+    box.append(row);
+  });
+  box.append(covRow('back'));
+  box.scrollTop = keep; $('strip-n').textContent = pages.length + ' разв.'; markStrip(true);
+}
+function markStrip(force) {
+  const cur = S.pose === 'open' ? 'p' + (S.spread - 1) : S.back ? 'back' : 'cover';
+  document.querySelectorAll('#strip-list .sp').forEach(r => r.classList.toggle('cur', r.classList.contains('cov') ? r.dataset.cov === cur : 'p' + r.dataset.i === cur));
+  document.querySelectorAll('#strip-list .th[data-side]').forEach(t => t.classList.toggle('act', S.pose === 'open' && !!t.closest('.sp.cur') && t.dataset.side === S.side));
+  const c = document.querySelector('#strip-list .sp.cur');
+  if (c && (force || lastStripCur !== cur) && stripOn()) c.scrollIntoView({ block: 'nearest', behavior: force ? 'auto' : 'smooth' });
+  lastStripCur = cur;
+}
+// after any structural change: renumber, keep the book consistent, remember it for undo
+function structChanged(msg) {
+  if (sel) deselect();
+  pages.forEach((p, i) => { p.id = i; });
+  S.total = pages.length; if (totalCtl) totalCtl.refresh();
+  if (S.pose === 'open') { S.spread = clamp(S.spread, 1, S.total); renderPages(); updateFan(); }
+  refreshUI(); commit(); if (msg) toast(msg);
+}
+function moveSpread(from, to) {                // `to` = final index
+  if (S.busy || from === to || to < 0 || to >= pages.length) return;
+  const cur = S.spread - 1, [p] = pages.splice(from, 1); pages.splice(to, 0, p);
+  if (S.pose === 'open') { if (cur === from) S.spread = to + 1; else if (from < cur && to >= cur) S.spread--; else if (from > cur && to <= cur) S.spread++; }
+  structChanged('Разворот ' + (from + 1) + ' → ' + (to + 1));
+}
+function swapPages(a, b) {
+  if (S.busy || (a.i === b.i && a.side === b.side)) return;
+  [pages[a.i][a.side], pages[b.i][b.side]] = [pages[b.i][b.side], pages[a.i][a.side]];
+  structChanged('Страницы поменялись местами');
+}
+function insertSpread(i) {
+  if (S.busy) return; if (pages.length >= 20) { toast('Максимум 20 разворотов'); return; }
+  const cur = S.spread - 1; pages.splice(i + 1, 0, newPage()); if (S.pose === 'open' && cur > i) S.spread++;
+  structChanged('Добавлен пустой разворот');
+}
+function deleteSpread(i) {
+  if (S.busy) return; if (pages.length <= 2) { toast('Должно остаться хотя бы 2 разворота'); return; }
+  const cur = S.spread - 1; pages.splice(i, 1); if (S.pose === 'open' && cur > i) S.spread--;
+  structChanged('Разворот удалён');
+}
+async function goToSpread(i) { if (S.busy) return; if (S.pose === 'closed') await openBook(); if (S.pose === 'open') goTo(i + 1); }
+(() => {
+  const list = $('strip-list');
+  const clearMarks = () => list.querySelectorAll('.ins-b,.ins-a,.drop,.dragging').forEach(n => n.classList.remove('ins-b', 'ins-a', 'drop', 'dragging'));
+  list.addEventListener('click', e => {
+    const add = e.target.closest('.th-add');
+    if (add) { const th = add.closest('.th'); stripPick = th.dataset.side ? { idx: +th.dataset.i, side: th.dataset.side } : { board: add.closest('.sp').dataset.cov }; $('f-photo-multi').click(); return; }
+    const row = e.target.closest('.sp'); if (!row) return;
+    if (row.classList.contains('cov')) { row.dataset.cov === 'cover' ? goCover() : goBack(); return; }
+    const mini = e.target.closest('.mini'), i = +row.dataset.i;
+    if (mini) {
+      const a = mini.dataset.a;
+      if (a === 'up') moveSpread(i, i - 1); else if (a === 'down') moveSpread(i, i + 1); else if (a === 'add') insertSpread(i);
+      else if (a === 'del') {                  // two clicks: the second one confirms
+        if (mini.classList.contains('armed')) deleteSpread(i);
+        else { mini.classList.add('armed'); mini.textContent = 'Точно?'; setTimeout(() => { if (mini.isConnected) { mini.classList.remove('armed'); mini.textContent = '×'; } }, 2500); }
+      }
+      return;
+    }
+    const th = e.target.closest('.th');
+    if (th && th.dataset.side) { S.side = th.dataset.side; markStrip(); updateAddWhere(); }
+    if (e.target.closest('.sp-go') || th) goToSpread(i);
+  });
+  list.addEventListener('dragstart', e => {
+    const th = e.target.closest && e.target.closest('.th[data-side]'), h = e.target.closest && e.target.closest('.sp-h[draggable]');
+    if (th) { dragInfo = { kind: 'page', i: +th.dataset.i, side: th.dataset.side }; th.classList.add('dragging'); }
+    else if (h) { const row = h.closest('.sp'); dragInfo = { kind: 'spread', i: +row.dataset.i }; row.classList.add('dragging'); try { e.dataTransfer.setDragImage(row, 20, 16); } catch (x) {} }
+    else return;
+    e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'moleskine-strip');
+  });
+  list.addEventListener('dragover', e => {
+    if (!dragInfo) return; const row = e.target.closest('.sp'); if (!row || row.classList.contains('cov')) return;
+    const mark = dragInfo.kind === 'spread' ? row : e.target.closest('.th');
+    if (!mark) return;
+    e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+    list.querySelectorAll('.ins-b,.ins-a,.drop').forEach(n => n.classList.remove('ins-b', 'ins-a', 'drop'));
+    if (dragInfo.kind === 'spread') { const r = row.getBoundingClientRect(); row.classList.add(e.clientY < r.top + r.height / 2 ? 'ins-b' : 'ins-a'); }
+    else mark.classList.add('drop');
+  });
+  list.addEventListener('drop', e => {
+    if (!dragInfo) return; const info = dragInfo; dragInfo = null; e.preventDefault(); e.stopPropagation();
+    const row = e.target.closest('.sp'); const before = row && row.classList.contains('ins-b'); clearMarks(); if (!row || row.classList.contains('cov')) return;
+    if (info.kind === 'spread') { const j = +row.dataset.i, ins = j + (before ? 0 : 1); moveSpread(info.i, ins > info.i ? ins - 1 : ins); }
+    else { const th = e.target.closest('.th'); if (th && th.dataset.side) swapPages({ i: info.i, side: info.side }, { i: +th.dataset.i, side: th.dataset.side }); }
+  });
+  list.addEventListener('dragend', () => { dragInfo = null; clearMarks(); });
+  $('strip-x').onclick = () => { UIS.strip = false; saveUIS(); stripFlag(); applyScale(); };
+  $('strip-add').onclick = () => { stripPick = null; $('f-photo-multi').click(); };
+  $('f-photo-multi').onchange = function () { addPhotosFromStrip(this.files); this.value = ''; };
+})();
+
+/* ═══════════ PANEL: CONTENT ═══════════ */
+const ctlRefs = {}, rowEls = {};
+let totalCtl = null, addTarget = 'right', tfBox = null;
+const TF = [['x', 'X', '%', -20, 120, 1, 50], ['y', 'Y', '%', -20, 120, 1, 50], ['w', 'Ширина', '%', 5, 200, 1, 80], ['scale', 'Масштаб', '%', 10, 400, 1, 100], ['rotation', 'Поворот', '°', -180, 180, 1, 0], ['opacity', 'Прозрачность', '%', 0, 100, 1, 100]];
+const tfCtls = [], matCtls = []; let matBox = null;
+const tfVal = (d, k) => k === 'scale' ? (d.scale || 1) * 100 : k === 'opacity' ? (d.opacity ?? 1) * 100 : (d[k] ?? 0);
+
+function updateDeps() {
+  SCHEMA.forEach(g => g.items.forEach(it => {
+    if (!it.dep || !rowEls[it.k]) return;
+    const on = !!ST[it.dep], row = rowEls[it.k];
+    row.classList.toggle('dim', !on); row.querySelectorAll('input,button,select').forEach(i => { i.disabled = !on; });
+  }));
+}
+function syncRow(k) { if (ctlRefs[k]) ctlRefs[k](); updateDeps(); }
+function syncAllRows() { Object.keys(ctlRefs).forEach(k => ctlRefs[k]()); updateDeps(); }
+
+function makeSettingRow(it) {
+  const set = v => { ST[it.k] = v; applySetting(it.k); updateDeps(); scheduleSave(); };
+  const get = () => ST[it.k];
+  let c;
+  if (it.t === 'range') c = makeCtl({ label: it.l, unit: it.unit, min: it.min, max: it.max, step: it.step, def: it.d, get, set });
+  else if (it.t === 'bool') c = makeSwitch({ label: it.l, def: it.d, get, set });
+  else if (it.t === 'color') c = makeColor({ label: it.l, def: it.d, get, set, key: it.k });
+  else if (it.t === 'gpack') {
+    const row = el$(`<div class="ctl"><div class="ctl-top"><label>${it.l}</label><div class="ctl-val"><button type="button" class="rst" aria-label="Сбросить: ${it.l}">↺</button></div></div><div class="gpack" role="radiogroup" aria-label="${it.l}"></div></div>`), box = row.querySelector('.gpack');
+    GP.forEach(p => {
+      const b = el$(`<button type="button" class="gchip" role="radio" data-p="${p.id}" aria-checked="false"><span class="gph"><img alt=""><i class="gx"></i><i class="gf"></i><i class="gn"></i></span><span>${p.n}</span></button>`);
+      b.onclick = () => { set(p.id); row.classList.toggle('dirty', p.id !== it.d); }; box.append(b);
+    });
+    row.querySelector('.rst').onclick = () => { set(it.d); row.classList.remove('dirty'); };
+    c = { el: row, refresh() { applyGrade(); row.classList.toggle('dirty', ST[it.k] !== it.d); } };
+  }
+  else if (it.t === 'seg') {
+    const row = el$(`<div class="ctl"><div class="ctl-top"><label>${it.l}</label><div class="ctl-val"><button type="button" class="rst" aria-label="Сбросить: ${it.l}">↺</button></div></div></div>`);
+    const seg = makeSeg(it.opts, ST[it.k], v => { set(v); row.classList.toggle('dirty', v !== it.d); });
+    seg.el.setAttribute('aria-label', it.l); row.append(seg.el);
+    row.querySelector('.rst').onclick = () => { seg.set(it.d); set(it.d); row.classList.remove('dirty'); };
+    c = { el: row, refresh() { seg.set(ST[it.k]); row.classList.toggle('dirty', ST[it.k] !== it.d); } };
+  } else if (it.t === 'select') {
+    const id = 'sel' + (++ctlId);
+    const row = el$(`<div class="ctl sw-row"><label for="${id}">${it.l}</label><div class="ctl-val"><button type="button" class="rst" aria-label="Сбросить: ${it.l}">↺</button><select class="sel" id="${id}">${it.opts.map(o => `<option value="${o.v}">${o.t}</option>`).join('')}</select></div></div>`);
+    const sl = row.querySelector('select');
+    sl.onchange = () => { set(sl.value); row.classList.toggle('dirty', sl.value !== it.d); };
+    row.querySelector('.rst').onclick = () => { sl.value = it.d; set(it.d); row.classList.remove('dirty'); };
+    c = { el: row, refresh() { sl.value = ST[it.k]; row.classList.toggle('dirty', ST[it.k] !== it.d); } };
+  } else if (it.t === 'action') {
+    const row = el$(`<div class="ctl sw-row"><label>${it.l}</label><div class="ctl-val"><button type="button" class="btn act-${it.k}" style="flex:none;height:30px;padding:0 14px">${it.btn}</button></div></div>`);
+    row.querySelector('button').onclick = () => { if (it.k === 'bgEdit') toggleBgEdit(); else if (it.k === 'gradeReset') resetGrade(); };
+    c = { el: row, refresh() {} };
+  } else {                                  // file: picture (belly band, page background)
+    const row = el$(`<div class="ctl"><div class="ctl-top"><label>${it.l}</label></div><div class="btns"><button type="button" class="btn pick">Выбрать картинку…</button><button type="button" class="btn clr">Убрать</button></div></div>`);
+    const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*,.heic,.heif'; inp.style.display = 'none'; row.append(inp);
+    row.querySelector('.pick').onclick = () => inp.click();
+    inp.onchange = () => { const f = inp.files[0]; inp.value = ''; if (!f) return; readFile(f, async src => { if (it.k === 'bgImg') src = (await prepareSrc(src)).src; set(src); toast('Картинка загружена'); }); };
+    row.querySelector('.clr').onclick = () => { set(''); if (it.k === 'bgImg') toggleBgEdit(false); toast('Картинка убрана'); };
+    c = { el: row, refresh() {} };
+  }
+  ctlRefs[it.k] = c.refresh; rowEls[it.k] = c.el;
+  return c.el;
+}
+
+function buildPanel() {
+  /* pages */
+  let inn = makeSection('nav', 'Страницы', true);
+  inn.append(el$('<div class="btns"><button class="btn" id="n-prev" aria-label="Назад">◀</button><button class="btn" id="n-label" style="flex:3;cursor:default" tabindex="-1">Обложка</button><button class="btn" id="n-next" aria-label="Вперёд">▶</button></div>'),
+             el$('<div class="btns"><button class="btn" id="n-open">Открыть / закрыть</button><button class="btn" id="n-strip">Панель страниц</button></div>'));
+  totalCtl = makeCtl({ label: 'Разворотов', min: 2, max: 20, step: 1, def: 6, get: () => S.total,
+    set: v => { if (v !== S.total) { initPages(v); if (S.pose === 'open') { S.spread = Math.min(S.spread, v); renderPages(); updateFan(); } refreshUI(); } }, commit });
+  inn.append(totalCtl.el);
+
+  /* add */
+  inn = makeSection('add', 'Добавить', true);
+  inn.append(el$('<div class="hintx" style="font-weight:500;color:var(--u-soft)">Добавится на: <b id="add-where"></b></div>'),
+             el$('<div class="btns"><button class="btn" id="a-photo">+ Фото</button><button class="btn" id="a-sticker">+ Стикер (PNG)</button></div>'),
+             el$('<div class="btns"><button class="btn" id="a-span">+ Фото на весь разворот</button></div>'),
+             el$('<div class="hintx">Идёт на обложку, если блокнот закрыт, на заднюю — если перевёрнут, иначе на страницу, выбранную в панели справа (или кликом по странице). Форматы: JPG, PNG, WebP, <b>HEIC</b>. Перетащи файл на страницу — добавится туда (с <b>Alt</b> — на весь разворот), на готовое фото — заменит его. <b>Shift</b> при перетаскивании PNG делает его стикером.</div>'));
+
+  /* layers: pick a layer, its controls open right under it */
+  inn = makeSection('layers', 'Слои на этом развороте', true);
+  inn.append(el$('<div class="list" id="layers"></div>'), el$('<div class="hintx" id="tf-none">Выбери слой в списке или кликни по фото на странице. Двойной клик по слою — заменить файл.</div>'));
+  tfBox = el$('<div class="tfbox"></div>');
+  TF.forEach(([k, l, unit, mn, mx, st, df]) => {
+    const c = makeCtl({ label: l, unit, min: mn, max: mx, step: st, def: df, get: () => sel ? tfVal(sel.d, k) : df,
+      set: v => { if (!sel) return; const d = sel.d; if (k === 'scale') d.scale = v / 100; else if (k === 'opacity') d.opacity = v / 100; else d[k] = v; applyItem(sel.el, d); },
+      commit: () => { refreshFanContent(); commit(); } });
+    tfCtls.push(c); tfBox.append(c.el);
+  });
+  tfBox.append(el$('<div class="btns"><button class="btn" id="tf-cover">Заполнить лист</button><button class="btn" id="tf-contain">Вписать</button><button class="btn" id="tf-reset">Сбросить</button></div>'),
+               el$('<div class="btns"><button class="btn" id="tf-span">На весь разворот</button></div>'),
+               el$('<div class="btns"><button class="btn" id="tf-up">▲ Выше</button><button class="btn" id="tf-down">▼ Ниже</button><button class="btn" id="tf-del">Удалить</button></div>'));
+  tfBox.querySelector('#tf-cover').onclick = () => fitSel('cover'); tfBox.querySelector('#tf-contain').onclick = () => fitSel('contain');
+  tfBox.querySelector('#tf-reset').onclick = () => { if (!sel) return; Object.assign(sel.d, { x: 50, y: 50, scale: 1, rotation: 0 }); applyItem(sel.el, sel.d); syncTransform(); commit(); };
+  tfBox.querySelector('#tf-span').onclick = toggleSpread;
+  tfBox.querySelector('#tf-up').onclick = () => sel && moveItem(sel.d, sel.ctx, 1);
+  tfBox.querySelector('#tf-down').onclick = () => sel && moveItem(sel.d, sel.ctx, -1);
+  arm(tfBox.querySelector('#tf-del'), () => sel && deleteItem(sel.d, sel.ctx), 'Удалить?');
+  /* material of the selected sticker (its own values; the settings group only holds defaults for new stickers) */
+  matBox = el$('<details class="mat" open><summary>Материал стикера (только этот)</summary><div class="mat-in"></div></details>');
+  const matIn = matBox.querySelector('.mat-in');
+  SCHEMA.find(g => g.id === 'stk').items.forEach(it => {
+    const k = it.k, get = () => sel && sel.d.type === 'stk' ? stkP(sel.d)[k] : DEF[k];
+    const set = v => { if (!sel || sel.d.type !== 'stk') return; sel.d.m = { ...stkP(sel.d), [k]: v }; refreshStk(sel.d); };
+    const c = it.t === 'bool' ? makeSwitch({ label: it.l, def: DEF[k], get, set: v => { set(v); refreshFanContent(); commit(); } })
+                              : makeCtl({ label: it.l, unit: it.unit, min: it.min, max: it.max, step: it.step, def: DEF[k], get, set, commit: () => { refreshFanContent(); commit(); } });
+    matCtls.push(c); matIn.append(c.el);
+  });
+  matIn.append(el$('<div class="btns"><button class="btn" id="mat-def">Как по умолчанию</button><button class="btn" id="mat-all">Всем стикерам</button></div>'));
+  matIn.querySelector('#mat-def').onclick = () => { if (!sel || sel.d.type !== 'stk') return; sel.d.m = stkDefaults(); refreshStk(sel.d); syncTransform(); refreshFanContent(); commit(); };
+  matIn.querySelector('#mat-all').onclick = () => {
+    if (!sel || sel.d.type !== 'stk') return; const m = stkP(sel.d); let n = 0;
+    const all = []; pages.forEach(pg => all.push(...pg.left.stickers, ...pg.right.stickers)); all.push(...coverDat.stickers, ...backDat.stickers);
+    all.forEach(x => { x.m = { ...m }; refreshStk(x); n++; }); refreshFanContent(); commit(); toast('Материал применён ко всем стикерам: ' + n);
+  };
+  tfBox.querySelector('#tf-up').parentElement.before(matBox);
+
+  /* settings schema */
+  SCHEMA.forEach(g => { const body = makeSection(g.id, g.title, !!g.open); g.items.forEach(it => body.append(makeSettingRow(it))); });
+
+  /* presets */
+  inn = makeSection('presets', 'Пресеты настроек', false);
+  inn.append(el$('<div class="btns"><input class="name-in" id="pr-name" placeholder="Название пресета" aria-label="Название пресета" maxlength="40"><button class="btn" id="pr-save" style="flex:none">Сохранить</button></div>'),
+             el$('<div class="list" id="pr-list"></div>'),
+             el$('<div class="hintx">Пресет хранит только настройки (не фото) и лежит в этом браузере.</div>'));
+
+  /* files */
+  inn = makeSection('io', 'Файлы и сохранение', false);
+  inn.append(el$('<div class="btns"><button class="btn pri" id="io-export">Экспорт JSON</button><button class="btn" id="io-import">Импорт JSON</button></div>'),
+             el$('<div class="btns"><button class="btn" id="io-copy">Копировать JSON</button><button class="btn" id="io-sample">Тестовые картинки</button></div>'),
+             el$('<div class="btns"><button class="btn" id="io-reset">Сбросить настройки</button><button class="btn" id="io-clear">Очистить автосохранение</button></div>'),
+             el$('<div class="hintx" id="save-info"></div>'),
+             el$('<div class="hintx">Экспорт сохраняет страницы, обложку и все настройки. Положи <b>config.json</b> рядом с index.html — он загрузится у посетителей. Добавь <b>?clean=1</b> к адресу, чтобы скрыть кнопки и панель.</div>'));
+
+  wirePanel();
+  updateDeps(); syncTransform(); updateSaveInfo(); renderPresets(); renderGradeChips(); applyGrade();
+}
+
+function wirePanel() {
+  $('n-prev').onclick = () => flip(-1); $('n-next').onclick = () => S.pose === 'closed' ? openBook() : flip(1);
+  $('n-open').onclick = () => S.pose === 'closed' ? openBook() : closeFront();
+  $('n-strip').onclick = () => { UIS.strip = !stripOn(); saveUIS(); stripFlag(); applyScale(); if (stripOn() && stripDirty) renderStrip(); };
+  $('a-photo').onclick = () => $('f-photo').click(); $('a-sticker').onclick = () => $('f-sticker').click();
+  $('a-span').onclick = () => { if (S.pose !== 'open') { toast('Открой блокнот, чтобы добавить фото на разворот'); return; } pickPhoto('span'); };
+  $('f-photo').onchange = function () { const f = this.files[0], t = photoTarget || 'auto'; photoTarget = null; if (f) readFile(f, s => addItem(s, t, 'img')); this.value = ''; };
+  $('f-sticker').onchange = function () { const f = this.files[0]; if (f) readFile(f, s => addItem(s, 'auto', 'stk')); this.value = ''; };
+  let repl = null;
+  $('f-replace').onchange = function () { const f = this.files[0]; if (f && repl) readFile(f, s => replaceSrc(repl.d, repl.ctx, s)); this.value = ''; };
+  window.askReplace = (d, ctx) => { repl = { d, ctx }; $('f-replace').click(); };
+  $('btn-mute').onclick = () => { ST.sound = !ST.sound; applySetting('sound'); syncRow('sound'); scheduleSave(); };
+  $('btn-gear').onclick = () => togglePanel(!editing()); $('panel-close').onclick = () => togglePanel(false);
+  $('h-undo').onclick = undo; $('h-redo').onclick = redo;
+  $('nav-l').onclick = () => flip(-1); $('nav-r').onclick = () => flip(1);
+
+  $('io-export').onclick = () => {
+    const blob = new Blob([JSON.stringify(exportConfig(), null, 2)], { type: 'application/json' });
+    Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'config.json' }).click();
+    toast('Сохранено · config.json · ' + (blob.size / 1048576).toFixed(1) + ' МБ');
+  };
+  $('io-import').onclick = () => $('f-config').click();
+  $('f-config').onchange = function () { const f = this.files[0]; if (!f) return; const r = new FileReader(); r.onload = e => { try { importConfig(JSON.parse(e.target.result)); toast('Импортировано'); } catch (x) { toast('Ошибка импорта: ' + x.message); } }; r.readAsText(f); this.value = ''; };
+  $('io-copy').onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(exportConfig())); toast('JSON скопирован'); } catch (e) { toast('Браузер не дал доступ к буферу. Используй Экспорт'); } };
+  $('io-sample').onclick = () => {
+    pages.forEach((p, i) => ['left', 'right'].forEach((s, j) => { if (!p[s].images.length) p[s].images.push({ id: uid(), type: 'img', src: sampleSvg(i * 2 + j), x: 50, y: 50, w: fitPct(400, 560, W, H, 'cover'), scale: 1, rotation: 0, opacity: 1 }); }));
+    if (S.pose === 'open') { renderPages(); updateFan(); } refreshUI(); commit(); toast('Тестовые картинки добавлены');
+  };
+  arm($('io-reset'), () => { const keep = [ST.bellyImg, ST.bgImg]; Object.assign(ST, DEF); [ST.bellyImg, ST.bgImg] = keep; applyAll(); syncAllRows(); scheduleSave(); toast('Настройки сброшены'); }, 'Сбросить?');
+  arm($('io-clear'), async () => { try { await IDB.del('autosave'); savedAt = 0; updateSaveInfo(); toast('Автосохранение очищено. При загрузке подхватится config.json'); } catch (e) {} }, 'Очистить?');
+
+  /* presets */
+  $('pr-save').onclick = () => {
+    const name = $('pr-name').value.trim() || 'Пресет ' + (loadPresets().length + 1);
+    const a = loadPresets(); a.push({ name, st: presetSettings() }); savePresets(a); $('pr-name').value = ''; renderPresets(); toast('Пресет «' + name + '» сохранён');
+  };
+  $('pr-name').addEventListener('keydown', e => { if (e.key === 'Enter') $('pr-save').click(); });
+}
+const PKEY = 'mlsk.presets';
+const loadPresets = () => { try { return JSON.parse(localStorage.getItem(PKEY) || '[]'); } catch (e) { return []; } };
+const savePresets = a => { try { localStorage.setItem(PKEY, JSON.stringify(a)); } catch (e) { toast('Не удалось сохранить пресет'); } };
+const presetSettings = () => { const o = { ...ST }; delete o.bellyImg; delete o.bgImg; return o; };
+function renderPresets() {
+  const box = $('pr-list'); if (!box) return; box.innerHTML = '';
+  const a = loadPresets();
+  if (!a.length) { box.append(el$('<div class="hintx">Пока нет пресетов.</div>')); return; }
+  a.forEach((p, i) => {
+    const r = el$(`<div class="rowi"><button class="nm" title="Применить"></button><button class="ibtn" title="Обновить текущими настройками" aria-label="Обновить">↻</button><button class="ibtn" title="Переименовать" aria-label="Переименовать">✎</button><button class="ibtn" title="Удалить" aria-label="Удалить">×</button></div>`);
+    r.querySelector('.nm').textContent = p.name;
+    const [b1, b2, b3] = r.querySelectorAll('.ibtn');
+    r.querySelector('.nm').onclick = () => { const keep = [ST.bellyImg, ST.bgImg]; Object.assign(ST, DEF, p.st); [ST.bellyImg, ST.bgImg] = keep; applyAll(); syncAllRows(); scheduleSave(); toast('Применён пресет «' + p.name + '»'); };
+    b1.onclick = () => { a[i].st = presetSettings(); savePresets(a); toast('Пресет «' + p.name + '» обновлён'); };
+    b2.onclick = () => { const n = prompt('Новое название', p.name); if (n && n.trim()) { a[i].name = n.trim().slice(0, 40); savePresets(a); renderPresets(); } };
+    arm(b3, () => { a.splice(i, 1); savePresets(a); renderPresets(); }, 'Удалить?');
+    box.append(r);
+  });
+}
+
+function syncTransform() {
+  const has = !!sel, none = $('tf-none'); if (none) none.style.display = has ? 'none' : '';
+  const sp2 = $('tf-span'), isSp = has && sel.ctx.type === 'span';
+  if (sp2) { sp2.parentElement.style.display = has && (isSp || sel.ctx.type === 'img') ? '' : 'none'; sp2.textContent = isSp ? 'Вернуть на одну страницу' : 'На весь разворот'; }
+  const tc = $('tf-cover'); if (tc) tc.textContent = isSp ? 'Заполнить разворот' : 'Заполнить лист';
+  if (has) tfCtls.forEach(c => c.refresh());
+  const isStk = has && sel.d.type === 'stk'; if (matBox) { matBox.style.display = isStk ? '' : 'none'; if (isStk) matCtls.forEach(c => c.refresh()); }
+}
+function renderLayers() {
+  const box = $('layers'); if (!box) return; if (tfBox) tfBox.remove(); box.innerHTML = '';
+  let selRow = null;
+  const add = (d, ctx) => {
+    const isSel = sel && sel.d === d;
+    const r = el$(`<div class="rowi${isSel ? ' sel' : ''}" role="button" tabindex="0" aria-pressed="${isSel ? 'true' : 'false'}"><img alt=""><span class="nm"></span><button class="ibtn" title="Заменить файл" aria-label="Заменить файл">⇄</button><button class="ibtn" title="Удалить" aria-label="Удалить слой">×</button></div>`);
+    r.querySelector('img').src = srcFor(d.src);
+    r.querySelector('.nm').textContent = (d.type === 'stk' ? 'Стикер' : 'Фото') + ' · ' + (ctx.type === 'span' ? 'разворот' : ctx.side === 'left' ? 'левая' : ctx.side === 'right' ? 'правая' : ctx.type.startsWith('back') ? 'задняя обложка' : 'обложка');
+    const pick = () => { const n = document.querySelector(`.item.editable[data-uid="${d.id}"]`); if (n) select(n, d, ctx); };
+    r.addEventListener('click', e => { e.stopPropagation(); pick(); }); r.addEventListener('keydown', e => { if (e.target === r && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); pick(); } });
+    r.ondblclick = () => askReplace(d, ctx);
+    const [rp, dl] = r.querySelectorAll('.ibtn'); rp.onclick = e => { e.stopPropagation(); askReplace(d, ctx); }; arm(dl, () => deleteItem(d, ctx), 'Удалить?');
+    box.appendChild(r); if (isSel) selRow = r;
+  };
+  if (S.pose === 'open') {
+    const idx = S.spread - 1;
+    if (pages[idx]) (pages[idx].span || []).forEach(d => add(d, { idx, side: 'left', type: 'span' }));
+    if (pages[idx]) ['left', 'right'].forEach(side => { pages[idx][side].images.forEach(d => add(d, { idx, side, type: 'img' })); pages[idx][side].stickers.forEach(d => add(d, { idx, side, type: 'stk' })); });
+  } else if (S.back) { backDat.images.forEach(d => add(d, { type: 'back-img' })); backDat.stickers.forEach(d => add(d, { type: 'back-stk' })); }
+  else { coverDat.images.forEach(d => add(d, { type: 'cover-img' })); coverDat.stickers.forEach(d => add(d, { type: 'cover-stk' })); }
+  if (!box.children.length) box.innerHTML = '<div class="hintx">Пусто. Перетащи фото на страницу, дважды кликни по пустой странице или нажми «+ Фото».</div>';
+  if (selRow && tfBox) {
+    selRow.after(tfBox);
+    if (lastSelId !== sel.d.id) selRow.scrollIntoView({ block: 'start', behavior: 'smooth' });   // controls open below the row; make sure they are on screen
+  }
+  lastSelId = sel ? sel.d.id : null;
+}
+let lastSelId = null;
+function toggleBgEdit(on) {
+  on = on === undefined ? !document.body.classList.contains('bg-editing') : on;
+  if (on && !ST.bgImg) { toast('Сначала выбери картинку фона'); return; }
+  if (on) deselect();
+  document.body.classList.toggle('bg-editing', on);
+  const b = document.querySelector('.act-bgEdit'); if (b) b.textContent = on ? 'Готово' : 'Править на экране';
+}
+(function bgMouse() {
+  const ov = $('bg-edit'); let drag = null, wt;
+  const sync = () => { applySetting('bgX'); syncRow('bgX'); syncRow('bgY'); };
+  ov.addEventListener('pointerdown', e => { document.body.classList.add('bg-drag'); drag = { x: e.clientX, y: e.clientY, bx: ST.bgX, by: ST.bgY }; try { ov.setPointerCapture(e.pointerId); } catch (x) {} });
+  ov.addEventListener('pointermove', e => { if (!drag) return; ST.bgX = clamp(drag.bx + (e.clientX - drag.x) / innerWidth * 100, -100, 100); ST.bgY = clamp(drag.by + (e.clientY - drag.y) / innerHeight * 100, -100, 100); sync(); });
+  ov.addEventListener('pointerup', () => { drag = null; document.body.classList.remove('bg-drag'); scheduleSave(); });
+  ov.addEventListener('wheel', e => { e.preventDefault(); ST.bgScale = clamp(ST.bgScale * Math.exp(-e.deltaY * .0012), 10, 400); applySetting('bgScale'); syncRow('bgScale'); clearTimeout(wt); wt = setTimeout(scheduleSave, 300); }, { passive: false });
+})();
+function togglePanel(on) {
+  navSoon(); $('panel').classList.toggle('open', on); $('btn-gear').setAttribute('aria-pressed', on); document.body.classList.toggle('editing', on);
+  stripFlag(); if (stripOn() && stripDirty) renderStrip();
+  if (!on) { toggleBgEdit(false); deselect(); if ($('panel').contains(document.activeElement)) $('btn-gear').focus(); }   // restore focus to the opener
+  applyScale();
+}
+
+/* ═══════════ EXPORT / IMPORT ═══════════ */
+function exportConfig() { return { version: 2, totalSpreads: S.total, pages, cover: coverDat, back: backDat, settings: ST }; }
+const STK_OLD = { stkOn: true, stkBevel: 2.5, stkHeight: 4, stkThick: 1, stkBorder: 0, stkLamps: 2, stkShine: 80, stkSharp: 20, stkAz: 225, stkElev: 50, stkShadow: 35, stkShBlur: 3, stkDyn: 40 };
+function migrateStickers() {              // the first defaults had a hard rim light that read as a thin outline: stickers still carrying exactly those values follow the new defaults
+  const all = []; pages.forEach(pg => all.push(...pg.left.stickers, ...pg.right.stickers)); all.push(...coverDat.stickers, ...backDat.stickers);
+  all.forEach(x => { if (x.m && Object.keys(STK_OLD).every(k => x.m[k] === STK_OLD[k])) x.m = stkDefaults(); });
+}
+function importConfig(c) {
+  if (c.totalSpreads) { pages = []; initPages(c.totalSpreads); }
+  if (c.pages) pages = c.pages; if (c.cover) coverDat = c.cover;
+  if (c.back) backDat = c.back; else if (c.pages) backDat = { images: [], stickers: [] };
+  if (c.settings) Object.keys(c.settings).forEach(k => { if (k in DEF) ST[k] = c.settings[k]; });
+  if (Object.keys(STK_OLD).every(k => ST[k] === STK_OLD[k])) STK_KEYS.forEach(k => { ST[k] = DEF[k]; });      // saved defaults that are still the first (hard) ones follow the new soft defaults
+  S.total = pages.length || S.total;
+  let mx = 0; const scan = a => (a || []).forEach(x => { const n = +x.id; if (n > mx) mx = n; });
+  pages.forEach(p => { p.span = p.span || []; scan(p.span); ['left', 'right'].forEach(s => { scan(p[s].images); scan(p[s].stickers); }); }); scan(coverDat.images); scan(coverDat.stickers); scan(backDat.images); scan(backDat.stickers); _id = mx + 1;
+  applyAll(); migrateStickers();
+  sel = null; syncAllRows(); if (totalCtl) totalCtl.refresh(); renderCover(); renderBack();
+  if (S.pose === 'open') { S.spread = Math.min(S.spread, S.total); renderPages(); updateFan(); }
+  syncTransform(); refreshUI(); histReset();
+}
+function sampleSvg(i) {
+  const cols = [['#e83a5a','#2c6bd6','#f4c542'],['#111','#e8e1cf','#d9363e'],['#3fa7d6','#fff','#111'],['#f26b3a','#1c1c1c','#f3e9d2'],['#7a4bd1','#f0b6c8','#222'],['#2d9b6a','#f2e8c9','#111']][i % 6];
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560"><rect width="400" height="560" fill="${cols[1]}"/>`;
+  for (let j = 0; j < 7; j++) { const x = (i * 53 + j * 71) % 360, y = (i * 37 + j * 97) % 500, r = 40 + ((i + j) * 23) % 90;
+    s += j % 2 ? `<circle cx="${x + 40}" cy="${y + 40}" r="${r / 1.6}" fill="${cols[j % 3]}" opacity=".9"/>` : `<rect x="${x}" y="${y}" width="${r * 1.6}" height="${r}" fill="${cols[j % 3]}" opacity=".85" transform="rotate(${(i * 13 + j * 19) % 50 - 25} ${x} ${y})"/>`; }
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(s + '</svg>');
+}
+
+/* ═══════════ INIT ═══════════ */
+if (CLEAN) document.body.classList.add('clean');
+if (EMBED) document.body.classList.add('embed');
+if (LITE) document.body.classList.add('lite');
+buildPanel();
+$('n-label') && refreshUI();
+[el.book, el.bflip, el.zoom].forEach(n => n.classList.add('notrans'));
+applyAll(); applyScale(); layoutBook(); syncAllRows();
+el.book.getBoundingClientRect(); [el.book, el.bflip, el.zoom].forEach(n => n.classList.remove('notrans'));
+el.pageL.style.visibility = el.pageR.style.visibility = 'hidden'; setSpine(false);
+function openAtInstant(n) {                           // no animation: used for the poster still (?at=N)
+  const nodes = [el.book, el.bflip, el.zoom]; nodes.forEach(x => x.classList.add('notrans'));
+  S.pose = 'open'; S.spread = clamp(n, 1, S.total); layoutBook(); renderPages(); updateFan(); setSpine(true);
+  el.pageL.style.visibility = el.pageR.style.visibility = 'visible'; el.hint.style.display = 'none';
+  el.book.getBoundingClientRect(); setTimeout(() => nodes.forEach(x => x.classList.remove('notrans')), 60); refreshUI();
+}
+function embedBoot() {
+  const post = m => { try { parent.postMessage(Object.assign({ source: 'moleskine-album' }, m), '*'); } catch (e) {} };
+  ST.sound = false; applySetting('sound');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { ST.flipMs = 260; ST.openMs = 450; }
+  // taps: the whole left half turns back, the whole right half forward (see the click handler); swipes do the same on touch screens
+  let sx = 0, sy = 0, st = 0, sid = null;
+  addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') return; sx = e.clientX; sy = e.clientY; st = performance.now(); sid = e.pointerId; }, { passive: true });
+  addEventListener('pointerup', e => {
+    if (e.pointerId !== sid) return; sid = null; const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (performance.now() - st < 700 && Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.6) { dragEndT = performance.now(); if (S.pose === 'open') flip(dx < 0 ? 1 : -1); else if (S.pose === 'closed' && dx < 0) openBook(); }
+  }, { passive: true });
+  // the page that embeds us scrolls smoothly (Lenis): wheel events over the frame never reach it, so they are handed over
+  if (parent !== window) addEventListener('wheel', e => { e.preventDefault(); post({ type: 'wheel', dx: e.deltaX, dy: e.deltaY, mode: e.deltaMode }); }, { passive: false });
+  // open by itself a moment after the frame is on screen; stop rendering while it is not
+  let opened = false, t = 0;
+  const open = () => { if (!opened && S.pose === 'closed' && !S.busy) { opened = true; openBook(); } };
+  if (QS.has('at')) { openAtInstant(+QS.get('at') || 1); opened = true; }
+  else if ('IntersectionObserver' in window) {
+    new IntersectionObserver(es => { for (const e of es) { embedVisible = e.isIntersecting; if (e.isIntersecting && e.intersectionRatio >= .55) { clearTimeout(t); t = setTimeout(open, 900); } else clearTimeout(t); } }, { threshold: [0, .55, 1] }).observe(document.documentElement);
+  } else setTimeout(open, 1200);
+  imagesReady(el.coverLayer).then(() => post({ type: 'ready' }));
+}
+(async function loadInitial() {
+  let cfg = null, from = '';
+  if (!CLEAN) { try { const a = await IDB.get('autosave'); if (a && a.data) { cfg = a.data; from = 'auto'; savedAt = a.t; } } catch (e) {} }
+  if (!cfg) { try { const r = await fetch('config.json'); if (r.ok) { cfg = await r.json(); from = 'file'; } } catch (e) {} }
+  if (cfg) { try { importConfig(cfg); if (from === 'auto' && !CLEAN) toast('Загружено автосохранение'); } catch (e) { console.error(e); } }
+  else histReset();
+  [1, 2, 3].forEach(prefetchSpread);
+  updateSaveInfo(); READY = true;
+  if (EMBED) embedBoot();
+  if (IS_DEV) { togglePanel(true); setTimeout(() => { if (S.pose === 'closed') openBook(); }, 300); }
+})();
+</script>
+</body>
+</html>

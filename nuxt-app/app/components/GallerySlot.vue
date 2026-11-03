@@ -11,7 +11,11 @@
 // nested <div>s breaking the flex/aspect-ratio contract every .pv-wide/
 // .pv-pair__photo CSS rule assumes for its DIRECT element.
 export interface GalleryMediaItem {
-  type: 'image' | 'video'
+  // 'embed' = the interactive photo album (AlbumEmbed.vue): src is the album
+  // page, poster the still shown while it loads / if it never does.
+  type: 'image' | 'video' | 'embed'
+  poster?: string
+  title?: string
   src: string
   width: number
   height: number
@@ -156,12 +160,13 @@ onBeforeUnmount(() => {
   <figure
     ref="el"
     class="gallery-slot"
-    :class="[wrapperClass, { reveal: !skipReveal, 'is-revealed': isRevealed, 'skip-reveal-fade': skipReveal, 'is-img-loaded': isImgLoaded, 'info-note': item.note, 'is-note-open': isNoteOpen }]"
+    :class="[wrapperClass, { reveal: !skipReveal, 'is-revealed': isRevealed, 'skip-reveal-fade': skipReveal, 'is-img-loaded': isImgLoaded, 'info-note': item.note, 'is-note-open': isNoteOpen, 'has-embed': item.type === 'embed' }]"
     :style="tallStyle"
     @mousemove="item.tip ? onTipMove($event) : undefined"
     @mouseleave="item.tip ? onTipLeave() : undefined"
   >
     <img v-if="item.type === 'image'" v-pinch-zoom :width="item.width" :height="item.height" loading="lazy" :src="item.src" :alt="item.alt || ''" />
+    <AlbumEmbed v-else-if="item.type === 'embed'" :src="item.src" :poster="item.poster" :title="item.title || item.alt" />
     <!-- `paired` (cropped, absolutely positioned to fill the box) only
          makes sense when there IS a sized box (a wrapperClass) to fill--a
          standalone top-level video (empty wrapperClass, see

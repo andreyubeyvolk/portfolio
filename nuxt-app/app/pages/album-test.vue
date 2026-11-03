@@ -1,0 +1,61 @@
+<script setup lang="ts">
+// HIDDEN TEST PAGE (not linked anywhere, noindex, not in the sitemap): the real
+// Sumsub project page with the interactive photo album slotted in before the
+// Team block, so the embed can be checked on every device exactly as it will
+// ship. Add ?lite=1 to force the lighter renderer (what iPhones get anyway).
+// Once approved the same gallery row goes into content/projects/sumsub.md and
+// this page + its prerender entry in nuxt.config.ts are deleted.
+const { data: project } = await useAsyncData('album-test', () => {
+  return queryCollection('project').where('section', '=', 'inhouse').where('slug', '=', 'sumsub').first()
+})
+
+if (!project.value) {
+  throw createError({ statusCode: 404, statusMessage: 'Project not found', fatal: true })
+}
+
+useSeoMeta({
+  title: 'Album test—Andrey Ubeyvolk',
+  robots: 'noindex, nofollow',
+})
+useHead({ bodyAttrs: { class: 'project-page' } })
+
+const albumSrc = ref('/albums/sumsub/index.html?embed=1&v=1')
+onMounted(() => {
+  if (new URLSearchParams(window.location.search).get('lite') === '1') albumSrc.value += '&lite=1'
+})
+
+const gallery = computed(() => {
+  const rows = [...project.value!.gallery] as any[]
+  const albumRow = {
+    type: 'wide',
+    item: {
+      type: 'embed',
+      src: albumSrc.value,
+      width: 2160,
+      height: 1440,
+      poster: '/assets/inhouse/sumsub/sumsub-album-poster.webp',
+      title: 'Interactive photo album: the design and brand team',
+      note: 'Design and brand team 2021–2025',
+    },
+  }
+  const at = rows.findIndex(r => r.type === 'text' && r.label === 'Team')
+  rows.splice(at < 0 ? rows.length : at, 0, albumRow)
+  return rows
+})
+</script>
+
+<template>
+  <ProjectPage
+    v-if="project"
+    section="inhouse"
+    :slug="project.slug"
+    :title="project.title"
+    :cover="project.cover"
+    :about="project.about"
+    :gallery="gallery"
+    :challenge="project.challenge"
+    :solution="project.solution"
+    :kv="project.kv"
+    :zip-url="project.zipUrl"
+  />
+</template>
