@@ -2,7 +2,8 @@
 // HIDDEN TEST PAGE (not linked anywhere, noindex, not in the sitemap): the real
 // Sumsub project page with the interactive photo album slotted in before the
 // Team block, so the embed can be checked on every device exactly as it will
-// ship. Add ?lite=1 to this page's URL to force the lighter renderer (what iPhones get anyway; the album reads it from here).
+// ship. The album picks its own version (3D on desktop, flat pre-rendered pictures on phones / weak devices);
+// add ?mode=flat or ?mode=3d to this page's URL to force one.
 // Once approved the same gallery row goes into content/projects/sumsub.md and
 // this page + its prerender entry in nuxt.config.ts are deleted.
 const { data: project } = await useAsyncData('album-test', () => {
@@ -19,7 +20,8 @@ useSeoMeta({
 })
 useHead({ bodyAttrs: { class: 'project-page' } })
 
-const albumSrc = '/albums/sumsub/index.html?embed=1&v=2'
+const albumSrc = '/albums/sumsub/index.html?embed=1&v=4'
+const flatSrc = '/albums/sumsub/flat/index.html?v=4'
 
 const gallery = computed(() => {
   const rows = [...project.value!.gallery] as any[]
@@ -28,6 +30,7 @@ const gallery = computed(() => {
     item: {
       type: 'embed',
       src: albumSrc,
+      flatSrc,
       width: 2160,
       height: 1440,
       poster: '/assets/inhouse/sumsub/sumsub-album-poster.webp',

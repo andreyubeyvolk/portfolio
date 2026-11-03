@@ -54,6 +54,8 @@ export default defineContentConfig({
         // and `title` (iframe title for screen readers).
         type: z.enum(['image', 'video', 'embed']),
         poster: z.string().optional(),
+        // lighter pre-rendered version of the album for phones / weak devices
+        flatSrc: z.string().optional(),
         title: z.string().optional(),
         src: z.string(),
         width: z.number(),
