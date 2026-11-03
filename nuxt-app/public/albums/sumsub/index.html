@@ -581,7 +581,8 @@ const IS_DEV = /[?&]dev/.test(location.search);
    ?lite=1 (or any iPhone/iPad) = cheaper rendering (no SVG lighting on stickers). ?at=N opens spread N at once (used to render the poster still). */
 const QS = new URLSearchParams(location.search);
 const EMBED = QS.has('embed');
-const LITE = QS.get('lite') === '1' || /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const parentQS = (() => { try { return parent !== window ? new URLSearchParams(parent.location.search) : null; } catch (e) { return null; } })();   // same-origin page that embeds us: ?lite=1 on ITS url also counts
+const LITE = QS.get('lite') === '1' || (parentQS && parentQS.get('lite') === '1') || /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 let embedVisible = true;
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
