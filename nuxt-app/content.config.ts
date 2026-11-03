@@ -49,7 +49,12 @@ export default defineContentConfig({
     // each photo's pixel dimensions)--carried over as-is, not re-derived.
     project: (() => {
       const mediaItem = z.object({
-        type: z.enum(['image', 'video']),
+        // 'embed' = the interactive photo album iframe (AlbumEmbed.vue),
+        // with `poster` (still shown while it loads / if it never does)
+        // and `title` (iframe title for screen readers).
+        type: z.enum(['image', 'video', 'embed']),
+        poster: z.string().optional(),
+        title: z.string().optional(),
         src: z.string(),
         width: z.number(),
         height: z.number(),

@@ -672,3 +672,13 @@
 .vp-tip.is-visible {
   opacity: 1;
 }
+
+/* Interactive photo album (AlbumEmbed.vue): the poster sits underneath and the
+   iframe fades in over it once the album reports ready, so the slot is never
+   blank and the poster is what remains if the album cannot load. */
+.album-embed { position: absolute; inset: 0; overflow: hidden; }
+.album-embed .album-embed__poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.album-embed__frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; opacity: 0; transition: opacity 0.6s ease; }
+.album-embed.is-ready .album-embed__frame { opacity: 1; }
+.mobile-project__photo.has-embed { position: relative; aspect-ratio: 3 / 2; }
+@media (prefers-reduced-motion: reduce) { .album-embed__frame { transition: none; } }

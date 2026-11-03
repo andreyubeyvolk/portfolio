@@ -11,7 +11,9 @@ export default defineNuxtConfig({
   // here explicitly to end up as a static file in the output.
   nitro: {
     prerender: {
-      routes: ['/sitemap.xml'],
+      // /album-test is the hidden album preview page (app/pages/album-test.vue):
+      // nothing links to it, so the crawler would never find it.
+      routes: ['/sitemap.xml', '/album-test'],
     },
   },
   // Native (same-document) View Transitions for client-side route
