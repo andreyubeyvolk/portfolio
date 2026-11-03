@@ -207,8 +207,14 @@ body::before { content: ''; position: fixed; inset: 0; z-index: 0; pointer-event
 .item.editable { pointer-events: auto; cursor: pointer; } .item.editable.sel { cursor: move; }
 .item img { display: block; width: 100%; height: auto; pointer-events: none; -webkit-user-drag: none; }
 .item.stk > img { filter: var(--stk-fx); }
-.item .dyn { position: absolute; inset: 0; pointer-events: none; opacity: var(--stk-dyn);
-  -webkit-mask-image: var(--stk-mask); mask-image: var(--stk-mask); -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }   /* mouse highlight only where the sticker is */
+.item .dyn { position: absolute; inset: 0; pointer-events: none; opacity: var(--stk-dyn); overflow: hidden;
+  -webkit-mask-image: var(--stk-mask); mask-image: var(--stk-mask); -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }   /* mouse highlight only where the sticker is */
+/* the highlight is a STATIC gradient (an ellipse of 65% x 50% of the sticker) on a child that is only MOVED with transform: nothing is repainted while the mouse moves.
+   It used to be a background rewritten on every move, and every repaint of that region re-ran the sticker's SVG lighting filter in software (Safari: 46 fps instead of 60) */
+.item .dyn > i { position: absolute; left: 0; top: 0; width: 130%; height: 100%; will-change: transform;
+  background: radial-gradient(ellipse closest-side, rgba(255,255,255,calc(.4 * var(--Lm, 1))) 0%, rgba(255,255,255,calc(.08 * var(--Lm, 1))) 50%, rgba(255,255,255,0) 100%); }
+body.safari .item.stk > img { will-change: transform; }   /* its own layer: the SVG filter result is kept and not recomputed whenever something around it is repainted */
+body.no-dyn .item .dyn { display: none; }
 .item .ring { position: absolute; inset: -3px; border: calc(var(--hb, 3px) / var(--is, 1)) dashed #15171C; box-shadow: 0 0 0 calc(var(--hb, 3px) / var(--is, 1) / 2) rgba(255,255,255,.85); pointer-events: none; display: none; }
 .item .hdl { --sz: calc(var(--hk, 24px) / var(--is, 1)); position: absolute; width: var(--sz); height: var(--sz); margin: calc(var(--sz) / -2) 0 0 calc(var(--sz) / -2); border-radius: 2px; background: #fff;
   border: calc(var(--hb, 3px) / var(--is, 1)) solid #15171C; display: none; z-index: 9; box-shadow: 0 0 0 calc(var(--hb, 3px) / var(--is, 1) / 2) rgba(255,255,255,.9), 0 1px 4px rgba(0,0,0,.45); }
@@ -1323,7 +1329,7 @@ requestAnimationFrame(function loop(t) {
   requestAnimationFrame(loop);
 });
 // only compositor-friendly properties change per frame (transform / opacity); gradients are static, so big photos are never re-rasterised while the mouse moves
-const lt = { g: '', p: '', d: '', pv: '', dT: 0, dTimer: 0 };
+const lt = { g: '', p: '', d: '', pv: '', dT: 0, dTimer: 0, L: -1 };
 function updateLight() {
   const L = ST.light / 100;
   const g = [sp.mx.toFixed(3), sp.my.toFixed(3), ST.gloss, ST.glossSize, L].join();
@@ -1339,14 +1345,20 @@ function updateLight() {
   }
   const dk = sp.mx.toFixed(2) + ',' + sp.my.toFixed(2) + ',' + L;
   if (dk !== lt.d) {
-    // the sticker highlights are repainted (a gradient under a picture mask on a 3D-transformed layer): at most ~16 times a second, the last position is always applied
+    // at most ~30 times a second (each update reads the sticker's on-screen rectangle); the last position is always applied
     const now = performance.now();
-    if (now - lt.dT < 60) { if (!lt.dTimer) lt.dTimer = setTimeout(() => { lt.dTimer = 0; updateLight(); }, 60); return; }
+    if (now - lt.dT < 33) { if (!lt.dTimer) lt.dTimer = setTimeout(() => { lt.dTimer = 0; updateLight(); }, 33); return; }
     lt.d = dk; lt.dT = now;
+    if (lt.L !== L) { lt.L = L; document.documentElement.style.setProperty('--Lm', L); }       // strength of the highlight gradient (a rare change, so the root is fine)
+    // stickers that cannot be seen are left alone: the cover's while the book is open, the back's unless it is shown (Safari repainted those hidden faces on every move)
+    const covOn = S.pose === 'closed' && !S.back, backOn = S.pose === 'back' || (S.pose === 'closed' && S.back), pagesOn = S.pose === 'open';
     document.querySelectorAll('.item .dyn').forEach(n => {
-      const r = n.parentElement.getBoundingClientRect(); if (!r.width) return;
-      const lx = ((sp.mx * innerWidth - r.left) / r.width * 100).toFixed(0), ly = ((sp.my * innerHeight - r.top) / r.height * 100).toFixed(0);
-      n.style.background = `radial-gradient(ellipse 65% 50% at ${lx}% ${ly}%, rgba(255,255,255,${.4 * L}) 0%, rgba(255,255,255,${.08 * L}) 50%, transparent 100%)`;
+      const z = n._z || (n._z = n.closest('#cover-layer') ? 'c' : n.closest('#back-layer') ? 'b' : 'p');
+      if (!(z === 'c' ? covOn : z === 'b' ? backOn : pagesOn)) return;
+      const it = n.parentElement; if (!+it.style.getPropertyValue('--stk-dyn')) return;
+      const r = it.getBoundingClientRect(); if (!r.width) return;
+      const lx = (sp.mx * innerWidth - r.left) / r.width * 100, ly = (sp.my * innerHeight - r.top) / r.height * 100;
+      n.firstChild.style.transform = `translate(${((lx - 65) / 1.3).toFixed(1)}%, ${(ly - 50).toFixed(1)}%)`;     // the 130%-wide gradient box is centred on the pointer
     });
   }
 }
@@ -1474,7 +1486,7 @@ function buildItem(d, ctx, ghost) {
   const img = document.createElement('img'); img.src = srcFor(d.src); img.draggable = false; n.appendChild(img);
   n.insertAdjacentHTML('beforeend', '<i class="gx"></i><i class="gf"></i><i class="gn"></i>');   // colour-grade layers (shown only when a filter is on)
   img.addEventListener('load', () => { if (n.classList.contains('sel')) applyItem(n, d); });
-  if (d.type === 'stk') { n.insertAdjacentHTML('beforeend', '<div class="dyn"></div>'); n.style.setProperty('--stk-mask', `url("${srcFor(d.src)}")`); n._sd = d; styleStk(n); }
+  if (d.type === 'stk') { n.insertAdjacentHTML('beforeend', '<div class="dyn"><i></i></div>'); n.style.setProperty('--stk-mask', `url("${srcFor(d.src)}")`); n._sd = d; styleStk(n); }
   applyItem(n, d);
   if (!ghost) {
     n._d = d; n._ctx = ctx;
@@ -2306,6 +2318,7 @@ if (CLEAN) document.body.classList.add('clean');
 if (EMBED) document.body.classList.add('embed');
 if (LITE) document.body.classList.add('lite');
 if (SAFARI) document.body.classList.add('safari');
+if (QS.get('dyn') === '0') document.body.classList.add('no-dyn');          // ?dyn=0: no mouse highlight on stickers at all
 buildPanel();
 $('n-label') && refreshUI();
 [el.book, el.bflip, el.zoom].forEach(n => n.classList.add('notrans'));
