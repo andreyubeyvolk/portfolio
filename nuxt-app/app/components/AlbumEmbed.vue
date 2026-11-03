@@ -156,6 +156,25 @@ watch(mode, () => {
   if (seen) armWatchdog()
 })
 
+// Mouse events inside an iframe never reach this page, so the site's
+// "Ctrl+click to tag" idle hint (public/logo-scrub.js: 30 s without any mouse
+// movement) would take time spent on the album, clicking and looking, for
+// idleness and pop up over it. While the pointer is over the frame the page is
+// told it is active, right away and every 10 s.
+const ACTIVITY_MS = 10000
+let activityTimer: ReturnType<typeof setInterval> | undefined
+
+function pingActivity() {
+  window.dispatchEvent(new Event('site-activity'))
+}
+
+function onHover(on: boolean) {
+  clearInterval(activityTimer)
+  if (!on) return
+  pingActivity()
+  activityTimer = setInterval(pingActivity, ACTIVITY_MS)
+}
+
 onMounted(() => {
   window.addEventListener('message', onMessage)
   window.addEventListener('online', onOnline)
@@ -181,13 +200,14 @@ onBeforeUnmount(() => {
   window.removeEventListener('online', onOnline)
   clearTimeout(watchdog)
   clearTimeout(retryTimer)
+  clearInterval(activityTimer)
   resizeObserver?.disconnect()
   intersectionObserver?.disconnect()
 })
 </script>
 
 <template>
-  <div ref="root" class="album-embed" :class="{ 'is-ready': ready }">
+  <div ref="root" class="album-embed" :class="{ 'is-ready': ready }" @mouseenter="onHover(true)" @mouseleave="onHover(false)">
     <img v-if="poster" class="album-embed__poster" :src="poster" :alt="title || ''" width="2160" height="1440" loading="lazy" />
     <iframe
       v-if="frameSrc"

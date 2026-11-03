@@ -108,16 +108,23 @@ addEventListener('keydown', e => { if (e.code === 'ArrowRight' || e.code === 'Pa
 if (parent !== window) addEventListener('wheel', e => { e.preventDefault(); post({ type: 'wheel', dx: e.deltaX, dy: e.deltaY, mode: e.deltaMode }); }, { passive: false });
 
 // ---- start: the closed album, which opens by itself a moment after it is on screen
-let opened = false, t = 0;
+const HOLD = 2400;                          // ms the closed album is on screen (cover shown AND frame in view) before it opens by itself: time to look at the cover
+let opened = false, t = 0, visibleAt = 0, coverAt = 0;
 (async () => {
   await go(0, 1);
   if (cur !== 0) { post({ type: 'error', reason: 'cover' }); return; }       // the page keeps its poster
+  coverAt = performance.now();
   post({ type: 'ready' });
   if (!SLOW) setTimeout(() => { pump(); pump(); }, 300);
 })();
-const open = () => { if (opened) return; if (cur !== 0 || busy) { t = setTimeout(open, 400); return; } opened = true; go(1, 1); };
-if ('IntersectionObserver' in window) new IntersectionObserver(es => { for (const e of es) { if (e.isIntersecting && e.intersectionRatio >= .55) { clearTimeout(t); t = setTimeout(open, 900); } else clearTimeout(t); } }, { threshold: [0, .55, 1] }).observe(document.documentElement);
-else setTimeout(open, 1200);
+const open = () => {
+  if (opened) return;
+  const left = HOLD - (performance.now() - Math.max(visibleAt, coverAt));
+  if (!visibleAt || !coverAt || cur !== 0 || busy || left > 0) { t = setTimeout(open, left > 0 ? Math.max(left, 150) : 400); return; }
+  opened = true; go(1, 1);
+};
+if ('IntersectionObserver' in window) new IntersectionObserver(es => { for (const e of es) { if (e.isIntersecting && e.intersectionRatio >= .55) { if (!visibleAt) visibleAt = performance.now(); clearTimeout(t); t = setTimeout(open, 300); } else { visibleAt = 0; clearTimeout(t); } } }, { threshold: [0, .55, 1] }).observe(document.documentElement);
+else { visibleAt = performance.now(); setTimeout(open, 400); }
 if (/[?&]at=\d+/.test(location.search)) { opened = true; go(+location.search.match(/[?&]at=(\d+)/)[1], 1); }
 </script>
 </body>
