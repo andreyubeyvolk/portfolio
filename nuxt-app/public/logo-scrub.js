@@ -172,5 +172,15 @@
     hideTip();
     armIdleTimer();
   });
+  // Activity the window cannot see itself: the cursor moving or clicking
+  // inside a same-origin <iframe> (the photo album) never reaches the
+  // listeners above, so without this the page would read "looking at the
+  // album" as 30s of idleness and nudge about Ctrl+click on top of it.
+  // The embedding component dispatches this while the pointer is over the
+  // frame (see AlbumEmbed.vue).
+  window.addEventListener('site-activity', function () {
+    hideTip();
+    armIdleTimer();
+  });
   armIdleTimer();
 })();

@@ -26,7 +26,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook('app:suspense:resolve', () => {
     if (injected) return
     injected = true
-    ;['/menu.js', '/logo-scrub.js', '/mobile-logo-swipe.js'].forEach((src) => {
+    // ?v=2: logo-scrub.js now also listens for 'site-activity' (the album)
+    ;['/menu.js', '/logo-scrub.js?v=2', '/mobile-logo-swipe.js'].forEach((src) => {
       const script = document.createElement('script')
       script.src = src
       document.body.appendChild(script)
