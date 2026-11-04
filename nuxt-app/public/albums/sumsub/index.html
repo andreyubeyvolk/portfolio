@@ -1197,6 +1197,8 @@ function setLeaf(p, fwd) {
 }
 // decode pictures before they are shown, so a turning page never flashes empty or half-drawn
 const imagesReady = (...boxes) => Promise.race([Promise.all(boxes.flatMap(b => [...b.querySelectorAll('img')]).map(i => i.decode ? i.decode().catch(() => {}) : 0)), wait(EMBED ? 3000 : 800)]);
+let FLIP_GUARD = true;                                   // ?diag=1 can switch it off to compare
+const settleFrames = () => Promise.race([new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))), wait(120)]);     // two painted frames (or 120 ms where frames do not run)
 const imgCache = new Map();
 function prefetchSpread(n) {
   if (n < 1 || n > S.total || !pages[n - 1]) return;
@@ -1231,6 +1233,9 @@ async function flip(dir, ms) {
     (fwd ? el.fanL : el.fanR).appendChild(preCard); preCard.style.transform = FLATL; preCard.style.zIndex = '1'; preCard.getBoundingClientRect();
   }
   await imagesReady($('leaf-f'), $('leaf-b'), landing, ...(slideCard ? [slideCard] : []), ...(preCard ? [preCard] : []));
+  // The leaf goes up FIRST, exactly over the page it is made of, and gets two frames to be painted; only then is the page underneath swapped. On Metal compositors (Safari
+  // AND Chrome on a Mac) a layer that appears in the same frame as the swap can show up blank for one frame: white pages / rectangles at the start of a turn.
+  if (FLIP_GUARD) { leaf.style.display = 'block'; setLeaf(0, fwd); await settleFrames(); }
   // from here on everything happens in ONE synchronous block (no frame is painted in between)
   (fwd ? el.prc : el.plc).replaceChildren(...landing.childNodes);
   if (slidePage) slidePage.style.visibility = 'hidden';
@@ -1256,8 +1261,10 @@ async function flip(dir, ms) {
     })();
   });
   if (fwd) el.plc.replaceChildren(...$('leaf-b').childNodes); else el.prc.replaceChildren(...$('leaf-f').childNodes);
-  if (slidePage) { slidePage.style.visibility = 'visible'; slideCard.remove(); }
+  if (slidePage) slidePage.style.visibility = 'visible';
   if (outCard) { outPage.style.visibility = 'visible'; outCard.style.transition = ''; const sh = outCard.querySelector('.card-shade'); if (sh) sh.style.transition = ''; }
+  if (FLIP_GUARD) await settleFrames();            // the pages that just changed are painted while the leaf / the slid card still cover them; only then is that cover taken away
+  if (slidePage) slideCard.remove();
   leaf.style.display = 'none'; $('pr-flip').style.background = $('pl-flip').style.background = '';
   S.busy = false; refreshUI(); prefetchAround();
   return true;
@@ -2426,6 +2433,7 @@ function diagInit() {
     ['gloss',   'блик на обложке', '#gloss-blob, .cover-gloss { display: none !important; }'],
     ['will',    'will-change', '* { will-change: auto !important; }'],
     ['outline', 'outline-хак антиалиаса', '* { outline: none !important; }'],
+    ['guard',   'ожидание 2 кадров при листании (JS)', null],
     ['fan',     'боковые стопки страниц (JS)', null],
     ['tilt',    'наклон от мыши (JS)', null],
   ];
@@ -2435,14 +2443,14 @@ function diagInit() {
   box.style.cssText = 'position:fixed;left:8px;top:8px;z-index:99999;width:300px;max-height:calc(100vh - 16px);overflow:auto;padding:10px 12px;border-radius:10px;background:rgba(15,17,24,.9);color:#e8eaf0;font:12px/1.35 -apple-system,system-ui,sans-serif;user-select:text;-webkit-user-select:text;box-shadow:0 6px 24px rgba(0,0,0,.4)';
   box.innerHTML = '<div style="display:flex;justify-content:space-between;font-weight:600;margin-bottom:6px"><span>Диагностика (галочка = ВЫКЛ)</span><span id="d-fps">…</span></div>'
     + FX.map(f => `<label style="display:flex;gap:6px;align-items:flex-start;margin:2px 0;cursor:pointer"><input type="checkbox" data-k="${f[0]}" style="margin-top:2px">${f[1]}</label>`).join('')
-    + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"><button id="d-auto">Авто-замер (~1 мин)</button><button id="d-all">Выкл всё</button><button id="d-none">Сброс</button><button id="d-copy">Копировать отчёт</button></div>'
-    + '<div id="d-state" style="opacity:.75;margin:2px 0"></div><pre id="d-out" style="white-space:pre-wrap;margin:4px 0 0;font:11px/1.4 ui-monospace,Menlo,monospace"></pre>';
+    + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"><button id="d-auto">Авто-замер мыши (~1 мин)</button><button id="d-flip">Авто-листание (~1 мин)</button><button id="d-all">Выкл всё</button><button id="d-none">Сброс</button><button id="d-copy">Копировать отчёт</button></div>'
+    + '<div id="d-state" style="opacity:.75;margin:2px 0"></div><pre id="d-out" style="white-space:pre-wrap;margin:4px 0 0;font:11px/1.4 ui-monospace,Menlo,monospace"></pre><pre id="d-out2" style="white-space:pre-wrap;margin:4px 0 0;font:11px/1.4 ui-monospace,Menlo,monospace"></pre>';
   document.body.appendChild(box);
   box.querySelectorAll('button').forEach(b => b.style.cssText = 'font:12px -apple-system,system-ui,sans-serif;padding:4px 8px;border-radius:6px;border:0;background:#3a4156;color:#fff;cursor:pointer');
   const out = box.querySelector('#d-out'), stateEl = box.querySelector('#d-state');
   function apply() {
     style.textContent = FX.filter(f => f[2] && off.has(f[0])).map(f => f[2]).join('\n');
-    ST.fanMax = off.has('fan') ? 0 : saved.fanMax; ST.tiltMax = off.has('tilt') ? 0 : saved.tiltMax;
+    ST.fanMax = off.has('fan') ? 0 : saved.fanMax; ST.tiltMax = off.has('tilt') ? 0 : saved.tiltMax; FLIP_GUARD = !off.has('guard');
     if (S.pose === 'open') updateFan(); applyZoom();
     box.querySelectorAll('input[data-k]').forEach(i => { i.checked = off.has(i.dataset.k); });
     stateEl.textContent = 'выключено: ' + (off.size ? [...off].join(', ') : 'ничего');
@@ -2478,8 +2486,30 @@ function diagInit() {
     window.dispatchEvent(new MouseEvent('mousemove', { clientX: innerWidth / 2, clientY: innerHeight / 2 }));
     off.clear(); keep.forEach(k => off.add(k)); apply(); this.disabled = false; stateEl.textContent += ' · замер готов';
   };
+  // page turns: 4 turns per setting (2 forward, 2 back) with the pointer circling meanwhile; frame times over the whole run + the delay from the call to the first frame of the leaf
+  const frows = [];
+  box.querySelector('#d-flip').onclick = async function () {
+    if (this.disabled) return; this.disabled = true; frows.length = 0; const out2 = box.querySelector('#d-out2');
+    const keep = new Set(off), flipKeys = ['guard', 'stkfx', 'grade', 'blend', 'blur', 'clip', 'shadow', 'will', 'outline', 'fan'];
+    const plan = [['всё включено', []]]; flipKeys.forEach(k => plan.push(['выкл: ' + k, [k]])); plan.push(['всё выключено', FX.map(f => f[0]).filter(k => k !== 'tilt')]); plan.push(['всё включено (повтор)', []]);
+    let circ = true, ang = 0;
+    (function f() { if (!circ) return; ang += .05; const w = innerWidth, h = innerHeight, r = Math.min(w, h) * .3; window.dispatchEvent(new MouseEvent('mousemove', { clientX: w / 2 + Math.cos(ang) * r, clientY: h / 2 + Math.sin(ang) * r * .8 })); requestAnimationFrame(f); })();
+    const origLeaf = window.setLeaf; let firstLeaf = 0; window.setLeaf = function (p) { if (!firstLeaf && p > .02) firstLeaf = performance.now(); return origLeaf.apply(this, arguments); };     // "start" = call -> the leaf really begins to move
+    for (const [name, keys] of plan) {
+      off.clear(); keys.forEach(k => off.add(k)); apply(); stateEl.textContent = 'листаю: ' + name;
+      openAtInstant(3); await wait(600);
+      const dts = [], lat = []; let last = performance.now(), run = true;
+      (function f() { const now = performance.now(); dts.push(now - last); last = now; if (run) requestAnimationFrame(f); })();
+      for (const dir of [1, 1, -1, -1]) { firstLeaf = 0; const t0 = performance.now(); await flip(dir); lat.push(firstLeaf ? firstLeaf - t0 : 0); await wait(250); }
+      run = false; const s = stat(dts.slice(4)), avg = lat.reduce((a, b) => a + b, 0) / lat.length;
+      frows.push(`${name.padEnd(22)} ${s.fps.toFixed(0).padStart(3)} fps  p95 ${s.p95.toFixed(0).padStart(3)}  max ${s.max.toFixed(0).padStart(3)} мс  >33мс: ${String(s.slow).padStart(2)}  старт ${avg.toFixed(0)}/${Math.max(...lat).toFixed(0)} мс`);
+      out2.textContent = 'ЛИСТАНИЕ\n' + frows.join('\n');
+    }
+    circ = false; window.setLeaf = origLeaf; openAtInstant(1);
+    off.clear(); keep.forEach(k => off.add(k)); apply(); this.disabled = false; stateEl.textContent += ' · листание готово';
+  };
   box.querySelector('#d-copy').onclick = () => {
-    const text = `${navigator.userAgent}\ndpr ${devicePixelRatio}, окно ${innerWidth}x${innerHeight}, safari=${SAFARI}, lite=${LITE}\nвыключено: ${[...off].join(', ') || '—'}\n${rows.join('\n')}`;
+    const text = `${navigator.userAgent}\ndpr ${devicePixelRatio}, окно ${innerWidth}x${innerHeight}, safari=${SAFARI}, lite=${LITE}\nвыключено: ${[...off].join(', ') || '—'}\n${rows.join('\n')}${frows.length ? '\nЛИСТАНИЕ\n' + frows.join('\n') : ''}`;
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => { stateEl.textContent = 'скопировано'; }, () => { prompt('Скопируй отчёт (⌘C):', text); });
   };
   apply();
