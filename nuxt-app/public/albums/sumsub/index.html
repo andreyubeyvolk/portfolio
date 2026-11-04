@@ -2446,8 +2446,8 @@ function diagInit() {
   box.style.cssText = 'position:fixed;left:8px;top:8px;z-index:99999;width:300px;max-height:calc(100vh - 16px);overflow:auto;padding:10px 12px;border-radius:10px;background:rgba(15,17,24,.9);color:#e8eaf0;font:12px/1.35 -apple-system,system-ui,sans-serif;user-select:text;-webkit-user-select:text;box-shadow:0 6px 24px rgba(0,0,0,.4)';
   box.innerHTML = '<div style="display:flex;justify-content:space-between;font-weight:600;margin-bottom:6px"><span>Диагностика (галочка = ВЫКЛ)</span><span id="d-fps">…</span></div>'
     + FX.map(f => `<label style="display:flex;gap:6px;align-items:flex-start;margin:2px 0;cursor:pointer"><input type="checkbox" data-k="${f[0]}" style="margin-top:2px">${f[1]}</label>`).join('')
-    + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"><button id="d-auto">Авто-замер мыши (~1 мин)</button><button id="d-flip">Авто-листание (~1 мин)</button><button id="d-all">Выкл всё</button><button id="d-none">Сброс</button><button id="d-copy">Копировать отчёт</button></div>'
-    + '<div id="d-state" style="opacity:.75;margin:2px 0"></div><pre id="d-out" style="white-space:pre-wrap;margin:4px 0 0;font:11px/1.4 ui-monospace,Menlo,monospace"></pre><pre id="d-out2" style="white-space:pre-wrap;margin:4px 0 0;font:11px/1.4 ui-monospace,Menlo,monospace"></pre>';
+    + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"><button id="d-auto">Авто-замер мыши (~1 мин)</button><button id="d-flip">Авто-листание (~1 мин)</button><button id="d-long">Долгое листание (~1,5 мин)</button><button id="d-all">Выкл всё</button><button id="d-none">Сброс</button><button id="d-copy">Копировать отчёт</button></div>'
+    + '<div id="d-state" style="opacity:.75;margin:2px 0"></div><pre id="d-out" style="white-space:pre-wrap;margin:4px 0 0;font:11px/1.4 ui-monospace,Menlo,monospace"></pre><pre id="d-out2" style="white-space:pre-wrap;margin:4px 0 0;font:11px/1.4 ui-monospace,Menlo,monospace"></pre><pre id="d-out3" style="white-space:pre-wrap;margin:4px 0 0;font:11px/1.4 ui-monospace,Menlo,monospace"></pre>';
   document.body.appendChild(box);
   box.querySelectorAll('button').forEach(b => b.style.cssText = 'font:12px -apple-system,system-ui,sans-serif;padding:4px 8px;border-radius:6px;border:0;background:#3a4156;color:#fff;cursor:pointer');
   const out = box.querySelector('#d-out'), stateEl = box.querySelector('#d-state');
@@ -2511,8 +2511,42 @@ function diagInit() {
     circ = false; window.setLeaf = origLeaf; openAtInstant(1);
     off.clear(); keep.forEach(k => off.add(k)); apply(); this.disabled = false; stateEl.textContent += ' · листание готово';
   };
+  // long run: every spread forward and back, twice, with the default settings and the pointer circling. Does it get worse the longer pages are turned?
+  // (the run above restarts from spread 3 for every setting, so it can never show a slow build-up)
+  const lrows = [];
+  box.querySelector('#d-long').onclick = async function () {
+    if (this.disabled) return; this.disabled = true; lrows.length = 0; const out3 = box.querySelector('#d-out3');
+    const keep = new Set(off); off.clear(); apply();
+    let circ = true, ang = 0;
+    (function f() { if (!circ) return; ang += .05; const w = innerWidth, h = innerHeight, r = Math.min(w, h) * .3; window.dispatchEvent(new MouseEvent('mousemove', { clientX: w / 2 + Math.cos(ang) * r, clientY: h / 2 + Math.sin(ang) * r * .8 })); requestAnimationFrame(f); })();
+    const origLeaf = window.setLeaf; let firstLeaf = 0; window.setLeaf = function (p) { if (!firstLeaf && p > .02) firstLeaf = performance.now(); return origLeaf.apply(this, arguments); };
+    const frames = []; let last = performance.now(), run = true;
+    (function f() { const now = performance.now(); frames.push([now, now - last]); last = now; if (run) requestAnimationFrame(f); })();
+    openAtInstant(1); await wait(700);
+    const turns = [], mem = () => performance.memory ? performance.memory.usedJSHeapSize / 1048576 : 0;
+    for (let cyc = 0; cyc < 2; cyc++) for (const dir of [1, -1]) for (let i = 0; i < S.total - 1; i++) {
+      stateEl.textContent = `долгое листание: поворот ${turns.length + 1}`;
+      const t0 = performance.now(); firstLeaf = 0; await flip(dir); const t1 = performance.now();
+      turns.push({ dts: frames.filter(f => f[0] >= t0 && f[0] <= t1).map(f => f[1]), lat: firstLeaf ? firstLeaf - t0 : 0, nodes: document.getElementsByTagName('*').length, heap: mem() });
+      await wait(250);
+    }
+    run = false; circ = false; window.setLeaf = origLeaf; openAtInstant(1);
+    const B = 8, blocks = [];
+    for (let b = 0; b < turns.length; b += B) {
+      const seg = turns.slice(b, b + B), dts = seg.flatMap(t => t.dts.slice(2)); if (dts.length < 5) continue;
+      const s = stat(dts), lat = seg.reduce((a, t) => a + t.lat, 0) / seg.length, e = seg[seg.length - 1];
+      blocks.push({ s, lat });
+      lrows.push(`повороты ${String(b + 1).padStart(2)}–${String(b + seg.length).padStart(2)}  ${s.fps.toFixed(0).padStart(3)} fps  p95 ${s.p95.toFixed(0).padStart(3)}  max ${s.max.toFixed(0).padStart(3)} мс  >33мс: ${String(s.slow).padStart(2)}  старт ${lat.toFixed(0)} мс  узлов ${e.nodes}${e.heap ? '  куча ' + e.heap.toFixed(1) + ' МБ' : ''}`);
+    }
+    if (blocks.length > 1) {
+      const a = blocks[0], z = blocks[blocks.length - 1];
+      lrows.push(`итог: fps ${a.s.fps.toFixed(0)} → ${z.s.fps.toFixed(0)}, p95 ${a.s.p95.toFixed(0)} → ${z.s.p95.toFixed(0)} мс, провалов >33мс ${a.s.slow} → ${z.s.slow}, старт ${a.lat.toFixed(0)} → ${z.lat.toFixed(0)} мс`);
+    }
+    out3.textContent = 'ДОЛГОЕ ЛИСТАНИЕ\n' + lrows.join('\n');
+    off.clear(); keep.forEach(k => off.add(k)); apply(); this.disabled = false; stateEl.textContent += ' · долгое листание готово';
+  };
   box.querySelector('#d-copy').onclick = () => {
-    const text = `${navigator.userAgent}\ndpr ${devicePixelRatio}, окно ${innerWidth}x${innerHeight}, safari=${SAFARI}, lite=${LITE}\nвыключено: ${[...off].join(', ') || '—'}\n${rows.join('\n')}${frows.length ? '\nЛИСТАНИЕ\n' + frows.join('\n') : ''}`;
+    const text = `${navigator.userAgent}\ndpr ${devicePixelRatio}, окно ${innerWidth}x${innerHeight}, safari=${SAFARI}, lite=${LITE}\nвыключено: ${[...off].join(', ') || '—'}\n${rows.join('\n')}${frows.length ? '\nЛИСТАНИЕ\n' + frows.join('\n') : ''}${lrows.length ? '\nДОЛГОЕ ЛИСТАНИЕ\n' + lrows.join('\n') : ''}`;
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => { stateEl.textContent = 'скопировано'; }, () => { prompt('Скопируй отчёт (⌘C):', text); });
   };
   apply();
