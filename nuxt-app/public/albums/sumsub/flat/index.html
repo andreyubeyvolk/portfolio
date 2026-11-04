@@ -108,7 +108,7 @@ addEventListener('keydown', e => { if (e.code === 'ArrowRight' || e.code === 'Pa
 if (parent !== window) addEventListener('wheel', e => { e.preventDefault(); post({ type: 'wheel', dx: e.deltaX, dy: e.deltaY, mode: e.deltaMode }); }, { passive: false });
 
 // ---- start: the closed album, which opens by itself a moment after it is on screen
-const HOLD = 2400;                          // ms the closed album is on screen (cover shown AND frame in view) before it opens by itself: time to look at the cover
+const HOLD = 1800;                         // ms the closed album is on screen (cover shown AND frame in view) before it opens by itself: time to look at the cover
 let opened = false, t = 0, visibleAt = 0, coverAt = 0;
 (async () => {
   await go(0, 1);
