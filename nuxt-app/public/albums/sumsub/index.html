@@ -1215,13 +1215,16 @@ async function flip(dir, ms) {
   if (dir > 0 && s >= S.total) { await closeFromEnd(); return true; }
   if (dir < 0 && s <= 1) { await closeFront(); return true; }
   S.busy = true; ms = ms || ST.flipMs; setDur(ms); playFlip();
-  const fwd = dir > 0, leaf = el.leaf;
+  const fwd = dir > 0, leaf = el.leaf, guard = FLIP_GUARD;
   // the page about to be revealed is the card sticking out beside the book: that card slides into place, so the real page stays hidden until the leaf lands (otherwise the same page is drawn twice)
   const slideCard = fwd ? cards.get('R' + s) : cards.get('L' + (s - 3)), slidePage = slideCard ? (fwd ? el.pageR : el.pageL) : null;
   if (sel) deselect();
-  // the face that lands on the book is built with real (editable) items and later MOVED into the page, so nothing is re-created or re-decoded at the end of the turn
-  if (fwd) { fillPage($('leaf-f'), s - 1, 'right', true); fillPage($('leaf-b'), s, 'left', false); }
-  else { fillPage($('leaf-b'), s - 1, 'left', true); fillPage($('leaf-f'), s - 2, 'right', false); }
+  // The face that lands on the book is built with real (editable) items and later MOVED into the page, so nothing is re-created or re-decoded at the end of the turn.
+  // With the paint guard the leaf has to keep its picture while the page underneath is painted (a moved-out face would show blank paper for those frames: a flash of every
+  // landing page), so the page gets its own copy, built and decoded together with the rest, and the leaf face is a plain display copy.
+  const nearBox = guard ? document.createElement('div') : null;
+  if (fwd) { fillPage($('leaf-f'), s - 1, 'right', true); fillPage($('leaf-b'), s, 'left', guard); if (nearBox) fillPage(nearBox, s, 'left'); }
+  else { fillPage($('leaf-b'), s - 1, 'left', true); fillPage($('leaf-f'), s - 2, 'right', guard); if (nearBox) fillPage(nearBox, s - 2, 'right'); }
   // the incoming page is built OFF-screen and decoded first; the real page keeps showing what it shows until the leaf is on top of it
   // (hiding it earlier, while waiting for the decode, uncovered the next photo for a few frames: the flicker right before the turn)
   const landing = document.createElement('div'); fillPage(landing, fwd ? s : s - 2, fwd ? 'right' : 'left');
@@ -1232,10 +1235,10 @@ async function flip(dir, ms) {
     preCard = makeCard(fwd ? 'L' : 'R', fwd ? s - 2 : s - 1); cards.set(outKey, preCard);
     (fwd ? el.fanL : el.fanR).appendChild(preCard); preCard.style.transform = FLATL; preCard.style.zIndex = '1'; preCard.getBoundingClientRect();
   }
-  await imagesReady($('leaf-f'), $('leaf-b'), landing, ...(slideCard ? [slideCard] : []), ...(preCard ? [preCard] : []));
+  await imagesReady($('leaf-f'), $('leaf-b'), landing, ...(nearBox ? [nearBox] : []), ...(slideCard ? [slideCard] : []), ...(preCard ? [preCard] : []));
   // The leaf goes up FIRST, exactly over the page it is made of, and gets two frames to be painted; only then is the page underneath swapped. On Metal compositors (Safari
   // AND Chrome on a Mac) a layer that appears in the same frame as the swap can show up blank for one frame: white pages / rectangles at the start of a turn.
-  if (FLIP_GUARD) { leaf.style.display = 'block'; setLeaf(0, fwd); await settleFrames(); }
+  if (guard) { leaf.style.display = 'block'; setLeaf(0, fwd); await settleFrames(); }
   // from here on everything happens in ONE synchronous block (no frame is painted in between)
   (fwd ? el.prc : el.plc).replaceChildren(...landing.childNodes);
   if (slidePage) slidePage.style.visibility = 'hidden';
@@ -1260,10 +1263,10 @@ async function flip(dir, ms) {
       if (p < 1) requestAnimationFrame(step); else res();
     })();
   });
-  if (fwd) el.plc.replaceChildren(...$('leaf-b').childNodes); else el.prc.replaceChildren(...$('leaf-f').childNodes);
+  if (fwd) el.plc.replaceChildren(...(nearBox || $('leaf-b')).childNodes); else el.prc.replaceChildren(...(nearBox || $('leaf-f')).childNodes);
   if (slidePage) slidePage.style.visibility = 'visible';
   if (outCard) { outPage.style.visibility = 'visible'; outCard.style.transition = ''; const sh = outCard.querySelector('.card-shade'); if (sh) sh.style.transition = ''; }
-  if (FLIP_GUARD) await settleFrames();            // the pages that just changed are painted while the leaf / the slid card still cover them; only then is that cover taken away
+  if (guard) await settleFrames();            // the pages that just changed are painted while the leaf / the slid card still cover them; only then is that cover taken away
   if (slidePage) slideCard.remove();
   leaf.style.display = 'none'; $('pr-flip').style.background = $('pl-flip').style.background = '';
   S.busy = false; refreshUI(); prefetchAround();
