@@ -200,6 +200,14 @@ body::before { content: ''; position: fixed; inset: 0; z-index: 0; pointer-event
 #leaf .face { overflow: hidden; box-shadow: calc(var(--et) * .2) calc(var(--et) * .2) 0 var(--e1), calc(var(--et) * .4) calc(var(--et) * .4) 0 var(--e2), calc(var(--et) * .6) calc(var(--et) * .6) 0 var(--e3), calc(var(--et) * .8) calc(var(--et) * .8) 0 var(--e4), var(--et) var(--et) 0 var(--e5); }
 #leaf .item, #leaf .empty-hint { pointer-events: none !important; } #leaf .hdl, #leaf .ring { display: none !important; }
 #leaf .face.a { border-radius: 3px 12px 12px 3px; }
+/* Pre-clipped exports (preclip.py cuts every photo to its page, config.preclipped): pages, fan cards and leaf faces need NO overflow clip. A rounded overflow clip made each of them its own
+   offscreen render pass in the compositor (~24 per frame at 2x, ~8 ms of GPU time a frame, and grey un-rastered tiles after a turn); the corners are rounded on the contents instead. */
+body.noclip .page, body.noclip .card, body.noclip #leaf .face { overflow: visible; }
+body.noclip .page > .page-content, body.noclip .card > .page-content, body.noclip #leaf .face > .page-content, body.noclip .page > .shade, body.noclip .card > .shade, body.noclip .card > .card-shade, body.noclip #leaf .face > .shade { border-radius: inherit; }
+body.noclip .page > .page-content > .item.c-tl, body.noclip .page > .page-content > .item.c-tl > *, body.noclip .page > .page-content > .item.c-tl > *::before, body.noclip .page > .page-content > .item.c-tl > *::after, body.noclip .card > .page-content > .item.c-tl, body.noclip .card > .page-content > .item.c-tl > *, body.noclip .card > .page-content > .item.c-tl > *::before, body.noclip .card > .page-content > .item.c-tl > *::after, body.noclip #leaf .face > .page-content > .item.c-tl, body.noclip #leaf .face > .page-content > .item.c-tl > *, body.noclip #leaf .face > .page-content > .item.c-tl > *::before, body.noclip #leaf .face > .page-content > .item.c-tl > *::after { border-top-left-radius: inherit; }
+body.noclip .page > .page-content > .item.c-tr, body.noclip .page > .page-content > .item.c-tr > *, body.noclip .page > .page-content > .item.c-tr > *::before, body.noclip .page > .page-content > .item.c-tr > *::after, body.noclip .card > .page-content > .item.c-tr, body.noclip .card > .page-content > .item.c-tr > *, body.noclip .card > .page-content > .item.c-tr > *::before, body.noclip .card > .page-content > .item.c-tr > *::after, body.noclip #leaf .face > .page-content > .item.c-tr, body.noclip #leaf .face > .page-content > .item.c-tr > *, body.noclip #leaf .face > .page-content > .item.c-tr > *::before, body.noclip #leaf .face > .page-content > .item.c-tr > *::after { border-top-right-radius: inherit; }
+body.noclip .page > .page-content > .item.c-br, body.noclip .page > .page-content > .item.c-br > *, body.noclip .page > .page-content > .item.c-br > *::before, body.noclip .page > .page-content > .item.c-br > *::after, body.noclip .card > .page-content > .item.c-br, body.noclip .card > .page-content > .item.c-br > *, body.noclip .card > .page-content > .item.c-br > *::before, body.noclip .card > .page-content > .item.c-br > *::after, body.noclip #leaf .face > .page-content > .item.c-br, body.noclip #leaf .face > .page-content > .item.c-br > *, body.noclip #leaf .face > .page-content > .item.c-br > *::before, body.noclip #leaf .face > .page-content > .item.c-br > *::after { border-bottom-right-radius: inherit; }
+body.noclip .page > .page-content > .item.c-bl, body.noclip .page > .page-content > .item.c-bl > *, body.noclip .page > .page-content > .item.c-bl > *::before, body.noclip .page > .page-content > .item.c-bl > *::after, body.noclip .card > .page-content > .item.c-bl, body.noclip .card > .page-content > .item.c-bl > *, body.noclip .card > .page-content > .item.c-bl > *::before, body.noclip .card > .page-content > .item.c-bl > *::after, body.noclip #leaf .face > .page-content > .item.c-bl, body.noclip #leaf .face > .page-content > .item.c-bl > *, body.noclip #leaf .face > .page-content > .item.c-bl > *::before, body.noclip #leaf .face > .page-content > .item.c-bl > *::after { border-bottom-left-radius: inherit; }
 #leaf .face.b { border-radius: 12px 3px 3px 12px; }   /* the back face is mirrored (rotateY 180): its local LEFT edge is the outer edge once the leaf lies on the left page; the old 3/12 order made the page lose its rounded corners during turns, mostly backwards */
 
 /* ───────── ITEMS ON PAGES ───────── */
@@ -1494,7 +1502,7 @@ function placeHandles(n, d) {
 }
 function buildItem(d, ctx, ghost) {
   const n = document.createElement('div');
-  n.className = 'item ' + (d.type === 'stk' ? 'stk' : 'img'); n.dataset.uid = d.id; n._dim = dimsOf(ctx); n._span = ctx.type === 'span'; n._off = offOf(ctx);
+  n.className = 'item ' + (d.type === 'stk' ? 'stk' : 'img') + (d.corners ? ' ' + d.corners.split(' ').map(c => 'c-' + c).join(' ') : ''); n.dataset.uid = d.id; n._dim = dimsOf(ctx); n._span = ctx.type === 'span'; n._off = offOf(ctx);
   const img = document.createElement('img'); img.src = srcFor(d.src); img.draggable = false; n.appendChild(img);
   n.insertAdjacentHTML('beforeend', '<i class="gx"></i><i class="gf"></i><i class="gn"></i>');   // colour-grade layers (shown only when a filter is on)
   img.addEventListener('load', () => { if (n.classList.contains('sel')) applyItem(n, d); });
@@ -2582,6 +2590,7 @@ function diagInit() {
     if (cfg.settings) ['bgImg', 'bellyImg'].forEach(k => { if (cfg.settings[k]) cfg.settings[k] = versioned(cfg.settings[k]); });
   }
   let broken = !cfg;
+  if (cfg && EMBED && cfg.preclipped) document.body.classList.add('noclip');         // the photos are already cut to their pages (preclip.py)
   if (cfg) { try { importConfig(cfg); if (from === 'auto' && !CLEAN) toast('Загружено автосохранение'); } catch (e) { console.error(e); broken = true; } }
   else histReset();
   [1, 2, 3].forEach(prefetchSpread);
