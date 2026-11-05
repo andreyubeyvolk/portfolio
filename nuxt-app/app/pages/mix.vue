@@ -177,7 +177,7 @@ onBeforeUnmount(() => {
 /* The container the grid measures itself against: the pane's content box, which is
    the screen minus 16px on the left and the 16px scrollbar track on the right. */
 .mix-content {
-  --mix-gap: 12px;
+  --mix-gap: 16px;
   container-type: inline-size;
 }
 
