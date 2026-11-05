@@ -95,9 +95,10 @@ function toTop() {
 // The toggle (and Esc) go back to the page the mosaic was entered from, the home
 // page if it was opened directly.
 const backTo = ref('/')
+const toggle = useTemplateRef<{ go: () => void }>('toggle')
 
 function onKey(e: KeyboardEvent) {
-  if (e.key === 'Escape') navigateTo(backTo.value)
+  if (e.key === 'Escape') toggle.value?.go()
 }
 
 onMounted(async () => {
@@ -150,7 +151,7 @@ onBeforeUnmount(() => {
         </div>
       </ScrollPane>
     </div>
-    <MixToggle :to="backTo" label="Back" on />
+    <MixToggle ref="toggle" :to="backTo" label="Back" on />
   </div>
 </template>
 

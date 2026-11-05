@@ -4,23 +4,53 @@
 // and as tall as the 16px page margin. Its two halves are 16px wide each, so the
 // seam lines up with the left edge of the content. Invisible until hovered, and
 // only on a desktop with a mouse (the mosaic page is desktop-only).
-defineProps<{
+//
+// A click does not navigate at once: the dark half first slides to the other side
+// (a real switch flipping), and only when it has landed does the page curtain start.
+const props = defineProps<{
   to: string
   label: string
   // true = the mosaic is showing (dark half on the right)
   on?: boolean
 }>()
+
+const FLIP_MS = 300
+const moving = ref(false)
+// The dark half rests on the right when "on"; while moving it is on the other side.
+const atRight = computed(() => !!props.on !== moving.value)
+
+function go() {
+  if (moving.value) return
+  moving.value = true
+  const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : FLIP_MS
+  setTimeout(() => navigateTo(props.to), delay)
+}
+
+function onClick(e: MouseEvent) {
+  // Let the browser handle new-tab / new-window clicks itself.
+  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+  e.preventDefault()
+  go()
+}
+
+defineExpose({ go })
 </script>
 
 <template>
-  <NuxtLink class="mix-toggle" :class="{ 'is-on': on }" :to="to" :aria-label="label" :title="label">
+  <a
+    class="mix-toggle"
+    :class="{ 'is-right': atRight, 'is-moving': moving }"
+    :href="to"
+    :aria-label="label"
+    :title="label"
+    @click="onClick"
+  >
     <svg width="32" height="16" viewBox="0 0 32 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <rect x="1" y="1" width="30" height="14" stroke="#171717" stroke-width="2" />
-      <rect x="2" y="2" width="14" height="12" :fill="on ? '#F5F4F4' : '#171717'" />
-      <rect x="16" y="2" width="14" height="12" :fill="on ? '#171717' : '#F5F4F4'" />
+      <rect x="2" y="2" width="28" height="12" fill="#F5F4F4" />
     </svg>
     <span class="mix-toggle__knob" aria-hidden="true"></span>
-  </NuxtLink>
+  </a>
 </template>
 
 <style scoped>
@@ -44,13 +74,14 @@ defineProps<{
 .mix-toggle svg {
   display: block;
 }
+/* Shown while flipping even if the pointer is not on it (Esc on the mosaic). */
 .mix-toggle:hover,
-.mix-toggle:focus-visible {
+.mix-toggle:focus-visible,
+.mix-toggle.is-moving {
   opacity: 1;
 }
 
-/* Same sheen as the info-note buttons on the project photos (.info-note__toggle
-   in project-page.css), on the dark half of the switch. */
+/* The dark half: 14x12 inside the outline, resting on the left (off) or the right (on). */
 .mix-toggle__knob {
   position: absolute;
   top: 2px;
@@ -58,11 +89,16 @@ defineProps<{
   width: 14px;
   height: 12px;
   overflow: hidden;
+  background: #171717;
   pointer-events: none;
+  transition: transform 260ms cubic-bezier(0.4, 0, 0.2, 1);
 }
-.mix-toggle.is-on .mix-toggle__knob {
-  left: 16px;
+.mix-toggle.is-right .mix-toggle__knob {
+  transform: translateX(14px);
 }
+
+/* Same sheen as the info-note buttons on the project photos (.info-note__toggle
+   in project-page.css), on the dark half of the switch. */
 .mix-toggle__knob::after {
   content: '';
   position: absolute;
@@ -78,5 +114,11 @@ defineProps<{
 @keyframes mix-sheen {
   from { transform: translateX(-120%); }
   to { transform: translateX(120%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mix-toggle__knob {
+    transition: none;
+  }
 }
 </style>
