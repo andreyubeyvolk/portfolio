@@ -158,6 +158,9 @@ onMounted(() => {
   resizeObserver = new ResizeObserver(update)
   resizeObserver.observe(pane)
   resizeObserver.observe(host)
+  // Content that grows after mount (a page that loads its data client-side, a
+  // "Load more" batch) changes the scroll height without resizing the pane.
+  if (pane.firstElementChild) resizeObserver.observe(pane.firstElementChild)
 
   track.addEventListener('pointerdown', onTrackPointerDown)
   thumb.addEventListener('pointerdown', onThumbPointerDown)

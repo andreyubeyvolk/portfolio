@@ -43,6 +43,10 @@ const tallStyle = computed(() => (props.wrapperClass === 'pv-wide' && props.item
   ? { aspectRatio: `${props.item.width} / ${props.item.height}` }
   : undefined)
 
+// File name without extension (a video and its poster share one): what the /mix
+// page's ?img=<stem> link looks up to scroll a project page to this photo.
+const mediaStem = computed(() => props.item.src.split('/').pop()?.replace(/\.[^.]+$/, ''))
+
 const el = useTemplateRef<HTMLElement>('el')
 const isRevealed = ref(!!props.skipReveal)
 // Skipped items (already on/near screen at load, per the comment above)
@@ -161,6 +165,7 @@ onBeforeUnmount(() => {
   <figure
     ref="el"
     class="gallery-slot"
+    :data-media="mediaStem"
     :class="[wrapperClass, { reveal: !skipReveal, 'is-revealed': isRevealed, 'skip-reveal-fade': skipReveal, 'is-img-loaded': isImgLoaded, 'info-note': item.note, 'is-note-open': isNoteOpen, 'has-embed': item.type === 'embed' }]"
     :style="tallStyle"
     @mousemove="item.tip ? onTipMove($event) : undefined"

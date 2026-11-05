@@ -13,7 +13,8 @@ export default defineNuxtConfig({
     prerender: {
       // /album-test is the hidden album preview page (app/pages/album-test.vue):
       // nothing links to it, so the crawler would never find it.
-      routes: ['/sitemap.xml', '/album-test'],
+      // /mix is the hidden photo-mosaic test page (app/pages/mix.vue), same story.
+      routes: ['/sitemap.xml', '/album-test', '/mix'],
     },
   },
   // Native (same-document) View Transitions for client-side route

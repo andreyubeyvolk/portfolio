@@ -130,6 +130,21 @@ watch(mobileOpenIndex, (idx, prevIdx) => {
   if (idx === null && prevIdx !== undefined && prevIdx !== null) revealAndScrollTo(prevIdx)
 })
 
+// Arriving from the /mix mosaic with ?open=<index into the full catalog>: open that
+// picture right away (lightbox on desktop, card overlay on tablet/phone), then drop
+// the query. Closing it scrolls the grid to that card like any other lightbox close.
+const route = useRoute()
+onMounted(() => {
+  const raw = route.query.open
+  const index = typeof raw === 'string' ? Number(raw) : NaN
+  if (!Number.isInteger(index) || index < 0 || index >= allItems.value.length) return
+  nextTick(() => {
+    window.history.replaceState(window.history.state, '', window.location.pathname)
+    if (isMobile()) mobileOpenIndex.value = index
+    else openIndex.value = index
+  })
+})
+
 function loadMore() {
   const from = shown.value
   revealingFrom.value = from

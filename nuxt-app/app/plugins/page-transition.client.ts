@@ -15,7 +15,9 @@
 // panel one. It still correctly gets the SMALLER panel treatment
 // against a project specifically (isProjectPanelPeer, checked first
 // below)--adding it here only affects its pairing with genuine sections.
-const SECTION_ROUTE_NAMES = new Set(['index', 'inhouse', 'brands', 'archive', 'about', 'all-projects'])
+// 'mix' is the photo mosaic (pages/mix.vue): reached and left via the corner toggle,
+// and from its tiles into a project or the Archive--all of it gets the full curtain.
+const SECTION_ROUTE_NAMES = new Set(['index', 'inhouse', 'brands', 'archive', 'about', 'all-projects', 'mix'])
 const PROJECT_ROUTE_NAMES = new Set(['inhouse-slug', 'brands-slug'])
 // Which listing a project's own panel transition is allowed to pair
 // with--its own section's listing, or all-projects (which lists every

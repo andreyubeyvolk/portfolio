@@ -137,4 +137,7 @@ useHead({
       </div>
     </article>
   </section>
+
+  <!-- Desktop only, invisible until hovered: switches to the /mix photo mosaic. -->
+  <MixToggle to="/mix" label="Photo mosaic" />
 </template>

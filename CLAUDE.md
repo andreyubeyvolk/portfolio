@@ -35,7 +35,13 @@ public/             global CSS (styles.css desktop+tablet ≤980px, mobile.css �
                     mobile-logo-swipe.js — injected after hydration), graffiti.js
 public/assets/<section>/<slug>/   that project's media, every file prefixed with the slug
 server/routes/sitemap.xml.ts      sitemap generated from the project collection
+scripts/make-mix-thumbs.mjs       thumbs + manifest for the /mix photo mosaic (public/assets/mix/)
 ```
+
+`/mix` is a desktop-only mosaic of random photos from every project and the Archive
+(noindex, not in the sitemap), reached by the invisible bottom-left toggle on the home
+page (`MixToggle.vue`). Clicking a tile opens the project scrolled to that photo
+(`?img=<file stem>`) or the Archive lightbox (`/archive?open=<index>`).
 
 Two sections: **Inhouse** and **Brands** — same template, different nav
 item and intro text (`utils/sectionIntro.ts`). Listings and the sitemap are
@@ -106,7 +112,10 @@ own tight black rectangle.
 7. **Build the download zip only at the very end**, right before pushing —
    exclude `-card`, `-kv`, `-og`, and posters/stills superseded by a video.
    Delete a stale zip rather than leaving it inconsistent.
-8. `npm run generate` in `nuxt-app/`, check in the browser, then ask before pushing.
+8. `node scripts/make-mix-thumbs.mjs` in `nuxt-app/` (new project's photos into `/mix`; commit
+   `public/assets/mix/`). A video's tile uses its poster; to use another frame add it to
+   `FRAME_AT` in the script.
+9. `npm run generate` in `nuxt-app/`, check in the browser, then ask before pushing.
 
 ## House rules
 
