@@ -41,6 +41,30 @@ if (props.cover.type === 'video') {
 
 const panelTransitionStyle = usePanelTransitionStyle()
 
+// Arriving from the /mix mosaic with ?img=<file stem>: scroll the project to that
+// photo (centered when it fits) instead of the top, then drop the query so a
+// refresh or a shared link doesn't carry it.
+const route = useRoute()
+const coverStem = computed(() => props.cover.src.split('/').pop()?.replace(/\.[^.]+$/, ''))
+function scrollToMedia(stem: string) {
+  const pane = document.querySelector<HTMLElement>('.content-pane__scroll')
+  const target = Array.from(document.querySelectorAll<HTMLElement>('.project-content [data-media]')).find(el => el.dataset.media === stem)
+  if (!pane || !target) return
+  const paneRect = pane.getBoundingClientRect()
+  const rect = target.getBoundingClientRect()
+  const top = Math.max(0, pane.scrollTop + (rect.top - paneRect.top) - Math.max(0, (pane.clientHeight - rect.height) / 2))
+  if (pane.lenisInstance) pane.lenisInstance.scrollTo(top, { immediate: true })
+  else pane.scrollTop = top
+}
+onMounted(() => {
+  const img = route.query.img
+  if (typeof img !== 'string') return
+  setTimeout(() => {
+    scrollToMedia(img)
+    window.history.replaceState(window.history.state, '', window.location.pathname)
+  }, 80)
+})
+
 // e.g. "nimax" → "Andrey_Ubeyvolk_Nimax.zip"
 const zipFilename = computed(() => {
   const name = props.title.replace(/[^a-zA-Z0-9]+/g, '_').replace(/_+$/, '')
@@ -83,7 +107,7 @@ const flatGallery = computed(() => {
       </header>
       <ScrollPane project-scroll>
         <article class="project-content">
-          <figure class="pv-cover">
+          <figure class="pv-cover" :data-media="coverStem">
             <img
               v-if="cover.type === 'image'"
               v-pinch-zoom
