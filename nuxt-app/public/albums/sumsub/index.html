@@ -1020,8 +1020,15 @@ function slot(side, i) {
   return side === 'L' ? { x: -x, z: -i * dz, a: -a } : { x, z: -i * dz, a };
 }
 const FLATL = 'translate3d(0,0,0) rotateY(0deg)';
-const nLeftCards  = () => S.pose === 'open' ? clamp(S.spread - 2, 0, ST.fanMax) : 0;
-const nRightCards = () => S.pose === 'open' ? clamp(S.total - S.spread, 0, ST.fanMax) : 0;
+const nLeftCards  = (sp = S.spread) => S.pose === 'open' ? clamp(sp - 2, 0, ST.fanMax) : 0;
+const nRightCards = (sp = S.spread) => S.pose === 'open' ? clamp(S.total - sp, 0, ST.fanMax) : 0;
+// the cards the two side stacks hold at a given spread: [side, k, depth] (depth 1 = the one next to the page). flip() builds the ones for the spread it is going to BEFORE the turn.
+function fanKeys(sp) {
+  const out = [];
+  for (let i = 1; i <= nLeftCards(sp); i++) out.push(['L', sp - 2 - i, i]);
+  for (let i = 1; i <= nRightCards(sp); i++) out.push(['R', sp - 1 + i, i]);
+  return out;
+}
 
 function layoutPlates() {
   const t = T(), f = el.plateF.style, b = el.plateB.style;
@@ -1094,10 +1101,7 @@ function makeCard(side, k) {
 let fanFlipKey = null;      // while a page turns: key of the card that becomes the page (every OTHER card that leaves the stack just fades out where it is)
 function updateFan() {
   const want = new Map();
-  if (S.pose === 'open') {
-    for (let i = 1; i <= nLeftCards(); i++)  { const k = S.spread - 2 - i; want.set('L' + k, { side: 'L', k, i }); }
-    for (let i = 1; i <= nRightCards(); i++) { const k = S.spread - 1 + i; want.set('R' + k, { side: 'R', k, i }); }
-  }
+  if (S.pose === 'open') for (const [side, k, i] of fanKeys(S.spread)) want.set(side + k, { side, k, i });
   cards.forEach((c, key) => {
     if (want.has(key)) return;
     cards.delete(key);
@@ -1216,7 +1220,12 @@ function prefetchSpread(n) {
     if (imgCache.size > 60) imgCache.delete(imgCache.keys().next().value);
   });
 }
-function prefetchAround() { const go = () => [S.spread, S.spread + 1, S.spread - 1, S.spread + 2].forEach(prefetchSpread); (window.requestIdleCallback || setTimeout)(go); }
+// everything that can come into view next: the neighbouring spreads AND every spread shown by the side stacks (their photos used to be fetched only when the card was built, mid-turn)
+function prefetchAround() {
+  const n = ST.fanMax + 1, list = [S.spread, S.spread + 1, S.spread - 1, S.spread + 2];
+  for (let i = 2; i <= n; i++) list.push(S.spread + i, S.spread - i);
+  (window.requestIdleCallback || setTimeout)(() => list.forEach(prefetchSpread));
+}
 async function flip(dir, ms) {
   if (S.busy || S.pose !== 'open') return false;
   const s = S.spread;
@@ -1236,14 +1245,18 @@ async function flip(dir, ms) {
   // the incoming page is built OFF-screen and decoded first; the real page keeps showing what it shows until the leaf is on top of it
   // (hiding it earlier, while waiting for the decode, uncovered the next photo for a few frames: the flicker right before the turn)
   const landing = document.createElement('div'); fillPage(landing, fwd ? s : s - 2, fwd ? 'right' : 'left');
-  // the card that will carry the covered page is created now (behind the real page, so nobody sees it) and decoded together with everything else
+  // EVERY card the two side stacks will hold after the turn is created now, lying flat behind the page where nobody sees it, and decoded together with everything else.
+  // Created at the swap instead (which is what updateFan() does for a card it does not find), the deepest new card had to fetch, decode and rasterise its photos while it
+  // was already sliding out into view: the side pages flickered. This also covers the card that carries the page being covered (outKey, the first one of its stack).
   const outKey = fwd ? 'L' + (s - 2) : 'R' + (s - 1);
-  let preCard = null;
-  if (ST.fanMax >= 1 && (fwd ? s >= 2 : true) && !cards.has(outKey)) {
-    preCard = makeCard(fwd ? 'L' : 'R', fwd ? s - 2 : s - 1); cards.set(outKey, preCard);
-    (fwd ? el.fanL : el.fanR).appendChild(preCard); preCard.style.transform = FLATL; preCard.style.zIndex = '1'; preCard.getBoundingClientRect();
+  const preCards = [];
+  for (const [side, k] of fanKeys(s + dir)) {
+    const key = side + k; if (cards.has(key)) continue;
+    const c = makeCard(side, k); cards.set(key, c);
+    (side === 'L' ? el.fanL : el.fanR).appendChild(c); c.style.transform = FLATL; c.style.zIndex = '1'; c.style.willChange = 'transform'; c.getBoundingClientRect();
+    preCards.push(c);     // will-change puts the card on its own layer, so it is drawn while it is still hidden behind the page instead of at the moment it slides out
   }
-  await imagesReady($('leaf-f'), $('leaf-b'), landing, ...(nearBox ? [nearBox] : []), ...(slideCard ? [slideCard] : []), ...(preCard ? [preCard] : []));
+  await imagesReady($('leaf-f'), $('leaf-b'), landing, ...(nearBox ? [nearBox] : []), ...(slideCard ? [slideCard] : []), ...preCards);
   // The leaf goes up FIRST, exactly over the page it is made of, and gets two frames to be painted; only then is the page underneath swapped. On Metal compositors (Safari
   // AND Chrome on a Mac) a layer that appears in the same frame as the swap can show up blank for one frame: white pages / rectangles at the start of a turn.
   if (guard) { leaf.style.display = 'block'; setLeaf(0, fwd); await settleFrames(); }
@@ -1277,6 +1290,7 @@ async function flip(dir, ms) {
   if (guard) await settleFrames();            // the pages that just changed are painted while the leaf / the slid card still cover them; only then is that cover taken away
   if (slidePage) slideCard.remove();
   leaf.style.display = 'none'; $('pr-flip').style.background = $('pl-flip').style.background = '';
+  preCards.forEach(c => { c.style.willChange = ''; });        // the extra layers are only needed while the card moves
   S.busy = false; refreshUI(); prefetchAround();
   return true;
 }
