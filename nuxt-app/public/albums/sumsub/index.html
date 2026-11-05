@@ -2492,6 +2492,20 @@ function diagInit() {
     window.dispatchEvent(new MouseEvent('mousemove', { clientX: innerWidth / 2, clientY: innerHeight / 2 }));
     off.clear(); keep.forEach(k => off.add(k)); apply(); this.disabled = false; stateEl.textContent += ' · замер готов';
   };
+  // WHERE in a page turn the late frames (> 33 ms) fall: prep = call -> the leaf starts to move (building, decoding, the painted-frames guard), fly = the leaf in the air,
+  // land = the swap at the end up to the end of the call, after = the 260 ms after it
+  const phaseOf = (fr, wins) => {
+    const c = { prep: 0, fly: 0, land: 0, after: 0 };
+    for (const [now, dt] of fr) {
+      if (dt <= 33.5) continue;
+      for (const [t0, tl, t1] of wins) {
+        const k = now >= t0 && now < tl ? 'prep' : now >= tl && now < tl + ST.flipMs ? 'fly' : now >= tl + ST.flipMs && now <= t1 ? 'land' : now > t1 && now <= t1 + 260 ? 'after' : null;
+        if (k) { c[k]++; break; }
+      }
+    }
+    return c;
+  };
+  const phaseTxt = c => `подг ${c.prep} · полёт ${c.fly} · посадка ${c.land} · после ${c.after}`;
   // page turns: 4 turns per setting (2 forward, 2 back) with the pointer circling meanwhile; frame times over the whole run + the delay from the call to the first frame of the leaf
   const frows = [];
   box.querySelector('#d-flip').onclick = async function () {
@@ -2504,12 +2518,12 @@ function diagInit() {
     for (const [name, keys] of plan) {
       off.clear(); keys.forEach(k => off.add(k)); apply(); stateEl.textContent = 'листаю: ' + name;
       openAtInstant(3); await wait(600);
-      const dts = [], lat = []; let last = performance.now(), run = true;
-      (function f() { const now = performance.now(); dts.push(now - last); last = now; if (run) requestAnimationFrame(f); })();
-      for (const dir of [1, 1, -1, -1]) { firstLeaf = 0; const t0 = performance.now(); await flip(dir); lat.push(firstLeaf ? firstLeaf - t0 : 0); await wait(250); }
+      const dts = [], lat = [], fr = [], wins = []; let last = performance.now(), run = true;
+      (function f() { const now = performance.now(); dts.push(now - last); fr.push([now, now - last]); last = now; if (run) requestAnimationFrame(f); })();
+      for (const dir of [1, 1, -1, -1]) { firstLeaf = 0; const t0 = performance.now(); await flip(dir); const t1 = performance.now(); lat.push(firstLeaf ? firstLeaf - t0 : 0); wins.push([t0, firstLeaf || t0, t1]); await wait(250); }
       run = false; const s = stat(dts.slice(4)), avg = lat.reduce((a, b) => a + b, 0) / lat.length;
-      frows.push(`${name.padEnd(22)} ${s.fps.toFixed(0).padStart(3)} fps  p95 ${s.p95.toFixed(0).padStart(3)}  max ${s.max.toFixed(0).padStart(3)} мс  >33мс: ${String(s.slow).padStart(2)}  старт ${avg.toFixed(0)}/${Math.max(...lat).toFixed(0)} мс`);
-      out2.textContent = 'ЛИСТАНИЕ\n' + frows.join('\n');
+      frows.push(`${name.padEnd(22)} ${s.fps.toFixed(0).padStart(3)} fps  p95 ${s.p95.toFixed(0).padStart(3)}  max ${s.max.toFixed(0).padStart(3)} мс  >33мс: ${String(s.slow).padStart(2)}  старт ${avg.toFixed(0)}/${Math.max(...lat).toFixed(0)} мс\n${' '.repeat(23)}└ ${phaseTxt(phaseOf(fr.slice(4), wins))}`);
+      out2.textContent = 'ЛИСТАНИЕ (под каждой строкой: где случились кадры >33 мс)\n' + frows.join('\n');
     }
     circ = false; window.setLeaf = origLeaf; openAtInstant(1);
     off.clear(); keep.forEach(k => off.add(k)); apply(); this.disabled = false; stateEl.textContent += ' · листание готово';
@@ -2530,7 +2544,7 @@ function diagInit() {
     for (let cyc = 0; cyc < 2; cyc++) for (const dir of [1, -1]) for (let i = 0; i < S.total - 1; i++) {
       stateEl.textContent = `долгое листание: поворот ${turns.length + 1}`;
       const t0 = performance.now(); firstLeaf = 0; await flip(dir); const t1 = performance.now();
-      turns.push({ dts: frames.filter(f => f[0] >= t0 && f[0] <= t1).map(f => f[1]), lat: firstLeaf ? firstLeaf - t0 : 0, nodes: document.getElementsByTagName('*').length, heap: mem() });
+      turns.push({ dts: frames.filter(f => f[0] >= t0 && f[0] <= t1).map(f => f[1]), win: [t0, firstLeaf || t0, t1], lat: firstLeaf ? firstLeaf - t0 : 0, nodes: document.getElementsByTagName('*').length, heap: mem() });
       await wait(250);
     }
     run = false; circ = false; window.setLeaf = origLeaf; openAtInstant(1);
@@ -2539,7 +2553,7 @@ function diagInit() {
       const seg = turns.slice(b, b + B), dts = seg.flatMap(t => t.dts.slice(2)); if (dts.length < 5) continue;
       const s = stat(dts), lat = seg.reduce((a, t) => a + t.lat, 0) / seg.length, e = seg[seg.length - 1];
       blocks.push({ s, lat });
-      lrows.push(`повороты ${String(b + 1).padStart(2)}–${String(b + seg.length).padStart(2)}  ${s.fps.toFixed(0).padStart(3)} fps  p95 ${s.p95.toFixed(0).padStart(3)}  max ${s.max.toFixed(0).padStart(3)} мс  >33мс: ${String(s.slow).padStart(2)}  старт ${lat.toFixed(0)} мс  узлов ${e.nodes}${e.heap ? '  куча ' + e.heap.toFixed(1) + ' МБ' : ''}`);
+      lrows.push(`повороты ${String(b + 1).padStart(2)}–${String(b + seg.length).padStart(2)}  ${s.fps.toFixed(0).padStart(3)} fps  p95 ${s.p95.toFixed(0).padStart(3)}  max ${s.max.toFixed(0).padStart(3)} мс  >33мс: ${String(s.slow).padStart(2)}  старт ${lat.toFixed(0)} мс  узлов ${e.nodes}${e.heap ? '  куча ' + e.heap.toFixed(1) + ' МБ' : ''}\n${' '.repeat(18)}└ кадры >33 мс: ${phaseTxt(phaseOf(frames, seg.map(t => t.win)))}`);
     }
     if (blocks.length > 1) {
       const a = blocks[0], z = blocks[blocks.length - 1];
