@@ -115,6 +115,20 @@ gallery:
         height: 1440
         player: bare
         note: "Side projects in ads"
+  # The interactive photo album of the brand team, right before the Team block.
+  # `src` is the 3D book (desktop), `flatSrc` the pre-rendered pictures phones and
+  # weak devices get instead, `poster` the still shown while it loads and kept if it
+  # never does (see AlbumEmbed.vue). Bump ?v= whenever public/albums/sumsub changes.
+  - type: wide
+    item:
+      type: embed
+      src: "/albums/sumsub/index.html?embed=1&v=16"
+      flatSrc: "/albums/sumsub/flat/index.html?v=16"
+      width: 2160
+      height: 1440
+      poster: /assets/inhouse/sumsub/sumsub-album-poster.webp
+      title: "Interactive photo album: the design and brand team"
+      note: "Design and brand team 2021–2025"
   # Team sits before photo 16 for now--move the block to reposition it.
   - type: text
     label: "Team"
