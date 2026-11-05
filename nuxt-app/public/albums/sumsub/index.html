@@ -1340,7 +1340,9 @@ requestAnimationFrame(function loop(t) {
 });
 // only compositor-friendly properties change per frame (transform / opacity); gradients are static, so big photos are never re-rasterised while the mouse moves
 const lt = { g: '', p: '', d: '', pv: '', dT: 0, dTimer: 0, L: -1 };
+let LIGHT_JS = true;                                     // ?diag=1 can switch the whole pointer-driven light off (cover glare, page shade, sticker highlight) to compare
 function updateLight() {
+  if (!LIGHT_JS) return;
   const L = ST.light / 100;
   const g = [sp.mx.toFixed(3), sp.my.toFixed(3), ST.gloss, ST.glossSize, L].join();
   if (g !== lt.g) {
@@ -2434,6 +2436,7 @@ function diagInit() {
     ['clip',    'обрезка углов (clip-path, overflow)', '.cover-face { clip-path: none !important; } .card, #leaf .face, .inset { overflow: visible !important; }'],
     ['shadow',  'тень толщины стопки (box-shadow)', '.card, #leaf .face { box-shadow: none !important; }'],
     ['gloss',   'блик на обложке', '#gloss-blob, .cover-gloss { display: none !important; }'],
+    ['mlight',  'ВЕСЬ свет от курсора: блик + тень страниц + стикеры (тени корешка остаются)', '.item .dyn, .cm, #pl-mouse, #pr-mouse, #gloss-blob, .cover-gloss { display: none !important; }'],
     ['will',    'will-change', '* { will-change: auto !important; }'],
     ['outline', 'outline-хак антиалиаса', '* { outline: none !important; }'],
     ['guard',   'ожидание 2 кадров при листании (JS)', null],
@@ -2446,14 +2449,14 @@ function diagInit() {
   box.style.cssText = 'position:fixed;left:8px;top:8px;z-index:99999;width:300px;max-height:calc(100vh - 16px);overflow:auto;padding:10px 12px;border-radius:10px;background:rgba(15,17,24,.9);color:#e8eaf0;font:12px/1.35 -apple-system,system-ui,sans-serif;user-select:text;-webkit-user-select:text;box-shadow:0 6px 24px rgba(0,0,0,.4)';
   box.innerHTML = '<div style="display:flex;justify-content:space-between;font-weight:600;margin-bottom:6px"><span>Диагностика (галочка = ВЫКЛ)</span><span id="d-fps">…</span></div>'
     + FX.map(f => `<label style="display:flex;gap:6px;align-items:flex-start;margin:2px 0;cursor:pointer"><input type="checkbox" data-k="${f[0]}" style="margin-top:2px">${f[1]}</label>`).join('')
-    + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"><button id="d-auto">Авто-замер мыши (~1 мин)</button><button id="d-flip">Авто-листание (~1 мин)</button><button id="d-long">Долгое листание (~1,5 мин)</button><button id="d-all">Выкл всё</button><button id="d-none">Сброс</button><button id="d-copy">Копировать отчёт</button></div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px"><button id="d-auto">Авто-замер мыши (~1 мин)</button><button id="d-flip">Авто-листание (~1,5 мин)</button><button id="d-long">Долгое листание (~1,5 мин)</button><button id="d-all">Выкл всё</button><button id="d-none">Сброс</button><button id="d-copy">Копировать отчёт</button></div>'
     + '<div id="d-state" style="opacity:.75;margin:2px 0"></div><pre id="d-out" style="white-space:pre-wrap;margin:4px 0 0;font:11px/1.4 ui-monospace,Menlo,monospace"></pre><pre id="d-out2" style="white-space:pre-wrap;margin:4px 0 0;font:11px/1.4 ui-monospace,Menlo,monospace"></pre><pre id="d-out3" style="white-space:pre-wrap;margin:4px 0 0;font:11px/1.4 ui-monospace,Menlo,monospace"></pre>';
   document.body.appendChild(box);
   box.querySelectorAll('button').forEach(b => b.style.cssText = 'font:12px -apple-system,system-ui,sans-serif;padding:4px 8px;border-radius:6px;border:0;background:#3a4156;color:#fff;cursor:pointer');
   const out = box.querySelector('#d-out'), stateEl = box.querySelector('#d-state');
   function apply() {
     style.textContent = FX.filter(f => f[2] && off.has(f[0])).map(f => f[2]).join('\n');
-    ST.fanMax = off.has('fan') ? 0 : saved.fanMax; ST.tiltMax = off.has('tilt') ? 0 : saved.tiltMax; FLIP_GUARD = !off.has('guard');
+    ST.fanMax = off.has('fan') ? 0 : saved.fanMax; ST.tiltMax = off.has('tilt') ? 0 : saved.tiltMax; FLIP_GUARD = !off.has('guard'); LIGHT_JS = !off.has('mlight');
     if (S.pose === 'open') updateFan(); applyZoom();
     box.querySelectorAll('input[data-k]').forEach(i => { i.checked = off.has(i.dataset.k); });
     stateEl.textContent = 'выключено: ' + (off.size ? [...off].join(', ') : 'ничего');
@@ -2493,7 +2496,7 @@ function diagInit() {
   const frows = [];
   box.querySelector('#d-flip').onclick = async function () {
     if (this.disabled) return; this.disabled = true; frows.length = 0; const out2 = box.querySelector('#d-out2');
-    const keep = new Set(off), flipKeys = ['guard', 'stkfx', 'grade', 'blend', 'blur', 'clip', 'shadow', 'will', 'outline', 'fan'];
+    const keep = new Set(off), flipKeys = ['mlight', 'dyn', 'cm', 'gloss', 'tilt', 'guard', 'stkfx', 'grade', 'blend', 'blur', 'clip', 'shadow', 'will', 'outline', 'fan'];
     const plan = [['всё включено', []]]; flipKeys.forEach(k => plan.push(['выкл: ' + k, [k]])); plan.push(['всё выключено', FX.map(f => f[0]).filter(k => k !== 'tilt')]); plan.push(['всё включено (повтор)', []]);
     let circ = true, ang = 0;
     (function f() { if (!circ) return; ang += .05; const w = innerWidth, h = innerHeight, r = Math.min(w, h) * .3; window.dispatchEvent(new MouseEvent('mousemove', { clientX: w / 2 + Math.cos(ang) * r, clientY: h / 2 + Math.sin(ang) * r * .8 })); requestAnimationFrame(f); })();
