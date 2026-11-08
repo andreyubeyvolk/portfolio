@@ -3,6 +3,7 @@ slug: nimax
 section: brands
 title: Nimax
 description: Nimax visual identity by Andrey Ubeyvolk—a five-year-old dark, premium system refreshed into something lighter and more technological.
+pinDescription: "Nimax—visual identity refresh by art director Andrey Ubeyvolk. A five-year-old dark premium system for a St. Petersburg digital agency, reworked into something lighter and more technological. Branding, logo, brand system, visual identity inspiration."
 cover:
   type: image
   src: /assets/brands/nimax/nimax-cover.webp

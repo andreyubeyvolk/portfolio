@@ -3,6 +3,7 @@ slug: stickerburg
 section: brands
 title: Stickerburg
 description: Stickerburg visual identity by Andrey Ubeyvolk—a fictional underground Petersburg built around a fortress-and-cathedral seal mark.
+pinDescription: "Stickerburg—visual identity by art director Andrey Ubeyvolk. A fictional underground Saint Petersburg with a fortress-and-cathedral seal, made for a sticker printing brand. Branding, seal, sticker design, visual identity inspiration."
 cover:
   type: image
   src: /assets/brands/stickerburg/stickerburg-cover.webp

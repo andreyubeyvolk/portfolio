@@ -3,6 +3,7 @@ slug: ovo
 section: brands
 title: OVO Bureau
 description: OVO Bureau visual identity by Andrey Ubeyvolk—an architectural identity built from rulers, translating the studio's obsessive depth into form.
+pinDescription: "OVO Bureau—architectural visual identity by art director Andrey Ubeyvolk. A scalable brand system built from rulers for a full-cycle architecture and design studio. Branding, logo, architecture, visual identity inspiration."
 cover:
   type: image
   src: /assets/brands/ovo/ovo-cover.webp
