@@ -3,6 +3,7 @@ slug: crypto
 section: inhouse
 title: Crypto identity
 description: Crypto identity by Andrey Ubeyvolk—a visual system built around a single radiating point—an expert center, and the people within it.
+pinDescription: "Crypto identity—visual system by art director Andrey Ubeyvolk for Sumsub, a leader in KYC/KYT/AML. A beam and a burst radiating from a single point, an expert center and the people within it, built around benchmark identity verification for crypto. Branding, key visual, crypto, visual identity inspiration."
 cover:
   type: image
   src: /assets/inhouse/crypto/crypto-cover.webp

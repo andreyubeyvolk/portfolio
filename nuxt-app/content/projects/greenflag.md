@@ -3,6 +3,7 @@ slug: greenflag
 section: inhouse
 title: Welcome to Greenflag
 description: Welcome to Greenflag visual identity by Andrey Ubeyvolk—a cinematic, human-first identity for people shut out by technology.
+pinDescription: "Welcome to Greenflag—campaign visual identity by art director Andrey Ubeyvolk for Sumsub, a leader in KYC/KYT/AML. A cinematic, human-first identity for a fictional nation of people excluded by technology. Branding, campaign, storytelling, visual identity inspiration."
 cover:
   type: image
   src: /assets/inhouse/greenflag/greenflag-cover.webp

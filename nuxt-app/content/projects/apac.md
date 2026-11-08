@@ -3,6 +3,7 @@ slug: apac
 section: inhouse
 title: Digital Identity 3.0 in APAC
 description: Digital Identity 3.0 in APAC visual identity by Andrey Ubeyvolk—overlapping coins symbolizing money platforms merging with Web3, in an AI-driven world.
+pinDescription: "Digital Identity 3.0 in APAC—event visual identity by art director Andrey Ubeyvolk for Sumsub, a leader in KYC/KYT/AML. Overlapping coins for money platforms merging with Web3 in an AI-driven world, made for Sumsub Multiverse in Singapore. Branding, key visual, fintech, visual identity inspiration."
 cover:
   type: image
   src: /assets/inhouse/apac/apac-cover.webp

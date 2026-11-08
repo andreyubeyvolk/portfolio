@@ -3,6 +3,7 @@ slug: igaming
 section: inhouse
 title: iGaming system
 description: Sumsub iGaming visual identity by Andrey Ubeyvolk—trust and compliance combined with the energy, speed, and culture of modern gaming.
+pinDescription: "Sumsub iGaming—visual identity by art director Andrey Ubeyvolk. A bold visual language for iGaming from Sumsub, a leader in KYC/KYT/AML, combining trust and compliance with the energy, speed and culture of modern gaming. Branding, iGaming, fintech, visual identity inspiration."
 cover:
   type: image
   src: /assets/inhouse/igaming/igaming-cover.webp

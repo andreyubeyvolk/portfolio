@@ -3,6 +3,7 @@ slug: finance
 section: inhouse
 title: The Future of Finance
 description: The Future of Finance visual identity by Andrey Ubeyvolk—finance as an unnamed cybernetic mechanism, technical and precise, not yet fully legible.
+pinDescription: "The Future of Finance—event visual identity by art director Andrey Ubeyvolk for Sumsub, a leader in KYC/KYT/AML. Finance imagined as an unnamed cybernetic mechanism, technical and precise, not yet fully legible. Branding, key visual, fintech, visual identity inspiration."
 cover:
   type: image
   src: /assets/inhouse/finance/finance-01.webp
