@@ -3,6 +3,7 @@ slug: valera
 section: brands
 title: Valera the era
 description: Valera the era visual identity by Andrey Ubeyvolk—a flexible system built on film, music, and the screen, with a magazine-style brand book.
+pinDescription: "Valera the era—visual identity by art director Andrey Ubeyvolk. A flexible personal brand system built on film, music and the screen for a DJ and musician, with a magazine-style brand book. Branding, brand book, editorial, visual identity inspiration."
 cover:
   type: video
   src: /assets/brands/valera/valera-cover.mp4
