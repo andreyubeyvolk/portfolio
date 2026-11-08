@@ -74,6 +74,7 @@ const { isActive, show } = useSprayReveal(paintImg)
           :title="project.title"
           :card-preview="project.cardPreview"
           :coming-soon="project.comingSoon"
+          :pin-description="project.pinDescription"
         />
       </article>
     </ScrollPane>

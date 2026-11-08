@@ -22,6 +22,8 @@ const props = defineProps<{
   title: string
   cardPreview?: CardPreviewItem[]
   comingSoon?: boolean
+  // Pinterest's Save-button description for the card images (see content.config.ts)
+  pinDescription?: string
 }>()
 
 const cardRef = useTemplateRef('cardRef')
@@ -134,6 +136,7 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
         height="1440"
         :src="`/assets/${section}/${slug}/${slug}-card.webp`"
         :alt="title"
+        :data-pin-description="pinDescription"
       />
       <div class="inhouse-card__noise" aria-hidden="true"></div>
       <div class="inhouse-card__coming-soon-label" aria-hidden="true">
@@ -161,6 +164,7 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
         height="1440"
         :src="`/assets/${section}/${slug}/${slug}-card.webp`"
         :alt="title"
+        :data-pin-description="pinDescription"
       />
       <div class="inhouse-card__noise" aria-hidden="true"></div>
       <img
@@ -172,6 +176,7 @@ const activePreview = computed(() => (props.cardPreview && activeIndex.value !==
         :src="(activePreview ?? cardPreview[0]).src"
         alt=""
         aria-hidden="true"
+        :data-pin-description="pinDescription"
       />
     </div>
     <span class="inhouse-title">{{ title }}</span>

@@ -25,7 +25,12 @@ const props = defineProps<{
   solution: string
   kv: { src: string, width: number, height: number, canvas?: boolean }
   zipUrl?: string
+  // Pinterest's Save-button description for every image of this project; the
+  // gallery slots and video posters pick it up through provide/inject.
+  pinDescription?: string
 }>()
+
+provide('pinDescription', props.pinDescription)
 
 const introText = computed(() => sectionIntroText(props.section))
 
@@ -116,6 +121,7 @@ const flatGallery = computed(() => {
               fetchpriority="high"
               :src="cover.src"
               :alt="title"
+              :data-pin-description="pinDescription"
             />
             <VpBare v-else :src="cover.src" :width="cover.width" :height="cover.height" />
           </figure>
@@ -194,7 +200,7 @@ const flatGallery = computed(() => {
   </div>
 
   <div class="mobile-project">
-    <img v-if="cover.type === 'image'" v-pinch-zoom :width="cover.width" :height="cover.height" fetchpriority="high" :src="cover.src" :alt="title" />
+    <img v-if="cover.type === 'image'" v-pinch-zoom :width="cover.width" :height="cover.height" fetchpriority="high" :src="cover.src" :alt="title" :data-pin-description="pinDescription" />
     <div v-else class="mobile-project__video">
       <VpBare :src="cover.src" :width="cover.width" :height="cover.height" />
     </div>
