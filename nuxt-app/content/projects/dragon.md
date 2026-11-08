@@ -3,6 +3,7 @@ slug: dragon
 section: inhouse
 title: AI Secures APAC
 description: AI Secures APAC visual identity by Andrey Ubeyvolk—a digital dragon built scale by scale from wires and glowing data, guarding against fraud.
+pinDescription: "AI Secures APAC—event visual identity by art director Andrey Ubeyvolk for Sumsub, a leader in KYC/KYT/AML. A digital dragon built from wires and glowing data, guarding against fraud, made for Sumsub Multiverse in Singapore. Branding, key visual, dragon, fintech, visual identity inspiration."
 cover:
   type: video
   src: /assets/inhouse/dragon/dragon-cover.mp4

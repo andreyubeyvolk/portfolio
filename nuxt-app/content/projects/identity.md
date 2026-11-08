@@ -3,6 +3,7 @@ slug: identity
 section: inhouse
 title: The Future of Digital Identity
 description: The Future of Digital Identity visual identity by Andrey Ubeyvolk—Sumsub Multiverse turned inward, from structure to selfhood.
+pinDescription: "The Future of Digital Identity—event visual identity by art director Andrey Ubeyvolk for Sumsub, a leader in KYC/KYT/AML. Sumsub Multiverse London 2025, turned inward from structure to selfhood. Branding, key visual, digital identity, visual identity inspiration."
 cover:
   type: image
   src: /assets/inhouse/identity/identity-01.webp

@@ -3,6 +3,7 @@ slug: sumsub
 section: inhouse
 title: Sumsub rebranding
 description: Sumsub rebranding by Andrey Ubeyvolk—a modular pixel-and-bento identity and brand team built from scratch for a global verification platform.
+pinDescription: "Sumsub rebranding—visual identity by art director Andrey Ubeyvolk. A modular pixel-and-bento system and an in-house brand team built from scratch for Sumsub, a leader in KYC/KYT/AML. Branding, brand system, rebranding, visual identity inspiration."
 cover:
   type: image
   src: /assets/inhouse/sumsub/sumsub-cover.webp
