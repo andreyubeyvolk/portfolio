@@ -49,5 +49,6 @@ useHead({
     :solution="project.solution"
     :kv="project.kv"
     :zip-url="project.zipUrl"
+    :pin-description="project.pinDescription"
   />
 </template>

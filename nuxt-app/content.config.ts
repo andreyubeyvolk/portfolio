@@ -115,6 +115,11 @@ export default defineContentConfig({
           }),
           comingSoon: z.boolean().optional(),
           zipUrl: z.string().optional(),
+          // Pinterest's Save-button description (img data-pin-description) for
+          // every image of the project: name + "by art director Andrey
+          // Ubeyvolk" + what it is + keywords. Pinterest otherwise falls back
+          // to alt or the site-wide OG data.
+          pinDescription: z.string().optional(),
           // Listing-card hover preview (ProjectCard.vue): up to 4 gallery
           // photos that cycle in as the cursor (or a touch drag) crosses
           // the card left-to-right. Optional--only iGaming has this for

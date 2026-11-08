@@ -446,6 +446,9 @@ onBeforeUnmount(() => {
   clearTimeout(hideTimer)
   intersectionObserver?.disconnect()
 })
+
+// Pinterest's Save-button description for this project's images (set by ProjectPage).
+const pinDescription = inject<string | undefined>('pinDescription', undefined)
 </script>
 
 <template>
@@ -458,7 +461,7 @@ onBeforeUnmount(() => {
   >
     <picture class="vp__poster">
       <source v-if="posterMobile" media="(max-width: 640px)" :srcset="posterMobile" />
-      <img :src="posterSrc" alt="" aria-hidden="true" decoding="async" />
+      <img :src="posterSrc" alt="" aria-hidden="true" decoding="async" :data-pin-description="pinDescription" />
     </picture>
     <video ref="video" class="vp__video" playsinline muted loop preload="metadata" :autoplay="isImmediateAutoplay">
       <source v-if="srcMobile" :src="srcMobile" media="(max-width: 640px)" />

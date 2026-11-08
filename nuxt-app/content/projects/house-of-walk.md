@@ -3,6 +3,7 @@ slug: house-of-walk
 section: brands
 title: House of Walk
 description: House of Walk by Andrey Ubeyvolk—a personal visual archive of photographs, travels, and memories, built from idea to launch using Claude Code.
+pinDescription: "House of Walk—personal photo archive by art director Andrey Ubeyvolk. Editorial travel photography, minimal web design, visual identity inspiration."
 cover:
   type: image
   src: /assets/brands/house-of-walk/house-of-walk-cover.webp

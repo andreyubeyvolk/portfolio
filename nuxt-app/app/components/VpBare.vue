@@ -147,10 +147,13 @@ onBeforeUnmount(() => {
   clearInterval(watchdog)
   stopFrameWatch()
 })
+
+// Pinterest's Save-button description for this project's images (set by ProjectPage).
+const pinDescription = inject<string | undefined>('pinDescription', undefined)
 </script>
 
 <template>
-  <img class="vp-bare__poster" :src="poster" :width="width" :height="height" alt="" aria-hidden="true" decoding="async" />
+  <img class="vp-bare__poster" :src="poster" :width="width" :height="height" alt="" aria-hidden="true" decoding="async" :data-pin-description="pinDescription" />
   <video
     ref="video"
     class="vp-bare"

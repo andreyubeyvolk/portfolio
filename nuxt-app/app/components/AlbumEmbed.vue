@@ -204,11 +204,14 @@ onBeforeUnmount(() => {
   resizeObserver?.disconnect()
   intersectionObserver?.disconnect()
 })
+
+// Pinterest's Save-button description for this project's images (set by ProjectPage).
+const pinDescription = inject<string | undefined>('pinDescription', undefined)
 </script>
 
 <template>
   <div ref="root" class="album-embed" :class="{ 'is-ready': ready }" @mouseenter="onHover(true)" @mouseleave="onHover(false)">
-    <img v-if="poster" class="album-embed__poster" :src="poster" :alt="title || ''" width="2160" height="1440" loading="lazy" />
+    <img v-if="poster" class="album-embed__poster" :src="poster" :alt="title || ''" width="2160" height="1440" loading="lazy" :data-pin-description="pinDescription" />
     <iframe
       v-if="frameSrc"
       :key="mode || ''"
