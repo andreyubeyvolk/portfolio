@@ -340,6 +340,9 @@ window.initGraffiti = function initGraffiti() {
   // for a softness difference that's hard to see in a loose,
   // textured spray effect anyway.
   var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  // false until resize() has sized the fixed canvas once (a fresh canvas is
+  // 300x150 of nothing: no point copying that aside, see resize)
+  var fixedSized = false;
   // The min-width:981px check at the top of this script only ever
   // runs once, at load—if the page loaded wide enough for the
   // feature to initialize and the window is later narrowed below
@@ -360,12 +363,38 @@ window.initGraffiti = function initGraffiti() {
       return;
     }
     canvas.style.display = '';
-    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    // Reassigning width/height below wipes the fixed canvas (see the note
+    // further down). Its paint is anchored to the viewport and has no
+    // off-screen store the way the pane's does, so it is copied aside here
+    // and put back afterwards, 1:1 in device pixels--as long as the pixel
+    // density is unchanged (a zoom change re-rasters at a new density, and
+    // the old pixels would come back at the wrong scale: that case stays a
+    // wipe, as before). Until now every window resize, and every lazy image
+    // loading further down the gallery (the ResizeObserver below), erased
+    // whatever was sprayed over the sidebar. It also keeps the paint in place
+    // when the browser shrinks the viewport for its own "sharing this tab"
+    // bar while GraffitiSaveButton.vue captures the screenshot.
+    var nextDpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    var keep = null;
+    if (fixedSized && nextDpr === dpr && canvas.width > 0 && canvas.height > 0) {
+      keep = document.createElement('canvas');
+      keep.width = canvas.width;
+      keep.height = canvas.height;
+      keep.getContext('2d').drawImage(canvas, 0, 0);
+    }
+    dpr = nextDpr;
     canvas.width = Math.round(window.innerWidth * dpr);
     canvas.height = Math.round(window.innerHeight * dpr);
     canvas.style.width = window.innerWidth + 'px';
     canvas.style.height = window.innerHeight + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (keep) {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(keep, 0, 0);
+      ctx.restore();
+    }
+    fixedSized = true;
 
     paneView.style.display = '';
     filmstripView.style.display = '';
@@ -623,9 +652,20 @@ window.initGraffiti = function initGraffiti() {
   // are fully hidden, then they reappear already blank.
   var CLEAR_EFFECT = window.GRAFFITI_CLEAR_EFFECT === 'wipe' ? 'wipe' : 'fade';
   var clearing = false;
+  // Whether there is any paint on the page right now--announced to the rest of
+  // the site as a 'graffiti-ink' window event (detail.on true/false) so that
+  // e.g. the "Save screenshot" button (GraffitiSaveButton.vue) can show itself
+  // the moment a first dot lands and go away the moment the tag is wiped.
+  var hasInk = false;
+  function setInk(on) {
+    if (hasInk === on) return;
+    hasInk = on;
+    window.dispatchEvent(new CustomEvent('graffiti-ink', { detail: { on: on } }));
+  }
   function clearAll() {
     if (clearing) return;
     clearing = true;
+    setInk(false);
     // Whatever nav link/button happened to end up focused during the
     // stroke that triggered this (mousedown/mouseup landing on it while
     // the canvas's own pointer-events:none lets clicks fall through)
@@ -643,6 +683,7 @@ window.initGraffiti = function initGraffiti() {
       blitPane();
       blitFilmstrip();
       clearing = false;
+      setInk(false);
     };
     if (CLEAR_EFFECT === 'wipe') {
       wipeAway(visible, finish);
@@ -758,7 +799,7 @@ window.initGraffiti = function initGraffiti() {
   // today's black/gray. null means "use the tone value as a literal
   // gray" (unchanged default path); a color object means "blend the
   // tone value as a lightening amount on top of this hue instead."
-  var COLOR_PINK = { r: 0xFF, g: 0x16, b: 0xA2, key: 'pink' };
+  var COLOR_PINK = { r: 0xED, g: 0x10, b: 0x70, key: 'pink' };
   var COLOR_SILVER = { r: 0xC9, g: 0xC9, b: 0xC9, key: 'silver' };
   var strokeColor = null;
 
@@ -896,6 +937,7 @@ window.initGraffiti = function initGraffiti() {
       var flocalY = y - filmstripRect.top;
       paintDot(fctx, flocalX, flocalY, 0, alpha);
       paintDot(fvctx, x - filmstripRect.left, y - filmstripRect.top, 0, alpha);
+      setInk(true);
       return;
     }
     // Membership on the pane is horizontal only (left edge, and
@@ -931,6 +973,7 @@ window.initGraffiti = function initGraffiti() {
       if (y >= paneRect.top && y <= paneRect.bottom) {
         paintDot(pvctx, x - paneRect.left, y - paneRect.top + lift, g, a);
       }
+      setInk(true);
     } else if (!(cardRect && x >= cardRect.left && x <= cardRect.right + 10 && y >= cardRect.top && y <= cardRect.bottom + CARD_BOTTOM_MARGIN)) {
       // Outside the pane horizontally (sidebar, or past the
       // scrollbar gutter) and outside the section's footprint
@@ -953,6 +996,7 @@ window.initGraffiti = function initGraffiti() {
       // entirely and leaked through right at the corner where
       // both were needed at once.)
       paintDot(ctx, x, y, 0, alpha);
+      setInk(true);
     }
   }
 
@@ -1211,6 +1255,7 @@ window.initGraffiti = function initGraffiti() {
     window.removeEventListener('click', onClick, true);
     if (resizeObserver) resizeObserver.disconnect();
     document.body.classList.remove('graffiti-mode');
+    setInk(false);
     if (window.clearGraffiti === clearAll) delete window.clearGraffiti;
     canvas.remove();
     paneView.remove();

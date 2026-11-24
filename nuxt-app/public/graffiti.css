@@ -87,6 +87,10 @@
 .graffiti-cursor.is-active {
   opacity: 1;
 }
+/* Out of the picture while GraffitiSaveButton.vue takes the screenshot. */
+body.graffiti-capturing .graffiti-cursor {
+  opacity: 0;
+}
 /* Position (translate, every frame, no transition) lives on
    .graffiti-cursor itself; the lean lives on this inner wrapper
    instead, with its own transition—so the tilt eases in/out smoothly

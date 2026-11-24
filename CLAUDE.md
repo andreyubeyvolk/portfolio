@@ -25,7 +25,9 @@ assuming a push didn't land.
 app/pages/          index, about, archive, all-projects, inhouse|brands/{index,[slug]}
 app/components/     ProjectPage (the one project template), GallerySlot, Vp (full video
                     player), VpBare (silent loop), ProjectCard/ProjectGrid, ArchivePreview
-                    (desktop lightbox), ArchiveCardOverlay (tablet/phone), SiteNav, MobileNav…
+                    (desktop lightbox), ArchiveCardOverlay (tablet/phone), SiteNav, MobileNav,
+                    GraffitiSaveButton (PNG of the tab via getDisplayMedia while there is spray
+                    paint; graffiti.js fires the 'graffiti-ink' window event)…
 app/error.vue       branded 404 (crossed-out frame) inside the default layout
 app/utils/          projectOrder.ts (Next-project order), videoPoster.ts, archive helpers
 app/plugins/        analytics (GA, real domain only), graffiti, legacy nav scripts, page transitions
