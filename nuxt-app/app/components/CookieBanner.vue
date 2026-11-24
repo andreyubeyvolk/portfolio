@@ -61,10 +61,10 @@ const bannerStyle = computed(() => {
 
 onMounted(() => {
   read()
-  // TEMP: shown in every region while the user reviews the banner's
-  // design live--restore `shouldShow.value = regionRequiresConsent()`
-  // before this ships for real.
-  shouldShow.value = true
+  // Only where the prompt is legally required (EU/EEA/UK/CH by the
+  // browser's timezone, see regionRequiresConsent); elsewhere analytics
+  // loads without a prompt (plugins/analytics.client.ts).
+  shouldShow.value = regionRequiresConsent()
   measure()
   window.addEventListener('resize', measure)
 })
