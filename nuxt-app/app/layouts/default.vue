@@ -21,5 +21,4 @@
        client's post-hydration render has the full mobile markup. -->
   <MobileNav />
   <CookieBanner />
-  <GraffitiSaveButton />
 </template>

@@ -1,7 +1,7 @@
 // ── Spray-can graffiti. Desktop: hold Ctrl (or Cmd on Mac)—cursor swaps
 // to a black spray-can icon. Hold it + drag with the left mouse button:
-// paints a spray-style stroke—add Shift for red (#EB1026) or Alt for
-// green (#11E3B0), held for the whole stroke; plain Ctrl+drag stays the
+// paints a spray-style stroke—add Shift for pink (#ED1070) or Alt for
+// silver (#C9C9C9), held for the whole stroke; plain Ctrl+drag stays the
 // default black/gray. Release Ctrl/Cmd: painting stops, but the tag
 // itself stays put—nothing fades or clears on its own. To wipe it,
 // press Backspace, Delete, Space, or Escape (while not typing in a text
@@ -371,9 +371,7 @@ window.initGraffiti = function initGraffiti() {
     // the old pixels would come back at the wrong scale: that case stays a
     // wipe, as before). Until now every window resize, and every lazy image
     // loading further down the gallery (the ResizeObserver below), erased
-    // whatever was sprayed over the sidebar. It also keeps the paint in place
-    // when the browser shrinks the viewport for its own "sharing this tab"
-    // bar while GraffitiSaveButton.vue captures the screenshot.
+    // whatever was sprayed over the sidebar.
     var nextDpr = Math.min(window.devicePixelRatio || 1, 1.5);
     var keep = null;
     if (fixedSized && nextDpr === dpr && canvas.width > 0 && canvas.height > 0) {
@@ -652,20 +650,9 @@ window.initGraffiti = function initGraffiti() {
   // are fully hidden, then they reappear already blank.
   var CLEAR_EFFECT = window.GRAFFITI_CLEAR_EFFECT === 'wipe' ? 'wipe' : 'fade';
   var clearing = false;
-  // Whether there is any paint on the page right now--announced to the rest of
-  // the site as a 'graffiti-ink' window event (detail.on true/false) so that
-  // e.g. the "Save screenshot" button (GraffitiSaveButton.vue) can show itself
-  // the moment a first dot lands and go away the moment the tag is wiped.
-  var hasInk = false;
-  function setInk(on) {
-    if (hasInk === on) return;
-    hasInk = on;
-    window.dispatchEvent(new CustomEvent('graffiti-ink', { detail: { on: on } }));
-  }
   function clearAll() {
     if (clearing) return;
     clearing = true;
-    setInk(false);
     // Whatever nav link/button happened to end up focused during the
     // stroke that triggered this (mousedown/mouseup landing on it while
     // the canvas's own pointer-events:none lets clicks fall through)
@@ -683,7 +670,6 @@ window.initGraffiti = function initGraffiti() {
       blitPane();
       blitFilmstrip();
       clearing = false;
-      setInk(false);
     };
     if (CLEAR_EFFECT === 'wipe') {
       wipeAway(visible, finish);
@@ -795,7 +781,7 @@ window.initGraffiti = function initGraffiti() {
 
   // Color modifiers, captured once at stroke-start and held for the
   // whole stroke (same as "Ctrl held = graffiti mode" already is)—
-  // Ctrl+Shift+drag = red, Ctrl+Alt+drag = green, plain Ctrl+drag =
+  // Ctrl+Shift+drag = pink, Ctrl+Alt+drag = silver, plain Ctrl+drag =
   // today's black/gray. null means "use the tone value as a literal
   // gray" (unchanged default path); a color object means "blend the
   // tone value as a lightening amount on top of this hue instead."
@@ -937,7 +923,6 @@ window.initGraffiti = function initGraffiti() {
       var flocalY = y - filmstripRect.top;
       paintDot(fctx, flocalX, flocalY, 0, alpha);
       paintDot(fvctx, x - filmstripRect.left, y - filmstripRect.top, 0, alpha);
-      setInk(true);
       return;
     }
     // Membership on the pane is horizontal only (left edge, and
@@ -973,7 +958,6 @@ window.initGraffiti = function initGraffiti() {
       if (y >= paneRect.top && y <= paneRect.bottom) {
         paintDot(pvctx, x - paneRect.left, y - paneRect.top + lift, g, a);
       }
-      setInk(true);
     } else if (!(cardRect && x >= cardRect.left && x <= cardRect.right + 10 && y >= cardRect.top && y <= cardRect.bottom + CARD_BOTTOM_MARGIN)) {
       // Outside the pane horizontally (sidebar, or past the
       // scrollbar gutter) and outside the section's footprint
@@ -996,7 +980,6 @@ window.initGraffiti = function initGraffiti() {
       // entirely and leaked through right at the corner where
       // both were needed at once.)
       paintDot(ctx, x, y, 0, alpha);
-      setInk(true);
     }
   }
 
@@ -1255,7 +1238,6 @@ window.initGraffiti = function initGraffiti() {
     window.removeEventListener('click', onClick, true);
     if (resizeObserver) resizeObserver.disconnect();
     document.body.classList.remove('graffiti-mode');
-    setInk(false);
     if (window.clearGraffiti === clearAll) delete window.clearGraffiti;
     canvas.remove();
     paneView.remove();
