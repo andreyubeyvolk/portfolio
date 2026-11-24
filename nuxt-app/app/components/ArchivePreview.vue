@@ -151,10 +151,25 @@ function syncPreviewWidth() {
   const img = previewImg.value
   const ov = overlay.value
   if (!img || !ov) return
+  // Start from the plaques' own natural width, not from whatever the
+  // property held before. fitPreviewImage measures the title/description
+  // height at the CURRENT plaque width to work out the room left for the
+  // photo--so a tiny stale value is self-perpetuating: text wrapped at
+  // ~0px is thousands of px tall, which leaves the photo no height, which
+  // makes its width 0, which is then written back as the plaque width.
+  // That lock is exactly the "letters one per line in a column at the
+  // right edge, no photo" state the lightbox could get stuck in for every
+  // card after a single bad measurement.
+  ov.style.removeProperty('--preview-width')
+  // A photo with no size (its load failed, see waitForPreviewImage) keeps
+  // the property unset too: the plaques stay at their natural width
+  // instead of matching a broken-image box.
+  if (!img.naturalWidth) return
   let lastWidth = -1
   for (let i = 0; i < 6; i++) {
     fitPreviewImage()
     const width = img.offsetWidth
+    if (!width) { ov.style.removeProperty('--preview-width'); return }
     ov.style.setProperty('--preview-width', `${width}px`)
     if (Math.abs(width - lastWidth) < 0.05) return
     lastWidth = width
@@ -176,13 +191,38 @@ async function syncPreviewSize() {
   // by the time either fires, and isStepping's own opacity fade already
   // gives the browser a real paint's worth of time to finish decoding
   // before the image is ever actually revealed.
-  if (!img.complete) {
-    await new Promise<void>((resolve) => {
-      img.addEventListener('load', () => resolve(), { once: true })
-      img.addEventListener('error', () => resolve(), { once: true })
-    })
-  }
+  await waitForPreviewImage(img)
   syncPreviewWidth()
+}
+
+// Resolves once the lightbox <img> has real dimensions--or, after one retry,
+// once it is clear it never will. A load that FAILED (the connection dropped
+// while the page sat open for a long time, a request the browser gave up on)
+// used to be treated like a success: load/error both resolved, naturalWidth
+// was 0, the sizing math in fitPreviewImage came out NaN and syncPreviewWidth
+// wrote `--preview-width: 0px`--the title and description collapsed into a
+// one-letter-wide column at the right edge of the screen with no photo in
+// sight, and stayed that way for every card after. A failed load is now
+// fetched again with a fresh request (reassigning the same src would just
+// replay the cached failure), and if that fails too the sizing code leaves
+// the plaques at their natural width (see syncPreviewWidth).
+function imageSettled(img: HTMLImageElement) {
+  return new Promise<void>((resolve) => {
+    img.addEventListener('load', () => resolve(), { once: true })
+    img.addEventListener('error', () => resolve(), { once: true })
+  })
+}
+
+async function waitForPreviewImage(img: HTMLImageElement): Promise<boolean> {
+  const src = currentEntry.value?.src
+  if (!img.complete) await imageSettled(img)
+  if (img.naturalWidth) return true
+  // the visitor has already stepped on: that card's own sizing pass handles it
+  if (!src || currentEntry.value?.src !== src) return false
+  const settled = imageSettled(img)
+  img.src = `${src}${src.includes('?') ? '&' : '?'}retry=${Date.now()}`
+  await settled
+  return img.naturalWidth > 0
 }
 
 function fitPreviewImage() {
@@ -215,6 +255,16 @@ function fitPreviewImage() {
   text.style.width = ''
   inner.style.alignItems = ''
 
+  // No dimensions (the load failed and the retry in waitForPreviewImage
+  // did too): every formula below would divide by zero. Leave the cleared
+  // state--the plaques keep their natural width, the broken photo takes
+  // no space--rather than writing NaN sizes.
+  if (!img.naturalWidth || !img.naturalHeight) return
+  // Not laid out (a resize event fired for a window that has no size yet,
+  // e.g. the display coming back after sleep): nothing measured now would
+  // mean anything, keep the previous sizes.
+  if (!ov.clientWidth || !ov.clientHeight) return
+
   if (isMobile()) {
     const availableHeight = ov.clientHeight - header.offsetHeight - text.offsetHeight - tagsH - 40
     const availableWidth = ov.clientWidth - 32
@@ -238,7 +288,10 @@ function fitPreviewImage() {
     const availableWidth2 = ov.clientWidth - 16
     const heightByWidth2 = availableWidth2 * (img.naturalHeight / img.naturalWidth)
     const previewHeight = Math.min(availableHeight2, heightByWidth2)
-    ov.style.setProperty('--preview-image-height', `${Math.max(0, previewHeight)}px`)
+    // No room at all for the photo (the plaques alone fill the overlay):
+    // a 0px photo would also zero the plaque width, see syncPreviewWidth.
+    if (!(previewHeight > 0)) return
+    ov.style.setProperty('--preview-image-height', `${previewHeight}px`)
   }
 }
 
