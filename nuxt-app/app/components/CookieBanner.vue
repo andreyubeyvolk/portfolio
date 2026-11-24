@@ -44,7 +44,11 @@ function measure() {
   if (pane) {
     const r = pane.getBoundingClientRect()
     const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--grid-gap')) || 0
-    matchedRect.value = { left: r.left + r.width / 2 + gap / 2, width: r.width / 2 - gap / 2 }
+    // .content-pane runs to the screen edge (its scrollbar track sits in the
+    // page margin), so the right half's right edge is the screen edge: stop
+    // one page margin short of it, where the home page's .home-socials ends.
+    const margin = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-margin')) || 16
+    matchedRect.value = { left: r.left + r.width / 2 + gap / 2, width: r.width / 2 - gap / 2 - margin }
     return
   }
   matchedRect.value = null

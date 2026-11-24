@@ -106,12 +106,12 @@ gallery:
         src: /assets/brands/house-of-walk/house-of-walk-14.webp
         width: 1080
         height: 1440
-        alt: House of Walk tool — screen animation app
+        alt: House of Walk tool—screen animation app
       - type: image
         src: /assets/brands/house-of-walk/house-of-walk-15.webp
         width: 1080
         height: 1440
-        alt: House of Walk tool — X-ray photo filter
+        alt: House of Walk tool—X-ray photo filter
         note: "Covers for text essays about cities"
   - type: wide
     item:
