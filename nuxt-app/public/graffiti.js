@@ -1,7 +1,7 @@
 // ── Spray-can graffiti. Desktop: hold Ctrl (or Cmd on Mac)—cursor swaps
 // to a black spray-can icon. Hold it + drag with the left mouse button:
-// paints a spray-style stroke—add Shift for red (#EB1026) or Alt for
-// green (#11E3B0), held for the whole stroke; plain Ctrl+drag stays the
+// paints a spray-style stroke—add Shift for pink (#ED1070) or Alt for
+// silver (#C9C9C9), held for the whole stroke; plain Ctrl+drag stays the
 // default black/gray. Release Ctrl/Cmd: painting stops, but the tag
 // itself stays put—nothing fades or clears on its own. To wipe it,
 // press Backspace, Delete, Space, or Escape (while not typing in a text
@@ -340,6 +340,9 @@ window.initGraffiti = function initGraffiti() {
   // for a softness difference that's hard to see in a loose,
   // textured spray effect anyway.
   var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  // false until resize() has sized the fixed canvas once (a fresh canvas is
+  // 300x150 of nothing: no point copying that aside, see resize)
+  var fixedSized = false;
   // The min-width:981px check at the top of this script only ever
   // runs once, at load—if the page loaded wide enough for the
   // feature to initialize and the window is later narrowed below
@@ -360,12 +363,36 @@ window.initGraffiti = function initGraffiti() {
       return;
     }
     canvas.style.display = '';
-    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    // Reassigning width/height below wipes the fixed canvas (see the note
+    // further down). Its paint is anchored to the viewport and has no
+    // off-screen store the way the pane's does, so it is copied aside here
+    // and put back afterwards, 1:1 in device pixels--as long as the pixel
+    // density is unchanged (a zoom change re-rasters at a new density, and
+    // the old pixels would come back at the wrong scale: that case stays a
+    // wipe, as before). Until now every window resize, and every lazy image
+    // loading further down the gallery (the ResizeObserver below), erased
+    // whatever was sprayed over the sidebar.
+    var nextDpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    var keep = null;
+    if (fixedSized && nextDpr === dpr && canvas.width > 0 && canvas.height > 0) {
+      keep = document.createElement('canvas');
+      keep.width = canvas.width;
+      keep.height = canvas.height;
+      keep.getContext('2d').drawImage(canvas, 0, 0);
+    }
+    dpr = nextDpr;
     canvas.width = Math.round(window.innerWidth * dpr);
     canvas.height = Math.round(window.innerHeight * dpr);
     canvas.style.width = window.innerWidth + 'px';
     canvas.style.height = window.innerHeight + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (keep) {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(keep, 0, 0);
+      ctx.restore();
+    }
+    fixedSized = true;
 
     paneView.style.display = '';
     filmstripView.style.display = '';
@@ -754,11 +781,11 @@ window.initGraffiti = function initGraffiti() {
 
   // Color modifiers, captured once at stroke-start and held for the
   // whole stroke (same as "Ctrl held = graffiti mode" already is)—
-  // Ctrl+Shift+drag = red, Ctrl+Alt+drag = green, plain Ctrl+drag =
+  // Ctrl+Shift+drag = pink, Ctrl+Alt+drag = silver, plain Ctrl+drag =
   // today's black/gray. null means "use the tone value as a literal
   // gray" (unchanged default path); a color object means "blend the
   // tone value as a lightening amount on top of this hue instead."
-  var COLOR_PINK = { r: 0xFF, g: 0x16, b: 0xA2, key: 'pink' };
+  var COLOR_PINK = { r: 0xED, g: 0x10, b: 0x70, key: 'pink' };
   var COLOR_SILVER = { r: 0xC9, g: 0xC9, b: 0xC9, key: 'silver' };
   var strokeColor = null;
 

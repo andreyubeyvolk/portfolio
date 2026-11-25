@@ -123,7 +123,7 @@ gallery:
       src: /assets/inhouse/finance/finance-17.webp
       width: 2160
       height: 1440
-      alt: Grid of five social media mockups for the event — a "Get Ready" teaser, the speaker lineup, a "Learn How" slide on financial exclusion, and location and time callouts
+      alt: Grid of five social media mockups for the event—a "Get Ready" teaser, the speaker lineup, a "Learn How" slide on financial exclusion, and location and time callouts
   - type: wide
     item:
       type: image
@@ -149,7 +149,7 @@ gallery:
       src: /assets/inhouse/finance/finance-21.webp
       width: 2161
       height: 1440
-      alt: Scattered social card mockups reading "New Rules. New Cash," "Code Meets Cash," "Money Is Shifting Form," and "Fraud Is Evolving — Meet It Head-On at The Future of Finance," each with the Sumsub Multiverse logo
+      alt: Scattered social card mockups reading "New Rules. New Cash," "Code Meets Cash," "Money Is Shifting Form," and "Fraud Is Evolving—Meet It Head-On at The Future of Finance," each with the Sumsub Multiverse logo
   - type: pair
     items:
       - type: image

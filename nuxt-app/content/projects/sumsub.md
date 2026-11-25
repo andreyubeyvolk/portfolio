@@ -123,8 +123,8 @@ gallery:
   - type: wide
     item:
       type: embed
-      src: "/albums/sumsub/index.html?embed=1&v=16"
-      flatSrc: "/albums/sumsub/flat/index.html?v=16"
+      src: "/albums/sumsub/index.html?embed=1&v=17"
+      flatSrc: "/albums/sumsub/flat/index.html?v=17"
       width: 2160
       height: 1440
       poster: /assets/inhouse/sumsub/sumsub-album-poster.webp
