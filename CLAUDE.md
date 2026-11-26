@@ -34,6 +34,10 @@ public/             global CSS (styles.css desktop+tablet ≤980px, mobile.css �
                     project-page.css, archive-page.css, …), legacy nav JS (menu.js, logo-scrub.js,
                     mobile-logo-swipe.js — injected after hydration), graffiti.js
 public/assets/<section>/<slug>/   that project's media, every file prefixed with the slug
+public/albums/sumsub/   the photo-album iframe on the Sumsub page (AlbumEmbed.vue): flat/ is the
+                        version in use (pre-rendered spreads, tap to turn); index.html is the retired
+                        3D book, reachable only with ?mode=3d on the page URL (it flickered in Chrome).
+                        Standalone copy: D:\AI\Projects\moleskine-album. Bump ?v= in sumsub.md on change.
 server/routes/sitemap.xml.ts      sitemap generated from the project collection
 scripts/make-mix-thumbs.mjs       thumbs + manifest for the /mix photo mosaic (public/assets/mix/)
 ```

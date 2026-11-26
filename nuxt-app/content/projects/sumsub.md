@@ -117,14 +117,15 @@ gallery:
         player: bare
         note: "Side projects in ads"
   # The interactive photo album of the brand team, right before the Team block.
-  # `src` is the 3D book (desktop), `flatSrc` the pre-rendered pictures phones and
-  # weak devices get instead, `poster` the still shown while it loads and kept if it
-  # never does (see AlbumEmbed.vue). Bump ?v= whenever public/albums/sumsub changes.
+  # `flatSrc` is the version in use: pre-rendered pictures of the cover, every spread
+  # and the back cover, tap to turn (see AlbumEmbed.vue). `src` is the retired 3D book,
+  # shown only with ?mode=3d on the page URL. `poster` is the still shown while it
+  # loads and kept if it never does. Bump ?v= whenever public/albums/sumsub changes.
   - type: wide
     item:
       type: embed
-      src: "/albums/sumsub/index.html?embed=1&v=17"
-      flatSrc: "/albums/sumsub/flat/index.html?v=17"
+      src: "/albums/sumsub/index.html?embed=1&v=18"
+      flatSrc: "/albums/sumsub/flat/index.html?v=18"
       width: 2160
       height: 1440
       poster: /assets/inhouse/sumsub/sumsub-album-poster.webp

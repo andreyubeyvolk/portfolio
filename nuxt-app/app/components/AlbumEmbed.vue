@@ -1,15 +1,17 @@
 <script setup lang="ts">
 // The interactive photo album (public/albums/<slug>/) as a gallery slot: an
 // <iframe> over a still poster. Two versions of the album exist:
-//   - 3D  (`src`)      the real book: covers, thickness, page turns, stickers.
-//                      Desktop with a mouse, a decent GPU and a decent connection.
 //   - flat (`flatSrc`)  pre-rendered pictures of the closed album, of every
-//                      spread and of the back cover, no 3D, no filters. Phones,
-//                      tablets, narrow windows, reduced motion, data saver / 2G-3G,
-//                      little memory, and any device where the 3D version reports
-//                      that it runs below ~18 fps or gets stuck.
-// `?mode=3d` or `?mode=flat` on THIS page's URL forces one (for testing; no
-// automatic fallback then).
+//                      spread and of the back cover, no 3D, no filters. A tap on
+//                      the cover opens it, left/right halves turn the pages, a
+//                      tap on the back cover closes it. THE version in use, on
+//                      every device.
+//   - 3D  (`src`)      the real book: covers, thickness, page turns, stickers.
+//                      Retired from the site: it flickered in Chrome (the side
+//                      stacks while the mouse moved, the spread while the book
+//                      opened). Kept here only behind `?mode=3d` on THIS page's
+//                      URL; a standalone copy lives in D:\AI\Projects\moleskine-album.
+// `?mode=3d` or `?mode=flat` forces one (for testing; no automatic fallback then).
 //
 // The poster is what shows while the album loads and what stays if it never
 // does (offline, blocked script, very old browser); the iframe fades in over
@@ -68,14 +70,7 @@ function pickMode(): Mode {
     forced = true
     return forcedMode
   }
-  if (!props.flatSrc) return '3d'
-  // Data saver, 2G, or a measured downlink under 1 Mbit/s. effectiveType "3g" alone is not enough: Chrome also says 3g on a fast desktop connection with a high round trip (VPN).
-  const nav = navigator as Navigator & { connection?: { saveData?: boolean, effectiveType?: string, downlink?: number }, deviceMemory?: number }
-  const conn = nav.connection
-  const slowNetwork = !!conn && (!!conn.saveData || /^(slow-2g|2g)$/.test(conn.effectiveType || '') || (typeof conn.downlink === 'number' && conn.downlink > 0 && conn.downlink < 1))
-  const littleMemory = typeof nav.deviceMemory === 'number' && nav.deviceMemory <= 2
-  const lite = window.matchMedia('(pointer: coarse), (max-width: 820px), (prefers-reduced-motion: reduce)').matches
-  return lite || slowNetwork || littleMemory ? 'flat' : '3d'
+  return props.flatSrc ? 'flat' : '3d'
 }
 
 function decide() {
