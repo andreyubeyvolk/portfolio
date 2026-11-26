@@ -128,6 +128,8 @@ body::before { content: ''; position: fixed; inset: 0; z-index: 0; pointer-event
 #pb-right  { left: 680px; top: 12px; width: calc(var(--T) - 8px); height: 876px; transform-origin: 0 0;
   transform: translateZ(calc((var(--T) - 8px) / 2)) rotateY(90deg);
   background: repeating-linear-gradient(90deg, var(--pa) 0 1.2px, var(--pb) 1.2px 2.4px); box-shadow: inset 0 0 20px rgba(0,0,0,.25); }
+/* Seen from behind (the shut book turned over), the fore-edge face lies exactly on the back cover's outer edge and peeked past its rounded corners as two short light lines (the paper-edge stripes, seen edge-on); the back cover hides it anyway, so it goes away. */
+body.back-view #pb-right { opacity: 0; }
 #pb-top    { left: 3px; top: 0; width: 665px; height: calc(var(--T) - 8px); transform-origin: 0 0;
   transform: translateZ(calc((var(--T) - 8px) / -2)) rotateX(90deg);
   background: repeating-linear-gradient(0deg, var(--pa) 0 1.2px, var(--pb) 1.2px 2.4px); box-shadow: inset 0 0 16px rgba(0,0,0,.25); }
