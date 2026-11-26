@@ -38,6 +38,8 @@ public/albums/sumsub/   the photo-album iframe on the Sumsub page (AlbumEmbed.vu
                         version in use (pre-rendered spreads, tap to turn); index.html is the retired
                         3D book, reachable only with ?mode=3d on the page URL (it flickered in Chrome).
                         Standalone copy: D:\AI\Projects\moleskine-album. Bump ?v= in sumsub.md on change.
+scripts/bake-flat.mjs   re-renders flat/sNN.webp (2160×1440, webp q78) from the 3D page in headless
+                        Chrome against the dev server: `node scripts/bake-flat.mjs http://localhost:3002`
 server/routes/sitemap.xml.ts      sitemap generated from the project collection
 scripts/make-mix-thumbs.mjs       thumbs + manifest for the /mix photo mosaic (public/assets/mix/)
 ```
